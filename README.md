@@ -31,6 +31,25 @@ node /path/to/jev-intent-review/src/cli/main.ts --pr 123              # the issu
 node /path/to/jev-intent-review/src/cli/main.ts --base main --intent "Disabled users cannot sign in."
 ```
 
+Judgments go to Cloudflare Workers AI by default, or to any HTTPS endpoint that runs the tool's
+models from a Workers AI run request (`POST` with `model` and `input` in the body): set
+`JEV_API_URL` and `JEV_API_TOKEN` instead. The models are `typesafe/jev` for every judgment and
+`@cf/meta/llama-3.3-70b-instruct-fp8-fast` when requirements are written from prose, so an
+endpoint that serves only one of them serves only the paths that use it. An answer is read with
+or without Workers AI's `{"result": …}` envelope, so a proxy that returns what its own
+`env.AI.run()` gave it works too. Cloudflare AI Gateway's Workers AI route puts the model in the
+URL, which Jev refuses, so a gateway is not expected to work; that has not been tried.
+
+Each token goes only to the endpoint of its own pair — `JEV_API_TOKEN` with `JEV_API_URL`,
+`CLOUDFLARE_API_TOKEN` with `CLOUDFLARE_ACCOUNT_ID` — and a mismatched pair is refused (exit 10)
+rather than sent. Keep secrets out of the URL itself: an endpoint that echoes the request it was
+sent hands a key in the query string straight back, and this tool can only redact the part it
+knows. The URL must be `https:`, or `http:` for `localhost`, `127.0.0.1` or `[::1]`
+(with `NODE_USE_ENV_PROXY=1`, on the Node versions that honour it, even a loopback address can go
+out through a proxy in the clear). It comes from the environment only, never from
+`.jev-intent-review.yml`, redirects are never followed, and a report names the endpoint's origin
+— which is written to the run's log, public for a public repository.
+
 `--pr` and `--issue` read GitHub with `GITHUB_TOKEN`, `GH_TOKEN` or a logged-in `gh` (public
 repositories also work without one). `--intent-spec file.json` skips the requirement compiler
 and takes requirements as written. `--json` prints the report as JSON, `--trace` prints every
@@ -38,7 +57,11 @@ search, candidate and answer to stderr, `--help` lists the rest.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete (unknown results when
 `policy.unknown: fail`, or an unexpected error), 10 configuration error, 11 intent could not be
-resolved, 12 the judgment provider failed, 13 the repository could not be read.
+resolved, 12 the judgment provider failed — a refused token, an empty balance, a URL that does
+not run models (a 404, a 405, a redirect, or a second answer the tool could not use while it has
+read none), or a run that sent judgments and got no answer it could read — 13 the repository
+could not be read. A run that stops on its own request, byte or time budget still reports what
+it has, as before.
 
 What it costs, measured: the `missed-path` fixture takes 7-8 requests (18-19 KB) and 2-3
 seconds. A real Rust pull request (omamori #559, one requirement from its issue, 30 places
@@ -68,8 +91,9 @@ npm run typecheck
 npm test
 ```
 
-Two scripts ask the real model and are not part of CI; both need `CLOUDFLARE_ACCOUNT_ID` and
-`CLOUDFLARE_API_TOKEN`:
+Two scripts ask the real model and are not part of CI; both take either pair of credentials
+(`CLOUDFLARE_ACCOUNT_ID` with `CLOUDFLARE_API_TOKEN`, or `JEV_API_URL` with `JEV_API_TOKEN`) and
+print which endpoint they used:
 
 - `npm run probe:jev` sends hand-built evidence from the `missed-path` fixture and checks each
   answer.
