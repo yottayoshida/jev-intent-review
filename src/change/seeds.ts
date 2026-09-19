@@ -22,6 +22,7 @@ export interface CalledSymbol {
   name: string;
   onChangedLine: boolean; // written on an added or removed line (a guard helper) vs only around them
   regions: number; // how many changed regions call it
+  constructed: boolean; // made with `new X(`, `throw X(` or `raise X(`: an object or an error, not a call
 }
 
 export interface ChangeAnalysis {
@@ -47,14 +48,14 @@ const KEYWORDS = new Set(
 // ranks common ones down by how many files use them instead.
 const BUILTIN_CALLS = new Set(
   (
-    "console log info warn error debug trace print println printf sprintf format push pop shift unshift map filter reduce forEach some every find findIndex includes indexOf lastIndexOf join split slice splice concat sort reverse keys values entries then catch finally resolve reject all allSettled race toString valueOf toJSON trim trimStart trimEnd toLowerCase toUpperCase replace replaceAll startsWith endsWith padStart padEnd charAt charCodeAt parseInt parseFloat isNaN isFinite stringify parse freeze assign isArray setTimeout clearTimeout setInterval clearInterval require len str int float bool list dict tuple range enumerate zip isinstance hasattr getattr setattr append extend unwrap expect clone collect iter into to_string ok_or Some Ok Err Box Vec String Number Boolean Array Object Symbol BigInt Date Math JSON Promise Error TypeError RangeError Set Map WeakMap WeakSet RegExp describe it test beforeEach afterEach assertEqual equal deepEqual strictEqual"
+    "console log info warn error debug trace print println printf sprintf format push pop shift unshift map filter reduce forEach some every findIndex includes indexOf lastIndexOf join split slice splice concat sort reverse keys values entries then catch finally resolve reject all allSettled race toString valueOf toJSON trim trimStart trimEnd toLowerCase toUpperCase replace replaceAll startsWith endsWith padStart padEnd charAt charCodeAt parseInt parseFloat isNaN isFinite stringify parse freeze assign isArray setTimeout clearTimeout setInterval clearInterval require len str int float bool list dict tuple range enumerate zip isinstance hasattr getattr setattr append extend unwrap expect clone collect iter into to_string ok_or Some Ok Err Box Vec String Number Boolean Array Object Symbol BigInt Date Math JSON Promise Error TypeError RangeError Set Map WeakMap WeakSet RegExp describe it test beforeEach afterEach assertEqual equal deepEqual strictEqual"
   ).split(" "),
 );
 
 // Source files by extension. Prose and configuration are still regions of the change, but reading
 // "calls" out of a README only produces noise (measured: 150+ English words as identifiers).
 const CODE_EXTENSIONS = new Set(
-  "ts tsx mts cts js jsx mjs cjs py pyi go rs zig java kt kts scala swift rb php cs fs c h cc cpp cxx hpp hh m mm lua ex exs erl hrl clj cljs dart sh bash zsh ps1 sql vue svelte groovy pl pm r jl nim cr v sol".split(" "),
+  "ts tsx mts cts js jsx mjs cjs py pyi go rs zig java kt kts scala swift rb php cs fs c h cc cpp cxx hpp hh m mm lua ex exs erl hrl clj cljs dart sh bash zsh ps1 sql vue svelte astro groovy pl pm r jl nim cr v sol tf hcl erb ejs hbs handlebars twig jinja j2 liquid mustache".split(" "),
 );
 
 export function isCode(path: string): boolean {
@@ -74,7 +75,8 @@ function significant(name: string): boolean {
 
 /**
  * Names called in `text`, minus keywords and built-ins. A definition (`def run(`, `handle(req) {`)
- * has the same shape as a call, so the name a header line defines is not counted on that line.
+ * has the same shape as a call, so the name a header line defines is not counted on that line. A
+ * method call is never a keyword: `db.delete(id)` and `query.select(...)` are calls.
  */
 export function calledNames(text: string): Set<string> {
   const names = new Set<string>();
@@ -82,10 +84,19 @@ export function calledNames(text: string): Set<string> {
     const defines = looksLikeHeader(line) ? definedName(line) : undefined;
     for (const match of line.matchAll(CALL)) {
       const name = match[1] as string;
-      if (name !== defines && significant(name)) names.add(name);
+      const method = line[(match.index ?? 0) - 1] === ".";
+      const kept = method ? name.length >= 3 && !BUILTIN_CALLS.has(name) : significant(name);
+      if (name !== defines && kept) names.add(name);
     }
   }
   return names;
+}
+
+const CONSTRUCTED = /(?:\bnew|\bthrow|\braise)\s+([A-Z][\w$]*)\s*\(/g;
+
+/** Names made with `new X(`, `throw X(` or `raise X(` in `text`. */
+export function constructedNames(text: string): Set<string> {
+  return new Set([...text.matchAll(CONSTRUCTED)].map((m) => m[1] as string));
 }
 
 export function identifiers(text: string): Set<string> {
@@ -252,11 +263,13 @@ export async function analyzeChange(
     for (const id of identifiers(changedText)) changedIds.add(id);
     const body = (linesOf.get(region.path) ?? []).slice(region.block.startLine - 1, region.block.endLine).join("\n");
     const onChanged = calledNames(changedText);
+    const constructed = constructedNames(`${body}\n${changedText}`);
     for (const name of new Set([...calledNames(body), ...onChanged])) {
       if (name === region.block.name) continue;
-      const entry = calls.get(name) ?? { name, onChangedLine: false, regions: 0 };
+      const entry = calls.get(name) ?? { name, onChangedLine: false, regions: 0, constructed: false };
       entry.regions += 1;
       entry.onChangedLine ||= onChanged.has(name);
+      entry.constructed ||= constructed.has(name);
       calls.set(name, entry);
     }
   }

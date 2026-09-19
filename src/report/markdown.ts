@@ -3,6 +3,7 @@
 // requirement text, code, author names) is put inside a code span or code block, where GitHub
 // renders neither Markdown nor HTML. The result line is drawn from the verdict enum only.
 
+import { probabilityOf } from "../review/requirement.ts";
 import type { CandidateOutcome, CandidateResult, Location, ReviewReport, RequirementResult, Status } from "../types.ts";
 
 /** The longest run of backticks. A loop: spreading every run into Math.max overflows on long text. */
@@ -79,8 +80,9 @@ function candidateLine(result: CandidateResult): string[] {
   const parts = [`${MARK[result.outcome]} ${result.outcome.replace("_", " ")}`, where(c)];
   if (c.symbol) parts.push(codeSpan(c.symbol));
   if (c.changed) parts.push("changed in this pull request");
+  // The same number the policy used: the probability of the chosen answer, not Jev's `confidence`.
   const answer = result.satisfaction ?? result.relevance;
-  if (answer) parts.push(`confidence ${answer.confidence.toFixed(2)}`);
+  if (answer) parts.push(`p ${probabilityOf(answer, answer.choice).toFixed(2)}`);
   const lines = [`- ${parts.join(" · ")}`];
   for (const location of result.evidence) lines.push(`  - evidence: ${where(location)}`);
   for (const text of result.notes) lines.push(`  - ${note(text)}`);
@@ -95,7 +97,7 @@ function requirementSection(report: ReviewReport, result: RequirementResult): st
   const shown = result.candidates.filter((c) => c.outcome !== "unrelated");
   for (const candidate of shown) lines.push(...candidateLine(candidate));
   const hidden = result.candidates.length - shown.length;
-  if (hidden > 0) lines.push(`- ${plural(hidden, "other candidate")} judged unrelated`);
+  if (hidden > 0) lines.push(`- ${plural(hidden, "other candidate")} judged unrelated or only supporting`);
   for (const text of result.notes) lines.push(`- ${note(text)}`);
   lines.push("");
   return lines;

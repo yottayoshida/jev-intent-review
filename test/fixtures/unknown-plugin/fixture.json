@@ -1,0 +1,31 @@
+{
+  "description": "The pull request adds an audit entry to record deletion through the API. The purge job already audits. The plugin loader hands deleteRecord to plugins that live outside the repository, so whether their deletions are audited cannot be seen.",
+  "intent": "Audit every deletion operation.",
+  "spec": {
+    "version": 1,
+    "title": "Audit every deletion operation",
+    "summary": "",
+    "requirements": [
+      {
+        "id": "R1",
+        "text": "Every deletion of a record writes an entry to the audit log.",
+        "kind": "behavior",
+        "sourceRefs": [{ "sourceId": "fixture", "quote": "Audit every deletion operation." }],
+        "searchHints": ["delete", "audit"]
+      }
+    ]
+  },
+  "expected": {
+    "head": {
+      "R1": "unknown",
+      "paths": {
+        "src/records/api.ts": "not_violation",
+        "src/jobs/purge.ts": "not_violation"
+      },
+      "discovery": {
+        "must_find": ["src/plugins/loader.ts", "src/jobs/purge.ts"],
+        "must_not_find": []
+      }
+    }
+  }
+}

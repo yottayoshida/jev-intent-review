@@ -82,10 +82,16 @@ export interface Location {
   endLine: number;
 }
 
+/** One key per place: discovery and the run tell candidates apart by it. */
+export function locationKey(l: Location): string {
+  return `${l.path}:${l.startLine}-${l.endLine}`;
+}
+
 export interface Candidate extends Location {
   symbol?: string;
   changed: boolean; // the pull request changed lines inside this region
   reasons: string[]; // why discovery picked it, e.g. "calls createSession"
+  windowed?: boolean; // no enclosing function was found; a fixed window of lines stands in for it
 }
 
 export interface ChoiceAnswer {
@@ -131,7 +137,8 @@ export interface SearchRecord {
   layer: "A" | "B" | "C";
   query: string;
   hits: number;
-  rejected?: string; // why the query was not run
+  rejected?: string; // why the query was not run, or its results not followed
+  skipped?: number; // hits in files this requirement's kind does not look at (prose for a behavior)
 }
 
 /**

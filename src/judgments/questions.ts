@@ -16,7 +16,7 @@ export const CANDIDATE_QUESTIONS = {
     criteria: {
       directly_enforces: "The code itself performs the check or behavior that `requirement` asks for",
       may_violate:
-        "The code performs, or leads straight to, an action that `requirement` restricts or governs, so whether the requirement holds depends on this code",
+        "The code performs, or leads straight to, an action that `requirement` restricts or governs, or hands the ability to perform it to other code (a callback, plugin or dynamically loaded module), so whether the requirement holds depends on this code",
       supporting:
         "The code is a definition, helper, constant or test that the requirement's behavior uses, but not itself a path on which the requirement can hold or fail",
       unrelated: "The code has nothing to do with `requirement`",
@@ -31,7 +31,8 @@ export const CANDIDATE_QUESTIONS = {
       satisfies: "The evidence shows the required check or behavior happens on this path",
       violates:
         "The path performs the governed action, and neither `evidence.code` nor `evidence.related` shows the required check or behavior on this path",
-      insufficient_evidence: "Whether the path meets `requirement` depends on code that `evidence` does not show",
+      insufficient_evidence:
+        "Whether the path meets `requirement` depends on code that `evidence` does not show, including code this path hands the governed action to (a callback, plugin or dynamically loaded module)",
       not_applicable: "`requirement` does not apply to this code",
     },
   },
