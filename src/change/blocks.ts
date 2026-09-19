@@ -71,6 +71,11 @@ export function looksLikeHeader(line: string): boolean {
   return HEADERS.some((p) => p.test(text));
 }
 
+/** Whether `line` is the header that defines `name`: its definition, not a use of it. */
+export function defines(line: string, name: string): boolean {
+  return looksLikeHeader(line) && definedName(line) === name;
+}
+
 export function definedName(line: string): string | undefined {
   const text = clip(line);
   if (CONTROL.test(text)) return undefined;
