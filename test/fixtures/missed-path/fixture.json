@@ -1,0 +1,36 @@
+{
+  "description": "The pull request adds the disabled-user check to password login only. OAuth and the WebSocket handshake create sessions without it and are not touched by the pull request. API-key login is already guarded by middleware on its route.",
+  "intent": "Prevent disabled users from authenticating.",
+  "spec": {
+    "version": 1,
+    "title": "Prevent disabled users from authenticating",
+    "summary": "",
+    "requirements": [
+      {
+        "id": "R1",
+        "text": "Disabled users cannot authenticate.",
+        "kind": "security",
+        "sourceRefs": [{ "sourceId": "fixture", "quote": "Prevent disabled users from authenticating." }],
+        "searchHints": ["disabled", "authenticate"]
+      }
+    ]
+  },
+  "expected": {
+    "head": {
+      "R1": "violation",
+      "paths": {
+        "src/auth/password.ts": "not_violation",
+        "src/auth/oauth.ts": "violation",
+        "src/auth/websocket.ts": "violation",
+        "src/auth/api-key.ts": "not_violation"
+      },
+      "discovery": {
+        "must_find": ["src/auth/oauth.ts", "src/auth/websocket.ts"],
+        "must_not_find": ["src/billing/invoice.ts"]
+      }
+    },
+    "fixed": {
+      "R1": "verified"
+    }
+  }
+}
