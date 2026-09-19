@@ -19,6 +19,20 @@ correct.
 
 The design is in [docs/SPEC.md](docs/SPEC.md).
 
+## Development
+
+Node.js 22.18 or later runs the TypeScript sources directly; there is no build step for tests.
+
+```sh
+npm ci
+npm run typecheck
+npm test
+```
+
+`npm run probe:jev` sends hand-built evidence from the `missed-path` fixture to the real model
+and checks each answer. It needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (a token with
+Workers AI permission) and is not part of CI.
+
 ## License
 
 MIT
