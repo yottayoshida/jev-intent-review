@@ -230,15 +230,22 @@ test("an endpoint that redirects or has nothing there fails the run at once, and
     const repo = fixtureRepo("missed-path");
     const endpoint = await localEndpoint(() => wrong);
     try {
+      // Two requirements over the same places: without the stop, each would be judged on its own
+      // (14 requests). Eight judgments are in flight at a time, so one wave can leave together,
+      // and what was already in flight cannot be recalled — but no second wave follows.
+      const spec = JSON.parse(readFileSync(join(FIXTURES, "missed-path", "fixture.json"), "utf8")).spec as IntentSpec;
+      const first = spec.requirements[0]!;
+      spec.requirements = [first, { ...first, id: "R2" }];
+      const path = join(repo.dir, "two.json");
+      writeFileSync(path, JSON.stringify(spec));
+
       const run = io(repo.dir, { JEV_API_URL: endpoint.url, JEV_API_TOKEN: "local-token" });
-      const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir)], run.value);
+      const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", path], run.value);
       assert.equal(code, EXIT.provider, String(wrong.status));
-      // Eight judgments are in flight at a time, so a few may leave together; nothing follows the answer.
-      assert.ok(endpoint.seen.length <= 8, `${endpoint.seen.length} requests`);
-      const before = endpoint.seen.length;
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      assert.equal(endpoint.seen.length, before, "nothing was sent after the endpoint refused");
       assert.equal(run.out(), "");
+      // Counted after everything in flight has landed, so the number does not depend on timing.
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      assert.ok(endpoint.seen.length <= 8, `${endpoint.seen.length} requests reached the endpoint`);
     } finally {
       endpoint.close();
       repo.remove();
