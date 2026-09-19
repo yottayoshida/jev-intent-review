@@ -85,17 +85,22 @@ export class CloudflareClient {
     await this.#sleep(ms);
   }
 
-  /** POSTs `body` to `/accounts/{id}/{path}` and returns the parsed JSON. Retries 429 and 5xx. */
-  async post(path: string, body: unknown): Promise<unknown> {
+  /**
+   * POSTs `body` to `/accounts/{id}/{path}` and returns the parsed JSON. Retries 429 and 5xx.
+   * `options` overrides the per-call timeout and retries: a long generation needs more time per
+   * attempt and fewer attempts than a typed judgment.
+   */
+  async post(path: string, body: unknown, options: { timeoutMs?: number; maxRetries?: number } = {}): Promise<unknown> {
     const url = `https://api.cloudflare.com/client/v4/accounts/${this.#credentials.accountId}/${path}`;
     const payload = JSON.stringify(body);
     const size = Buffer.byteLength(payload, "utf8");
+    const maxRetries = options.maxRetries ?? this.#maxRetries;
     for (let attempt = 0; ; attempt++) {
       const remaining = this.#deadline - this.#now();
       if (remaining <= 0) throw new ProviderError("budget", "time limit reached");
       if (this.sent.requests + 1 > this.#maxRequests) throw new ProviderError("budget", `request limit reached (${this.#maxRequests})`);
       if (this.sent.bytes + size > this.#maxBytes) throw new ProviderError("budget", `byte limit reached (${this.#maxBytes})`);
-      const timeout = Math.min(this.#timeoutMs, remaining);
+      const timeout = Math.min(options.timeoutMs ?? this.#timeoutMs, remaining);
       let response: Response;
       let text: string;
       try {
@@ -107,7 +112,7 @@ export class CloudflareClient {
           body: payload,
           signal: AbortSignal.timeout(timeout),
         });
-        if (RETRYABLE.has(response.status) && attempt < this.#maxRetries) {
+        if (RETRYABLE.has(response.status) && attempt < maxRetries) {
           await response.body?.cancel();
           await this.#wait(retryAfter(response) ?? backoff(attempt));
           continue;
@@ -116,7 +121,7 @@ export class CloudflareClient {
       } catch (error) {
         if (error instanceof ProviderError) throw error;
         const timedOut = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
-        if (attempt < this.#maxRetries) {
+        if (attempt < maxRetries) {
           await this.#wait(backoff(attempt));
           continue;
         }
