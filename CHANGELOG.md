@@ -7,6 +7,13 @@ All notable changes to this project are recorded here. The format follows
 
 ### Added
 
+- Changes no requirement asked for are reported. Every changed region that carries behaviour is
+  judged against the requirements, and the ones Jev calls unasked-for, at
+  `judgment.violation_probability` or above, are listed with the lines that changed. Comments,
+  blank lines, imports and files with no code are left out before anything is asked; regions that
+  were judged and are not shown are counted in a note, so "nothing to report" reads differently
+  from "nothing was looked at". Which requirement would have asked for a change is not guessed,
+  and no sentence about a change is generated.
 - The endpoint for the judgments can be any HTTPS endpoint that runs the tool's models from a
   Workers AI run request: set `JEV_API_URL` and `JEV_API_TOKEN`. Without them it is Cloudflare
   Workers AI from `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`, as before. Each token is

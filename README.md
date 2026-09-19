@@ -15,6 +15,14 @@ and asks [Jev](https://developers.cloudflare.com/ai/models/typesafe/jev/) — a 
 fixed, typed questions — one small question per place. The result is a table of requirements
 against code locations, each marked `VERIFIED`, `VIOLATION`, `UNKNOWN` or `NOT_APPLICABLE`.
 
+It reads the other direction as well: every change the pull request made that carries behaviour is
+held against the requirements, and the ones no requirement asked for are listed with their own
+lines. What the report shows is the excerpt itself — never a sentence describing it. Left out
+before anything is asked: a blank line, a line that opens a comment (`//`, `/*`, `# `, `-- `,
+`;;`, `"""`, `<!--`) or continues one (`* `), an import, a file the tool does not read as code
+(prose, JSON, YAML), and a path it never reads at all. A line inside a block comment that carries
+no marker of its own is not recognised as a comment, and costs one question.
+
 It only speaks about the places it found. It never claims that finding nothing means the code is
 correct.
 
@@ -63,10 +71,11 @@ read none), or a run that sent judgments and got no answer it could read — 13 
 could not be read. A run that stops on its own request, byte or time budget still reports what
 it has, as before.
 
-What it costs, measured: the `missed-path` fixture takes 7-8 requests (18-19 KB) and 2-3
-seconds. A real Rust pull request (omamori #559, one requirement from its issue, 30 places
-judged) took 31 requests (172 KB) and 14 seconds in all; turning an issue into requirements
-alone has taken up to 26 seconds.
+What it costs, measured: the `missed-path` fixture takes 8-11 requests (19-24 KB) and 2-4
+seconds, of which one per changed region goes to the reverse direction. A real Rust pull request
+(omamori #559, eight requirements from its issue, 30 places judged per requirement, 11 changed
+regions) took 248 requests (1.5 MB) and 20 seconds in all — 8 of those requests, and 3%, for the
+changes; turning an issue into requirements alone has taken up to 26 seconds.
 
 ## Differences from the spec
 
