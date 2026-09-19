@@ -2,7 +2,7 @@
   "name": "jev-intent-review",
   "version": "0.0.0",
   "description": "Verify a pull request against the intent that caused it, across the whole repository, with small typed judgments from Jev",
-  "license": "MIT",
+  "license": "MIT OR Apache-2.0",
   "private": true,
   "type": "module",
   "engines": {
