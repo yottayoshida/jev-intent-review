@@ -21,7 +21,7 @@ export interface Config {
     reference_search: "auto" | "off";
   };
   evidence: { max_primary_chars: number; max_related_chars: number };
-  judgment: { violation_confidence: number; relevance_confidence: number };
+  judgment: { violation_probability: number; satisfaction_probability: number; relevance_probability: number };
   limits: { max_requests: number; max_sent_bytes: number; max_seconds: number };
   policy: {
     fail_on: "violation"[];
@@ -43,7 +43,16 @@ export function defaultConfig(): Config {
     },
     discovery: { max_candidates_per_requirement: 30, lexical_search: true, reference_search: "auto" },
     evidence: { max_primary_chars: 8000, max_related_chars: 4000 },
-    judgment: { violation_confidence: 0.75, relevance_confidence: 0.6 },
+    // Measured with the real model. On the fixtures, violating paths answered `violates` at
+    // 0.79-0.92 and were called paths at 0.98-0.99; other paths gave `violates` at most 0.04, and
+    // a middleware that does protect its route answered `satisfies` at 0.61-0.71. On a real pull
+    // request (omamori #559) places that were not violations drew `violates` at up to 0.87, and
+    // were called paths at 0.50-0.62: a false violation fails CI, so a violation needs 0.7 on both
+    // answers. Satisfaction at 0.5 (the answer outweighs all others together) because VERIFIED
+    // needs far more than one answer: every relevant path, complete evidence, complete discovery.
+    // Relevance decides what is excluded, and excluding a real path is how a false VERIFIED would
+    // happen, so 0.6.
+    judgment: { violation_probability: 0.7, satisfaction_probability: 0.5, relevance_probability: 0.6 },
     limits: { max_requests: 400, max_sent_bytes: 4_000_000, max_seconds: 600 },
     policy: { fail_on: ["violation"], unknown: "warn", missing_credentials: "skip", no_intent: "skip" },
   };
@@ -73,8 +82,9 @@ const RULES: Record<string, Record<string, Rule>> = {
     max_related_chars: { kind: "number", min: 0, max: 60_000 },
   },
   judgment: {
-    violation_confidence: { kind: "number", min: 0, max: 1 },
-    relevance_confidence: { kind: "number", min: 0, max: 1 },
+    violation_probability: { kind: "number", min: 0, max: 1 },
+    satisfaction_probability: { kind: "number", min: 0, max: 1 },
+    relevance_probability: { kind: "number", min: 0, max: 1 },
   },
   limits: {
     max_requests: { kind: "number", min: 1, max: 100_000 },

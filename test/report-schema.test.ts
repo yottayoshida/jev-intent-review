@@ -100,8 +100,9 @@ test("the Markdown report leads with a result line drawn from the verdict alone"
 test("the Markdown report shows each path, whether the change touched it, and the evidence lines", () => {
   const text = renderMarkdown(report());
   assert.match(text, /### R1 · VIOLATION/);
-  assert.match(text, /- ✓ satisfies · `src\/auth\/password\.ts:6-13` · `loginWithPassword` · changed in this pull request · confidence 0\.99/);
-  assert.match(text, /- ✗ violates · `src\/auth\/oauth\.ts:16-23` · confidence 0\.47\n  - evidence: `src\/auth\/oauth\.ts:22`/);
+  assert.match(text, /- ✓ satisfies · `src\/auth\/password\.ts:6-13` · `loginWithPassword` · changed in this pull request · p 0\.99/);
+  // The probability the policy used (0.61), not Jev's `confidence` field (0.47).
+  assert.match(text, /- ✗ violates · `src\/auth\/oauth\.ts:16-23` · p 0\.61\n  - evidence: `src\/auth\/oauth\.ts:22`/);
   assert.match(text, /1 other candidate judged unrelated/);
   assert.match(text, /Repository candidates examined: 3 \(in changed files 1, in unchanged files 2\)/);
   assert.ok(!text.includes("<img"), "notes cannot carry HTML");

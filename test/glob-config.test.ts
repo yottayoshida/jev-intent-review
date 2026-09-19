@@ -40,18 +40,18 @@ function configError(text: string): ToolError {
 
 test("parseConfig: empty file gives the defaults; set keys override them", () => {
   assert.deepEqual(parseConfig("", "t"), defaultConfig());
-  const config = parseConfig("version: 1\njudgment:\n  violation_confidence: 0.9\nrepository:\n  include: [src/**]\n", "t");
-  assert.equal(config.judgment.violation_confidence, 0.9);
-  assert.equal(config.judgment.relevance_confidence, defaultConfig().judgment.relevance_confidence);
+  const config = parseConfig("version: 1\njudgment:\n  violation_probability: 0.9\nrepository:\n  include: [src/**]\n", "t");
+  assert.equal(config.judgment.violation_probability, 0.9);
+  assert.equal(config.judgment.relevance_probability, defaultConfig().judgment.relevance_probability);
   assert.deepEqual(config.repository.include, ["src/**"]);
 });
 
 test("parseConfig: unknown keys, wrong types, out-of-range values and bad YAML are configuration errors", () => {
   for (const text of [
     "judgment:\n  violation_confidense: 0.9\n", // misspelt key
-    "judgement:\n  violation_confidence: 0.9\n", // misspelt section
-    "judgment:\n  violation_confidence: high\n",
-    "judgment:\n  violation_confidence: 1.5\n",
+    "judgement:\n  violation_probability: 0.9\n", // misspelt section
+    "judgment:\n  violation_probability: high\n",
+    "judgment:\n  violation_probability: 1.5\n",
     "policy:\n  fail_on: [everything]\n",
     "policy:\n  unknown: ignore\n",
     "repository:\n  ignore: dist/**\n",
@@ -74,14 +74,14 @@ test("parseConfig: unknown keys, wrong types, out-of-range values and bad YAML a
 test("loadConfig reads the file as it was before the change, and says when the change edits it", async () => {
   const repo = tempRepo();
   try {
-    repo.write({ [CONFIG_PATH]: "judgment:\n  violation_confidence: 0.9\n", "a.ts": "x\n" });
+    repo.write({ [CONFIG_PATH]: "judgment:\n  violation_probability: 0.9\n", "a.ts": "x\n" });
     const before = repo.commit("config");
-    repo.write({ [CONFIG_PATH]: "judgment:\n  violation_confidence: 0.1\nrepository:\n  ignore: ['**']\n" });
+    repo.write({ [CONFIG_PATH]: "judgment:\n  violation_probability: 0.1\nrepository:\n  ignore: ['**']\n" });
     const after = repo.commit("loosen the config");
     const git = await Git.open(repo.dir);
 
     const loaded = await loadConfig(git, before, after);
-    assert.equal(loaded.config.judgment.violation_confidence, 0.9);
+    assert.equal(loaded.config.judgment.violation_probability, 0.9);
     assert.equal(loaded.changedInPullRequest, true);
     assert.match(loaded.source, /^\.jev-intent-review\.yml@[0-9a-f]{12}$/);
 
