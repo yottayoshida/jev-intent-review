@@ -223,6 +223,37 @@ test("runReview: a run that stops on its own budget keeps its report; one that r
   );
 });
 
+test("runReview: a change in a path this tool never reads is not analysed, judged or reported", async () => {
+  const repo = tempRepo();
+  try {
+    repo.write({ "src/secrets.ts": "export const dbPassword = 'hunter2';\n", "src/login.ts": "export function login(user) {\n  return createSession(user.id);\n}\n" });
+    const base = repo.commit("base");
+    // The pull request takes the key out of the repository: its old lines still hold it.
+    repo.write({ "src/secrets.ts": "export const dbPassword = process.env.DB_PASSWORD;\n", "src/login.ts": "export function login(user) {\n  if (user.disabledAt) throw new Error('disabled');\n  return createSession(user.id);\n}\n" });
+    const head = repo.commit("head");
+    const git = await Git.open(repo.dir);
+    const provider = guardProvider("createSession", "disabledAt");
+    const report = await runReview({
+      git,
+      revisions: { before: base, after: head, how: "test" },
+      loaded: await loadConfig(git, base, head),
+      intent: { version: 1, title: "", summary: "", requirements: [{ id: "R1", text: "Disabled users cannot sign in.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [] }], nonGoals: [], ambiguities: [] },
+      sources: [],
+      prBodyOnly: false,
+      provider,
+      sent: () => ({ requests: provider.calls.length, bytes: 0 }),
+      repository: "o/r",
+      trace: () => {},
+    });
+    assert.ok(!JSON.stringify(provider.calls).includes("hunter2"), "nothing from that file was sent");
+    assert.ok(!JSON.stringify(report).includes("hunter2"), "and nothing from it is reported");
+    assert.ok(!report.sent.locations.some((l) => l.path === "src/secrets.ts"));
+    assert.ok(report.sent.locations.some((l) => l.path === "src/login.ts"), "the rest of the change is still read");
+  } finally {
+    repo.remove();
+  }
+});
+
 test("runReview: a bad request is about one packet and makes that place unknown, not the run fail", async () => {
   const provider = new ScriptedProvider((state, questions) => {
     if ((state.candidate?.path ?? "") === "src/auth/oauth.ts") throw new ProviderError("bad_request", "Workers AI 413: too large", 413);

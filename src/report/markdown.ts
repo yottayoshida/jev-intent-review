@@ -139,7 +139,7 @@ export function renderMarkdown(report: ReviewReport): string {
   if (report.unexpectedChanges.length > 0) {
     out.push("## Changes no requirement asked for", "");
     for (const change of report.unexpectedChanges) {
-      out.push(`### ${change.id} · ${change.judgment.replace("_", " ")} · ${where(change.location)} · confidence ${change.confidence.toFixed(2)}`, "");
+      out.push(`### ${change.id} · ${change.judgment.replace("_", " ")} · ${where(change.location)} · p ${change.confidence.toFixed(2)}`, "");
       out.push(codeBlock(change.excerpt), "");
       for (const text of change.notes) out.push(`- ${note(text)}`);
     }

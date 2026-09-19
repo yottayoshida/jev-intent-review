@@ -1,0 +1,25 @@
+{
+  "description": "The pull request does what the issue asked — the token exchange retries once — and also shortens the session lifetime from 24 hours to 1, which no requirement asks for. The third change is a comment in oauth.ts, which is left out before anything is asked.",
+  "intent": "The OAuth token exchange should retry once when the provider drops a request.",
+  "spec": {
+    "version": 1,
+    "title": "Retry a dropped token exchange once",
+    "summary": "",
+    "requirements": [
+      {
+        "id": "R1",
+        "text": "A failed OAuth token exchange is retried once before the login fails.",
+        "kind": "behavior",
+        "sourceRefs": [{ "sourceId": "fixture", "quote": "The OAuth token exchange should retry once when the provider drops a request." }],
+        "searchHints": ["exchangeCode", "token"]
+      }
+    ]
+  },
+  "expected": {
+    "head": {
+      "unrequested": ["src/session/store.ts"],
+      "not_unrequested": ["src/auth/exchange.ts"],
+      "never_asked": ["src/auth/oauth.ts"]
+    }
+  }
+}
