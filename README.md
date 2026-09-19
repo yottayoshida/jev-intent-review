@@ -78,4 +78,4 @@ Two scripts ask the real model and are not part of CI; both need `CLOUDFLARE_ACC
 
 ## License
 
-MIT
+Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your option.
