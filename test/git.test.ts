@@ -260,13 +260,17 @@ test("a word with more than 64 MB of matches does not fail the run", async () =>
 test("git runs without the secrets in this process's environment", async () => {
   const repo = tempRepo();
   process.env.JIR_TEST_API_TOKEN = "must-not-reach-git";
+  // Not a secret by its name, but a key can be kept in its query string.
+  process.env.JEV_API_URL = "https://judge.example.com/ai/run?key=must-not-reach-git-either";
   try {
     const git = await Git.open(repo.dir);
     const env = await git.text(["-c", "alias.envdump=!env", "envdump"]);
     assert.ok(env.includes("GIT_CONFIG_NOSYSTEM=1"), "the alias did run");
     assert.ok(!env.includes("must-not-reach-git"));
+    assert.ok(!env.includes("JEV_API_URL"), env.split("\n").filter((l) => l.startsWith("JEV")).join(" "));
   } finally {
     delete process.env.JIR_TEST_API_TOKEN;
+    delete process.env.JEV_API_URL;
     repo.remove();
   }
 });

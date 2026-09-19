@@ -29,13 +29,15 @@ export interface RunInput {
   repository: string;
   trace: (line: string) => void;
   notes?: string[]; // from resolving the intent, for the report
+  endpoint?: string; // where the judgments were sent: scheme, host and port
 }
 
 const BUDGET = "the run's request, byte or time budget ran out";
 
 // These end the run: every further request would fail the same way. A bad request (400, 413) is
-// about one packet, so it only makes that place unknown.
-const FATAL = new Set(["auth", "payment"]);
+// about one packet, so it only makes that place unknown — unless a second one arrives with
+// nothing yet answered, which the client reads as the endpoint and reports as one of these.
+const FATAL = new Set(["auth", "payment", "endpoint"]);
 
 function providerFailure(error: unknown): string {
   if (error instanceof ProviderError) {
@@ -88,6 +90,11 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
   const incompleteReasons: string[] = [];
   const sentLocations = new Map<string, Location>();
   const requirements: RequirementResult[] = [];
+  // Reached the endpoint and could not read one answer from it: the endpoint is wrong, or it is
+  // not answering at all, and a report of nothing but "unknown" would pass for a review that ran.
+  // A run that stopped on its own budget did reach nothing, and keeps its report.
+  let reached = 0;
+  let answered = 0;
   let candidateCount = 0;
   let changedCandidates = 0;
 
@@ -108,6 +115,8 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
         if (evidence.redactions > 0) base.notes.push(`${evidence.redactions} secret-shaped value(s) were redacted before sending`);
         try {
           const answers = await provider.judge(evidence.packet, CANDIDATE_QUESTIONS);
+          reached += 1;
+          answered += 1;
           const relevance = answers.relevance;
           const satisfaction = answers.satisfaction;
           if (!relevance || !satisfaction) throw new ProviderError("bad_response", "an answer is missing");
@@ -119,7 +128,11 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
           return { ...base, outcome: decision.outcome, relevance, satisfaction, evidence: pointTo.map(({ path, startLine, endLine }) => ({ path, startLine, endLine })), notes: [...base.notes, ...decision.notes] };
         } catch (error) {
           const note = providerFailure(error);
-          if (error instanceof ProviderError && error.kind === "budget" && !incomplete.includes(BUDGET)) incomplete.push(BUDGET);
+          if (error instanceof ProviderError && error.kind === "budget") {
+            if (!incomplete.includes(BUDGET)) incomplete.push(BUDGET);
+          } else {
+            reached += 1; // the endpoint, or the network to it, answered this one its own way
+          }
           return { ...base, outcome: "unknown", notes: [...base.notes, note] };
         }
       }),
@@ -157,6 +170,8 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
       try {
         const state = { requirement: { id: requirement.id, text: redact(requirement.text).text }, found: results.filter((r) => r.outcome !== "unrelated").map((r) => ({ path: r.candidate.path, lines: `${r.candidate.startLine}-${r.candidate.endLine}`, ...(r.candidate.symbol ? { symbol: r.candidate.symbol } : {}) })) };
         const completeness = (await provider.judge(state, COMPLETENESS_QUESTIONS)).completeness;
+        reached += 1;
+        answered += 1;
         const p = completeness ? probabilityOf(completeness, completeness.choice) : 0;
         if (!completeness || completeness.choice !== "likely_complete" || p < 0.5) {
           result = aggregate(requirement.id, results, [...requirementBlockers, `Jev did not judge the list of places likely complete (${completeness ? `${completeness.choice} ${p.toFixed(2)}` : "no answer"})`], true);
@@ -167,6 +182,10 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     }
     trace(`${requirement.id} -> ${result.status} (coverage ${result.coverage})`);
     requirements.push(result);
+  }
+
+  if (reached > 0 && answered === 0) {
+    throw new ToolError(`no judgment came back from ${input.endpoint ?? "the judgment provider"}: ${reached} request(s) were sent and none was answered`, EXIT.provider);
   }
 
   const { verdict, exitCode } = verdictOf(requirements, config.policy);
@@ -181,7 +200,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     requirements,
     unexpectedChanges: [],
     discovery: { candidateCount, changedCandidates, unchangedCandidates: candidateCount - changedCandidates, incompleteReasons, searches },
-    sent: { requests: sent.requests, bytes: sent.bytes, locations: [...sentLocations.values()] },
+    sent: { requests: sent.requests, bytes: sent.bytes, locations: [...sentLocations.values()], ...(input.endpoint ? { endpoint: input.endpoint } : {}) },
     metadata: {
       repository: input.repository,
       base: revisions.before,

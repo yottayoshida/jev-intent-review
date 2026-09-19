@@ -1,6 +1,7 @@
 // End to end against the real model: every fixture, through the command line, several times.
 //
 //   CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node bench/fixtures.ts [runs]
+//   JEV_API_URL=... JEV_API_TOKEN=... node bench/fixtures.ts [runs]
 //
 // Each case names the requirement status it expects and, per path, whether it expects a
 // violation there. A run passes a case only if every expectation holds.
@@ -52,7 +53,10 @@ for (const c of CASES) {
     for (const path of c.violations) if (!outcomes.get(path)?.includes("violates")) wrong.push(`${path} not a violation`);
     for (const path of c.clean) if (outcomes.get(path)?.includes("violates")) wrong.push(`${path} a violation`);
     if (wrong.length > 0) failures += 1;
-    console.log(`${wrong.length === 0 ? "PASS" : "FAIL"} ${c.fixture}/${c.after} run ${run}: ${r1?.status} (exit ${code}, ${report.discovery.candidateCount} candidates, ${report.sent.requests} requests, ${report.sent.bytes} bytes, ${Date.now() - started} ms)${wrong.length ? ` — ${wrong.join("; ")}` : ""}`);
+    const from = process.env.JEV_API_URL ? "JEV_API_*" : "CLOUDFLARE_*";
+    console.log(
+      `${wrong.length === 0 ? "PASS" : "FAIL"} ${c.fixture}/${c.after} run ${run}: ${r1?.status} (exit ${code}, ${report.discovery.candidateCount} candidates, ${report.sent.requests} requests, ${report.sent.bytes} bytes, ${Date.now() - started} ms, ${report.sent.endpoint ?? "no endpoint"} from ${from})${wrong.length ? ` — ${wrong.join("; ")}` : ""}`,
+    );
     for (const cr of r1?.candidates ?? []) {
       const s = cr.satisfaction;
       const r = cr.relevance;

@@ -1,8 +1,11 @@
-// Calls to Cloudflare Workers AI over REST. The API token is held here and nowhere else: it is not
-// part of any object that gets printed, serialised or traced.
+// The Workers AI run request over REST: `POST {model, input}` to one endpoint. The endpoint is
+// Cloudflare's by default and `JEV_API_URL` otherwise; the shape of the request never changes. The
+// API token is held here and nowhere else: it is not part of any object that gets printed,
+// serialised or traced, and nothing the endpoint returns reaches a log without being flattened.
 
 export type ProviderErrorKind =
-  | "auth" // 401 / 403: the token is wrong or lacks Workers AI permission
+  | "auth" // 401 / 403: the token was refused
+  | "endpoint" // this URL does not run models: nothing is sent after it, bar what is already in flight
   | "payment" // 402: the account's balance is empty
   | "rate_limited"
   | "server"
@@ -23,20 +26,93 @@ export class ProviderError extends Error {
   }
 }
 
-export interface Credentials {
-  accountId: string;
-  apiToken: string;
+export interface Endpoint {
+  url: string; // the exact address every request is POSTed to
+  token: string;
+  source: "JEV_API_URL" | "CLOUDFLARE_ACCOUNT_ID"; // which pair of variables it came from
 }
 
-/** Credentials from CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN, or null when either is unset. */
-export function credentialsFromEnv(env: NodeJS.ProcessEnv = process.env): Credentials | null {
-  const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? "";
-  const apiToken = env.CLOUDFLARE_API_TOKEN?.trim() ?? "";
-  if (accountId === "" || apiToken === "") return null;
+/** A misconfigured environment: the caller turns this into exit 10, as for any bad setting. */
+export class EndpointError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "EndpointError";
+  }
+}
+
+// A host that is this machine. Compared against the parsed hostname, whole: `localhost.example.com`
+// is someone else's name, and `127.0.0.1.nip.io` resolves wherever its owner points it.
+const LOOPBACK = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+/** Empty and blank count as unset: an input a workflow did not fill arrives as "". */
+function value(raw: string | undefined): string | undefined {
+  const trimmed = raw?.trim();
+  return trimmed === undefined || trimmed === "" ? undefined : trimmed;
+}
+
+function checkedToken(token: string, name: string): string {
+  if (/\s/.test(token)) throw new EndpointError(`${name} must not contain whitespace`);
+  return token;
+}
+
+/**
+ * The address to POST to, checked. Only the origin ever appears in an error: a path or a query can
+ * carry the very thing this refuses to hand out.
+ */
+function checkedUrl(raw: string): string {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new EndpointError("JEV_API_URL is not a URL");
+  }
+  if (url.username !== "" || url.password !== "") throw new EndpointError("JEV_API_URL must not carry a user name or password");
+  if (url.protocol === "https:") return url.href;
+  if (url.protocol === "http:" && LOOPBACK.has(url.hostname)) return url.href;
+  throw new EndpointError(`JEV_API_URL must be https (http only for localhost): ${url.protocol}//${url.host}`);
+}
+
+/**
+ * Where judgments go, or null when no credentials were given (the caller's policy decides what
+ * that means). Each token goes only to the endpoint of its own pair, so forgetting `JEV_API_URL`
+ * cannot send another service's token to Cloudflare, and `CLOUDFLARE_API_TOKEN` is never sent
+ * anywhere else.
+ */
+export function endpointFromEnv(env: NodeJS.ProcessEnv = process.env): Endpoint | null {
+  const url = value(env.JEV_API_URL);
+  const token = value(env.JEV_API_TOKEN);
+  const accountId = value(env.CLOUDFLARE_ACCOUNT_ID);
+  const cloudflareToken = value(env.CLOUDFLARE_API_TOKEN);
+
+  if (url !== undefined) {
+    const checked = checkedUrl(url); // checked even without a token, so a bad URL is said now, not later
+    if (token === undefined) {
+      if (cloudflareToken !== undefined) throw new EndpointError("JEV_API_URL needs JEV_API_TOKEN: CLOUDFLARE_API_TOKEN is only ever sent to Cloudflare");
+      return null; // a fork's pull request sees the URL but not the secret
+    }
+    return { url: checked, token: checkedToken(token, "JEV_API_TOKEN"), source: "JEV_API_URL" };
+  }
+  if (token !== undefined) throw new EndpointError("JEV_API_TOKEN needs JEV_API_URL: for Cloudflare, use CLOUDFLARE_API_TOKEN");
+  if (accountId === undefined || cloudflareToken === undefined) return null;
   // The account id goes into the URL path; anything but the documented 32 hex digits is refused.
-  if (!/^[0-9a-f]{32}$/i.test(accountId)) throw new ProviderError("auth", "CLOUDFLARE_ACCOUNT_ID must be 32 hexadecimal characters");
-  if (/\s/.test(apiToken)) throw new ProviderError("auth", "CLOUDFLARE_API_TOKEN must not contain whitespace");
-  return { accountId, apiToken };
+  if (!/^[0-9a-f]{32}$/i.test(accountId)) throw new EndpointError("CLOUDFLARE_ACCOUNT_ID must be 32 hexadecimal characters");
+  return {
+    url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run`,
+    token: checkedToken(cloudflareToken, "CLOUDFLARE_API_TOKEN"),
+    source: "CLOUDFLARE_ACCOUNT_ID",
+  };
+}
+
+/**
+ * Text from the endpoint, fit to print: no control characters to forge a line with (a workflow
+ * command, a terminal escape), and never the token itself, which a mirror of the request hands
+ * straight back.
+ */
+export function fromEndpoint(text: string, token: string, limit = 200): string {
+  // Also the characters that reorder what is shown (U+202A-E, U+2066-9): the text is quoted in a
+  // report a person reads.
+  const flat = text.replace(/[\u0000-\u001f\u007f\u2028\u2029\u202a-\u202e\u2066-\u2069]+/g, " ").trim();
+  return (token === "" ? flat : flat.split(token).join("[REDACTED TOKEN]")).slice(0, limit);
 }
 
 export interface ClientOptions {
@@ -57,7 +133,15 @@ const RETRYABLE = new Set([429, 500, 502, 503, 504]);
 export class CloudflareClient {
   /** What actually went over the wire, retries included. */
   readonly sent = { requests: 0, bytes: 0 };
-  readonly #credentials: Credentials;
+  /** Where it went: scheme, host and port, for the report and the trace. No path, no query. */
+  readonly origin: string;
+  readonly #endpoint: Endpoint;
+  // Once the endpoint has refused everything of its kind (a wrong URL, a refused token, an empty
+  // balance), the rest of the run must not keep sending: eight judgments are in flight at a time,
+  // and a queue behind them.
+  #stopped: ProviderError | undefined;
+  #answered = 0; // answers that could be read, not merely HTTP 200s
+  #unusable = 0; // answers that could not, while none has been read
   readonly #fetch: typeof fetch;
   readonly #timeoutMs: number;
   readonly #maxRetries: number;
@@ -67,8 +151,9 @@ export class CloudflareClient {
   readonly #maxBytes: number;
   readonly #now: () => number;
 
-  constructor(credentials: Credentials, options: ClientOptions = {}) {
-    this.#credentials = credentials;
+  constructor(endpoint: Endpoint, options: ClientOptions = {}) {
+    this.#endpoint = endpoint;
+    this.origin = new URL(endpoint.url).origin;
     this.#fetch = options.fetch ?? fetch;
     this.#timeoutMs = options.timeoutMs ?? 30_000;
     this.#maxRetries = options.maxRetries ?? 3;
@@ -79,6 +164,22 @@ export class CloudflareClient {
     this.#now = options.now ?? Date.now;
   }
 
+  /**
+   * What the endpoint said, fit to print. The query string goes too: an endpoint that echoes the
+   * request it was sent (a plain 404 page does) would otherwise hand back a key kept in the URL.
+   */
+  #say(text: string, limit?: number): string {
+    const query = new URL(this.#endpoint.url).search;
+    const cleaned = query === "" ? text : text.split(query).join("?[REDACTED QUERY]");
+    return fromEndpoint(cleaned, this.#endpoint.token, limit);
+  }
+
+  /** The errors that make every later request pointless, thrown from then on without sending. */
+  #latch(error: ProviderError): ProviderError {
+    if (error.kind === "endpoint" || error.kind === "auth" || error.kind === "payment") this.#stopped ??= error;
+    return error;
+  }
+
   /** Waits before a retry, unless the wait would run past the deadline. */
   async #wait(ms: number): Promise<void> {
     if (ms >= this.#deadline - this.#now()) throw new ProviderError("budget", "time limit reached before the next retry");
@@ -86,12 +187,13 @@ export class CloudflareClient {
   }
 
   /**
-   * POSTs `body` to `/accounts/{id}/{path}` and returns the parsed JSON. Retries 429 and 5xx.
-   * `options` overrides the per-call timeout and retries: a long generation needs more time per
-   * attempt and fewer attempts than a typed judgment.
+   * POSTs `body` to the endpoint and returns the parsed JSON. Retries 429 and 5xx. `options`
+   * overrides the per-call timeout and retries: a long generation needs more time per attempt and
+   * fewer attempts than a typed judgment.
    */
-  async post(path: string, body: unknown, options: { timeoutMs?: number; maxRetries?: number } = {}): Promise<unknown> {
-    const url = `https://api.cloudflare.com/client/v4/accounts/${this.#credentials.accountId}/${path}`;
+  async post(body: unknown, options: { timeoutMs?: number; maxRetries?: number } = {}): Promise<unknown> {
+    if (this.#stopped) throw this.#stopped;
+    const url = this.#endpoint.url;
     const payload = JSON.stringify(body);
     const size = Buffer.byteLength(payload, "utf8");
     const maxRetries = options.maxRetries ?? this.#maxRetries;
@@ -108,10 +210,16 @@ export class CloudflareClient {
         this.sent.bytes += size;
         response = await this.#fetch(url, {
           method: "POST",
-          headers: { Authorization: `Bearer ${this.#credentials.apiToken}`, "Content-Type": "application/json" },
+          headers: { Authorization: `Bearer ${this.#endpoint.token}`, "Content-Type": "application/json" },
           body: payload,
+          // Never follow a redirect: the token would go with it, and a run endpoint does not move.
+          redirect: "manual",
           signal: AbortSignal.timeout(timeout),
         });
+        if (response.status >= 300 && response.status < 400) {
+          await response.body?.cancel();
+          throw this.#latch(new ProviderError("endpoint", `${this.origin} redirected the request (${response.status}); it is not a Workers AI run endpoint`, response.status));
+        }
         if (RETRYABLE.has(response.status) && attempt < maxRetries) {
           await response.body?.cancel();
           await this.#wait(retryAfter(response) ?? backoff(attempt));
@@ -125,20 +233,36 @@ export class CloudflareClient {
           await this.#wait(backoff(attempt));
           continue;
         }
-        throw new ProviderError(timedOut ? "timeout" : "network", timedOut ? `no answer within ${timeout} ms` : `request failed: ${error instanceof Error ? error.message : String(error)}`);
+        // The exception's own text is not printed: an invalid header value puts the whole token in it.
+        throw new ProviderError(timedOut ? "timeout" : "network", timedOut ? `no answer from ${this.origin} within ${timeout} ms` : `the request to ${this.origin} could not be sent`);
       }
 
-      if (!response.ok) throw new ProviderError(kindOf(response.status), `Workers AI ${response.status}: ${text.slice(0, 200)}`, response.status);
+      const say = (t: string, limit?: number) => this.#say(t, limit);
+      // One unusable answer is about one packet (too large, say). A second one, on a different
+      // packet, with none read yet, is about the endpoint: the URL runs something else, or nothing.
+      const unusable = (kind: ProviderErrorKind, message: string, status?: number): ProviderError => {
+        const twice = this.#answered === 0 && ++this.#unusable >= 2;
+        const because = twice ? "; nothing it was sent has been answered, so this is not a Workers AI run endpoint" : "";
+        return this.#latch(new ProviderError(twice ? "endpoint" : kind, `${message}${because}`, status));
+      };
+
+      if (!response.ok) {
+        const kind = kindOf(response.status);
+        // A rate limit or a server error is the endpoint saying "not now", not "not here".
+        if (kind === "rate_limited" || kind === "server") throw this.#latch(new ProviderError(kind, `${this.origin} answered ${response.status}: ${say(text)}`, response.status));
+        throw unusable(kind, `${this.origin} answered ${response.status}: ${say(text)}`, response.status);
+      }
       let json: unknown;
       try {
         json = JSON.parse(text);
       } catch {
-        throw new ProviderError("bad_response", `Workers AI returned something other than JSON: ${text.slice(0, 120)}`, response.status);
+        throw unusable("bad_response", `${this.origin} returned something other than JSON: ${say(text, 120)}`, response.status);
       }
       if (json && typeof json === "object" && (json as { success?: unknown }).success === false) {
         const errors = (json as { errors?: { message?: string }[] }).errors;
-        throw new ProviderError("bad_response", `Workers AI reported failure: ${errors?.[0]?.message ?? "no message"}`, response.status);
+        throw unusable("bad_response", `${this.origin} reported failure: ${say(errors?.[0]?.message ?? "no message")}`, response.status);
       }
+      this.#answered += 1;
       return json;
     }
   }
@@ -147,6 +271,7 @@ export class CloudflareClient {
 function kindOf(status: number): ProviderErrorKind {
   if (status === 401 || status === 403) return "auth";
   if (status === 402) return "payment";
+  if (status === 404 || status === 405) return "endpoint"; // nothing runs models here
   if (status === 429) return "rate_limited";
   if (status >= 500) return "server";
   return "bad_request";

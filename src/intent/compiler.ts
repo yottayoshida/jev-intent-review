@@ -178,13 +178,22 @@ const PR_DESCRIPTION_CHARS_BESIDE_AN_ISSUE = 3_000;
 
 /** The model's JSON, whichever of the gateway's shapes carries it. */
 export function readModelJson(payload: unknown): unknown {
-  const result = (payload as { result?: Record<string, unknown> } | null)?.result;
-  const choice = (result?.choices as { finish_reason?: unknown; message?: { content?: unknown } }[] | undefined)?.[0];
+  // Cloudflare's REST wraps the model's answer in `result`; a proxy that returns what its own
+  // `env.AI.run()` gave it does not. Both are read, so either kind of endpoint works.
+  const top = (payload ?? {}) as Record<string, unknown>;
+  const result = (typeof top.result === "object" && top.result !== null ? top.result : top) as Record<string, unknown>;
+  const choice = (result.choices as { finish_reason?: unknown; message?: { content?: unknown } }[] | undefined)?.[0];
   if (choice?.finish_reason === "length") throw new Error("the model ran out of room before finishing its answer");
-  if (result && typeof result.response === "object" && result.response !== null) return result.response;
-  const content = choice?.message?.content ?? result?.response;
+  if (typeof result.response === "object" && result.response !== null) return result.response;
+  const content = choice?.message?.content ?? result.response;
   if (typeof content !== "string") throw new Error("no answer text in the response");
-  return JSON.parse(content);
+  try {
+    return JSON.parse(content);
+  } catch {
+    // Not `JSON.parse`'s own message: it quotes the text it choked on, and that text is whatever
+    // the endpoint sent, newlines and all, on its way to stderr.
+    throw new Error("the answer was not the JSON that was asked for");
+  }
 }
 
 type Obj = Record<string, unknown>;
@@ -256,7 +265,9 @@ export class WorkersAiCompiler implements IntentCompiler {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         // A generation takes far longer than a typed judgment; one retry, a long timeout.
-        const payload = await this.#client.post(`ai/run/${COMPILER_MODEL}`, body, { timeoutMs: 120_000, maxRetries: 1 });
+        // The same request shape as a judgment: the model in the body, not in the path. Measured
+        // on Workers AI, both forms answer alike, and only this one reaches Jev.
+        const payload = await this.#client.post({ model: COMPILER_MODEL, input: body }, { timeoutMs: 120_000, maxRetries: 1 });
         const spec = toSpec(readModelJson(payload), sources);
         if (spec.requirements.length > 0) return spec;
         lastError = "the model found no requirement it could quote from the sources";

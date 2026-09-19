@@ -30,7 +30,17 @@ export function codeBlock(text: string): string {
 
 /** Notes are this tool's own sentences; `<`, `>` and `&` are still escaped so no HTML can form. */
 function note(text: string): string {
-  return text.replace(/[\r\n]+/g, " ").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Brackets too: a note can carry text an endpoint chose, and `[click](http://…)` in a pull
+  // request's summary is a link the reader did not ask for.
+  return text
+    .replace(/[\r\n]+/g, " ")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/[[\]]/g, (b) => `\\${b}`)
+    // A bare address is a link on GitHub without any brackets at all. As a code span it reads the
+    // same wherever the report is shown, and links nowhere.
+    .replace(/[a-z][a-z0-9+.-]*:\/\/[^\s`]+/gi, (address) => `\`${address}\``);
 }
 
 export function where(location: Location): string {
@@ -103,6 +113,8 @@ function requirementSection(report: ReviewReport, result: RequirementResult): st
   return lines;
 }
 
+const CLOUDFLARE_ORIGIN = "https://api.cloudflare.com";
+
 export function renderMarkdown(report: ReviewReport): string {
   const out: string[] = ["# jev-intent-review", "", resultLine(report), ""];
 
@@ -111,6 +123,11 @@ export function renderMarkdown(report: ReviewReport): string {
   if (report.sources.length > 0) {
     const sources = report.sources.map((s) => `${codeSpan(s.id)}${s.author ? ` by ${codeSpan(s.author)}` : ""}`);
     out.push(`Intent from ${sources.join(", ")}`);
+  }
+  // Whoever answers the judgments decides this report, so an endpoint other than the default is
+  // said where a reader of the summary sees it, not only in the section at the end.
+  if (report.sent.endpoint !== undefined && report.sent.endpoint !== CLOUDFLARE_ORIGIN) {
+    out.push(`Judged by ${codeSpan(report.sent.endpoint)}, not ${codeSpan(CLOUDFLARE_ORIGIN)}`);
   }
   out.push("");
 
@@ -142,6 +159,7 @@ export function renderMarkdown(report: ReviewReport): string {
 
   out.push("## Sent to the judgment model", "");
   out.push(`- ${plural(report.sent.requests, "request")}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
+  if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}`);
   if (report.sent.locations.length > 0) {
     out.push("", `<details><summary>${plural(report.sent.locations.length, "location")} sent</summary>`, "");
     for (const location of report.sent.locations) out.push(`- ${where(location)}`);

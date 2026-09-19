@@ -203,6 +203,26 @@ async function wrapperReview(p: number) {
   }
 }
 
+test("runReview: a run that stops on its own budget keeps its report; one that reached the endpoint and read nothing does not", async () => {
+  // Every judgment refused by this run's own limits: nothing reached the endpoint, so the report
+  // stands as it did before, with the budget written in it.
+  const overBudget = new ScriptedProvider(() => {
+    throw new ProviderError("budget", "request limit reached (0)");
+  });
+  const report = await review("missed-path", "head", overBudget, { endpoint: "https://judge.example.com" });
+  assert.equal(report.requirements[0]?.status, "unknown");
+  assert.ok(report.discovery.incompleteReasons.some((r) => /budget ran out/.test(r)));
+
+  // The endpoint itself answering nothing usable is a different thing, and ends the run.
+  const unusable = new ScriptedProvider(() => {
+    throw new ProviderError("bad_response", "Jev's response has no answers");
+  });
+  await assert.rejects(
+    review("missed-path", "head", unusable, { endpoint: "https://judge.example.com" }),
+    (e: unknown) => e instanceof ToolError && e.exitCode === EXIT.provider && /no judgment came back from https:\/\/judge\.example\.com/.test(e.message),
+  );
+});
+
 test("runReview: a bad request is about one packet and makes that place unknown, not the run fail", async () => {
   const provider = new ScriptedProvider((state, questions) => {
     if ((state.candidate?.path ?? "") === "src/auth/oauth.ts") throw new ProviderError("bad_request", "Workers AI 413: too large", 413);
