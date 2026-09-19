@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 // Command line entry. Exit codes are spec §26 (see EXIT in types.ts).
 
-import { realpathSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { analyzeChange, type ChangeAnalysis } from "../change/seeds.ts";
-import { loadConfig } from "../config/config.ts";
-import { pathFilter } from "../config/glob.ts";
-import { parseIntentSpec } from "../intent/schema.ts";
-import { JEV_MODEL } from "../judgments/jev.ts";
+import { loadConfig, type Config } from "../config/config.ts";
+import { compileChecklist, WorkersAiCompiler, type IntentCompiler } from "../intent/compiler.ts";
+import { GitHub, githubToken, parseRepository } from "../intent/github.ts";
+import { resolveIntent } from "../intent/resolver.ts";
+import { CloudflareClient, credentialsFromEnv, ProviderError, type Credentials } from "../judgments/cloudflare.ts";
+import { JevProvider, JEV_MODEL } from "../judgments/jev.ts";
+import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
-import { resolveRevisions } from "../repository/revisions.ts";
-import { EXIT, ToolError, type IntentSpec, type ReviewReport } from "../types.ts";
+import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
+import { runReview } from "../review/run.ts";
+import { EXIT, ToolError, type IntentSource, type ReviewReport } from "../types.ts";
 import { VERSION } from "../version.ts";
 
 const HELP = `Usage: jev-intent-review [options]
@@ -22,15 +24,30 @@ const HELP = `Usage: jev-intent-review [options]
 Checks the repository after a change against the intent behind it, including code the change
 did not touch.
 
-Options:
+Intent (one or more):
+  --pr <number>         a pull request: the issues it closes, then its description
+                        (in a GitHub pull_request workflow, the event's pull request by default)
+  --issue <number>      an issue
+  --intent <text>       the intent as text
+  --intent-file <file>  the intent as a text file
+  --intent-spec <file>  requirements as an IntentSpec JSON file (no compiling)
+  --repo <owner/name>   the GitHub repository (default: GITHUB_REPOSITORY, then the origin remote)
+
+Change:
   --base <rev>          the branch or commit the change starts from
-                        (in a GitHub pull_request workflow: the merge commit's first parent)
-  --head <rev>          the commit after the change (default: HEAD)
-  --intent-spec <file>  the requirements, as an IntentSpec JSON file
+                        (with --pr: the pull request's base branch; in a pull_request workflow:
+                        the merge commit's first parent)
+  --head <rev>          the commit after the change (default: HEAD; with --pr outside a
+                        pull_request workflow, the pull request's head commit)
+
+Output:
   --json                print the report as JSON instead of Markdown
-  --trace               print what was analysed to stderr
+  --trace               print searches, candidates and answers to stderr
   -h, --help            show this help
   --version             show the version
+
+Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI) for judgments;
+GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr and --issue.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
 10 configuration error, 11 intent could not be resolved, 12 judgment provider failed,
@@ -44,16 +61,28 @@ export interface Io {
   env: NodeJS.ProcessEnv;
 }
 
+/** What talks to the outside world; tests pass scripted ones. */
+export interface Deps {
+  judges?: (credentials: Credentials, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number } };
+  github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
+}
+
 function parse(argv: string[]) {
+  let values;
   try {
-    return parseArgs({
+    values = parseArgs({
       args: argv,
       strict: true,
       allowPositionals: false,
       options: {
+        pr: { type: "string" },
+        issue: { type: "string" },
+        intent: { type: "string" },
+        "intent-file": { type: "string" },
+        "intent-spec": { type: "string" },
+        repo: { type: "string" },
         base: { type: "string" },
         head: { type: "string" },
-        "intent-spec": { type: "string" },
         json: { type: "boolean", default: false },
         trace: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
@@ -63,23 +92,58 @@ function parse(argv: string[]) {
   } catch (error) {
     throw new ToolError(`${error instanceof Error ? error.message : String(error)} (see --help)`, EXIT.config);
   }
+  const number = (name: "pr" | "issue") => {
+    const raw = values[name];
+    if (raw === undefined) return undefined;
+    if (!/^[1-9]\d{0,9}$/.test(raw)) throw new ToolError(`--${name} must be a number`, EXIT.config);
+    return Number(raw);
+  };
+  return { ...values, prNumber: number("pr"), issueNumber: number("issue") };
 }
 
-function traceChange(trace: (line: string) => void, change: ChangeAnalysis): void {
-  trace(`changed files: ${change.changedPaths.length}`);
-  for (const s of change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
-  for (const r of change.regions) {
-    trace(`region ${r.path}:${r.block.startLine}-${r.block.endLine}${r.block.name ? ` ${r.block.name}` : ""}${r.block.windowed ? " (window)" : ""}, changed lines ${r.changedLines.join(",")}`);
+function defaultJudges(credentials: Credentials, config: Config, deadline: number) {
+  const client = new CloudflareClient(credentials, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
+  return {
+    provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
+    compiler: new WorkersAiCompiler(client),
+    sent: () => ({ ...client.sent }),
+  };
+}
+
+async function defaultGithub(env: NodeJS.ProcessEnv): Promise<GitHub> {
+  const token = await githubToken(env);
+  return new GitHub({ ...(token ? { token } : {}), ...(env.GITHUB_API_URL ? { apiUrl: env.GITHUB_API_URL } : {}), ...(env.GITHUB_GRAPHQL_URL ? { graphqlUrl: env.GITHUB_GRAPHQL_URL } : {}) });
+}
+
+/** The pull request number of the pull_request event this workflow runs for, if any. */
+function eventPullRequest(env: NodeJS.ProcessEnv): number | undefined {
+  if (env.GITHUB_EVENT_NAME !== "pull_request" || !env.GITHUB_EVENT_PATH) return undefined;
+  try {
+    const number = (JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8")) as { pull_request?: { number?: unknown } }).pull_request?.number;
+    return typeof number === "number" ? number : undefined;
+  } catch {
+    return undefined;
   }
-  const around = change.calledSymbols.filter((s) => !s.onChangedLine).map((s) => s.name);
-  const on = change.calledSymbols.filter((s) => s.onChangedLine).map((s) => s.name);
-  trace(`calls around the changed lines: ${around.join(", ") || "(none)"}`);
-  trace(`calls on the changed lines: ${on.join(", ") || "(none)"}`);
-  trace(`symbols defined by changed blocks: ${change.definedSymbols.join(", ") || "(none)"}`);
-  trace(`identifiers on changed lines: ${change.changedIdentifiers.join(", ") || "(none)"}`);
 }
 
-export async function main(argv: string[], io: Io): Promise<number> {
+function skippedReport(reason: string, revisions: Revisions, repository: string, configSource: string, sources: IntentSource[]): ReviewReport {
+  return {
+    version: 1,
+    tool: { name: "jev-intent-review", version: VERSION },
+    verdict: "skipped",
+    exitCode: EXIT.ok,
+    skipReason: reason,
+    intent: { version: 1, title: "", summary: "", requirements: [], nonGoals: [], ambiguities: [] },
+    sources: sources.map(({ text: _text, ...source }) => source),
+    requirements: [],
+    unexpectedChanges: [],
+    discovery: { candidateCount: 0, changedCandidates: 0, unchangedCandidates: 0, incompleteReasons: [], searches: [] },
+    sent: { requests: 0, bytes: 0, locations: [] },
+    metadata: { repository, base: revisions.before, head: revisions.after, model: JEV_MODEL, questionsHash: QUESTIONS_HASH, configSource, notes: [] },
+  };
+}
+
+export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<number> {
   try {
     const args = parse(argv);
     if (args.help) {
@@ -90,63 +154,96 @@ export async function main(argv: string[], io: Io): Promise<number> {
       io.stdout(`${VERSION}\n`);
       return EXIT.ok;
     }
-    const trace = args.trace ? (line: string) => io.stderr(`[trace] ${line}\n`) : () => {};
-
-    let intent: IntentSpec;
-    const specPath = args["intent-spec"];
-    if (specPath === undefined) throw new ToolError("no intent given: pass --intent-spec <file>", EXIT.intent);
-    try {
-      intent = parseIntentSpec(await readFile(specPath, "utf8"), specPath);
-    } catch (error) {
-      if (error instanceof ToolError) throw error;
-      throw new ToolError(`cannot read ${specPath}: ${error instanceof Error ? error.message : String(error)}`, EXIT.intent);
+    // Trace lines carry text from the repository and the pull request. Control characters are
+    // flattened so no value can start a line of its own (in GitHub Actions, a line starting with
+    // `::` is a workflow command).
+    const trace = args.trace ? (line: string) => io.stderr(`[trace] ${line.replace(/[\u0000-\u001f\u007f\u2028\u2029]+/g, " ")}\n`) : () => {};
+    const explicitIntent = args.prNumber !== undefined || args.issueNumber !== undefined || args.intent !== undefined || args["intent-file"] !== undefined;
+    if (args["intent-spec"] !== undefined && explicitIntent) {
+      throw new ToolError("--intent-spec takes the requirements as written; it cannot be combined with --pr, --issue, --intent or --intent-file", EXIT.config);
     }
-    if (intent.requirements.length === 0) throw new ToolError(`${specPath} has no requirements`, EXIT.intent);
+    const output = (report: ReviewReport) => {
+      io.stdout(args.json ? renderJson(report) : renderMarkdown(report));
+      return report.exitCode;
+    };
 
     const git = await Git.open(io.cwd);
-    const revisions = await resolveRevisions(git, { ...(args.base !== undefined ? { base: args.base } : {}), ...(args.head !== undefined ? { head: args.head } : {}), env: io.env });
+    const origin = await git.text(["remote", "get-url", "origin"], [0, 2, 128]).catch(() => "");
+    const repo = parseRepository(args.repo ?? io.env.GITHUB_REPOSITORY ?? origin);
+    if (args.repo !== undefined && !repo) throw new ToolError("--repo must look like owner/name", EXIT.config);
+    const repository = repo ? `${repo.owner}/${repo.name}` : git.dir;
+    // The event's pull request stands in for --pr, unless the requirements were given as written.
+    const prNumber = args.prNumber ?? (args["intent-spec"] === undefined ? eventPullRequest(io.env) : undefined);
+    let github: Promise<GitHub> | undefined;
+    const getGithub = () => (github ??= (deps.github ?? defaultGithub)(io.env));
+
+    // Outside a pull_request workflow, --pr names the change as well as the intent: its base
+    // branch and its head commit, not whatever is checked out.
+    let base = args.base;
+    let head = args.head;
+    // Only a pull_request event checks out the pull request (as a merge commit); an issue_comment
+    // or workflow_dispatch run has the default branch checked out, so --pr must name the head there too.
+    if (prNumber !== undefined && repo && io.env.GITHUB_EVENT_NAME !== "pull_request" && (base === undefined || head === undefined)) {
+      const pr = await (await getGithub()).pullRequest(repo, prNumber);
+      if (base === undefined) base = (await git.resolve(`origin/${pr.baseRefName}`).catch(() => undefined)) ?? pr.baseRefName;
+      if (head === undefined) {
+        if (!pr.headSha) throw new ToolError(`GitHub gave no head commit for pull request #${prNumber}; pass --head`, EXIT.intent);
+        await git.resolve(pr.headSha).catch(() => {
+          throw new ToolError(`the head of pull request #${prNumber} (${pr.headSha.slice(0, 12)}) is not in this clone; run \`git fetch origin pull/${prNumber}/head\` or pass --head`, EXIT.repository);
+        });
+        head = pr.headSha;
+      }
+    }
+    const revisions = await resolveRevisions(git, { ...(base !== undefined ? { base } : {}), ...(head !== undefined ? { head } : {}), env: io.env });
     trace(`before ${revisions.before}, after ${revisions.after} (${revisions.how})`);
     const loaded = await loadConfig(git, revisions.before, revisions.after);
-    trace(`config: ${loaded.source}${loaded.changedInPullRequest ? " (the change edits the config file; the version before it applies)" : ""}`);
+    const config = loaded.config;
+    trace(`config: ${loaded.source}`);
 
-    const change = await analyzeChange(git, revisions.before, revisions.after, pathFilter(loaded.config.repository.include, loaded.config.repository.ignore));
-    traceChange(trace, change);
-
-    const notes: string[] = [];
-    if (loaded.changedInPullRequest) notes.push("The change edits .jev-intent-review.yml; the version before the change was used.");
-    const report: ReviewReport = {
-      version: 1,
-      tool: { name: "jev-intent-review", version: VERSION },
-      verdict: "incomplete",
-      exitCode: EXIT.incomplete,
-      intent,
-      sources: [{ id: `file:${specPath}`, type: "spec", authority: 100 }],
-      requirements: intent.requirements.map((r) => ({
-        requirementId: r.id,
-        status: "unknown",
-        coverage: "none",
-        candidates: [],
-        notes: ["Requirement verification is not implemented in this build yet."],
-      })),
-      unexpectedChanges: [],
-      discovery: { candidateCount: 0, changedCandidates: 0, unchangedCandidates: 0, incompleteReasons: ["discovery is not implemented in this build yet"], searches: [] },
-      sent: { requests: 0, bytes: 0, locations: [] },
-      metadata: {
-        repository: io.env.GITHUB_REPOSITORY ?? git.dir,
-        base: revisions.before,
-        head: revisions.after,
-        model: JEV_MODEL,
-        questionsHash: QUESTIONS_HASH,
-        configSource: loaded.source,
-        notes,
+    const resolved = await resolveIntent(
+      {
+        ...(prNumber !== undefined ? { pr: prNumber } : {}),
+        ...(args.issueNumber !== undefined ? { issue: args.issueNumber } : {}),
+        ...(args.intent !== undefined ? { intent: args.intent } : {}),
+        ...(args["intent-file"] !== undefined ? { intentFile: args["intent-file"] } : {}),
+        ...(args["intent-spec"] !== undefined ? { intentSpec: args["intent-spec"] } : {}),
+        ...(repo ? { repo } : {}),
       },
-    };
-    io.stdout(args.json ? renderJson(report) : renderMarkdown(report));
-    return report.exitCode;
+      { github: getGithub, includePrDescription: config.intent.include_pr_description, preferIssue: config.intent.prefer_issue },
+    );
+    for (const source of resolved.sources) trace(`intent source ${source.id} (${source.type}, authority ${source.authority}${source.author ? `, by ${source.author}` : ""})`);
+    if (resolved.sources.length === 0) {
+      if (config.policy.no_intent === "fail") throw new ToolError("no intent was found: the pull request links no issue and has no description, and no --intent was given", EXIT.intent);
+      return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, []));
+    }
+
+    let credentials: Credentials | null;
+    try {
+      credentials = credentialsFromEnv(io.env);
+    } catch (error) {
+      throw new ToolError(error instanceof Error ? error.message : String(error), EXIT.config);
+    }
+    if (!credentials) {
+      if (config.policy.missing_credentials === "fail") throw new ToolError("CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are not set", EXIT.provider);
+      return output(skippedReport("No Workers AI credentials (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", revisions, repository, loaded.source, resolved.sources));
+    }
+    const deadline = Date.now() + config.limits.max_seconds * 1000;
+    const judges = (deps.judges ?? defaultJudges)(credentials, config, deadline);
+
+    const intent = resolved.spec ?? compileChecklist(resolved.sources) ?? (await judges.compiler.compile(resolved.sources));
+    if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
+    for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
+
+    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes });
+    return output(report);
   } catch (error) {
     if (error instanceof ToolError) {
       io.stderr(`jev-intent-review: ${error.message}\n`);
       return error.exitCode;
+    }
+    if (error instanceof ProviderError) {
+      io.stderr(`jev-intent-review: the judgment provider failed: ${error.message}\n`);
+      return EXIT.provider;
     }
     io.stderr(`jev-intent-review: unexpected error: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`);
     return EXIT.incomplete;
