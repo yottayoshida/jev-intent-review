@@ -109,6 +109,30 @@ test("the Markdown report shows each path, whether the change touched it, and th
   assert.match(text, /&lt;img src=x&gt;/);
 });
 
+test("the report names the endpoint, and says so at the top when it is not the default", () => {
+  const plain = renderMarkdown(report());
+  assert.ok(!plain.includes("Endpoint:"), "nothing to say when the run did not record one");
+
+  const cloudflare = renderMarkdown(report({ sent: { ...report().sent, endpoint: "https://api.cloudflare.com" } }));
+  assert.match(cloudflare, /- Endpoint: `https:\/\/api\.cloudflare\.com`/);
+  assert.ok(!cloudflare.includes("Judged by"), "the default endpoint needs no warning");
+
+  // Whoever answers the judgments decides the verdict, so another endpoint is named up front.
+  const other = renderMarkdown(report({ sent: { ...report().sent, endpoint: "https://judge.example.com" } }));
+  assert.match(other, /Judged by `https:\/\/judge\.example\.com`, not `https:\/\/api\.cloudflare\.com`/);
+});
+
+test("a note cannot become a link, whatever the text in it came from", () => {
+  const withLink = report({ requirements: [{ ...report().requirements[0]!, notes: ["judgment failed: [click here](http://example.com/x)"] }] });
+  const text = renderMarkdown(withLink);
+  assert.ok(!text.includes("[click here](http://example.com/x)"), text.slice(0, 300));
+  assert.match(text, /\\\[click here\\\]/);
+
+  // A bare address is a link on GitHub with no brackets at all; as a code span it is not.
+  const bare = report({ requirements: [{ ...report().requirements[0]!, notes: ["judgment failed: see http://example.com/x for why"] }] });
+  assert.match(renderMarkdown(bare), /see `http:\/\/example\.com\/x` for why/);
+});
+
 test("renderJson is the report itself", () => {
   assert.deepEqual(JSON.parse(renderJson(report())), report());
 });

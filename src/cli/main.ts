@@ -8,7 +8,7 @@ import { loadConfig, type Config } from "../config/config.ts";
 import { compileChecklist, WorkersAiCompiler, type IntentCompiler } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
-import { CloudflareClient, credentialsFromEnv, ProviderError, type Credentials } from "../judgments/cloudflare.ts";
+import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
 import { JevProvider, JEV_MODEL } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
@@ -46,12 +46,14 @@ Output:
   -h, --help            show this help
   --version             show the version
 
-Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI) for judgments;
-GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr and --issue.
+Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for judgments on Cloudflare
+Workers AI, or JEV_API_URL and JEV_API_TOKEN for any other endpoint that runs this tool's
+models from a Workers AI run request; GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for
+--pr and --issue.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
-10 configuration error, 11 intent could not be resolved, 12 judgment provider failed,
-13 repository could not be read.
+10 configuration error, 11 intent could not be resolved, 12 judgment provider failed
+(including an endpoint that answered no judgment at all), 13 repository could not be read.
 `;
 
 export interface Io {
@@ -61,9 +63,18 @@ export interface Io {
   env: NodeJS.ProcessEnv;
 }
 
+/**
+ * One line, whatever was put in it. Everything written to stderr goes through this: a message can
+ * carry text from the repository, the pull request or the endpoint, and in GitHub Actions a line
+ * that starts with `::` is a command to the runner.
+ */
+function flat(text: string): string {
+  return text.replace(/[\u0000-\u001f\u007f\u2028\u2029]+/g, " ");
+}
+
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (credentials: Credentials, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number } };
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string };
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -101,12 +112,13 @@ function parse(argv: string[]) {
   return { ...values, prNumber: number("pr"), issueNumber: number("issue") };
 }
 
-function defaultJudges(credentials: Credentials, config: Config, deadline: number) {
-  const client = new CloudflareClient(credentials, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
+function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
+  const client = new CloudflareClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
     compiler: new WorkersAiCompiler(client),
     sent: () => ({ ...client.sent }),
+    origin: client.origin,
   };
 }
 
@@ -157,7 +169,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // Trace lines carry text from the repository and the pull request. Control characters are
     // flattened so no value can start a line of its own (in GitHub Actions, a line starting with
     // `::` is a workflow command).
-    const trace = args.trace ? (line: string) => io.stderr(`[trace] ${line.replace(/[\u0000-\u001f\u007f\u2028\u2029]+/g, " ")}\n`) : () => {};
+    const trace = args.trace ? (line: string) => io.stderr(`[trace] ${flat(line)}\n`) : () => {};
     const explicitIntent = args.prNumber !== undefined || args.issueNumber !== undefined || args.intent !== undefined || args["intent-file"] !== undefined;
     if (args["intent-spec"] !== undefined && explicitIntent) {
       throw new ToolError("--intent-spec takes the requirements as written; it cannot be combined with --pr, --issue, --intent or --intent-file", EXIT.config);
@@ -166,6 +178,16 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       io.stdout(args.json ? renderJson(report) : renderMarkdown(report));
       return report.exitCode;
     };
+
+    // Before anything is read or resolved: a malformed endpoint is a setting to fix, and a run
+    // that is skipped for want of an intent must not hide one.
+    let endpoint: Endpoint | null;
+    try {
+      endpoint = endpointFromEnv(io.env);
+    } catch (error) {
+      throw new ToolError(error instanceof EndpointError ? error.message : String(error), EXIT.config);
+    }
+    if (endpoint) trace(`judgments go to ${new URL(endpoint.url).origin} (from ${endpoint.source})`);
 
     const git = await Git.open(io.cwd);
     const origin = await git.text(["remote", "get-url", "origin"], [0, 2, 128]).catch(() => "");
@@ -217,35 +239,29 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, []));
     }
 
-    let credentials: Credentials | null;
-    try {
-      credentials = credentialsFromEnv(io.env);
-    } catch (error) {
-      throw new ToolError(error instanceof Error ? error.message : String(error), EXIT.config);
-    }
-    if (!credentials) {
-      if (config.policy.missing_credentials === "fail") throw new ToolError("CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN are not set", EXIT.provider);
-      return output(skippedReport("No Workers AI credentials (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", revisions, repository, loaded.source, resolved.sources));
+    if (!endpoint) {
+      if (config.policy.missing_credentials === "fail") throw new ToolError("no credentials for the judgments: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN", EXIT.provider);
+      return output(skippedReport("No credentials for the judgments (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN) were available, so nothing was judged.", revisions, repository, loaded.source, resolved.sources));
     }
     const deadline = Date.now() + config.limits.max_seconds * 1000;
-    const judges = (deps.judges ?? defaultJudges)(credentials, config, deadline);
+    const judges = (deps.judges ?? defaultJudges)(endpoint, config, deadline);
 
     const intent = resolved.spec ?? compileChecklist(resolved.sources) ?? (await judges.compiler.compile(resolved.sources));
     if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
     for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
 
-    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes });
+    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes, endpoint: judges.origin });
     return output(report);
   } catch (error) {
     if (error instanceof ToolError) {
-      io.stderr(`jev-intent-review: ${error.message}\n`);
+      io.stderr(`jev-intent-review: ${flat(error.message)}\n`);
       return error.exitCode;
     }
     if (error instanceof ProviderError) {
-      io.stderr(`jev-intent-review: the judgment provider failed: ${error.message}\n`);
+      io.stderr(`jev-intent-review: the judgment provider failed: ${flat(error.message)}\n`);
       return EXIT.provider;
     }
-    io.stderr(`jev-intent-review: unexpected error: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`);
+    io.stderr(`jev-intent-review: unexpected error: ${flat(error instanceof Error ? (error.stack ?? error.message) : String(error))}\n`);
     return EXIT.incomplete;
   }
 }

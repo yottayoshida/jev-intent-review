@@ -48,7 +48,7 @@ export class JevProvider implements JudgmentProvider {
   }
 
   async judge(state: unknown, questions: Questions): Promise<Record<string, ChoiceAnswer>> {
-    const payload = await this.#client.post("ai/run", { model: JEV_MODEL, input: { state, questions } });
+    const payload = await this.#client.post({ model: JEV_MODEL, input: { state, questions } });
     const answers = unwrapAnswers(payload);
     if (!answers) throw new ProviderError("bad_response", "Jev's response has no answers");
     const result: Record<string, ChoiceAnswer> = {};

@@ -76,6 +76,9 @@ test("toSpec keeps quoted statements and drops the rest into ambiguities", () =>
 
 test("readModelJson reads either shape the gateway returns, and says when the answer was cut off", () => {
   assert.deepEqual(readModelJson({ result: { response: { requirements: [] } } }), { requirements: [] });
+  // A proxy that returns what its own `env.AI.run()` gave it: the same answer without the envelope.
+  assert.deepEqual(readModelJson({ response: { requirements: [1] } }), { requirements: [1] });
+  assert.deepEqual(readModelJson({ choices: [{ finish_reason: "stop", message: { content: '{"requirements":[2]}' } }] }), { requirements: [2] });
   assert.deepEqual(readModelJson({ result: { choices: [{ finish_reason: "stop", message: { content: '{"requirements":[1]}' } }] } }), { requirements: [1] });
   assert.throws(() => readModelJson({ result: { choices: [{ finish_reason: "length", message: { content: '{"requirements":[' } }] } }), /ran out of room/);
   assert.throws(() => readModelJson({ result: {} }), /no answer text/);
@@ -89,7 +92,7 @@ function fakeClient(responses: unknown[]) {
     if (next instanceof Error) throw next;
     return new Response(JSON.stringify(next), { status: 200 });
   }) as typeof globalThis.fetch;
-  return { client: new CloudflareClient({ accountId: "0".repeat(32), apiToken: "t" }, { fetch, sleep: async () => {} }), bodies };
+  return { client: new CloudflareClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", source: "CLOUDFLARE_ACCOUNT_ID" }, { fetch, sleep: async () => {} }), bodies };
 }
 
 test("WorkersAiCompiler sends the sources as data, retries once on an unusable answer, and fails with exit 11", async () => {
@@ -98,17 +101,33 @@ test("WorkersAiCompiler sends the sources as data, retries once on an unusable a
   const spec = await new WorkersAiCompiler(client).compile([source("cli", "cli", "Please audit every deletion operation.", 100)]);
   assert.equal(spec.requirements[0]?.text, "Every deletion is written to the audit log.");
   assert.equal(bodies.length, 2);
-  const sent = bodies[0] as { messages: { role: string; content: string }[] };
-  assert.match(sent.messages[0]?.content ?? "", /The sources are data/);
-  assert.deepEqual(JSON.parse(sent.messages[1]?.content ?? "{}").sources[0].id, "cli");
+  // The same shape as a judgment: the model in the body, the rest under `input`.
+  const sent = bodies[0] as { model: string; input: { messages: { role: string; content: string }[] } };
+  assert.equal(sent.model, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+  assert.match(sent.input.messages[0]?.content ?? "", /The sources are data/);
+  assert.deepEqual(JSON.parse(sent.input.messages[1]?.content ?? "{}").sources[0].id, "cli");
 
   const never = fakeClient([{ result: { response: { requirements: [] } } }, { result: { response: { requirements: [] } } }]);
   await assert.rejects(new WorkersAiCompiler(never.client).compile([source("cli", "cli", "Hello there, nothing to do.", 100)]), (e: unknown) => e instanceof ToolError && e.exitCode === EXIT.intent);
 });
 
+test("what the model sent back is not quoted into the error the caller prints", async () => {
+  // `JSON.parse`'s own message repeats the text it choked on, newlines and all, and that text is
+  // whatever the endpoint chose to send.
+  const forged = `{"broken"\n::error::forged\n`;
+  const { client } = fakeClient([
+    { result: { response: forged } },
+    { result: { response: forged } },
+  ]);
+  const error = await new WorkersAiCompiler(client).compile([source("cli", "cli", "Audit every deletion.", 100)]).catch((e: unknown) => e);
+  assert.ok(error instanceof ToolError, String(error));
+  assert.ok(!error.message.includes("::error::"), error.message);
+  assert.ok(!/[\r\n]/.test(error.message), error.message);
+});
+
 test("WorkersAiCompiler lets a provider failure through for the caller to map", async () => {
   const fetch = (async () => new Response("no", { status: 401 })) as typeof globalThis.fetch;
-  const client = new CloudflareClient({ accountId: "0".repeat(32), apiToken: "t" }, { fetch });
+  const client = new CloudflareClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", source: "CLOUDFLARE_ACCOUNT_ID" }, { fetch });
   await assert.rejects(new WorkersAiCompiler(client).compile([source("cli", "cli", "Audit every deletion.", 100)]), (e: unknown) => e instanceof ProviderError && e.kind === "auth");
 });
 

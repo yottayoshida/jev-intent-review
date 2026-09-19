@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -41,6 +43,7 @@ function fakeDeps(compiled?: IntentSpec, github?: Partial<GitHub>): Deps {
         },
       },
       sent: () => ({ requests: provider.calls.length, bytes: 0 }),
+      origin: "https://api.cloudflare.com",
     }),
     github: async () => github as GitHub,
   };
@@ -75,7 +78,7 @@ test("with no credentials the review is skipped (exit 0), or fails with exit 12 
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir), "--json"], skipped.value, fakeDeps()), EXIT.ok);
     const report = JSON.parse(skipped.out());
     assert.equal(report.verdict, "skipped");
-    assert.match(report.skipReason, /No Workers AI credentials/);
+    assert.match(report.skipReason, /No credentials for the judgments/);
 
     repo.git("checkout", "-q", repo.base);
     repo.write({ [CONFIG_PATH]: "policy:\n  missing_credentials: fail\n" });
@@ -163,6 +166,163 @@ test("--intent-spec cannot be combined with other intent, and trace lines cannot
     await main(["--base", repo.base, "--head", repo.head, "--intent", "anything at all here", "--trace"], traced.value, fakeDeps(compiled));
     assert.ok(traced.err().includes("forged"), "the text is still shown");
     assert.ok(!traced.err().split("\n").some((line) => line.startsWith("::")), "but never at the start of a line");
+  } finally {
+    repo.remove();
+  }
+});
+
+/** A stand-in for the judgment endpoint on this machine: answers like Workers AI, remembers what it was asked. */
+async function localEndpoint(answer: (body: { model?: string }) => { status: number; body?: unknown; headers?: Record<string, string> }) {
+  const seen: { auth: string | undefined; body: { model?: string; input?: unknown } }[] = [];
+  const server = createServer((request, response) => {
+    let text = "";
+    request.on("data", (chunk: Buffer) => void (text += chunk.toString("utf8")));
+    request.on("end", () => {
+      const body = JSON.parse(text || "{}") as { model?: string };
+      seen.push({ auth: request.headers.authorization, body });
+      const { status, body: answerBody, headers } = answer(body);
+      response.writeHead(status, { "content-type": "application/json", ...headers });
+      response.end(answerBody === undefined ? "" : JSON.stringify(answerBody));
+    });
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const port = (server.address() as AddressInfo).port;
+  return { seen, url: `http://127.0.0.1:${port}/ai/run`, origin: `http://127.0.0.1:${port}`, close: () => server.close() };
+}
+
+const answers = (relevance: string, satisfaction: string, wrapped: boolean) => {
+  const choice = (c: string) => ({ type: "choice", choice: c, confidence: 0.9, probabilities: { [c]: 0.9 } });
+  const inner = { answers: { relevance: choice(relevance), satisfaction: choice(satisfaction), completeness: choice("likely_complete") } };
+  return wrapped ? { result: { state: "Completed", result: inner } } : inner;
+};
+
+test("with JEV_API_URL every judgment goes there, with its own token, wrapped answer or not", async () => {
+  const repo = fixtureRepo("missed-path");
+  let wrapped = true;
+  const endpoint = await localEndpoint(() => {
+    wrapped = !wrapped;
+    return { status: 200, body: answers("may_violate", "violates", wrapped) };
+  });
+  try {
+    // The environment is built from nothing: a broken build must not reach api.cloudflare.com.
+    const run = io(repo.dir, { JEV_API_URL: endpoint.url, JEV_API_TOKEN: "local-token" });
+    const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir), "--json"], run.value);
+    assert.equal(code, EXIT.violation);
+    const report = JSON.parse(run.out()) as { sent: { requests: number; endpoint?: string } };
+    assert.ok(endpoint.seen.length >= 1);
+    assert.equal(report.sent.requests, endpoint.seen.length, "every request in the report reached this server");
+    assert.equal(report.sent.endpoint, endpoint.origin);
+    for (const request of endpoint.seen) {
+      assert.equal(request.auth, "Bearer local-token");
+      assert.equal(request.body.model, "typesafe/jev");
+    }
+  } finally {
+    endpoint.close();
+    repo.remove();
+  }
+});
+
+test("an endpoint that redirects or has nothing there fails the run at once, and is not asked again", async () => {
+  for (const wrong of [
+    { status: 302, headers: { location: "https://elsewhere.example.com/" } },
+    { status: 404, body: { error: "no route" } },
+  ]) {
+    const repo = fixtureRepo("missed-path");
+    const endpoint = await localEndpoint(() => wrong);
+    try {
+      // Two requirements over the same places: without the stop, each would be judged on its own
+      // (14 requests). Eight judgments are in flight at a time, so one wave can leave together,
+      // and what was already in flight cannot be recalled — but no second wave follows.
+      const spec = JSON.parse(readFileSync(join(FIXTURES, "missed-path", "fixture.json"), "utf8")).spec as IntentSpec;
+      const first = spec.requirements[0]!;
+      spec.requirements = [first, { ...first, id: "R2" }];
+      const path = join(repo.dir, "two.json");
+      writeFileSync(path, JSON.stringify(spec));
+
+      const run = io(repo.dir, { JEV_API_URL: endpoint.url, JEV_API_TOKEN: "local-token" });
+      const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", path], run.value);
+      assert.equal(code, EXIT.provider, String(wrong.status));
+      assert.equal(run.out(), "");
+      // Counted after everything in flight has landed, so the number does not depend on timing.
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      assert.ok(endpoint.seen.length <= 8, `${endpoint.seen.length} requests reached the endpoint`);
+    } finally {
+      endpoint.close();
+      repo.remove();
+    }
+  }
+});
+
+test("an endpoint that answers nothing usable fails the run instead of reporting unknown everywhere", async () => {
+  // Refusing every request: the second refusal, with nothing ever answered, stops the run early.
+  const refusing = fixtureRepo("missed-path");
+  const wrongShape = await localEndpoint(() => ({ status: 400, body: { error: "not this shape" } }));
+  try {
+    const run = io(refusing.dir, { JEV_API_URL: wrongShape.url, JEV_API_TOKEN: "local-token" });
+    assert.equal(await main(["--base", refusing.base, "--head", refusing.head, "--intent-spec", specFile(refusing.dir)], run.value), EXIT.provider);
+    assert.match(run.err(), /not a Workers AI run endpoint/);
+    assert.ok(wrongShape.seen.length <= 8, `${wrongShape.seen.length} requests`);
+  } finally {
+    wrongShape.close();
+    refusing.remove();
+  }
+
+  // Answering 200 with nothing in it: each place is unknown, and a report of nothing but unknown
+  // is not a review that ran.
+  const empty = fixtureRepo("missed-path");
+  const emptyAnswers = await localEndpoint(() => ({ status: 200, body: { result: {} } }));
+  try {
+    const run = io(empty.dir, { JEV_API_URL: emptyAnswers.url, JEV_API_TOKEN: "local-token" });
+    assert.equal(await main(["--base", empty.base, "--head", empty.head, "--intent-spec", specFile(empty.dir)], run.value), EXIT.provider);
+    assert.match(run.err(), /no judgment came back from http:\/\/127\.0\.0\.1:\d+/);
+    assert.ok(emptyAnswers.seen.length >= 1);
+  } finally {
+    emptyAnswers.close();
+    empty.remove();
+  }
+});
+
+test("nothing the endpoint says can start a line of its own, in the trace or in the report", async () => {
+  const repo = fixtureRepo("missed-path");
+  const endpoint = await localEndpoint(() => ({ status: 500, body: { error: `broken\n::error::forged\ntoken local-token` } }));
+  try {
+    const run = io(repo.dir, { JEV_API_URL: endpoint.url, JEV_API_TOKEN: "local-token" });
+    await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir), "--trace"], run.value);
+    for (const stream of [run.err(), run.out()]) {
+      assert.ok(!stream.split("\n").some((line) => line.startsWith("::")), stream.slice(0, 200));
+      assert.ok(!stream.includes("local-token"), "the token is never echoed back into the output");
+    }
+  } finally {
+    endpoint.close();
+    repo.remove();
+  }
+});
+
+test("a token without its endpoint, or an endpoint the token does not belong to, is a setting to fix", async () => {
+  const repo = fixtureRepo("missed-path");
+  try {
+    const cases: [NodeJS.ProcessEnv, number, RegExp][] = [
+      [{ JEV_API_URL: "http://example.com/ai/run", JEV_API_TOKEN: "t" }, EXIT.config, /must be https/],
+      [{ JEV_API_URL: "http://localhost.attacker.com/ai/run", JEV_API_TOKEN: "t" }, EXIT.config, /must be https/],
+      [{ JEV_API_URL: "https://alice:hunter2@example.com/ai/run", JEV_API_TOKEN: "t" }, EXIT.config, /user name or password/],
+      [{ JEV_API_URL: "https://judge.example.com/ai/run", ...CREDENTIALS }, EXIT.config, /CLOUDFLARE_API_TOKEN is only ever sent to Cloudflare/],
+      [{ JEV_API_TOKEN: "t", ...CREDENTIALS }, EXIT.config, /JEV_API_TOKEN needs JEV_API_URL/],
+    ];
+    for (const [env, expected, message] of cases) {
+      const run = io(repo.dir, env);
+      assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir)], run.value, fakeDeps()), expected, JSON.stringify(env));
+      assert.match(run.err(), message);
+      assert.equal(run.out(), "");
+      assert.ok(!run.err().includes("hunter2") && !run.err().includes("alice"), run.err());
+    }
+
+    // The URL without its token is a fork's pull request: skipped, not failed, and nothing is sent.
+    const fork = io(repo.dir, { JEV_API_URL: "https://judge.example.com/ai/run" });
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir), "--json"], fork.value, fakeDeps()), EXIT.ok);
+    const report = JSON.parse(fork.out()) as { verdict: string; sent: { requests: number; endpoint?: string } };
+    assert.equal(report.verdict, "skipped");
+    assert.equal(report.sent.requests, 0);
+    assert.equal(report.sent.endpoint, undefined, "a skipped run names no endpoint");
   } finally {
     repo.remove();
   }

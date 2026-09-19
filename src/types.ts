@@ -164,7 +164,7 @@ export interface ReviewReport {
     incompleteReasons: string[];
     searches: SearchRecord[];
   };
-  sent: { requests: number; bytes: number; locations: Location[] };
+  sent: { requests: number; bytes: number; locations: Location[]; endpoint?: string };
   metadata: {
     repository: string;
     base: string;

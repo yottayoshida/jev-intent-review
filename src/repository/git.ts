@@ -17,8 +17,9 @@ const MAX_OUTPUT = 64 * 1024 * 1024;
 export const MAX_BLOB_BYTES = 1024 * 1024;
 
 // git needs none of this run's secrets; a token in its environment would only be one more place
-// it could surface.
-const SECRET_NAME = /TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|PRIVATE_KEY/i;
+// it could surface. `JEV_API_URL` is named as well: it is not a secret by its name, but a key can
+// be kept in its query string, and a filter or textconv driver would see the whole environment.
+const SECRET_NAME = /TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|PRIVATE_KEY|^JEV_API_URL$/i;
 
 function gitEnv(): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {};

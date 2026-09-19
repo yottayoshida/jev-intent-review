@@ -2,13 +2,14 @@
 // model several times. No discovery, no aggregation: only whether the judgment itself is right.
 //
 //   CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node bench/probe-jev.ts [runs]
+//   JEV_API_URL=... JEV_API_TOKEN=... node bench/probe-jev.ts [runs]
 //
 // Expected: oauth and websocket `violates`; password and api-key not `violates`.
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { enclosingBlock } from "../src/change/blocks.ts";
-import { CloudflareClient, credentialsFromEnv } from "../src/judgments/cloudflare.ts";
+import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { CANDIDATE_QUESTIONS } from "../src/judgments/questions.ts";
 import { FIXTURES } from "../test/helpers/repo.ts";
@@ -50,12 +51,14 @@ const cases: Case[] = [
   { label: "api-key, route + middleware", path: "src/auth/api-key.ts", changed: false, expectViolation: false, related: [routeLine("loginWithApiKey"), middleware] },
 ];
 
-const credentials = credentialsFromEnv();
-if (!credentials) {
-  console.error("set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN");
+const endpoint = endpointFromEnv();
+if (!endpoint) {
+  console.error("set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
   process.exit(10);
 }
-const jev = new JevProvider(new CloudflareClient(credentials));
+const client = new CloudflareClient(endpoint);
+console.log(`endpoint ${client.origin} (from ${endpoint.source})`);
+const jev = new JevProvider(client);
 const runs = Number(process.argv[2] ?? 3);
 
 let failures = 0;
