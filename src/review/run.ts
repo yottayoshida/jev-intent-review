@@ -5,10 +5,11 @@
 import { analyzeChange } from "../change/seeds.ts";
 import type { LoadedConfig } from "../config/config.ts";
 import { pathFilter } from "../config/glob.ts";
+import { isSensitivePath } from "../evidence/redact.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
-import { ProviderError } from "../judgments/cloudflare.ts";
+import { FATAL_KINDS, ProviderError } from "../judgments/cloudflare.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, COMPLETENESS_QUESTIONS, QUESTIONS_HASH } from "../judgments/questions.ts";
 import type { Git } from "../repository/git.ts";
@@ -16,6 +17,7 @@ import type { Revisions } from "../repository/revisions.ts";
 import { EXIT, ToolError, locationKey, type Candidate, type CandidateResult, type IntentSource, type IntentSpec, type Location, type RequirementResult, type ReviewReport, type SearchRecord } from "../types.ts";
 import { VERSION } from "../version.ts";
 import { aggregate, decide, probabilityOf, verdictOf, type Thresholds } from "./requirement.ts";
+import { reviewChanges } from "./unexpected-change.ts";
 
 export interface RunInput {
   git: Git;
@@ -37,7 +39,7 @@ const BUDGET = "the run's request, byte or time budget ran out";
 // These end the run: every further request would fail the same way. A bad request (400, 413) is
 // about one packet, so it only makes that place unknown — unless a second one arrives with
 // nothing yet answered, which the client reads as the endpoint and reports as one of these.
-const FATAL = new Set(["auth", "payment", "endpoint"]);
+const FATAL = FATAL_KINDS;
 
 function providerFailure(error: unknown): string {
   if (error instanceof ProviderError) {
@@ -55,7 +57,10 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     satisfaction: config.judgment.satisfaction_probability,
     relevance: config.judgment.relevance_probability,
   };
-  const include = pathFilter(config.repository.include, config.repository.ignore);
+  // A path this tool must never read is not part of the change either: the reverse pass sends the
+  // lines as they were before, so a pull request that removes a hardcoded key would hand it over.
+  const configured = pathFilter(config.repository.include, config.repository.ignore);
+  const include = (path: string) => configured(path) && !isSensitivePath(path);
   const change = await analyzeChange(git, revisions.before, revisions.after, include);
   trace(`changed files: ${change.changedPaths.length}`);
   for (const s of change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
@@ -184,9 +189,32 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     requirements.push(result);
   }
 
-  if (reached > 0 && answered === 0) {
-    throw new ToolError(`no judgment came back from ${input.endpoint ?? "the judgment provider"}: ${reached} request(s) were sent and none was answered`, EXIT.provider);
-  }
+  const noAnswer = () => {
+    if (reached > 0 && answered === 0) {
+      throw new ToolError(`no judgment came back from ${input.endpoint ?? "the judgment provider"}: ${reached} request(s) were sent and none was answered`, EXIT.provider);
+    }
+  };
+  noAnswer(); // before asking about the changes: a dead endpoint is not worth another round
+
+  // The other direction: every change the pull request made, against the requirements it names.
+  // What it throws is what the run cannot go on with — a refused token, an empty balance, a URL
+  // that runs no models, or a fault in this tool — and the command line reads all of those as the
+  // judgment provider failing, exit 12. Everything it can go on with comes back in its notes.
+  const changes = await reviewChanges({
+    change,
+    requirements: intent.requirements,
+    provider,
+    maxChars: config.evidence.max_primary_chars,
+    threshold: config.judgment.violation_probability,
+    trace,
+  });
+  reached += changes.reached;
+  answered += changes.answered;
+  notes.push(...changes.notes);
+  for (const location of changes.sent) sentLocations.set(locationKey(location), location);
+  trace(`changes no requirement asked for: ${changes.unexpected.length}`);
+
+  noAnswer();
 
   const { verdict, exitCode } = verdictOf(requirements, config.policy);
   const sent = input.sent();
@@ -198,7 +226,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     intent,
     sources: input.sources.map(({ text: _text, ...source }) => source),
     requirements,
-    unexpectedChanges: [],
+    unexpectedChanges: changes.unexpected,
     discovery: { candidateCount, changedCandidates, unchangedCandidates: candidateCount - changedCandidates, incompleteReasons, searches },
     sent: { requests: sent.requests, bytes: sent.bytes, locations: [...sentLocations.values()], ...(input.endpoint ? { endpoint: input.endpoint } : {}) },
     metadata: {

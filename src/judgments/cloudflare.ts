@@ -15,6 +15,9 @@ export type ProviderErrorKind =
   | "bad_response"
   | "budget"; // this run's own request / byte / time limit
 
+/** The kinds that make every later request pointless: the run ends rather than asking again. */
+export const FATAL_KINDS: ReadonlySet<ProviderErrorKind> = new Set<ProviderErrorKind>(["auth", "payment", "endpoint"]);
+
 export class ProviderError extends Error {
   readonly kind: ProviderErrorKind;
   readonly status: number | undefined;
