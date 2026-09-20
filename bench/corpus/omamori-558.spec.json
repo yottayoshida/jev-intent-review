@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The software should not drop checks that need no key, including tail-truncation detection, when a halt occurs.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#470",
+          "quote": "a halt drops the checks that need no key, including tail-truncation detection"
+        }
+      ],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

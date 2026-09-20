@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The function should fail the whole listing on the first per-entry error when reading a directory, and not silently drop entries after the error and report the directory as empty or with a truncated count, even if some entries were successfully read before the error occurred, and instead report an '未.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#485",
+          "quote": "a listing that stopped partway is not a listing"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R2",
+      "text": "The doctor should report a staging directory as empty or with a file count only if it was read in full, otherwise it should report an error and provide a reason for the error, and the --json output should include a summary with a staging status of error and null counts and a path-free reason, and a.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#553",
+          "quote": "omamori doctor reports [Staging] empty or a file count only for a staging directory it read in full"
+        }
+      ],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

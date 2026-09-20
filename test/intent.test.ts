@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { checklistItems, compileChecklist, isStatement, quoteIsIn, readModelJson, toSpec, WorkersAiCompiler } from "../src/intent/compiler.ts";
+import { checklistItems, compileChecklist, isStatement, quoteIsIn, readModelJson, readRequirementText, toSpec, WorkersAiCompiler } from "../src/intent/compiler.ts";
 import { closedIssueNumbers, GitHub, NotFound, parseRepository } from "../src/intent/github.ts";
 import { resolveIntent } from "../src/intent/resolver.ts";
 import { CloudflareClient, ProviderError } from "../src/judgments/cloudflare.ts";
@@ -72,6 +72,41 @@ test("toSpec keeps quoted statements and drops the rest into ambiguities", () =>
     ["R2", "behavior", "issue#1", []],
   ]);
   assert.equal(spec.ambiguities.length, 3);
+});
+
+test("readRequirementText takes the record the model wrote into the sentence", () => {
+  // All four shapes are from the first real measurement: every one of 38 requirements over ten
+  // pull requests came back with its hints in the sentence, and the field left empty, so the
+  // search fell back to the sentence's words — `search_hints`, `quote` and `kind` among them.
+  const hintsInProse = readRequirementText("Keep stderr output as a single JSON object when a command is blocked, with search hints: stderr, json object, error handling");
+  assert.equal(hintsInProse.text, "Keep stderr output as a single JSON object when a command is blocked.");
+  assert.deepEqual(hintsInProse.hints, ["stderr", "json object", "error handling"]);
+
+  const fieldNames = readRequirementText("kind: behavior, quote: The refusal is a latch now, search_hints: [refusal, latch], source: pr#557");
+  assert.equal(fieldNames.text, "The refusal is a latch now.");
+  assert.deepEqual(fieldNames.hints, ["refusal", "latch"]);
+
+  const debris = readRequirementText("The test-isolation-canary fails on a host with omamori installed.', 'search_hints': 'test-isolation-canary omamori installed'}], {");
+  assert.equal(debris.text, "The test-isolation-canary fails on a host with omamori installed.");
+
+  // What this tool cut at the requirement limit loses its fragment rather than carrying it into
+  // every packet — and only that: the same sentence, if the model simply wrote it without a full
+  // stop, keeps every word.
+  const cut = readRequirementText("The function should fail the whole listing on the first per-entry error. It should not silently drop entries after the error and re", true);
+  assert.equal(cut.text, "The function should fail the whole listing on the first per-entry error.");
+  const unpunctuated = readRequirementText("The function should fail the whole listing on the first per-entry error. It should not silently drop entries after the error and re");
+  assert.equal(unpunctuated.text, "The function should fail the whole listing on the first per-entry error. It should not silently drop entries after the error and re");
+
+  // A requirement written the way it was asked for is left alone — including one that quotes a
+  // list. Cutting at `', '` as though it were a serialized field took two thirds of this away.
+  for (const written of [
+    "Disabled users cannot authenticate.",
+    "The observation mode accepts 'wrappers', 'syscalls' and rejects everything else.",
+    "The refusal is a latch. It stays until the file is rewritten",
+    "Every deletion is written to the audit log, with the actor and the time.",
+  ]) {
+    assert.deepEqual(readRequirementText(written), { text: written, hints: [] }, written);
+  }
 });
 
 test("readModelJson reads either shape the gateway returns, and says when the answer was cut off", () => {

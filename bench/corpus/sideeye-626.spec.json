@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines, copies its report, transcript and world directory under `failed/`, and the CI step uploads `failed/` when it is red.'.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#626",
+          "quote": "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines"
+        }
+      ],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

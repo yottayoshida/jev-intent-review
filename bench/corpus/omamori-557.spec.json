@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The refusal is a property of the current tail, not a permanent latch on the file.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#465",
+          "quote": "append()'s refusal to write after a tail entry declaring an unrecognized chain_version"
+        }
+      ],
+      "searchHints": [
+        "append",
+        "refusal",
+        "unrecognized chain_version"
+      ]
+    },
+    {
+      "id": "R2",
+      "text": "It now walks backwards from the end of the file one line at a time, reads past everything that does not carry a chain_version, and stops at the first line that does.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#557",
+          "quote": "read_chain_state used to take the last line inside a 64 KB tail window that parsed as a JSON object"
+        }
+      ],
+      "searchHints": [
+        "read_chain_state",
+        "last line",
+        "JSON object"
+      ]
+    },
+    {
+      "id": "R3",
+      "text": "The refusal is a latch now.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#557",
+          "quote": "within the last 64 MiB, refusing rather than restarting when no chain entry starts inside them"
+        }
+      ],
+      "searchHints": [
+        "last 64 MiB",
+        "refusing",
+        "chain entry"
+      ]
+    },
+    {
+      "id": "R4",
+      "text": "append_links_to_a_huge_real_entry_behind_junk_and_a_malformed_line.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#557",
+          "quote": "No fork behind junk"
+        }
+      ],
+      "searchHints": [
+        "no fork",
+        "junk"
+      ]
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

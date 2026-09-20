@@ -122,9 +122,13 @@ export function aggregate(requirementId: string, candidates: CandidateResult[], 
     status = "unknown";
     notes.push(candidates.length === 0 ? "No place this requirement applies to was found." : `None of the ${candidates.length} place(s) judged was called a path of this requirement.`);
   } else if (count("unknown") > 0) status = "unknown";
-  else {
+  else status = full.blocking.length > 0 ? "unknown" : "verified";
+  // Every reason, whatever the status. Listing them only where they were the deciding one told a
+  // reader that an undecided place was the whole story, when four more things also had to change.
+  if (status !== "violation") {
     for (const blocker of full.blocking) notes.push(`VERIFIED is withheld: ${blocker}.`);
-    status = full.blocking.length > 0 ? "unknown" : "verified";
+    const undecided = count("unknown");
+    if (undecided > 0) notes.push(`VERIFIED is withheld: ${undecided} of ${paths.length} path(s) came back undecided.`);
   }
 
   let coverage: Coverage;

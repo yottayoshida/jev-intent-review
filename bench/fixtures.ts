@@ -15,15 +15,20 @@ import { FIXTURES, fixtureRepo } from "../test/helpers/repo.ts";
 
 interface Case {
   fixture: string;
-  after: "head" | "fixed";
+  after: string; // a layer of the fixture: head, fixed, or one of its own
   status: string | { not: string }; // the status expected, or the one that must not come out
   violations: string[]; // paths expected to hold a violation
   clean: string[]; // paths expected not to
+  unsatisfied?: string[]; // paths that must not come back satisfied
 }
 
 const CASES: Case[] = [
   { fixture: "missed-path", after: "head", status: "violation", violations: ["src/auth/oauth.ts", "src/auth/websocket.ts"], clean: ["src/auth/password.ts", "src/auth/api-key.ts"] },
   { fixture: "missed-path", after: "fixed", status: "verified", violations: [], clean: ["src/auth/password.ts", "src/auth/oauth.ts", "src/auth/websocket.ts", "src/auth/api-key.ts"] },
+  // The pair to the line above, and the one that makes it mean something: the same fixture with
+  // the check taken out of one path. If `fixed` verifies and this verifies too, the verifying
+  // was not a reading of the code.
+  { fixture: "missed-path", after: "one-guard-removed", status: { not: "verified" }, violations: [], clean: ["src/auth/password.ts", "src/auth/api-key.ts"], unsatisfied: ["src/auth/oauth.ts"] },
   { fixture: "unknown-plugin", after: "head", status: "unknown", violations: [], clean: ["src/records/api.ts", "src/jobs/purge.ts"] },
   // The guard sits in one of two callers. Whatever else it answers, a login reachable without
   // the guard must not come out verified — the case a `satisfies` read from the guarded caller
@@ -35,7 +40,7 @@ const runs = Number(process.argv[2] ?? 3);
 let failures = 0;
 for (const c of CASES) {
   const repo = fixtureRepo(c.fixture);
-  const after = c.after === "fixed" ? repo.fixed : repo.head;
+  const after = c.after === "head" ? repo.head : c.after === "fixed" ? repo.fixed : repo.layers[c.after];
   if (!after) throw new Error(`${c.fixture} has no ${c.after} version`);
   const spec = join(repo.dir, "spec.json");
   writeFileSync(spec, JSON.stringify(JSON.parse(readFileSync(join(FIXTURES, c.fixture, "fixture.json"), "utf8")).spec));
@@ -56,6 +61,7 @@ for (const c of CASES) {
     if (typeof c.status === "string" ? r1?.status !== c.status : r1?.status === c.status.not) wrong.push(`status ${r1?.status}`);
     for (const path of c.violations) if (!outcomes.get(path)?.includes("violates")) wrong.push(`${path} not a violation`);
     for (const path of c.clean) if (outcomes.get(path)?.includes("violates")) wrong.push(`${path} a violation`);
+    for (const path of c.unsatisfied ?? []) if (outcomes.get(path)?.includes("satisfies")) wrong.push(`${path} satisfied, with its check removed`);
     if (wrong.length > 0) failures += 1;
     const from = process.env.JEV_API_URL ? "JEV_API_*" : "CLOUDFLARE_*";
     console.log(

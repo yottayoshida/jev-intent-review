@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The judge refuses a report whose digest does not match the one printed to stderr by sideeye or read from sideeye's stdout, to prevent the agent-built binary from overwriting the report before the judge reads it, so loop_closed could rest on a verdict the subject supplied, and the judge's verdict on.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#597",
+          "quote": "the eval container's replay report is written where the agent-built binary can overwrite it before the judge reads it"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R2",
+      "text": "The judge reads the eval container's outputs only from its stdout, to prevent the agent-built binary from rewriting the replay report, its rc, or the functional gate's status or export, and refuses rather than judging if the agent-built binary rewrites any of those files.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#602",
+          "quote": "nothing the agent can edit is trusted"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R3",
+      "text": "Sideeye prints the report's digest to stderr, and the judge compares it with the digest of the report read from the file, to prevent the agent-built binary from overwriting the report before the judge reads it.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#597",
+          "quote": "sideeye replay --json learns to print the report's digest to stderr"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R4",
+      "text": "The container runs timew as a different uid from sideeye, and the output directory is writable only by sideeye, to prevent the agent-built binary from overwriting the report before the judge reads it.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#597",
+          "quote": "the container runs timew as a different uid from sideeye and the output directory is writable by sideeye alone"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R5",
+      "text": "The judge reads the eval container's outputs from its stdout, and counts each token exactly once, requiring exactly one token, to prevent the agent-built binary from rewriting the replay report, its rc, or the functional gate's status or export.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#602",
+          "quote": "each token counted wherever it appears, exactly one required"
+        }
+      ],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

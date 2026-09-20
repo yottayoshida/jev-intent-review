@@ -107,7 +107,10 @@ function candidateLine(result: CandidateResult): string[] {
  */
 function scopeLine(result: RequirementResult): string {
   const s = result.scope;
-  const parts = [`${s.judged} of ${s.found} place(s) judged`, `${s.paths} path(s)`, `${s.setAside} set aside`];
+  const aside = new Map<string, number>();
+  for (const c of result.candidates) if (c.outcome === "aside") aside.set(c.aside ?? "set aside", (aside.get(c.aside ?? "set aside") ?? 0) + 1);
+  const why = [...aside].map(([kind, n]) => `${n} ${kind.replace(/_/g, " ")}`).join(", ");
+  const parts = [`${s.judged} of ${s.found} place(s) judged`, `${s.paths} path(s)`, `${s.setAside} set aside${why ? ` (${why})` : ""}`];
   if (s.notFollowed.length > 0) parts.push(`${s.notFollowed.length} lead(s) not followed`);
   if (s.unjudged.length > 0) parts.push(`${s.unjudged.length} reason(s) places went unjudged`);
   return `Coverage: ${result.coverage} — ${parts.join(", ")}`;

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { definedName, enclosingBlock, looksLikeHeader } from "../src/change/blocks.ts";
+import { BlockIndex, definedName, defines, enclosingBlock, looksLikeHeader, testRegions } from "../src/change/blocks.ts";
 import { parseDiff, unquotePath } from "../src/change/diff.ts";
 import { analyzeChange, calledNames, isCode, regionsOf, splitWords } from "../src/change/seeds.ts";
 import { pathFilter } from "../src/config/glob.ts";
@@ -126,6 +126,44 @@ test("looksLikeHeader: definitions yes; calls and control flow no", () => {
   for (const line of ["  save(record)", "if (x) {", "  } else if (y) {", "for (const a of b) {", "while (true) {", "  return build(x);", "// function x() {"]) {
     assert.ok(!looksLikeHeader(line), line);
   }
+});
+
+test("a match arm is not a function: `Err(_) => {` was read as one, and every Rust file has several", () => {
+  // The arrow rule used to take any line ending in `=> {`. In Rust and Zig that is a match arm,
+  // so `Err(_) => {` became a function named `Err` — a name defined many times over in any
+  // repository, which then marked the evidence around those places as possibly another
+  // definition's and voided the answers about them. Measured on ten real pull requests: the
+  // same-name flag fired on 22% of the places judged.
+  for (const line of ["    Err(_) => {", "    Ok(verify_result) => {", "        Some(user) => {", "    _ => {", "        .ok => {", "  HookCheckResult::Allow => {"]) {
+    assert.ok(!looksLikeHeader(line), line);
+  }
+  // A name is still read off the line; what changed is that the line is no longer a definition.
+  assert.equal(definedName("    Err(_) => {"), "Err");
+  assert.ok(!defines("    Err(_) => {", "Err"), "so it does not count as one of the definitions of Err");
+
+  // The arrow functions it has to keep: assigned, passed as an argument, with a return type.
+  for (const line of ["const handle = (req, res) => {", "  items.map((item) => {", "  items.map(item => {", "const f = (a: number): void => {", "  const go = async () => {", "() => {"]) {
+    assert.ok(looksLikeHeader(line), line);
+  }
+  const arrow = ["items.map((item) => {", "  use(item);", "});"];
+  assert.deepEqual([enclosingBlock(arrow, 2).startLine, enclosingBlock(arrow, 2).endLine], [1, 3]);
+});
+
+test("a definition inside a test region is not one a path outside it reaches", () => {
+  // Rust and Zig keep their tests in the file they test, where a path filter cannot see them, so
+  // `deinit` written in a test used to count as a second definition of a production name and void
+  // the answer about the production path.
+  const rust = ["pub fn deinit(self: *Self) void {", "    free(self);", "}", "", "#[cfg(test)]", "mod tests {", "    fn deinit() {}", "    #[test]", "    fn works() {}", "}"];
+  assert.deepEqual(testRegions(rust), [{ start: 5, end: 10 }]);
+  const zig = ["pub fn deinit(self: *Self) void {}", "", 'test "it frees" {', "    var x = init();", "    x.deinit();", "}"];
+  assert.deepEqual(testRegions(zig), [{ start: 3, end: 6 }]);
+  assert.deepEqual(testRegions(["fn a() {}", "fn b() {}"]), [], "a file with no test region has none");
+  // A region that opens and closes on one line ends there: looking for the next closing brace put
+  // every production definition after it inside the region, and out of the evidence.
+  const oneLine = ["#[cfg(test)]", "mod tests {}", "pub fn production_guard() {", "    enforce();", "}"];
+  assert.deepEqual(testRegions(oneLine), [{ start: 1, end: 2 }]);
+  assert.ok(!testRegions(oneLine).some((r) => 3 >= r.start && 3 <= r.end), "the production function is outside it");
+  assert.deepEqual(new BlockIndex(rust).testRegions, [{ start: 5, end: 10 }], "the index carries them");
 });
 
 test("a line that only closes brackets belongs to the block it closes", () => {

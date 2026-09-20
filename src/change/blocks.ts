@@ -23,7 +23,12 @@ const HEADERS: RegExp[] = [
   /^\s*(pub(\([\w:]+\))?\s+)?(export\s+)?(inline\s+)?(async\s+)?(const\s+)?(unsafe\s+)?(extern\s+("\w+"\s+)?)?fn\s+\w+/, // Rust / Zig
   /\b(fun|sub|proc|method)\s+[\w$]+\s*[(<]/, // Kotlin / Perl / Nim / Raku
   /^\s*(export\s+)?(default\s+)?(const|let|var)\s+[\w$]+\s*(:[^=]+)?=\s*(async\s+)?(\([^)]*\)|[\w$]+)\s*(:[^=]+)?=>/, // arrow function assigned
-  /=>\s*\{\s*$/, // arrow function with a body
+  // An arrow function with a body. What precedes the arrow has to be a parameter list or a single
+  // name, and it has to follow an `=`, an opening bracket, a comma, a colon or the start of the
+  // line — otherwise every `Err(_) => {` and `.ok => {` reads as a function. `Err(_) => {` was
+  // taken for one named `Err`, which every Rust file then has more than one of, so the evidence
+  // for those places carried another arm's surroundings and the answers about them were voided.
+  /(^|[=(,:[]\s*)(async\s+)?(\([^)]*\)(\s*:[^=]+)?|[a-z$][\w$]*)\s*=>\s*\{\s*$/,
   // `name(args) {`, `Type name(args) {`, `name(args): Type {`. Must open a block, or a plain call
   // in a brace-less language (`save(record)`) would read as a definition.
   /^\s*([\w$<>[\],.?*&:]+\s+)*[\w$]+\s*\([^;]*\)\s*(:\s*[^={};]+)?\s*(throws\s+[\w.,\s]+)?\s*(->\s*[^={};]+)?\{\s*$/,
@@ -45,6 +50,43 @@ const DEFINES: RegExp[] = [
 const CONTINUATION = /^\s*([)\]]|\{\s*$)/;
 
 const NOT_NAMES = new Set(["if", "for", "while", "switch", "catch", "return", "function", "new", "await", "async", "else", "do", "with", "yield"]);
+
+/**
+ * Lines inside a test region of a source file: Rust's `#[cfg(test)] mod tests`, Zig's
+ * `test "..." {`. A definition in one is not the definition a path outside it reaches, and both
+ * languages keep their tests in the file they test, where a path filter cannot see them.
+ */
+export function testRegions(lines: readonly string[]): { start: number; end: number }[] {
+  const regions: { start: number; end: number }[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] as string;
+    const cfgTest = /^\s*#\[cfg\(test\)\]/.test(line);
+    const zigTest = /^\s*test\s+("[^"]*"|[\w.]+)?\s*\{/.test(line);
+    if (!cfgTest && !zigTest) continue;
+    // The region is the block that opens on this line or the next one.
+    let open = i;
+    while (open < lines.length && !(lines[open] as string).includes("{")) open += 1;
+    if (open >= lines.length) continue;
+    // Counted by braces, not by indentation: `mod tests {}` opens and closes on its own line, and
+    // looking for the next closing brace instead put every production definition after it inside
+    // the region.
+    let depth = 0;
+    let end = open;
+    for (let j = open; j < lines.length; j++) {
+      const text = lines[j] as string;
+      if (isSkippable(text)) continue;
+      for (const ch of text) {
+        if (ch === "{") depth += 1;
+        else if (ch === "}") depth -= 1;
+      }
+      end = j;
+      if (depth <= 0) break;
+    }
+    regions.push({ start: i + 1, end: end + 1 });
+    i = end;
+  }
+  return regions;
+}
 
 export function isSkippable(line: string): boolean {
   return line.trim() === "" || COMMENT.test(line);
@@ -132,8 +174,12 @@ export class BlockIndex {
   readonly #ends = new Map<number, number>();
   readonly #headers = new Map<number, number>();
 
+  /** Lines inside a test region of this file, so a definition in one can be told apart. */
+  readonly testRegions: readonly { start: number; end: number }[];
+
   constructor(lines: readonly string[]) {
     this.lines = lines;
+    this.testRegions = testRegions(lines);
     const n = lines.length;
     this.#indent = lines.map(indentOf);
     this.#skip = lines.map(isSkippable);

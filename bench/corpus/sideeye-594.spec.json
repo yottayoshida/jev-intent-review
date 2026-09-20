@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The judge's path channel resolves relative paths and symlinks to the sideeye repo or the user's config dir in a tool input, voiding the run if a match is found.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#594",
+          "quote": "a tool input that names the sideeye repo or the user's config dir in a form the record's own text resolves voids the run"
+        }
+      ],
+      "searchHints": [
+        "resolve",
+        "symlinks",
+        "relative paths"
+      ]
+    },
+    {
+      "id": "R2",
+      "text": "A recursive read of an ancestor of the sideeye repo or the user's config dir voids the run if it is one from every directory the agent might have been in.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#594",
+          "quote": "a recursive read of an ancestor of either voids when it is one from every directory the agent might have been in"
+        }
+      ],
+      "searchHints": [
+        "recursive",
+        "read",
+        "ancestor"
+      ]
+    },
+    {
+      "id": "R3",
+      "text": "Each word of a Bash command, each path key, and a Glob's pattern is resolved against the candidate directories.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#594",
+          "quote": "each word of a Bash command, each path key and a Glob's pattern is now resolved against the candidate directories"
+        }
+      ],
+      "searchHints": [
+        "resolve",
+        "bash",
+        "command"
+      ]
+    },
+    {
+      "id": "R4",
+      "text": "The path is compared outside the stage by identity and name, with the repo's path matched at a name boundary.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#594",
+          "quote": "it is compared outside the stage by identity as well as by name, with the repo's path as text matched at a name boundary"
+        }
+      ],
+      "searchHints": [
+        "compare",
+        "identity",
+        "name"
+      ]
+    },
+    {
+      "id": "R5",
+      "text": "The path channel only matches absolute spellings, so relative walks out of the stage stay clean.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#510",
+          "quote": "the path channel matches only the absolute spelling, so a relative walk out of the stage stays clean"
+        }
+      ],
+      "searchHints": [
+        "absolute",
+        "spelling",
+        "relative"
+      ]
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

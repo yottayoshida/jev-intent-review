@@ -11,6 +11,7 @@ import { defines } from "../change/blocks.ts";
 import { calledNames, identifiers } from "../change/seeds.ts";
 import { IMPORT_LINE, isTestPath, type Discoverer } from "../discovery/discover.ts";
 import type { Candidate, Cut, Location, Requirement } from "../types.ts";
+import type { GrepHit } from "../repository/git.ts";
 import { cut, redact } from "./redact.ts";
 
 export interface EvidenceLimits {
@@ -61,6 +62,23 @@ function slice(lines: readonly string[], start: number, end: number): string {
   return lines.slice(start - 1, end).join("\n");
 }
 
+/**
+ * The definitions of a name that a path outside the tests can reach: not a fixture or a stub in a
+ * test file, and not one inside a test region of a source file, which is where Rust and Zig keep
+ * theirs. Measured on ten real pull requests: before this, the same-name flag fired on 22% of the
+ * places judged, and `deinit` in a Zig test was enough to void the answer about a production path.
+ */
+async function realDefinitions(discoverer: Discoverer, hits: readonly GrepHit[], name: string): Promise<GrepHit[]> {
+  const found = hits.filter((h) => defines(h.text, name) && !isTestPath(h.path));
+  const outside: GrepHit[] = [];
+  for (const hit of found) {
+    const index = await discoverer.index(hit.path);
+    const inTest = (index?.testRegions ?? []).some((r) => hit.line >= r.start && hit.line <= r.end);
+    if (!inTest) outside.push(hit);
+  }
+  return outside;
+}
+
 export async function buildEvidence(discoverer: Discoverer, requirement: Requirement, candidate: Candidate, limits: EvidenceLimits): Promise<Evidence> {
   const index = await discoverer.index(candidate.path);
   const lines = index?.lines ?? [];
@@ -100,9 +118,10 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
   const symbol = candidate.symbol;
   if (symbol && limits.maxRelatedChars > 0) {
     const { hits, more } = await discoverer.search(symbol);
-    // Outside tests: a fixture or a stub of the same name does not put the guard on another path,
-    // and counting them would make the flag fire on most names in a repository that has tests.
-    const definitions = hits.filter((h) => defines(h.text, symbol) && !isTestPath(h.path));
+    // The candidate is itself one of these definitions, so being in its own file settles nothing:
+    // what is unattributable is the callers, which were found by name and may belong to another
+    // definition of it. Only definitions a path outside the tests can reach are counted.
+    const definitions = await realDefinitions(discoverer, hits, symbol);
     if (definitions.length > 1) ambiguous = true;
     const outside = hits.filter(
       (h) =>
@@ -139,11 +158,14 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
     const { hits } = await discoverer.search(name);
     // ponytail: the first definition found stands for the name; two functions of the same name in
     // different modules are not told apart without name resolution (spec Phase 4).
-    const defined = hits.filter((h) => defines(h.text, name) && !isTestPath(h.path));
+    const defined = await realDefinitions(discoverer, hits, name);
     const definition = defined[0];
     if (!definition) continue;
-    // The body taken for this name is where a guard usually is; with the name defined more than
-    // once, the body shown may not be the one this path reaches.
+    // The body taken for this name is where a guard usually is, so with the name defined more than
+    // once the body shown may not be the one this path reaches. Being in the same file settles
+    // nothing: `remote.check(user)` beside a local `check(user)` would take the local one, and its
+    // guard, for a call that never reaches it. Without resolving the receiver and the imports, the
+    // honest answer is that it is ambiguous.
     if (defined.length > 1) ambiguous = true;
     const defIndex = await discoverer.index(definition.path);
     if (!defIndex) continue;
