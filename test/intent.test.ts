@@ -96,6 +96,11 @@ test("readRequirementText takes the record the model wrote into the sentence", (
   assert.equal(cut.text, "The function should fail the whole listing on the first per-entry error.");
   const unpunctuated = readRequirementText("The function should fail the whole listing on the first per-entry error. It should not silently drop entries after the error and re");
   assert.equal(unpunctuated.text, "The function should fail the whole listing on the first per-entry error. It should not silently drop entries after the error and re");
+  // A single clause cut at the limit has nowhere to fall back to, and is left open. Closing it
+  // with a full stop made `…and instead report an '未` read like a finished requirement — one of
+  // these went into a measurement that way.
+  const noSentence = readRequirementText("The function should fail the whole listing and not silently drop entries and instead report an '", true);
+  assert.equal(noSentence.text, "The function should fail the whole listing and not silently drop entries and instead report an '");
 
   // A requirement written the way it was asked for is left alone — including one that quotes a
   // list. Cutting at `', '` as though it were a serialized field took two thirds of this away.

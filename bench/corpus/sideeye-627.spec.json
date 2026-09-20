@@ -5,7 +5,7 @@
   "requirements": [
     {
       "id": "R1",
-      "text": "The MCP explore tool exposes observation mode as an optional input, with values 'wrappers' and 'syscalls'.”.",
+      "text": "The MCP explore tool exposes observation mode as an optional input, with values 'wrappers' and 'syscalls'.”,",
       "kind": "behavior",
       "priority": "required",
       "sourceRefs": [
