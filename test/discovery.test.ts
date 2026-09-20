@@ -255,6 +255,44 @@ test("a name defined twice makes its callers' context unreliable, and the eviden
   }
 });
 
+test("a second definition inside a test region does not make the evidence ambiguous", async () => {
+  // Rust and Zig keep their tests in the files they test. Counting a `deinit` written in one as
+  // another definition of the production name voided the answers about the production path; on
+  // ten real pull requests the same-name flag was firing on a fifth of the places judged.
+  const repo = tempRepo();
+  try {
+    repo.write({
+      "src/a.rs": "pub fn deinit(x: u8) {\n    free(x);\n}\n",
+      "src/caller.rs": "fn run() {\n    deinit(1);\n}\n",
+      "src/b.rs": "#[cfg(test)]\nmod tests {\n    fn deinit() {}\n\n    #[test]\n    fn works() { deinit(); }\n}\n",
+    });
+    const sha = repo.commit("files");
+    const git = await Git.open(repo.dir);
+    const d = new Discoverer(git, sha, { include: () => true, maxCandidates: 30, lexicalSearch: true, referenceSearch: true });
+    const requirement = { id: "R1", text: "Everything freed is freed once.", kind: "behavior" as const, priority: "required" as const, sourceRefs: [], searchHints: [] };
+    const candidate = { path: "src/a.rs", startLine: 1, endLine: 3, symbol: "deinit", changed: false, reasons: [] };
+    const evidence = await buildEvidence(d, requirement, candidate, { maxPrimaryChars: 8000, maxRelatedChars: 4000 });
+    assert.equal(evidence.cut.ambiguous, false, JSON.stringify(evidence.packet.evidence.related));
+
+    // Two definitions outside a test region are ambiguous wherever they sit — including in the
+    // candidate's own file, where `remote.check(user)` beside a local `check(user)` would
+    // otherwise hand over the local one's guard for a call that never reaches it.
+    repo.write({ "src/same.rs": "pub fn check(u: u8) {\n    deny(u);\n}\n\npub fn call_it(u: u8) {\n    remote.check(u);\n}\n", "src/remote.rs": "pub fn check(u: u8) {\n    allow(u);\n}\n" });
+    const both = repo.commit("two definitions, one of them local");
+    const d3 = new Discoverer(git, both, { include: () => true, maxCandidates: 30, lexicalSearch: true, referenceSearch: true });
+    const local = { path: "src/same.rs", startLine: 5, endLine: 7, symbol: "call_it", changed: false, reasons: ["calls check"] };
+    assert.equal((await buildEvidence(d3, requirement, local, { maxPrimaryChars: 8000, maxRelatedChars: 4000 })).cut.ambiguous, true);
+
+    // A second definition outside a test region still does, as before.
+    repo.write({ "src/c.rs": "pub fn deinit(y: u8) {\n    drop(y);\n}\n" });
+    const two = repo.commit("a second real definition");
+    const d2 = new Discoverer(git, two, { include: () => true, maxCandidates: 30, lexicalSearch: true, referenceSearch: true });
+    assert.equal((await buildEvidence(d2, requirement, candidate, { maxPrimaryChars: 8000, maxRelatedChars: 4000 })).cut.ambiguous, true);
+  } finally {
+    repo.remove();
+  }
+});
+
 test("evidence is redacted before it is cut, and a cut is reported", async () => {
   const repo = tempRepo();
   try {
