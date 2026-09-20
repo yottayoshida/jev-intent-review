@@ -72,7 +72,12 @@ export interface IntentSpec {
   ambiguities: Ambiguity[];
 }
 
-export type Status = "verified" | "violation" | "unknown" | "not_applicable";
+/**
+ * `not_applicable` is deliberately absent: with only the places Jev calls paths deciding a
+ * requirement, "the requirement does not apply here" cannot be told apart from "no place it
+ * applies to was found", and a claim that cannot be told apart from ignorance is not made.
+ */
+export type Status = "verified" | "violation" | "unknown";
 export type Coverage = "full" | "partial" | "weak" | "none";
 
 /** Lines are 1-based and inclusive. */
@@ -100,22 +105,55 @@ export interface ChoiceAnswer {
   probabilities: Record<string, number>;
 }
 
-export type CandidateOutcome = "satisfies" | "violates" | "unknown" | "not_applicable" | "unrelated";
+/** `aside`: not a place the requirement holds or fails on, so it decides nothing either way. */
+export type CandidateOutcome = "satisfies" | "violates" | "unknown" | "aside";
+
+/** Why a place was set aside. Counted in the report and shown to the completeness question. */
+export type AsideReason = "not_a_path" | "unsure" | "unreadable";
+
+/**
+ * How much of the evidence was cut, kept apart because the parts do not mean the same thing.
+ * `own`: the place's own code. `context`: its callers and the bodies it calls. `ambiguous`: the
+ * context may belong to another definition of the same name.
+ */
+export interface Cut {
+  own: boolean;
+  context: boolean;
+  ambiguous: boolean;
+}
 
 export interface CandidateResult {
   candidate: Candidate;
   outcome: CandidateOutcome;
+  aside?: AsideReason;
   relevance?: ChoiceAnswer;
   satisfaction?: ChoiceAnswer;
-  truncated: boolean;
+  truncated: boolean; // any of `cut`, for a reader; the parts are in `cut`
+  cut: Cut;
   evidence: Location[]; // the lines a reader should look at, e.g. the call the requirement governs
   notes: string[]; // written by the policy, never by a model
+}
+
+/**
+ * What a requirement's result is a statement about: how many places were judged of how many were
+ * found, how many of those were paths, what was set aside, and what the search did not follow.
+ * VERIFIED is a claim over `paths` alone, so these numbers travel with it.
+ */
+export interface Scope {
+  found: number; // places discovery offered
+  judged: number; // places a judgment was asked about
+  paths: number; // places Jev called a path of this requirement
+  setAside: number;
+  notFollowed: string[]; // leads the search declined to follow, in its own words
+  unjudged: string[]; // places found and not judged (a cap, a budget)
+  blocking: string[]; // reasons VERIFIED is withheld whatever the answers say
 }
 
 export interface RequirementResult {
   requirementId: string;
   status: Status;
   coverage: Coverage;
+  scope: Scope;
   candidates: CandidateResult[];
   notes: string[];
 }

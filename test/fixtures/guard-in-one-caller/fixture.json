@@ -1,0 +1,27 @@
+{
+  "description": "One login function, two routes. The first is guarded by middleware that rejects disabled users; the pull request adds a second route to the same function without it. The guard is visible in one caller and missing in another, so an answer that reads the guarded caller alone would verify a requirement that does not hold.",
+  "intent": "Prevent disabled users from authenticating.",
+  "spec": {
+    "version": 1,
+    "title": "Prevent disabled users from authenticating",
+    "summary": "",
+    "requirements": [
+      {
+        "id": "R1",
+        "text": "Disabled users cannot authenticate.",
+        "kind": "security",
+        "sourceRefs": [{ "sourceId": "fixture", "quote": "Prevent disabled users from authenticating." }],
+        "searchHints": ["disabled", "authenticate"]
+      }
+    ]
+  },
+  "expected": {
+    "head": {
+      "R1": "not_verified",
+      "discovery": {
+        "must_find": ["src/auth/api-key.ts"],
+        "must_not_find": []
+      }
+    }
+  }
+}

@@ -9,8 +9,8 @@
 
 import { defines } from "../change/blocks.ts";
 import { calledNames, identifiers } from "../change/seeds.ts";
-import { IMPORT_LINE, type Discoverer } from "../discovery/discover.ts";
-import type { Candidate, Location, Requirement } from "../types.ts";
+import { IMPORT_LINE, isTestPath, type Discoverer } from "../discovery/discover.ts";
+import type { Candidate, Cut, Location, Requirement } from "../types.ts";
 import { cut, redact } from "./redact.ts";
 
 export interface EvidenceLimits {
@@ -32,7 +32,14 @@ export interface Packet {
 
 export interface Evidence {
   packet: Packet;
-  truncated: boolean; // the candidate or its context was cut, or stood in for by a window
+  /**
+   * Which part of the evidence was cut. They do not mean the same thing: the place's own code
+   * missing voids every answer about it, missing surroundings can only hide a check, and
+   * surroundings that may belong to another definition of the same name can put a check on a path
+   * that is not this one.
+   */
+  cut: Cut;
+  truncated: boolean; // any of `cut`, which is what the packet tells Jev
   sent: Location[]; // every range whose text is in the packet
   redactions: number;
   callSites: Location[]; // where the candidate's governed calls sit, to point a reader at
@@ -68,13 +75,16 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
   const primary = cut(clean(body), limits.maxPrimaryChars);
   const sent: Location[] = [{ path: candidate.path, startLine: candidate.startLine, endLine: candidate.endLine }];
   const related: Related[] = [];
-  let relatedTruncated = false;
+  // No room for the surroundings is not the same as having none: with the related section
+  // skipped entirely, the packet would otherwise tell Jev nothing was cut.
+  let contextCut = limits.maxRelatedChars <= 0;
+  let ambiguous = false;
   let room = limits.maxRelatedChars;
 
   const push = (path: string, start: number, end: number, text: string): boolean => {
     const code = clean(text);
     if (code.length > room) {
-      relatedTruncated = true;
+      contextCut = true;
       return false;
     }
     room -= code.length;
@@ -90,15 +100,17 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
   const symbol = candidate.symbol;
   if (symbol && limits.maxRelatedChars > 0) {
     const { hits, more } = await discoverer.search(symbol);
-    const definitions = hits.filter((h) => defines(h.text, symbol));
-    if (definitions.length > 1) relatedTruncated = true;
+    // Outside tests: a fixture or a stub of the same name does not put the guard on another path,
+    // and counting them would make the flag fire on most names in a repository that has tests.
+    const definitions = hits.filter((h) => defines(h.text, symbol) && !isTestPath(h.path));
+    if (definitions.length > 1) ambiguous = true;
     const outside = hits.filter(
       (h) =>
         !(h.path === candidate.path && h.line >= candidate.startLine && h.line <= candidate.endLine) &&
         !defines(h.text, symbol) &&
         !IMPORT_LINE.test(h.text),
     );
-    if (more || outside.length > MAX_CALLERS) relatedTruncated = true;
+    if (more || outside.length > MAX_CALLERS) contextCut = true;
     for (const hit of outside.slice(0, MAX_CALLERS)) {
       const callerIndex = await discoverer.index(hit.path);
       if (!callerIndex) continue;
@@ -123,23 +135,27 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
   let definitions = 0;
   for (const name of limits.maxRelatedChars > 0 ? named : []) {
     // Past the limit with the cut already recorded, no further name can change the packet.
-    if (definitions >= MAX_DEFINITIONS && relatedTruncated) break;
+    if (definitions >= MAX_DEFINITIONS && contextCut) break;
     const { hits } = await discoverer.search(name);
     // ponytail: the first definition found stands for the name; two functions of the same name in
     // different modules are not told apart without name resolution (spec Phase 4).
-    const definition = hits.find((h) => defines(h.text, name));
+    const defined = hits.filter((h) => defines(h.text, name) && !isTestPath(h.path));
+    const definition = defined[0];
     if (!definition) continue;
+    // The body taken for this name is where a guard usually is; with the name defined more than
+    // once, the body shown may not be the one this path reaches.
+    if (defined.length > 1) ambiguous = true;
     const defIndex = await discoverer.index(definition.path);
     if (!defIndex) continue;
     const block = defIndex.enclosing(definition.line);
     // Too long to take as a block: not sent, and the guard could be in it, as with one too large.
     if (block.windowed) {
-      relatedTruncated = true;
+      contextCut = true;
       continue;
     }
     if (definition.path === candidate.path && block.startLine >= candidate.startLine && block.endLine <= candidate.endLine) continue;
     if (definitions >= MAX_DEFINITIONS || !push(definition.path, block.startLine, block.endLine, slice(defIndex.lines, block.startLine, block.endLine))) {
-      relatedTruncated = true;
+      contextCut = true;
       continue;
     }
     definitions += 1;
@@ -156,7 +172,8 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
     }
   }
 
-  const truncated = primary.truncated || relatedTruncated || candidate.windowed === true;
+  const cuts: Cut = { own: primary.truncated || candidate.windowed === true, context: contextCut, ambiguous };
+  const truncated = cuts.own || cuts.context || cuts.ambiguous;
   return {
     packet: {
       requirement: { id: requirement.id, text: clean(requirement.text) },
@@ -168,6 +185,7 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
       },
       evidence: { code: primary.text, related, truncated },
     },
+    cut: cuts,
     truncated,
     sent,
     redactions,

@@ -16,7 +16,7 @@ import { FIXTURES, fixtureRepo } from "../test/helpers/repo.ts";
 interface Case {
   fixture: string;
   after: "head" | "fixed";
-  status: string;
+  status: string | { not: string }; // the status expected, or the one that must not come out
   violations: string[]; // paths expected to hold a violation
   clean: string[]; // paths expected not to
 }
@@ -25,6 +25,10 @@ const CASES: Case[] = [
   { fixture: "missed-path", after: "head", status: "violation", violations: ["src/auth/oauth.ts", "src/auth/websocket.ts"], clean: ["src/auth/password.ts", "src/auth/api-key.ts"] },
   { fixture: "missed-path", after: "fixed", status: "verified", violations: [], clean: ["src/auth/password.ts", "src/auth/oauth.ts", "src/auth/websocket.ts", "src/auth/api-key.ts"] },
   { fixture: "unknown-plugin", after: "head", status: "unknown", violations: [], clean: ["src/records/api.ts", "src/jobs/purge.ts"] },
+  // The guard sits in one of two callers. Whatever else it answers, a login reachable without
+  // the guard must not come out verified — the case a `satisfies` read from the guarded caller
+  // alone would get wrong.
+  { fixture: "guard-in-one-caller", after: "head", status: { not: "verified" }, violations: [], clean: [] },
 ];
 
 const runs = Number(process.argv[2] ?? 3);
@@ -49,7 +53,7 @@ for (const c of CASES) {
     const outcomes = new Map<string, string[]>();
     for (const cr of r1?.candidates ?? []) outcomes.set(cr.candidate.path, [...(outcomes.get(cr.candidate.path) ?? []), cr.outcome]);
     const wrong: string[] = [];
-    if (r1?.status !== c.status) wrong.push(`status ${r1?.status}`);
+    if (typeof c.status === "string" ? r1?.status !== c.status : r1?.status === c.status.not) wrong.push(`status ${r1?.status}`);
     for (const path of c.violations) if (!outcomes.get(path)?.includes("violates")) wrong.push(`${path} not a violation`);
     for (const path of c.clean) if (outcomes.get(path)?.includes("violates")) wrong.push(`${path} a violation`);
     if (wrong.length > 0) failures += 1;

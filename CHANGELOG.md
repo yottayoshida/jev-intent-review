@@ -5,6 +5,36 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **VERIFIED is a claim about the paths Jev named, not about every place the search found.** A
+  place counts towards a requirement only when Jev calls it a path of that requirement at
+  `judgment.relevance_probability`; everything else — supporting, unrelated, or a path named too
+  weakly — is set aside with its reason and counted, instead of leaving the requirement open. The
+  section that reports a requirement now says what its status covers: how many places were judged
+  of how many were found, how many were paths, how many were set aside, and which leads the search
+  did not follow. Measured over 795 judged places on ten real pull requests, 19% were called paths
+  at all (a median of 2 per requirement), and requiring every one of about 30 to come back decided
+  left VERIFIED at 0 of 38 requirements. What the search left is now reported and handed to the
+  completeness question rather than each item blocking on its own — all 38 carried at least one
+  such reason, 405 in all. VERIFIED is still withheld outright for a path known by name and never
+  judged, a run that stopped on its own budget, or a change to this tool's configuration or
+  workflows. `NOT_APPLICABLE` is gone as a requirement status: with only paths deciding, it cannot
+  be told apart from "no place it applies to was found". The report's `questionsHash` is
+  `2dbfadbe52a2`; the wording before it hashed to `05f56019f295`.
+- Evidence that was cut is read by which part was cut. The place's own code cut, or no block found
+  for it at all, voids every answer about it, and the place is then counted with the ones the run
+  could not judge — which withholds VERIFIED, as it did before this release. Only its surroundings cut now voids a
+  `violates` alone — the missing callers could hold the check, but they cannot remove a check that
+  was seen — and surroundings that may belong to another definition of the same name void
+  `satisfies` as well, including when the ambiguity is in a one-hop definition, which is where a
+  guard usually lives. Of 116 cut packets measured across five pull requests, 111 had the place's
+  own code whole. A packet built with no room for the surroundings at all now says it was cut,
+  instead of reporting nothing missing while showing none of them.
+- The callers of code Jev calls a mere wrapper get room of their own instead of what the
+  per-requirement cap has left. A requirement that filled the cap used to reach them with room for
+  none: their names were known and not one was judged.
+
 ### Added
 
 - Changes no requirement asked for are reported. Every changed region that carries behaviour is
@@ -28,7 +58,7 @@ All notable changes to this project are recorded here. The format follows
   the configuration file, it must be `https:` (`http:` only for a loopback host) and carry no
   credentials, redirects are never followed, and the report names the endpoint's origin.
 
-- Requirement verification from the command line. Intent comes from `--pr` (the issues a pull request closes, then its description, each with its author; outside a workflow, `--pr` also names the change: the commit the pull request started from and its head commit), `--issue`, `--intent`, `--intent-file`, or `--intent-spec` on its own. When every source lists its criteria under an "Acceptance criteria" style heading, those items become requirements as written (an item too short to check is listed as an ambiguity, not dropped); otherwise all sources go to a Workers AI model together, and every requirement it writes must quote a sentence of its source. For each requirement the tool searches the repository after the change — from every call the changed functions make, and from the words the change checks — and follows the callers of anything Jev calls a mere wrapper one hop further. It builds bounded, redacted evidence that includes how each place is reached and the bodies of what it calls, asks Jev whether each place is a path the requirement governs and whether it satisfies it, and reports a violation only when Jev both calls a place a path the requirement governs and says it fails there, each at `judgment.violation_probability` or above. VERIFIED needs every relevant place satisfied on evidence that was not cut, a search that was not cut short (every call followed, nothing too common to search), Jev judging the list of places likely complete, and no edit to the tool's configuration or workflows; otherwise UNKNOWN. With no credentials or no intent the run is skipped with exit 0, or fails, as `policy.missing_credentials` and `policy.no_intent` say.
+- Requirement verification from the command line. Intent comes from `--pr` (the issues a pull request closes, then its description, each with its author; outside a workflow, `--pr` also names the change: the commit the pull request started from and its head commit), `--issue`, `--intent`, `--intent-file`, or `--intent-spec` on its own. When every source lists its criteria under an "Acceptance criteria" style heading, those items become requirements as written (an item too short to check is listed as an ambiguity, not dropped); otherwise all sources go to a Workers AI model together, and every requirement it writes must quote a sentence of its source. For each requirement the tool searches the repository after the change — from every call the changed functions make, and from the words the change checks — and follows the callers of anything Jev calls a mere wrapper one hop further. It builds bounded, redacted evidence that includes how each place is reached and the bodies of what it calls, asks Jev whether each place is a path the requirement governs and whether it satisfies it, and reports a violation only when Jev both calls a place a path the requirement governs and says it fails there, each at `judgment.violation_probability` or above. VERIFIED covers the places Jev called paths of the requirement, all of them satisfied, with Jev judging the list of places likely complete and nothing the run could not judge (see the Changed entry above for the rule this release settles on); otherwise UNKNOWN. With no credentials or no intent the run is skipped with exit 0, or fails, as `policy.missing_credentials` and `policy.no_intent` say.
 - The groundwork for the command line tool: it reads the change between two commits from git
   objects, never from the working tree's files or `.gitattributes`, and passes every diff setting
   explicitly so git config does not change what is read. It finds the function around each
