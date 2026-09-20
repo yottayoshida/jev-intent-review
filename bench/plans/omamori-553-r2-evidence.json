@@ -1,0 +1,73 @@
+{
+  "planVersion": "1",
+  "writtenAt": "2026-09-20",
+  "note": "Written and committed before any request of this run. The question, the condition and the target body are the ones already fixed in bench/plans/omamori-553-r2.json and are not touched here; the only thing that varies is which related entries the packet carries.",
+
+  "question": "The v3 contract, unchanged: bench/check-questions-v3.ts, `returns_error` / `returns_success` / `cannot_determine`, bar 0.6, the control kept as a diagnostic and never aggregated.",
+  "condition": "The one in bench/plans/omamori-553-r2.json, unchanged and re-read from that file rather than copied.",
+
+  "whyThisRun": {
+    "from": "#15 measured the plan missing the mutant; #16 corrected the account of why. Emptying the related section fixed that mutant, but it removed four things at once: the caller `staging_info_at`, the callee `collect_listing`, a test carrying the expected result, and that test's duplicate.",
+    "question": "Which kind of related entry carries the wrong answer, and which kind does the question need?",
+    "notThisRun": "An unused real requirement. This is the development case from #15, and no result here counts as generalisation."
+  },
+
+  "target": {
+    "repository": "yottayoshida/omamori",
+    "file": "src/cli/doctor.rs",
+    "symbol": "staging_info_from",
+    "pinnedContent": "The base is commit 916d954607f1f22a4326feb59c76c2197f540bc9. The mutant and variant are that commit plus bench/fixtures/omamori-553-r2/{mutant,variant}.patch. **Their commit SHAs are not stable**: rebuilding with `git am` makes new commits, so what is pinned is the base commit and the two patches, and the log records the SHAs the run actually used.",
+    "neededReferents": ["collect_listing"],
+    "whyThatReferent": "The shipped body reaches the caller through `crate::util::collect_listing(entries).map_err(...)?`. Whether a failure of `entries` becomes an `Err` is decided inside `collect_listing`, so a packet without it cannot answer the question — which is why `none` below is a diagnostic condition and not a candidate rule."
+  },
+
+  "howSelectionWorks": "One packet is built per code version with the product's `buildEvidence` at the default limits. Each related entry is classified once — `test` (a test path, or a line inside `BlockIndex.testRegions`), `needed_callee` (it defines a declared referent), `other`. The four conditions are **subsets of that one packet**. Nothing is rebuilt: a smaller budget would let other code into the freed room and the comparison would be between two collections rather than between what was kept.",
+
+  "selections": [
+    { "id": "as-is", "keeps": "every entry buildEvidence returned", "isCandidateRule": false, "why": "what the first measurement sent" },
+    { "id": "no-tests", "keeps": "entries that are not test code", "isCandidateRule": true, "why": "the candidate: runtime code, without expectations written by a test" },
+    { "id": "callee-only", "keeps": "only entries defining a declared referent", "isCandidateRule": false, "why": "the narrowest packet that can still answer; separates the caller from the callee" },
+    { "id": "none", "keeps": "nothing", "isCandidateRule": false, "why": "diagnostic, and the comparison point from the earlier run. It drops the needed referent, so under the referent gate it would be withheld rather than answered." }
+  ],
+
+  "phaseA": {
+    "what": "Two code versions × four selections × three runs = 24 requests.",
+    "versions": ["correct", "mutant"],
+    "expected": {
+      "correct": "returns_error in all four. It was returns_error 0.96-0.98 with the packet as-is, and removing evidence should not turn a correct implementation into a violation.",
+      "mutant": "returns_success in all four **if the tests were what carried the wrong answer**. Two of the cells are already known: as-is gave returns_error 0.51-0.60 (wrong), none gave returns_success 0.65-0.71 (right). The two new cells are what decide."
+    },
+    "howToRead": [
+      "`no-tests` right and `callee-only` right → the test expectations were the cause; the caller and callee are harmless.",
+      "`no-tests` wrong and `callee-only` right → the caller is a cause as well.",
+      "`callee-only` wrong → the callee is a cause, and the question cannot be asked with the referent it needs.",
+      "`no-tests` wrong and `callee-only` wrong → none of these three splits it; stop cutting the packet and look elsewhere."
+    ],
+    "stillConfounded": "Whether one copy of the test would mislead as much as two. Removing the test kind removes both copies, and no condition here keeps exactly one. It is left confounded on purpose: the rule that follows from either answer is the same — test code is not a runtime caller — so separating it would not change what gets built."
+  },
+
+  "phaseB": {
+    "what": "The candidate rule, checked on the four conditions a rule has to survive. Only the ones not already measured in phase A send requests.",
+    "cases": [
+      { "id": "candidate/correct", "expected": "returns_error", "from": "phase A, no-tests, correct", "sendsRequests": false },
+      { "id": "candidate/mutant", "expected": "returns_success", "from": "phase A, no-tests, mutant", "sendsRequests": false },
+      { "id": "candidate/variant", "expected": "returns_error", "what": "the behaviour-preserving variant under the candidate rule", "sendsRequests": true, "runs": 3 },
+      { "id": "candidate/referent-missing", "expected": "withheld locally, no request", "what": "the candidate packet with the needed callee removed", "sendsRequests": false }
+    ],
+    "passCondition": "Each sending case: the expected choice in 3 of 3 runs at 0.6 or above. `candidate/referent-missing` must be withheld by the referent gate with no request. A bar is not lowered afterwards, and a selection is not added after seeing an answer — that would be a new plan file."
+  },
+
+  "requestBudget": {
+    "oneJudgeCallIsOneHttpRequest": true,
+    "planned": { "phaseA": 24, "phaseB": 3, "total": 27 },
+    "maxRetries": 0,
+    "hardLimit": 40,
+    "onLimit": "The run stops and writes what it has. No case is dropped to fit."
+  },
+
+  "outOfScope": [
+    "Changing `builder.ts` so the caller collection excludes test regions. That is the repair this run is meant to justify; making it first would mix it into the measurement.",
+    "runReview, the report format, the thresholds.",
+    "Any other requirement. The next unused one comes after the rule is fixed."
+  ]
+}
