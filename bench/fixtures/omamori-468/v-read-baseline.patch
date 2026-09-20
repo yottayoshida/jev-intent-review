@@ -1,0 +1,30 @@
+From d6a6890f7dbc4573cc1f02ee102df48b69db0a93 Mon Sep 17 00:00:00 2001
+From: yotta <yoshida02@gmail.com>
+Date: Sun, 20 Sep 2026 21:12:00 +0900
+Subject: [PATCH] v-read-baseline: the parsed value returned inline
+
+---
+ src/integrity.rs | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/integrity.rs b/src/integrity.rs
+index 993cffb..8d2c2b6 100644
+--- a/src/integrity.rs
++++ b/src/integrity.rs
+@@ -214,9 +214,10 @@ pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppEr
+         return Ok(None);
+     }
+     let content = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)?;
+-    let baseline: IntegrityBaseline =
+-        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;
+-    Ok(Some(baseline))
++    Ok(Some(
++        serde_json::from_str::<IntegrityBaseline>(&content)
++            .map_err(|e| AppError::Config(e.to_string()))?,
++    ))
+ }
+ 
+ // ---------------------------------------------------------------------------
+-- 
+2.39.5 (Apple Git-154)
+

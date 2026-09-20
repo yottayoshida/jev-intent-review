@@ -1,0 +1,135 @@
+{
+  "planVersion": "1",
+  "writtenAt": "2026-09-20",
+  "note": "Written and committed before any request of this comparison. The frozen experiment spec is docs/frozen-spec-v1.md; nothing in it is changed here.",
+
+  "purpose": "Whether the verification plan a person has been writing can be generated instead, and whether the arrangement earns its keep against an ordinary LLM review.",
+
+  "methods": {
+    "A": { "what": "the hand-written plan + Jev", "measures": "whether a fit plan lets a new target be observed and judged at all" },
+    "B": { "what": "a generated plan + Jev", "measures": "whether choosing the target, the condition and the dependency from the requirement can be automated" },
+    "C": { "what": "an ordinary LLM review", "measures": "whether separating the plan from the local judgment buys anything in quality or cost" }
+  },
+  "sameModelForBandC": "@cf/meta/llama-3.3-70b-instruct-fp8-fast — the model the tool already uses to write requirements (`COMPILER_MODEL`), on the same endpoint, so requests and bytes are counted by `CloudflareClient.sent` for every method.",
+  "whatBandCMayNotSee": "The hand-written plan, the mutation labels, which branch a packet came from, and the expected answers. B receives the requirement text, the repository at the commit, and the target file; C receives the same plus the code.",
+
+  "cases": [
+    {
+      "id": "omamori-read-baseline",
+      "repository": "yottayoshida/omamori",
+      "base": "the commit at the time of writing, recorded by the runner",
+      "file": "src/integrity.rs",
+      "symbol": "read_baseline",
+      "neededReferents": ["read_to_string_capped"],
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "primarySource": "https://github.com/yottayoshida/omamori/pull/476",
+        "quote": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+        "issue": "https://github.com/yottayoshida/omamori/issues/468",
+        "correspondence": "`read_baseline` distinguishes `Ok(None)` — there is no baseline — from an `Err` — the baseline is there and could not be read. It reaches that through `crate::atomic_file::read_to_string_capped(&path, …)?`, which is the shared helper PR #476 introduced; `git log -S` puts the `?` in the commit that closed #468."
+      },
+      "usageHistory": "Neither the requirement nor the function has been used in any bench.",
+      "mutations": {
+        "target": "`let Ok(content) = read_to_string_capped(&path, …) else { return Ok(None) };` — a baseline that cannot be read comes back as 'there is no baseline'.",
+        "behaviourPreserving": "the parsed value returned inline instead of through a binding",
+        "dependency": null
+      }
+    },
+    {
+      "id": "omamori-raw-override-disables",
+      "repository": "yottayoshida/omamori",
+      "file": "src/config.rs",
+      "symbol": "raw_override_disables",
+      "neededReferents": ["read_to_string_capped"],
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "primarySource": "https://github.com/yottayoshida/omamori/pull/476",
+        "quote": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+        "correspondence": "The same helper, at the config path. A config that cannot be read must not read as 'this rule is not disabled'. #468 lists `.config/omamori/config.toml` among the paths that hang, and `config` among the callers that had their own check."
+      },
+      "usageHistory": "Neither the requirement nor the function has been used in any bench.",
+      "disclosure": "Same requirement and same callee as the case above, different function. Two of the three cases therefore share a source; this is disclosed rather than presented as three independent requirements.",
+      "secondFailureKind": "The function also swallows a TOML parse failure on purpose (`let Ok(value) = toml::from_str… else { return Ok(false) }`). The condition names the read, as in the earlier work, so the parse path is excluded by 'every other operation the function reaches succeeds'.",
+      "mutations": {
+        "target": "`let Ok(content) = read_to_string_capped(path, …) else { return Ok(false) };` — a config that cannot be read comes back as 'not disabled'.",
+        "behaviourPreserving": "`== Some(false)` written as `.is_some_and(|b| !b)`",
+        "dependency": null
+      }
+    },
+    {
+      "id": "lkr-custom-keychain-open",
+      "repository": "yottayoshida/llm-key-ring",
+      "file": "crates/lkr-core/src/custom_keychain.rs",
+      "symbol": "open",
+      "neededReferents": ["keychain_path"],
+      "requirement": {
+        "id": "llm-key-ring PR#3 item 1-2",
+        "primarySource": "https://github.com/yottayoshida/llm-key-ring/pull/3",
+        "quote": "`keychain_path()` returns `Error::Keychain` when `$HOME` unset (was silent `\".\"` fallback)",
+        "correspondence": "`open()` reaches the caller through `let path = keychain_path()?;`. The requirement is about the callee, and `open` keeping it means not substituting a path of its own. `git log -S` puts that `?` in the commit of PR #3."
+      },
+      "usageHistory": "A different repository, and neither the requirement nor the function has been used in any bench.",
+      "mutations": {
+        "target": "`let path = keychain_path().unwrap_or_else(|_| PathBuf::from(\".\"));` — the silent `.` fallback the pull request removed, put back.",
+        "behaviourPreserving": "the `map_err` message built with a positional argument instead of an inline one",
+        "dependency": null
+      }
+    }
+  ],
+
+  "conditions": [
+    { "id": "correct", "what": "as shipped", "property": "holds" },
+    { "id": "target-mutant", "what": "the mutation above", "property": "breaks" },
+    { "id": "variant", "what": "the behaviour-preserving change", "property": "holds" },
+    { "id": "evidence-missing", "what": "the needed referent taken out of the packet", "property": "withheld locally, no request" }
+  ],
+
+  "localVerificationBeforeAnyRequest": "Each mutation is a one-commit change on an isolated clone, and `cargo test` is run on every branch. A mutation that does not change what a test observes is not a mutation, and the case is dropped rather than measured. The counts go in the log.",
+
+  "localVerificationResult": {
+    "note": "Recorded after building the branches and before any request of this comparison. The case list above is left as written; this is the clause above being applied, not the plan being changed.",
+    "lkr-custom-keychain-open": {
+      "adopted": false,
+      "why": "The mutated branch cannot be reached on this machine, so the difference cannot be shown by running anything. `cargo test --workspace` is 100 passed / 0 failed on all three branches — the silent `.` fallback is caught by none of them. A probe run with `env -u HOME` then showed why: `home::home_dir()` falls back to the password database on macOS, so `keychain_path()` returns `Ok(/Users/…/Library/Keychains/lkr.keychain-db)` with `$HOME` unset, and `open()` returns `Ok` on the shipped branch, the mutant and the variant alike.",
+      "whatThatAlsoSays": "The requirement's own sentence — \"`keychain_path()` returns `Error::Keychain` when `$HOME` unset\" — does not reproduce here. That is a finding about the requirement text, recorded rather than worked around, and it is why no mutation of this function could be demonstrated.",
+      "notDone": "No attempt was made to force `home::home_dir()` to fail. Faking the failure would measure a case the repository cannot reach, which is what dropping it avoids.",
+      "cost": "The comparison loses its second repository. Two of the three cases remain, and they share a requirement source, which is already disclosed above."
+    }
+  },
+
+  "scoring": {
+    "perCase": [
+      "violation found: the property-breaking condition judged `property_breaks` at or over the bar",
+      "false violation: a holding condition judged `property_breaks`",
+      "missed: a breaking condition judged `property_holds`",
+      "undecided: anything else, including withheld",
+      "coverage: which clause of the requirement the plan claims, and what it leaves unchecked",
+      "human repair: for B, whether the generated plan needed a person to touch it before it could run at all — and a plan that picked the wrong target or dropped a needed condition counts as B failing, not as a case removed from B's score"
+    ],
+    "notCounted": "The number of VERIFIED. A method that withholds is not thereby worse than one that guesses."
+  },
+
+  "requestBudget": {
+    "runsPerCell": 3,
+    "A": "3 cases × 3 sending conditions × 3 runs = 27",
+    "B": "3 plan generations + at most 27 judgments = 30",
+    "C": "3 cases × 4 conditions × 3 runs = 36",
+    "total": 93,
+    "hardLimit": 130,
+    "maxRetries": 0,
+    "cost": "Workers AI bills by neuron and the REST answer does not carry a price. Requests and bytes are recorded for every method, plan generation included, and no yen figure is claimed."
+  },
+
+  "decisionsFixedBeforeTheRun": [
+    "A fails on the new targets → look again at what can be observed at all; that is not a failure of plan generation.",
+    "A passes and B does not → name which judgment the generated plan was missing.",
+    "B passes with no human repair → connect a limited requirement kind to the CLI.",
+    "C wins on quality and cost → reconsider the arrangement that puts Jev under a plan."
+  ],
+
+  "outOfScope": [
+    "Changing runReview, the report format or the thresholds.",
+    "The default `as-is` packet under v4.",
+    "Any requirement kind outside Rust failure propagation."
+  ]
+}

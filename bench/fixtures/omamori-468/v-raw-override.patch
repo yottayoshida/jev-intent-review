@@ -1,0 +1,25 @@
+From 13779e6ad1e5864bf837d1b6a20a4006b0701c58 Mon Sep 17 00:00:00 2001
+From: yotta <yoshida02@gmail.com>
+Date: Sun, 20 Sep 2026 21:12:37 +0900
+Subject: [PATCH] v-raw-override: the same test written with is_some_and
+
+---
+ src/config.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/config.rs b/src/config.rs
+index a1537f0..1a4c7af 100644
+--- a/src/config.rs
++++ b/src/config.rs
+@@ -327,7 +327,7 @@ pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, App
+         .get("overrides")
+         .and_then(|o| o.get(name))
+         .and_then(|v| v.as_bool())
+-        == Some(false))
++        .is_some_and(|enabled| !enabled))
+ }
+ 
+ // ---------------------------------------------------------------------------
+-- 
+2.39.5 (Apple Git-154)
+
