@@ -18,13 +18,11 @@ import { JevProvider } from "../src/judgments/jev.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
 import { VERSION } from "../src/version.ts";
 import type { ChoiceAnswer } from "../src/types.ts";
+import { BAR, MEANING, QUESTIONS, verdictOf, type Local } from "./local-check-plan.ts";
 
 // ---------------------------------------------------------------------------
 // The plan. Written before anything ran; the answers below never change it.
 // ---------------------------------------------------------------------------
-
-/** The bar an answer has to clear to count. The experiment's value, not a product guarantee. */
-const BAR = 0.6;
 
 const SOURCE = {
   requirement: "omamori#553 R1",
@@ -40,41 +38,6 @@ const SOURCE = {
 
 /** Where the shipped function is, so a later run can tell what these cases were derived from. */
 const SHIPPED_AT = { repository: "yottayoshida/omamori", commit: "916d954607f1f22a4326feb59c76c2197f540bc9", path: "src/util.rs", lines: "317-328" };
-
-const QUESTIONS = {
-  on_error_control: {
-    type: "choice",
-    instructions: "`code` is one function that walks an iterator whose items are each either a value or an error. Take the case where one item is an error. What does the function do with the items after it?",
-    criteria: {
-      stops_there: "It stops at that item; the ones after it are never taken from the iterator",
-      keeps_going: "It goes on taking the items after it",
-      cannot_determine: "The code does not say what happens to the items after an error",
-    },
-  },
-  on_error_result: {
-    type: "choice",
-    instructions: "Still `code`, still the case where one item is an error. What does the function return to its caller?",
-    criteria: {
-      an_error: "A failure — whatever the caller does with it, it is not a successful list",
-      a_success_with_what_it_had: "A success carrying the items it managed to take, without the failure",
-      a_success_with_nothing: "A success carrying no items",
-      cannot_determine: "The code does not say what is returned when an item is an error",
-    },
-  },
-} as const;
-
-/**
- * What an answer means for the property, and why. Only the result answer decides: a function that
- * reads to the end and then fails still never returns the failed listing as a success, so the
- * property this plan covers holds for it. Whether the requirement separately demands stopping at
- * the first error is in `notCovered` — this plan does not read that, either way.
- */
-const MEANING = {
-  an_error: { property: "holds" as const, why: "the failed enumeration does not leave the function as a success" },
-  a_success_with_what_it_had: { property: "breaks" as const, why: "the entries taken before the error are returned as though the listing were complete" },
-  a_success_with_nothing: { property: "breaks" as const, why: "an enumeration that failed is returned as an empty listing" },
-  cannot_determine: { property: "undecided" as const, why: "the code shown does not say what is returned" },
-};
 
 // ---------------------------------------------------------------------------
 // The cases. Each is the shipped function with one edit, and each edit's intended
@@ -165,27 +128,6 @@ const CASES: Case[] = [
     expect: { control: "cannot_determine", result: "cannot_determine", verdict: "unknown" },
   },
 ];
-
-// ---------------------------------------------------------------------------
-// Aggregation: the code decides, from the mapping above and nothing else.
-// ---------------------------------------------------------------------------
-
-interface Local {
-  question: string;
-  choice: string;
-  probability: number;
-  counted: boolean; // cleared the bar
-}
-
-function verdictOf(locals: Local[]): { verdict: "violation" | "covered_holds" | "unknown"; why: string } {
-  const result = locals.find((l) => l.question === "on_error_result");
-  if (!result || !result.counted) return { verdict: "unknown", why: `the result answer did not clear ${BAR} (${result?.choice ?? "none"} ${result?.probability.toFixed(2) ?? "-"})` };
-  const meaning = MEANING[result.choice as keyof typeof MEANING];
-  if (!meaning) return { verdict: "unknown", why: `no meaning is written for the answer ${result.choice}` };
-  if (meaning.property === "breaks") return { verdict: "violation", why: meaning.why };
-  if (meaning.property === "holds") return { verdict: "covered_holds", why: meaning.why };
-  return { verdict: "unknown", why: meaning.why };
-}
 
 // ---------------------------------------------------------------------------
 
