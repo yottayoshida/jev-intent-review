@@ -15,6 +15,8 @@ export interface Issue {
 
 export interface PullRequest extends Issue {
   baseRefName: string;
+  /** The base branch as it was when the pull request was opened, which is what it changed. */
+  baseSha: string;
   headSha: string;
   issues: Issue[];
   missingIssues?: number[]; // named with a closing keyword but not found
@@ -123,7 +125,7 @@ export class GitHub {
 
   async #fetchPullRequest(repo: { owner: string; name: string }, number: number): Promise<PullRequest> {
     if (this.#token) {
-      const query = `query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){number title body url author{login} baseRefName headRefOid closingIssuesReferences(first:10){nodes{number title body url author{login}}}}}}`;
+      const query = `query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){number title body url author{login} baseRefName baseRefOid headRefOid closingIssuesReferences(first:10){nodes{number title body url author{login}}}}}}`;
       const data = (await this.#request(this.#graphql, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,10 +134,10 @@ export class GitHub {
       const pr = data.data?.repository?.pullRequest;
       if (!pr) throw new ToolError(`GitHub has no pull request #${number} in ${repo.owner}/${repo.name}${data.errors?.[0]?.message ? ` (${data.errors[0].message})` : ""}`, EXIT.intent);
       const nodes = ((pr.closingIssuesReferences as { nodes?: Record<string, unknown>[] } | undefined)?.nodes ?? []).map(toIssue);
-      return { ...toIssue(pr), baseRefName: String(pr.baseRefName ?? ""), headSha: String(pr.headRefOid ?? ""), issues: nodes };
+      return { ...toIssue(pr), baseRefName: String(pr.baseRefName ?? ""), baseSha: String(pr.baseRefOid ?? ""), headSha: String(pr.headRefOid ?? ""), issues: nodes };
     }
     const pr = (await this.#request(`${this.#api}/repos/${repo.owner}/${repo.name}/pulls/${number}`)) as Record<string, unknown>;
-    const base = pr.base as { ref?: string } | undefined;
+    const base = pr.base as { ref?: string; sha?: string } | undefined;
     const head = pr.head as { sha?: string } | undefined;
     const issues: Issue[] = [];
     const missing: number[] = [];
@@ -148,7 +150,7 @@ export class GitHub {
         else throw error;
       }
     }
-    return { ...toIssue(pr), baseRefName: base?.ref ?? "", headSha: head?.sha ?? "", issues, ...(missing.length ? { missingIssues: missing } : {}) };
+    return { ...toIssue(pr), baseRefName: base?.ref ?? "", baseSha: base?.sha ?? "", headSha: head?.sha ?? "", issues, ...(missing.length ? { missingIssues: missing } : {}) };
   }
 }
 

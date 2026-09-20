@@ -28,7 +28,7 @@ All notable changes to this project are recorded here. The format follows
   the configuration file, it must be `https:` (`http:` only for a loopback host) and carry no
   credentials, redirects are never followed, and the report names the endpoint's origin.
 
-- Requirement verification from the command line. Intent comes from `--pr` (the issues a pull request closes, then its description, each with its author; outside a workflow, `--pr` also names the change: the pull request's base branch and head commit), `--issue`, `--intent`, `--intent-file`, or `--intent-spec` on its own. When every source lists its criteria under an "Acceptance criteria" style heading, those items become requirements as written (an item too short to check is listed as an ambiguity, not dropped); otherwise all sources go to a Workers AI model together, and every requirement it writes must quote a sentence of its source. For each requirement the tool searches the repository after the change — from every call the changed functions make, and from the words the change checks — and follows the callers of anything Jev calls a mere wrapper one hop further. It builds bounded, redacted evidence that includes how each place is reached and the bodies of what it calls, asks Jev whether each place is a path the requirement governs and whether it satisfies it, and reports a violation only when Jev both calls a place a path the requirement governs and says it fails there, each at `judgment.violation_probability` or above. VERIFIED needs every relevant place satisfied on evidence that was not cut, a search that was not cut short (every call followed, nothing too common to search), Jev judging the list of places likely complete, and no edit to the tool's configuration or workflows; otherwise UNKNOWN. With no credentials or no intent the run is skipped with exit 0, or fails, as `policy.missing_credentials` and `policy.no_intent` say.
+- Requirement verification from the command line. Intent comes from `--pr` (the issues a pull request closes, then its description, each with its author; outside a workflow, `--pr` also names the change: the commit the pull request started from and its head commit), `--issue`, `--intent`, `--intent-file`, or `--intent-spec` on its own. When every source lists its criteria under an "Acceptance criteria" style heading, those items become requirements as written (an item too short to check is listed as an ambiguity, not dropped); otherwise all sources go to a Workers AI model together, and every requirement it writes must quote a sentence of its source. For each requirement the tool searches the repository after the change — from every call the changed functions make, and from the words the change checks — and follows the callers of anything Jev calls a mere wrapper one hop further. It builds bounded, redacted evidence that includes how each place is reached and the bodies of what it calls, asks Jev whether each place is a path the requirement governs and whether it satisfies it, and reports a violation only when Jev both calls a place a path the requirement governs and says it fails there, each at `judgment.violation_probability` or above. VERIFIED needs every relevant place satisfied on evidence that was not cut, a search that was not cut short (every call followed, nothing too common to search), Jev judging the list of places likely complete, and no edit to the tool's configuration or workflows; otherwise UNKNOWN. With no credentials or no intent the run is skipped with exit 0, or fails, as `policy.missing_credentials` and `policy.no_intent` say.
 - The groundwork for the command line tool: it reads the change between two commits from git
   objects, never from the working tree's files or `.gitattributes`, and passes every diff setting
   explicitly so git config does not change what is read. It finds the function around each
@@ -38,6 +38,21 @@ All notable changes to this project are recorded here. The format follows
   budget counted on what is actually sent; `npm run probe:jev` uses it to ask the real model. The
   command line does not call it yet. Requirement verification itself is not in this build: every
   requirement is reported as unknown and the run exits 2.
+
+### Fixed
+
+- `--pr` now compares the commits the pull request changed. The base came from resolving the base
+  branch by name, so for a pull request merged with a merge commit — where the branch has since
+  come to contain the head — the merge base of the two was the head itself, and the tool reviewed
+  a commit against itself: no changed files, no seeds for the search, and a report that said only
+  that it found nothing, with no error. The base is now the latest commit the head still shares
+  with one of the places it could be — the base branch, the branch as `origin` has it, and the base
+  commit GitHub records for the pull request — which is right whether the branch has moved past the
+  head, the head took the branch in later, or the clone's copy of the branch is behind. A run whose
+  two commits are the same stops with exit 10 instead of reporting on an empty change. Measured on
+  the ten pull requests of the first measurement: the five merged with a merge commit (sideeye) now
+  compare the commits the pull request changed, with the changed files matching GitHub's own list
+  exactly, and the squash-merged ones (omamori) resolve to the same base as before.
 
 ### Changed
 

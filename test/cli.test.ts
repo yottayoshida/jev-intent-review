@@ -49,6 +49,19 @@ function fakeDeps(compiled?: IntentSpec, github?: Partial<GitHub>): Deps {
   };
 }
 
+// The pull requests the --pr tests hand to a fake GitHub differ only in the two commits they name.
+const pullRequest = (headSha: string, baseSha: string, body = "## Acceptance criteria\n- Disabled users cannot authenticate by any path") => ({
+  number: 7,
+  title: "Block disabled users",
+  body,
+  author: "dev",
+  url: "u",
+  baseRefName: "main",
+  baseSha,
+  headSha,
+  issues: [],
+});
+
 test("the CLI reviews the change against the intent and exits 1 on a violation in an untouched path", async () => {
   const repo = fixtureRepo("missed-path");
   try {
@@ -83,8 +96,10 @@ test("with no credentials the review is skipped (exit 0), or fails with exit 12 
     repo.git("checkout", "-q", repo.base);
     repo.write({ [CONFIG_PATH]: "policy:\n  missing_credentials: fail\n" });
     const base = repo.commit("config");
+    repo.write({ "docs/note.md": "a change to review\n" });
+    const after = repo.commit("a change");
     const strict = io(repo.dir, {});
-    assert.equal(await main(["--base", base, "--head", base, "--intent-spec", specFile(repo.dir)], strict.value, fakeDeps()), EXIT.provider);
+    assert.equal(await main(["--base", base, "--head", after, "--intent-spec", specFile(repo.dir)], strict.value, fakeDeps()), EXIT.provider);
     assert.match(strict.err(), /CLOUDFLARE_ACCOUNT_ID/);
   } finally {
     repo.remove();
@@ -101,8 +116,10 @@ test("with no intent the review is skipped (exit 0), or fails with exit 11 when 
     repo.git("checkout", "-q", repo.base);
     repo.write({ [CONFIG_PATH]: "policy:\n  no_intent: fail\n" });
     const base = repo.commit("config");
+    repo.write({ "docs/note.md": "a change to review\n" });
+    const after = repo.commit("a change");
     const strict = io(repo.dir, CREDENTIALS);
-    assert.equal(await main(["--base", base, "--head", base], strict.value, fakeDeps()), EXIT.intent);
+    assert.equal(await main(["--base", base, "--head", after], strict.value, fakeDeps()), EXIT.intent);
   } finally {
     repo.remove();
   }
@@ -121,7 +138,7 @@ test("--intent goes through the compiler; the pull request comes from the Action
 
     const event = join(repo.dir, "event.json");
     writeFileSync(event, JSON.stringify({ pull_request: { number: 7 } }));
-    const pr = { number: 7, title: "Block disabled users", body: "Blocks disabled users at password login.", author: "dev", url: "u", baseRefName: "main", headSha: repo.head, issues: [] };
+    const pr = pullRequest(repo.head, repo.base, "Blocks disabled users at password login.");
     const viaEvent = io(repo.dir, { ...CREDENTIALS, GITHUB_EVENT_NAME: "pull_request", GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: "o/r" });
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--json"], viaEvent.value, fakeDeps(compiled, { pullRequest: async () => pr })), EXIT.violation);
     const report = JSON.parse(viaEvent.out());
@@ -136,7 +153,7 @@ test("--pr outside a pull_request workflow reviews the pull request's head, not 
   const repo = fixtureRepo("missed-path");
   try {
     repo.git("checkout", "-q", repo.base);
-    const pr = { number: 7, title: "Block disabled users", body: "## Acceptance criteria\n- Disabled users cannot authenticate by any path", author: "dev", url: "u", baseRefName: "main", headSha: repo.head, issues: [] };
+    const pr = pullRequest(repo.head, repo.base);
     const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
     assert.equal(await main(["--pr", "7", "--base", repo.base, "--json"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
     assert.equal(JSON.parse(run.out()).metadata.head, repo.head);
@@ -150,6 +167,88 @@ test("--pr outside a pull_request workflow reviews the pull request's head, not 
     const gone = { ...pr, headSha: "f".repeat(40) };
     assert.equal(await main(["--pr", "7", "--base", repo.base], missing.value, fakeDeps(undefined, { pullRequest: async () => gone })), EXIT.repository);
     assert.match(missing.err(), /git fetch origin pull\/7\/head/);
+  } finally {
+    repo.remove();
+  }
+});
+
+test("--pr takes the base commit the pull request started from, not the branch as it is now", async () => {
+  const repo = fixtureRepo("missed-path");
+  try {
+    // A pull request merged with a merge commit, with the branch moved on afterwards: main now
+    // contains the head, so the merge base of the branch name and the head is the head itself.
+    repo.write({ "docs/later.md": "work that landed after the pull request\n" });
+    repo.commit("main moved on");
+    const pr = pullRequest(repo.head, repo.base);
+    const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
+    assert.equal(await main(["--pr", "7", "--json"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    const report = JSON.parse(run.out());
+    assert.deepEqual([report.metadata.base, report.metadata.head], [repo.base, repo.head]);
+
+    // Without a base commit — an older GitHub response, or one this clone does not have — the run
+    // stops instead of reporting on a commit compared with itself.
+    const blind = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
+    assert.equal(await main(["--pr", "7", "--json"], blind.value, fakeDeps(undefined, { pullRequest: async () => ({ ...pr, baseSha: "" }) })), EXIT.config);
+    assert.match(blind.err(), /nothing to compare: the merge base of main and [0-9a-f]+ is the head commit itself/);
+    assert.equal(blind.out(), "");
+  } finally {
+    repo.remove();
+  }
+});
+
+test("--pr keeps measuring against the base branch when the head took the branch in later", async () => {
+  const repo = fixtureRepo("missed-path");
+  try {
+    // An open pull request whose branch is behind: main moved on, the pull request took main in
+    // (a rebase, or GitHub's "Update branch"), and the base commit GitHub recorded at the start is
+    // now older than the point the two share. Measuring from it would call main's own commit a
+    // change of this pull request.
+    repo.git("checkout", "-q", "-b", "pr", repo.head);
+    repo.git("checkout", "-q", "main");
+    repo.git("reset", "-q", "--hard", repo.base);
+    repo.write({ "docs/upstream.md": "someone else's work\n" });
+    const later = repo.commit("main moved on");
+    repo.git("update-ref", "refs/remotes/origin/main", later);
+    repo.git("checkout", "-q", "pr");
+    repo.git("merge", "-q", "--no-edit", "main");
+    const head = repo.git("rev-parse", "HEAD").trim();
+
+    const pr = pullRequest(head, repo.base);
+    const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
+    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    const report = JSON.parse(run.out());
+    assert.deepEqual([report.metadata.base, report.metadata.head], [later, head]);
+    // The upstream commit is not part of this pull request, so its file is not among the changed
+    // ones. (The report's own list of unrequested changes cannot say this: the scripted provider
+    // answers nothing for the change question, so that list is empty whatever the base is.)
+    assert.match(run.err(), /changed files: \d+/);
+    assert.ok(!run.err().includes("docs/upstream.md"), run.err());
+  } finally {
+    repo.remove();
+  }
+});
+
+test("--pr takes the latest commit the head still shares with a candidate, so a stale origin does not widen the change", async () => {
+  const repo = fixtureRepo("missed-path");
+  try {
+    // A clone that has not fetched for a while: origin/main and the local branch both sit at an
+    // older commit than the one the pull request started from, which the clone has only because
+    // the head descends from it. Taking the branch would call the commit between them a change of
+    // this pull request.
+    repo.git("checkout", "-q", "-b", "upstream", repo.base);
+    repo.write({ "docs/upstream.md": "someone else's work\n" });
+    const startedFrom = repo.commit("main moved on");
+    repo.git("checkout", "-q", "-b", "pr");
+    repo.git("checkout", "-q", repo.head, "--", ".");
+    const head = repo.commit("the pull request");
+    repo.git("branch", "-q", "-f", "main", repo.base);
+    repo.git("update-ref", "refs/remotes/origin/main", repo.base);
+
+    const pr = pullRequest(head, startedFrom);
+    const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
+    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(JSON.parse(run.out()).metadata.base, startedFrom);
+    assert.ok(!run.err().includes("docs/upstream.md"), run.err());
   } finally {
     repo.remove();
   }

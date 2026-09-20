@@ -153,18 +153,18 @@ function fakeGithub(routes: Record<string, unknown>) {
 
 test("GitHub: with a token the linked issues come from GraphQL; without one, from closing keywords over REST", async () => {
   const graph = fakeGithub({
-    graphql: { data: { repository: { pullRequest: { number: 7, title: "Block disabled users", body: "Details", url: "https://github.com/o/r/pull/7", author: { login: "dev" }, baseRefName: "main", headRefOid: "abc", closingIssuesReferences: { nodes: [{ number: 3, title: "Disabled users can log in", body: "They should not.", url: "u", author: { login: "reporter" } }] } } } } },
+    graphql: { data: { repository: { pullRequest: { number: 7, title: "Block disabled users", body: "Details", url: "https://github.com/o/r/pull/7", author: { login: "dev" }, baseRefName: "main", baseRefOid: "def", headRefOid: "abc", closingIssuesReferences: { nodes: [{ number: 3, title: "Disabled users can log in", body: "They should not.", url: "u", author: { login: "reporter" } }] } } } } },
   });
   const pr = await new GitHub({ token: "t", fetch: graph.fetch }).pullRequest({ owner: "o", name: "r" }, 7);
-  assert.deepEqual([pr.author, pr.baseRefName, pr.issues.map((i) => [i.number, i.author])], ["dev", "main", [[3, "reporter"]]]);
+  assert.deepEqual([pr.author, pr.baseRefName, pr.baseSha, pr.headSha, pr.issues.map((i) => [i.number, i.author])], ["dev", "main", "def", "abc", [[3, "reporter"]]]);
   assert.deepEqual(graph.seen, ["graphql auth"]);
 
   const rest = fakeGithub({
-    "/repos/o/r/pulls/7": { number: 7, title: "Block disabled users", body: "Fixes #3", html_url: "https://github.com/o/r/pull/7", user: { login: "dev" }, base: { ref: "main" }, head: { sha: "abc" } },
+    "/repos/o/r/pulls/7": { number: 7, title: "Block disabled users", body: "Fixes #3", html_url: "https://github.com/o/r/pull/7", user: { login: "dev" }, base: { ref: "main", sha: "def" }, head: { sha: "abc" } },
     "/repos/o/r/issues/3": { number: 3, title: "Disabled users can log in", body: "They should not.", html_url: "https://github.com/o/r/issues/3", user: { login: "reporter" } },
   });
   const anon = await new GitHub({ fetch: rest.fetch }).pullRequest({ owner: "o", name: "r" }, 7);
-  assert.deepEqual([anon.url, anon.issues.map((i) => i.number)], ["https://github.com/o/r/pull/7", [3]]);
+  assert.deepEqual([anon.url, anon.baseRefName, anon.baseSha, anon.headSha, anon.issues.map((i) => i.number)], ["https://github.com/o/r/pull/7", "main", "def", "abc", [3]]);
   assert.deepEqual(rest.seen, ["/repos/o/r/pulls/7 anon", "/repos/o/r/issues/3 anon"]);
 
   await assert.rejects(new GitHub({ fetch: rest.fetch }).issue({ owner: "o", name: "r" }, 99), (e: unknown) => e instanceof ToolError && e.exitCode === EXIT.intent);
@@ -202,7 +202,7 @@ test("GitHub: a closing keyword naming no issue is skipped and reported; a serve
 });
 
 test("resolveIntent ranks the issue above the pull request's description and says when the description is all there is", async () => {
-  const pr = { number: 7, title: "Block disabled users", body: "Adds the check.", author: "dev", url: "u", baseRefName: "main", headSha: "abc", issues: [] as { number: number; title: string; body: string; author?: string; url: string }[] };
+  const pr = { number: 7, title: "Block disabled users", body: "Adds the check.", author: "dev", url: "u", baseRefName: "main", baseSha: "def", headSha: "abc", issues: [] as { number: number; title: string; body: string; author?: string; url: string }[] };
   const github = async () => ({ pullRequest: async () => pr, issue: async () => ({ number: 3, title: "t", body: "b", url: "u" }) }) as unknown as GitHub;
   const only = await resolveIntent({ pr: 7, repo: { owner: "o", name: "r" } }, { github, includePrDescription: true, preferIssue: true });
   assert.deepEqual(only.sources.map((s) => [s.id, s.type, s.authority, s.author]), [["pr#7", "pr_description", 50, "dev"]]);

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadConfig, type Config } from "../config/config.ts";
 import { compileChecklist, WorkersAiCompiler, type IntentCompiler } from "../intent/compiler.ts";
-import { GitHub, githubToken, parseRepository } from "../intent/github.ts";
+import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
 import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
 import { JevProvider, JEV_MODEL } from "../judgments/jev.ts";
@@ -138,6 +138,39 @@ function eventPullRequest(env: NodeJS.ProcessEnv): number | undefined {
   }
 }
 
+/**
+ * The commit a pull request started from: of the places it could be, the latest point the head
+ * still shares with one of them. Two ways of naming it are each wrong on their own — the base
+ * branch has the head in it once the pull request is merged with a merge commit, leaving nothing
+ * to compare (five of the ten pull requests in the first measurement silently did that), and the
+ * base oid GitHub recorded stays where the pull request started, so a head that took the branch
+ * in later would carry other people's commits into the change. A stale `origin/<branch>` in the
+ * clone is the same mistake as the second. The latest shared point is right in all three.
+ */
+async function baseOf(git: Git, pr: PullRequest, head: string): Promise<string> {
+  const after = await git.resolve(head);
+  let best: { rev: string; at: string } | undefined;
+  let shared: string | undefined; // resolves and shares history, but leaves nothing to compare
+  let known: string | undefined; // resolves at all
+  const branch = pr.baseRefName === "" ? [] : [`origin/${pr.baseRefName}`, pr.baseRefName];
+  for (const rev of [...branch, pr.baseSha]) {
+    if (rev === "") continue;
+    const sha = await git.resolve(rev).catch(() => undefined);
+    if (sha === undefined) continue;
+    known ??= rev;
+    const at = await git.mergeBase(sha, after);
+    if (at === null) continue;
+    if (at === after) {
+      shared ??= rev;
+      continue;
+    }
+    if (best === undefined || (at !== best.at && (await git.mergeBase(best.at, at)) === best.at)) best = { rev, at };
+  }
+  // With nothing to compare anywhere, keep a candidate that exists so the run stops with the
+  // message about the two commits rather than one about a revision that cannot be found.
+  return best?.rev ?? shared ?? known ?? pr.baseRefName;
+}
+
 function skippedReport(reason: string, revisions: Revisions, repository: string, configSource: string, sources: IntentSource[]): ReviewReport {
   return {
     version: 1,
@@ -207,7 +240,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // or workflow_dispatch run has the default branch checked out, so --pr must name the head there too.
     if (prNumber !== undefined && repo && io.env.GITHUB_EVENT_NAME !== "pull_request" && (base === undefined || head === undefined)) {
       const pr = await (await getGithub()).pullRequest(repo, prNumber);
-      if (base === undefined) base = (await git.resolve(`origin/${pr.baseRefName}`).catch(() => undefined)) ?? pr.baseRefName;
+      // The head first: which base leaves something to compare is a question about it.
       if (head === undefined) {
         if (!pr.headSha) throw new ToolError(`GitHub gave no head commit for pull request #${prNumber}; pass --head`, EXIT.intent);
         await git.resolve(pr.headSha).catch(() => {
@@ -215,6 +248,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         });
         head = pr.headSha;
       }
+      if (base === undefined) base = await baseOf(git, pr, head);
     }
     const revisions = await resolveRevisions(git, { ...(base !== undefined ? { base } : {}), ...(head !== undefined ? { head } : {}), env: io.env });
     trace(`before ${revisions.before}, after ${revisions.after} (${revisions.how})`);

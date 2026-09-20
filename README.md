@@ -59,7 +59,10 @@ out through a proxy in the clear). It comes from the environment only, never fro
 — which is written to the run's log, public for a public repository.
 
 `--pr` and `--issue` read GitHub with `GITHUB_TOKEN`, `GH_TOKEN` or a logged-in `gh` (public
-repositories also work without one). `--intent-spec file.json` skips the requirement compiler
+repositories also work without one). Outside a workflow, `--pr` also names the change: its head
+commit, and the commit it started from — the latest commit the head still shares with the base
+branch, with `origin`'s copy of it, or with the base commit GitHub recorded for the pull request.
+A run whose two commits are the same stops with exit 10 rather than reporting on an empty change. `--intent-spec file.json` skips the requirement compiler
 and takes requirements as written. `--json` prints the report as JSON, `--trace` prints every
 search, candidate and answer to stderr, `--help` lists the rest.
 

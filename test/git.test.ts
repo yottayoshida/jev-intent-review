@@ -294,6 +294,16 @@ test("revisions: --base uses the merge base with the head", async () => {
     const r = await resolveRevisions(git, { base: "main", head: "feature", env: {} });
     assert.equal(r.before, start);
     assert.equal(r.after, head);
+
+    // A base that already contains the head leaves nothing between the two: a review of that
+    // would report "nothing found" over no change at all. This is the shape a pull request merged
+    // with a merge commit takes once its base branch has the head in it.
+    await assert.rejects(resolveRevisions(git, { base: "main", head: start, env: {} }), (error: unknown) => {
+      assert.ok(error instanceof ToolError && error.exitCode === EXIT.config);
+      assert.match(error.message, /nothing to compare: the merge base of main and .* is the head commit itself/);
+      return true;
+    });
+    await assert.rejects(resolveRevisions(git, { base: "feature", head: "feature", env: {} }), toolError(EXIT.config));
   } finally {
     repo.remove();
   }
