@@ -1,0 +1,26 @@
+From 76e87321e0ac330cd510314fea4022dc91748e23 Mon Sep 17 00:00:00 2001
+From: b <b@e>
+Date: Sun, 20 Sep 2026 20:46:23 +0900
+Subject: [PATCH] dep-mutant: collect_listing swallows the per-entry error;
+ staging_info_from untouched
+
+---
+ src/util.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/util.rs b/src/util.rs
+index 91b6951..919e1f3 100644
+--- a/src/util.rs
++++ b/src/util.rs
+@@ -321,7 +321,7 @@ pub(crate) fn collect_listing(
+     for entry in entries {
+         match entry {
+             Ok(name) => seen.push(name),
+-            Err(err) => return Err(ListingStopped { seen, err }),
++            Err(_) => continue,
+         }
+     }
+     Ok(seen)
+-- 
+2.39.5 (Apple Git-154)
+
