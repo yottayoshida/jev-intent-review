@@ -1,0 +1,1308 @@
+{
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "commit": "c466cae95d78206e97391a0a6fd3f593eb17dda2",
+    "model": "typesafe/jev"
+  },
+  "plan": {
+    "path": "bench/plans/omamori-553-r2-dependency.json",
+    "hash": "0da7b1e8936d",
+    "content": {
+      "planVersion": "1",
+      "writtenAt": "2026-09-20",
+      "note": "Written and committed before any request of this run. The requirement, the condition data and the target are re-read from bench/plans/omamori-553-r2.json rather than copied.",
+      "whyThisRun": {
+        "correctionFirst": "#17 concluded that keeping any related evidence at all left the mutant unreadable, and that the declared referent was part of what misled. Re-read from the stored packets, the three non-empty conditions all carry `collect_listing` and nothing else was ever tried alone — so 'non-empty' and 'contains collect_listing' are the same manipulation, and the conclusion is wider than the run. What the run does establish: dropping the test entries does not meet the pass condition, and keeping only the callee does not separate the versions reliably either.",
+        "secondCorrection": "#17 also said a premise had been contradicted — that the callee is needed. It was not contradicted. Answering without the callee is not the same as being entitled to: this run builds the case that shows why, below.",
+        "question": "With the dependency actually present, can the plan tell a defect in the target from a defect in the dependency?"
+      },
+      "theDecisiveCase": {
+        "what": "A third branch, `dep-mutant`: `collect_listing` swallows the per-entry error and returns `Ok(seen)`. **`src/cli/doctor.rs` is byte-identical to the shipped commit** — `git diff correct dep-mutant -- src/cli/doctor.rs` is empty.",
+        "whyItSettlesIt": "`staging_info_from` is unchanged, so with no related evidence the packet for `correct` and the packet for `dep-mutant` are the same bytes — and the correct answers are opposite (`returns_error` against `returns_success`). One input, two correct answers: whatever a model says there, it is guessing. The runner checks that byte-identity and records it, with no request spent.",
+        "measuredLocally": "cargo test --lib staging_listing_that_stops_partway_is_reported_as_unreadable: `correct` passes; `mutant` fails with `got \"  [Staging] empty\\n\"`; `dep-mutant` fails with the same string. The full-suite counts are in the log."
+      },
+      "questionVersions": {
+        "v3": "bench/check-questions-v3.ts, unchanged. The baseline, measured in the same session rather than quoted from another day.",
+        "v4": "bench/check-questions-v4.ts. Names the target, says the related entries are there to work out what the target's calls do, and says the answer is the target's return value and not a dependency's. **The criteria, MEANING, the verdict rule and the bar are v3's, verbatim** — only `instructions` differs, and that is still a change of contract, so v3's earlier numbers are not v4's."
+      },
+      "neededReferents": [
+        "collect_listing"
+      ],
+      "whyThatReferent": "The target reaches its caller through `crate::util::collect_listing(entries).map_err(...)?`, so whether a failure of `entries` becomes an `Err` is decided inside it. The `dep-mutant` case below is the demonstration: with the same target body and a different `collect_listing`, the correct answer flips.",
+      "packet": {
+        "selection": "callee-only — the target's body plus the single entry defining `collect_listing`.",
+        "why": "The minimum shape in which the question is answerable at all, and the one the reviewer's table describes. It also keeps the test entries out, which would otherwise assert the expected answer for two of the four rows and the opposite of it for the third.",
+        "notMeasuredHere": "The packet `buildEvidence` produces by default (`as-is`). This run is about the question, with the dependency present; the default shape was measured in #17."
+      },
+      "cases": [
+        {
+          "id": "both-shipped",
+          "branch": "correct",
+          "target": "shipped",
+          "dependency": "shipped — propagates the per-entry error",
+          "truth": "returns_error",
+          "sendsRequests": true
+        },
+        {
+          "id": "target-mutated",
+          "branch": "mutant",
+          "target": "swallows the listing failure (`Err(stop) => stop.seen`)",
+          "dependency": "shipped",
+          "truth": "returns_success",
+          "sendsRequests": true,
+          "requires": "ignoring the dependency's own return value: `collect_listing` still returns `Err`, and the target throws it away."
+        },
+        {
+          "id": "dependency-mutated",
+          "branch": "dep-mutant",
+          "target": "shipped, byte-identical to `both-shipped`",
+          "dependency": "swallows the per-entry error and returns `Ok(seen)`",
+          "truth": "returns_success",
+          "sendsRequests": true,
+          "requires": "using the dependency: nothing in the target's own body distinguishes this from `both-shipped`."
+        },
+        {
+          "id": "no-dependency",
+          "branch": "correct",
+          "target": "shipped",
+          "dependency": "not in the packet",
+          "truth": null,
+          "sendsRequests": true,
+          "isDiagnostic": true,
+          "why": "The referent gate withholds this shape, and that is recorded with no request. It is also sent, once, as a diagnostic: the question is whether the model says `cannot_determine` when the referent is absent, or answers anyway. #17 measured it answering anyway under v3; this records what v4 does."
+        }
+      ],
+      "expected": {
+        "bothShipped": "returns_error under both versions. It was returns_error 0.98-1.00 under v3 with this packet shape.",
+        "targetMutated": "returns_success. Under v3 with this packet it was 0.49 and 1/3 — the author's prediction is that v4 does not fix it on its own, because nothing in #17 pointed at the wording. Being wrong here is the useful outcome.",
+        "dependencyMutated": "returns_success. Not measured before under any version. The author's prediction is that this is the harder of the two and fails under both.",
+        "noDependency": "Withheld by the gate with no request. Sent as a diagnostic, the author expects a confident wrong-or-right guess rather than `cannot_determine`, because that is what v3 did (0.93 on the shipped version with an empty related section)."
+      },
+      "howToRead": [
+        "All three of both-shipped / target-mutated / dependency-mutated at 3/3 over the bar under v4 → the framing was what was missing; fix the rule and move on to an unused requirement and the comparison of hand-written against generated plans.",
+        "target-mutated passes and dependency-mutated does not → the target can be picked out but the dependency is not being composed with it; narrowing what Jev is asked to in-function observation is the next branch.",
+        "dependency-mutated passes and target-mutated does not → the dependency is read and its return value is being taken for the target's.",
+        "Neither passes → the wording is not the lever either. Stop adjusting this case and compare against another way of judging."
+      ],
+      "measurement": {
+        "runsPerCase": 3,
+        "bar": 0.6,
+        "passCondition": "The choice the code actually gives, in 3 of 3 runs, at 0.6 or above. Applied to the three non-diagnostic cases under v4. No bar is moved afterwards; a wording changed after seeing an answer is a new version and a new plan file.",
+        "exitCondition": "With the needed dependency present, a defect in the target and a defect in the dependency are both distinguished from the shipped pair. That is `both-shipped`, `target-mutated` and `dependency-mutated` all passing under one version.",
+        "scoring": "Choice match and choice-match-over-the-bar recorded apart. The verdict reads the result answer only; the control is recorded and never aggregated."
+      },
+      "requestBudget": {
+        "oneJudgeCallIsOneHttpRequest": true,
+        "planned": {
+          "v4_three_cases": 9,
+          "v4_no_dependency_diagnostic": 3,
+          "v3_baseline_three_cases": 9,
+          "total": 21
+        },
+        "maxRetries": 0,
+        "hardLimit": 30
+      },
+      "outOfScope": [
+        "builder.ts's caller collection including test regions, and sending the same block twice. Both are defensible on code and ordinary tests alone and are not argued from any model score here; they are left for a separate change.",
+        "runReview, the report format, the thresholds.",
+        "An unused real requirement. That is after the exit condition, not before it."
+      ]
+    }
+  },
+  "basePlan": {
+    "path": "bench/plans/omamori-553-r2.json",
+    "hash": "15f4e2b27fa2"
+  },
+  "questions": {
+    "v3": {
+      "on_error_result": {
+        "type": "choice",
+        "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function return to its caller?",
+        "criteria": {
+          "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+          "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+          "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+        }
+      },
+      "on_error_control": {
+        "type": "choice",
+        "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function do with the items the iterator would yield after that one?",
+        "criteria": {
+          "stops_there": "It stops at that item; the ones after it are never taken from the iterator",
+          "keeps_going": "It goes on taking the items after it",
+          "cannot_determine": "The code does not say what happens to the items after an error"
+        }
+      }
+    },
+    "v4": {
+      "on_error_result": {
+        "type": "choice",
+        "instructions": "`code` is the body of `staging_info_from`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does `staging_info_from` return to its caller? Not what any function under `evidence.related` returns — what `staging_info_from` does with it.",
+        "criteria": {
+          "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+          "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+          "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+        }
+      },
+      "on_error_control": {
+        "type": "choice",
+        "instructions": "`code` is the body of `staging_info_from`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does `staging_info_from` do with the items the iterator would yield after that one?",
+        "criteria": {
+          "stops_there": "It stops at that item; the ones after it are never taken from the iterator",
+          "keeps_going": "It goes on taking the items after it",
+          "cannot_determine": "The code does not say what happens to the items after an error"
+        }
+      }
+    }
+  },
+  "questionHashes": {
+    "v3": "64011edea4c9",
+    "v4": "5bd1ae5bc12d"
+  },
+  "conditions": {
+    "v3": {
+      "setup": "`dir` is a path and the function has just been entered.",
+      "operation": "The iterator `entries`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "finite": "The iterator is finite."
+    },
+    "v4": {
+      "target": "staging_info_from",
+      "setup": "`dir` is a path and the function has just been entered.",
+      "operation": "The iterator `entries`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "finite": "The iterator is finite."
+    }
+  },
+  "bar": 0.6,
+  "targetBodyCheck": {
+    "identical": true,
+    "correctHash": "6c8404049130",
+    "depMutantHash": "6c8404049130",
+    "mutantHash": "c5d3cefe3f22",
+    "means": "One input, two correct answers, whenever the dependency is left out. Anything answered there is a guess."
+  },
+  "commits": {
+    "correct": "916d954607f1f22a4326feb59c76c2197f540bc9",
+    "mutant": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+    "dep-mutant": "76e87321e0ac330cd510314fea4022dc91748e23"
+  },
+  "runs": 3,
+  "sent": {
+    "requests": 21,
+    "bytes": 96693,
+    "hardLimit": 30
+  },
+  "packets": {
+    "9acf73d4a5b3": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "71c018d497f5": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "20229ad0f524": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "51862343ccd1": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [],
+        "truncated": true
+      }
+    }
+  },
+  "log": [
+    {
+      "version": "v4",
+      "case": "both-shipped",
+      "run": 1,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_error": 0.98,
+            "cannot_determine": 0.01,
+            "returns_success": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "probabilityOfTruth": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v4",
+      "case": "both-shipped",
+      "run": 2,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_success": 0.01,
+            "cannot_determine": 0.01,
+            "returns_error": 0.98
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "probabilityOfTruth": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v4",
+      "case": "both-shipped",
+      "run": 3,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0.02,
+            "returns_error": 0.98
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "probabilityOfTruth": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v4",
+      "case": "target-mutated",
+      "run": 1,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.76,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_error": 0.13,
+            "returns_success": 0.84
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.95,
+          "probabilities": {
+            "keeps_going": 0.03,
+            "stops_there": 0.97,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.84,
+        "probabilityOfTruth": 0.84,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "target-mutated",
+      "run": 2,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.79,
+          "probabilities": {
+            "returns_success": 0.86,
+            "returns_error": 0.1,
+            "cannot_determine": 0.04
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.94,
+          "probabilities": {
+            "stops_there": 0.96,
+            "keeps_going": 0.03,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.86,
+        "probabilityOfTruth": 0.86,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.96
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "target-mutated",
+      "run": 3,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.77,
+          "probabilities": {
+            "returns_error": 0.12,
+            "cannot_determine": 0.03,
+            "returns_success": 0.85
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.96,
+            "keeps_going": 0.03
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.85,
+        "probabilityOfTruth": 0.85,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.96
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "dependency-mutated",
+      "run": 1,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.85,
+          "probabilities": {
+            "returns_error": 0.08,
+            "cannot_determine": 0.02,
+            "returns_success": 0.9
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.88,
+          "probabilities": {
+            "stops_there": 0.07,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.92
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.9,
+        "probabilityOfTruth": 0.9,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.92
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "dependency-mutated",
+      "run": 2,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.85,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_success": 0.91,
+            "returns_error": 0.06
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.85,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.1,
+            "keeps_going": 0.89
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.91,
+        "probabilityOfTruth": 0.91,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.89
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "dependency-mutated",
+      "run": 3,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.8,
+          "probabilities": {
+            "returns_error": 0.11,
+            "cannot_determine": 0.03,
+            "returns_success": 0.86
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.85,
+          "probabilities": {
+            "stops_there": 0.1,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.89
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.86,
+        "probabilityOfTruth": 0.86,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.89
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v4",
+      "case": "no-dependency",
+      "run": 1,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": false,
+      "dependencyHash": null,
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "isDiagnostic": true,
+      "truth": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.89,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_success": 0.05,
+            "returns_error": 0.92
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0.01,
+            "stops_there": 0.99
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.92,
+        "probabilityOfTruth": 0.92,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v4",
+      "case": "no-dependency",
+      "run": 2,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": false,
+      "dependencyHash": null,
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "isDiagnostic": true,
+      "truth": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.88,
+          "probabilities": {
+            "returns_success": 0.04,
+            "returns_error": 0.92,
+            "cannot_determine": 0.04
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0.02,
+            "stops_there": 0.98
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.92,
+        "probabilityOfTruth": 0.92,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.98
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v4",
+      "case": "no-dependency",
+      "run": 3,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": false,
+      "dependencyHash": null,
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "isDiagnostic": true,
+      "truth": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.9,
+          "probabilities": {
+            "returns_success": 0.03,
+            "returns_error": 0.9299999999999999,
+            "cannot_determine": 0.04
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "stops_there": 0.97,
+            "keeps_going": 0.02,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.9299999999999999,
+        "probabilityOfTruth": 0.9299999999999999,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v3",
+      "case": "both-shipped",
+      "run": 1,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "probabilityOfTruth": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v3",
+      "case": "both-shipped",
+      "run": 2,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.98,
+            "cannot_determine": 0.01,
+            "returns_success": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 1,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "probabilityOfTruth": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v3",
+      "case": "both-shipped",
+      "run": 3,
+      "branch": "correct",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_success": 0.01,
+            "returns_error": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "probabilityOfTruth": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "version": "v3",
+      "case": "target-mutated",
+      "run": 1,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.35,
+          "probabilities": {
+            "returns_success": 0.57,
+            "returns_error": 0.34,
+            "cannot_determine": 0.09
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.97,
+            "keeps_going": 0.02
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.57,
+        "probabilityOfTruth": 0.57,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.57)"
+    },
+    {
+      "version": "v3",
+      "case": "target-mutated",
+      "run": 2,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.51,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "returns_success": 0.67,
+            "returns_error": 0.29
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "stops_there": 0.97,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.02
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.67,
+        "probabilityOfTruth": 0.67,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v3",
+      "case": "target-mutated",
+      "run": 3,
+      "branch": "mutant",
+      "commit": "6c763ec8f31137d9ff3289398c91a238a07b16f6",
+      "dependencyInPacket": true,
+      "dependencyHash": "34fe63c52df0",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.26,
+          "probabilities": {
+            "returns_error": 0.44,
+            "returns_success": 0.5,
+            "cannot_determine": 0.06
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.95,
+          "probabilities": {
+            "keeps_going": 0.03,
+            "cannot_determine": 0.01,
+            "stops_there": 0.96
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.5,
+        "probabilityOfTruth": 0.5,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.96
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.50)"
+    },
+    {
+      "version": "v3",
+      "case": "dependency-mutated",
+      "run": 1,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.77,
+          "probabilities": {
+            "returns_success": 0.85,
+            "returns_error": 0.13,
+            "cannot_determine": 0.02
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.86,
+          "probabilities": {
+            "stops_there": 0.09,
+            "keeps_going": 0.9,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.85,
+        "probabilityOfTruth": 0.85,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.9
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v3",
+      "case": "dependency-mutated",
+      "run": 2,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.7,
+          "probabilities": {
+            "returns_success": 0.81,
+            "cannot_determine": 0.03,
+            "returns_error": 0.16
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.7,
+          "probabilities": {
+            "keeps_going": 0.8,
+            "cannot_determine": 0.01,
+            "stops_there": 0.19
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.81,
+        "probabilityOfTruth": 0.81,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.8
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "version": "v3",
+      "case": "dependency-mutated",
+      "run": 3,
+      "branch": "dep-mutant",
+      "commit": "76e87321e0ac330cd510314fea4022dc91748e23",
+      "dependencyInPacket": true,
+      "dependencyHash": "b8f029b57c52",
+      "referents": {
+        "ok": true
+      },
+      "isDiagnostic": false,
+      "truth": "returns_success",
+      "sentStateHash": "20229ad0f524",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.74,
+          "probabilities": {
+            "returns_error": 0.15,
+            "returns_success": 0.83,
+            "cannot_determine": 0.02
+          }
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.73,
+          "probabilities": {
+            "stops_there": 0.17,
+            "keeps_going": 0.82,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.83,
+        "probabilityOfTruth": 0.83,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "keeps_going",
+        "probability": 0.82
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    }
+  ],
+  "localDecisions": [
+    {
+      "version": "v4",
+      "case": "no-dependency",
+      "withheldByGate": "the packet does not carry collect_listing, which the question needs to be answerable",
+      "alsoSentAsDiagnostic": true
+    }
+  ]
+}

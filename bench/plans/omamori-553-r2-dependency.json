@@ -1,0 +1,105 @@
+{
+  "planVersion": "1",
+  "writtenAt": "2026-09-20",
+  "note": "Written and committed before any request of this run. The requirement, the condition data and the target are re-read from bench/plans/omamori-553-r2.json rather than copied.",
+
+  "whyThisRun": {
+    "correctionFirst": "#17 concluded that keeping any related evidence at all left the mutant unreadable, and that the declared referent was part of what misled. Re-read from the stored packets, the three non-empty conditions all carry `collect_listing` and nothing else was ever tried alone — so 'non-empty' and 'contains collect_listing' are the same manipulation, and the conclusion is wider than the run. What the run does establish: dropping the test entries does not meet the pass condition, and keeping only the callee does not separate the versions reliably either.",
+    "secondCorrection": "#17 also said a premise had been contradicted — that the callee is needed. It was not contradicted. Answering without the callee is not the same as being entitled to: this run builds the case that shows why, below.",
+    "question": "With the dependency actually present, can the plan tell a defect in the target from a defect in the dependency?"
+  },
+
+  "theDecisiveCase": {
+    "what": "A third branch, `dep-mutant`: `collect_listing` swallows the per-entry error and returns `Ok(seen)`. **`src/cli/doctor.rs` is byte-identical to the shipped commit** — `git diff correct dep-mutant -- src/cli/doctor.rs` is empty.",
+    "whyItSettlesIt": "`staging_info_from` is unchanged, so with no related evidence the packet for `correct` and the packet for `dep-mutant` are the same bytes — and the correct answers are opposite (`returns_error` against `returns_success`). One input, two correct answers: whatever a model says there, it is guessing. The runner checks that byte-identity and records it, with no request spent.",
+    "measuredLocally": "cargo test --lib staging_listing_that_stops_partway_is_reported_as_unreadable: `correct` passes; `mutant` fails with `got \"  [Staging] empty\\n\"`; `dep-mutant` fails with the same string. The full-suite counts are in the log."
+  },
+
+  "questionVersions": {
+    "v3": "bench/check-questions-v3.ts, unchanged. The baseline, measured in the same session rather than quoted from another day.",
+    "v4": "bench/check-questions-v4.ts. Names the target, says the related entries are there to work out what the target's calls do, and says the answer is the target's return value and not a dependency's. **The criteria, MEANING, the verdict rule and the bar are v3's, verbatim** — only `instructions` differs, and that is still a change of contract, so v3's earlier numbers are not v4's."
+  },
+
+  "neededReferents": ["collect_listing"],
+  "whyThatReferent": "The target reaches its caller through `crate::util::collect_listing(entries).map_err(...)?`, so whether a failure of `entries` becomes an `Err` is decided inside it. The `dep-mutant` case below is the demonstration: with the same target body and a different `collect_listing`, the correct answer flips.",
+
+  "packet": {
+    "selection": "callee-only — the target's body plus the single entry defining `collect_listing`.",
+    "why": "The minimum shape in which the question is answerable at all, and the one the reviewer's table describes. It also keeps the test entries out, which would otherwise assert the expected answer for two of the four rows and the opposite of it for the third.",
+    "notMeasuredHere": "The packet `buildEvidence` produces by default (`as-is`). This run is about the question, with the dependency present; the default shape was measured in #17."
+  },
+
+  "cases": [
+    {
+      "id": "both-shipped",
+      "branch": "correct",
+      "target": "shipped",
+      "dependency": "shipped — propagates the per-entry error",
+      "truth": "returns_error",
+      "sendsRequests": true
+    },
+    {
+      "id": "target-mutated",
+      "branch": "mutant",
+      "target": "swallows the listing failure (`Err(stop) => stop.seen`)",
+      "dependency": "shipped",
+      "truth": "returns_success",
+      "sendsRequests": true,
+      "requires": "ignoring the dependency's own return value: `collect_listing` still returns `Err`, and the target throws it away."
+    },
+    {
+      "id": "dependency-mutated",
+      "branch": "dep-mutant",
+      "target": "shipped, byte-identical to `both-shipped`",
+      "dependency": "swallows the per-entry error and returns `Ok(seen)`",
+      "truth": "returns_success",
+      "sendsRequests": true,
+      "requires": "using the dependency: nothing in the target's own body distinguishes this from `both-shipped`."
+    },
+    {
+      "id": "no-dependency",
+      "branch": "correct",
+      "target": "shipped",
+      "dependency": "not in the packet",
+      "truth": null,
+      "sendsRequests": true,
+      "isDiagnostic": true,
+      "why": "The referent gate withholds this shape, and that is recorded with no request. It is also sent, once, as a diagnostic: the question is whether the model says `cannot_determine` when the referent is absent, or answers anyway. #17 measured it answering anyway under v3; this records what v4 does."
+    }
+  ],
+
+  "expected": {
+    "bothShipped": "returns_error under both versions. It was returns_error 0.98-1.00 under v3 with this packet shape.",
+    "targetMutated": "returns_success. Under v3 with this packet it was 0.49 and 1/3 — the author's prediction is that v4 does not fix it on its own, because nothing in #17 pointed at the wording. Being wrong here is the useful outcome.",
+    "dependencyMutated": "returns_success. Not measured before under any version. The author's prediction is that this is the harder of the two and fails under both.",
+    "noDependency": "Withheld by the gate with no request. Sent as a diagnostic, the author expects a confident wrong-or-right guess rather than `cannot_determine`, because that is what v3 did (0.93 on the shipped version with an empty related section)."
+  },
+
+  "howToRead": [
+    "All three of both-shipped / target-mutated / dependency-mutated at 3/3 over the bar under v4 → the framing was what was missing; fix the rule and move on to an unused requirement and the comparison of hand-written against generated plans.",
+    "target-mutated passes and dependency-mutated does not → the target can be picked out but the dependency is not being composed with it; narrowing what Jev is asked to in-function observation is the next branch.",
+    "dependency-mutated passes and target-mutated does not → the dependency is read and its return value is being taken for the target's.",
+    "Neither passes → the wording is not the lever either. Stop adjusting this case and compare against another way of judging."
+  ],
+
+  "measurement": {
+    "runsPerCase": 3,
+    "bar": 0.6,
+    "passCondition": "The choice the code actually gives, in 3 of 3 runs, at 0.6 or above. Applied to the three non-diagnostic cases under v4. No bar is moved afterwards; a wording changed after seeing an answer is a new version and a new plan file.",
+    "exitCondition": "With the needed dependency present, a defect in the target and a defect in the dependency are both distinguished from the shipped pair. That is `both-shipped`, `target-mutated` and `dependency-mutated` all passing under one version.",
+    "scoring": "Choice match and choice-match-over-the-bar recorded apart. The verdict reads the result answer only; the control is recorded and never aggregated."
+  },
+
+  "requestBudget": {
+    "oneJudgeCallIsOneHttpRequest": true,
+    "planned": { "v4_three_cases": 9, "v4_no_dependency_diagnostic": 3, "v3_baseline_three_cases": 9, "total": 21 },
+    "maxRetries": 0,
+    "hardLimit": 30
+  },
+
+  "outOfScope": [
+    "builder.ts's caller collection including test regions, and sending the same block twice. Both are defensible on code and ordinary tests alone and are not argued from any model score here; they are left for a separate change.",
+    "runReview, the report format, the thresholds.",
+    "An unused real requirement. That is after the exit condition, not before it."
+  ]
+}
