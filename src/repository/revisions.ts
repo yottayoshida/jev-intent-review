@@ -33,7 +33,17 @@ export async function resolveRevisions(git: Git, options: { base?: string; head?
       const hint = (await git.isShallow()) ? ` This clone is shallow. ${HISTORY_HINT}` : "";
       throw new ToolError(`'${options.base}' and the head share no history, so there is no point the change started from.${hint}`, EXIT.repository);
     }
-    return { before, after, how: `merge base of ${options.base} and ${options.head ?? "HEAD"}` };
+    const how = `merge base of ${options.base} and ${options.head ?? "HEAD"}`;
+    // Nothing between the two commits is not an empty review, it is a review that never happened:
+    // reporting "no violation found" over no change at all is the one answer that cannot be right.
+    // It is what a pull request merged with a merge commit gives when the base is resolved from
+    // the branch name, because the branch then contains the head. (The Actions path below cannot
+    // reach this: a merge commit is never its own first parent.)
+    if (before === after) {
+      const hint = (await git.isShallow()) ? ` This clone is shallow, so the commit the change starts from may be missing. ${HISTORY_HINT}` : "";
+      throw new ToolError(`there is nothing to compare: the ${how} is the head commit itself (${after.slice(0, 12)}). Pass --base with the commit the change starts from.${hint}`, EXIT.config);
+    }
+    return { before, after, how };
   }
 
   // Only the commit GitHub made for this pull_request event is known to be "base + the pull
