@@ -13,7 +13,14 @@ All notable changes to this project are recorded here. The format follows
   blank lines, imports and files with no code are left out before anything is asked; regions that
   were judged and are not shown are counted in a note, so "nothing to report" reads differently
   from "nothing was looked at". Which requirement would have asked for a change is not guessed,
-  and no sentence about a change is generated.
+  and no sentence about a change is generated. A test of what a requirement asks for, a helper or
+  fixture such a test needs, and the comments on code that carrying a requirement out added, all
+  count as part of carrying it out. Measured on the five real pull requests that had anything to
+  report, with the same requirements and the same commits on both sides: 32 reports became 24,
+  over an identical number of regions judged (20, 42, 86, 48 and 41), and a test written for an
+  unasked-for change is still reported with it. Per pull request the change is not uniform — one
+  went from 9 to 3, one from 6 to 7 — so part of this is the model's own spread. The report's
+  `questionsHash` is `05f56019f295`; the wording before it hashed to `0e38233a1edf`.
 - The endpoint for the judgments can be any HTTPS endpoint that runs the tool's models from a
   Workers AI run request: set `JEV_API_URL` and `JEV_API_TOKEN`. Without them it is Cloudflare
   Workers AI from `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`, as before. Each token is
