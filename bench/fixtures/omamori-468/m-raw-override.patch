@@ -1,0 +1,28 @@
+From 3b1fe7fe3a535374a2e2a5842546a9fa3c2bf303 Mon Sep 17 00:00:00 2001
+From: yotta <yoshida02@gmail.com>
+Date: Sun, 20 Sep 2026 21:12:22 +0900
+Subject: [PATCH] m-raw-override: an unreadable config comes back as 'not
+ disabled'
+
+---
+ src/config.rs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/config.rs b/src/config.rs
+index a1537f0..7a8adb3 100644
+--- a/src/config.rs
++++ b/src/config.rs
+@@ -319,7 +319,9 @@ pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, App
+     if !path.exists() {
+         return Ok(false);
+     }
+-    let content = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)?;
++    let Ok(content) = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES) else {
++        return Ok(false);
++    };
+     let Ok(value) = toml::from_str::<toml::Value>(&content) else {
+         return Ok(false);
+     };
+-- 
+2.39.5 (Apple Git-154)
+
