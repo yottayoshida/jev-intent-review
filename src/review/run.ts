@@ -35,6 +35,11 @@ export interface RunInput {
 }
 
 const BUDGET = "the run's request, byte or time budget ran out";
+// Room for the callers of a wrapper, outside the per-requirement candidate cap.
+const WRAPPER_ROOM = 10;
+// How many of the leads the search declined to follow are shown to the completeness question.
+// One real pull request offered about 58 per requirement; a packet of those is not a question.
+const MAX_LEADS_SHOWN = 10;
 
 // These end the run: every further request would fail the same way. A bad request (400, 413) is
 // about one packet, so it only makes that place unknown — unless a second one arrives with
@@ -105,7 +110,9 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
 
   for (const requirement of intent.requirements) {
     const found = await discoverer.discover(requirement, change);
-    const incomplete = [...found.incomplete];
+    const scope = { notFollowed: [...found.notFollowed], unjudged: [...found.unjudged], blocking: [...blockers, ...found.blocking] };
+    const runWide = new Set(blockers); // said once for the run, not once per requirement
+    let offered = found.found;
     const traceSearches = (list: SearchRecord[]) => {
       searches.push(...list);
       for (const s of list) trace(`${requirement.id} search [${s.layer}] ${s.query}: ${s.rejected ? `refused (${s.rejected})` : `${s.hits} hits`}${s.skipped ? `, ${s.skipped} in files not looked at` : ""}`);
@@ -116,7 +123,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
       candidates.map(async (candidate): Promise<CandidateResult> => {
         const evidence = await buildEvidence(discoverer, requirement, candidate, { maxPrimaryChars: config.evidence.max_primary_chars, maxRelatedChars: config.evidence.max_related_chars });
         for (const location of evidence.sent) sentLocations.set(locationKey(location), location);
-        const base = { candidate, truncated: evidence.truncated, evidence: [] as Location[], notes: [] as string[] };
+        const base = { candidate, truncated: evidence.truncated, cut: evidence.cut, evidence: [] as Location[], notes: [] as string[] };
         if (evidence.redactions > 0) base.notes.push(`${evidence.redactions} secret-shaped value(s) were redacted before sending`);
         try {
           const answers = await provider.judge(evidence.packet, CANDIDATE_QUESTIONS);
@@ -125,16 +132,16 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
           const relevance = answers.relevance;
           const satisfaction = answers.satisfaction;
           if (!relevance || !satisfaction) throw new ProviderError("bad_response", "an answer is missing");
-          const decision = decide(relevance, satisfaction, evidence.truncated, t);
+          const decision = decide(relevance, satisfaction, evidence.cut, t);
           trace(
             `${requirement.id} ${candidate.path}:${candidate.startLine}-${candidate.endLine} relevance ${relevance.choice} ${probabilityOf(relevance, relevance.choice).toFixed(2)}, satisfaction ${satisfaction.choice} ${probabilityOf(satisfaction, satisfaction.choice).toFixed(2)} -> ${decision.outcome}`,
           );
           const pointTo = decision.outcome === "violates" ? (evidence.callSites.length > 0 ? evidence.callSites : [candidate]) : [];
-          return { ...base, outcome: decision.outcome, relevance, satisfaction, evidence: pointTo.map(({ path, startLine, endLine }) => ({ path, startLine, endLine })), notes: [...base.notes, ...decision.notes] };
+          return { ...base, outcome: decision.outcome, ...(decision.aside ? { aside: decision.aside } : {}), relevance, satisfaction, evidence: pointTo.map(({ path, startLine, endLine }) => ({ path, startLine, endLine })), notes: [...base.notes, ...decision.notes] };
         } catch (error) {
           const note = providerFailure(error);
           if (error instanceof ProviderError && error.kind === "budget") {
-            if (!incomplete.includes(BUDGET)) incomplete.push(BUDGET);
+            if (!scope.blocking.includes(BUDGET)) scope.blocking.push(BUDGET);
           } else {
             reached += 1; // the endpoint, or the network to it, answered this one its own way
           }
@@ -152,37 +159,56 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     // Whatever the probability and whatever the second answer: below the relevance threshold a
     // supporting candidate is not excluded, but it is not a path either, so its callers still are.
     const isWrapper = (r: CandidateResult) => r.relevance?.choice === "supporting" && r.candidate.reasons.some((x) => x.startsWith("calls "));
+    // Room of their own, outside the candidate cap. Taking what the first pass left over meant
+    // that a requirement which filled the cap reached `callersOf(..., 0)`: the callers of a
+    // wrapper were found by name and none of them judged — a gap, and one that sat on three of
+    // the six requirements the recorded answers would otherwise have verified.
+    let wrapperRoom = WRAPPER_ROOM;
     for (const wrapper of results.filter(isWrapper)) {
-      const room = Math.max(0, config.discovery.max_candidates_per_requirement - results.length);
-      const more = await discoverer.callersOf(wrapper.candidate, requirement, change, known, room);
+      const more = await discoverer.callersOf(wrapper.candidate, requirement, change, known, wrapperRoom);
       traceSearches(more.searches);
-      incomplete.push(...more.incomplete);
+      scope.notFollowed.push(...more.notFollowed);
+      scope.blocking.push(...more.blocking);
+      offered += more.found;
+      wrapperRoom -= more.candidates.length;
       const expanded = await judgeAll(more.candidates);
-      if (expanded.some(isWrapper)) incomplete.push(`callers of a wrapper found through ${wrapper.candidate.symbol} were judged wrappers too; they were not followed further`);
+      if (expanded.some(isWrapper)) scope.blocking.push(`callers of a wrapper found through ${wrapper.candidate.symbol} were judged wrappers too; they were not followed further`);
       results.push(...expanded);
     }
 
-    for (const reason of incomplete) incompleteReasons.push(`${requirement.id}: ${reason}`);
+    for (const reason of [...scope.notFollowed, ...scope.unjudged, ...scope.blocking]) if (!runWide.has(reason)) incompleteReasons.push(`${requirement.id}: ${reason}`);
     candidateCount += results.length;
     changedCandidates += results.filter((r) => r.candidate.changed).length;
-    const discoveryIncomplete = incomplete.length > 0;
-    const requirementBlockers = [...blockers, ...incomplete.map((r) => `discovery was cut short (${r})`)];
-    let result = aggregate(requirement.id, results, requirementBlockers, discoveryIncomplete);
+    // Discovery's count can be behind when the wrapper pass added places of its own.
+    const offeredAtAll = Math.max(offered, results.length);
+    let result = aggregate(requirement.id, results, scope, offeredAtAll);
 
     // J5, only where it could change the outcome: a signal about the search, never proof of it.
+    // It now sees what the search left as well as what it found — the leads it did not follow, the
+    // places it did not judge, the ones it set aside — because that is what "complete" is about.
     // Anything but a clear "likely complete" withholds VERIFIED.
     if (result.status === "verified") {
       try {
-        const state = { requirement: { id: requirement.id, text: redact(requirement.text).text }, found: results.filter((r) => r.outcome !== "unrelated").map((r) => ({ path: r.candidate.path, lines: `${r.candidate.startLine}-${r.candidate.endLine}`, ...(r.candidate.symbol ? { symbol: r.candidate.symbol } : {}) })) };
+        const paths = results.filter((r) => r.outcome !== "aside");
+        const state = {
+          requirement: { id: requirement.id, text: redact(requirement.text).text },
+          found: paths.map((r) => ({ path: r.candidate.path, lines: `${r.candidate.startLine}-${r.candidate.endLine}`, ...(r.candidate.symbol ? { symbol: r.candidate.symbol } : {}) })),
+          not_looked_at: {
+            places_found_but_not_judged: result.scope.found - result.scope.judged,
+            places_set_aside_as_not_paths: result.scope.setAside,
+            leads_not_followed: result.scope.notFollowed.slice(0, MAX_LEADS_SHOWN).map((r) => redact(r).text),
+            more_leads: Math.max(0, result.scope.notFollowed.length - MAX_LEADS_SHOWN),
+          },
+        };
         const completeness = (await provider.judge(state, COMPLETENESS_QUESTIONS)).completeness;
         reached += 1;
         answered += 1;
         const p = completeness ? probabilityOf(completeness, completeness.choice) : 0;
         if (!completeness || completeness.choice !== "likely_complete" || p < 0.5) {
-          result = aggregate(requirement.id, results, [...requirementBlockers, `Jev did not judge the list of places likely complete (${completeness ? `${completeness.choice} ${p.toFixed(2)}` : "no answer"})`], true);
+          result = aggregate(requirement.id, results, { ...scope, blocking: [...scope.blocking, `Jev did not judge the list of places likely complete (${completeness ? `${completeness.choice} ${p.toFixed(2)}` : "no answer"})`] }, offeredAtAll);
         }
       } catch (error) {
-        result = aggregate(requirement.id, results, [...requirementBlockers, providerFailure(error)], discoveryIncomplete);
+        result = aggregate(requirement.id, results, { ...scope, blocking: [...scope.blocking, providerFailure(error)] }, offeredAtAll);
       }
     }
     trace(`${requirement.id} -> ${result.status} (coverage ${result.coverage})`);

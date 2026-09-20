@@ -22,10 +22,20 @@ export interface DiscoveryOptions {
   referenceSearch: boolean;
 }
 
+/**
+ * What the search offered, and what it left. The three lists are kept apart because they do not
+ * weigh the same: a lead the search declined to follow (a name too common to be the action a
+ * requirement governs) and places found with no budget left to judge are scope — reported, and
+ * handed to the completeness question. `blocking` is a path the search knows by name and never
+ * judged, which withholds VERIFIED whatever the answers say.
+ */
 export interface Discovery {
   candidates: Candidate[];
   searches: SearchRecord[];
-  incomplete: string[];
+  found: number; // places offered before the cap
+  notFollowed: string[];
+  unjudged: string[];
+  blocking: string[];
 }
 
 const HITS_PER_SEARCH = 200;
@@ -170,22 +180,24 @@ export class Discoverer {
    */
   async callersOf(wrapper: Candidate, requirement: Requirement, change: ChangeAnalysis, known: Set<string>, limit: number): Promise<Discovery> {
     const searches: SearchRecord[] = [];
-    const incomplete: string[] = [];
+    const notFollowed: string[] = [];
+    const blocking: string[] = [];
     const candidates: Candidate[] = [];
+    const nothing = () => ({ candidates, searches, found: 0, notFollowed, unjudged: [], blocking });
     const name = wrapper.symbol;
-    if (!name) return { candidates, searches, incomplete };
+    if (!name) return nothing();
     const refused = refuseWord(name, 3);
     if (refused) {
       searches.push({ requirementId: requirement.id, layer: "C", query: name, hits: 0, rejected: refused });
-      incomplete.push(`the callers of ${name}, judged supporting code, could not be searched (${refused})`);
-      return { candidates, searches, incomplete };
+      notFollowed.push(`the callers of ${name}, judged supporting code, could not be searched (${refused})`);
+      return nothing();
     }
     const { hits, more } = await this.search(name);
     const files = filesOutsideTests(hits);
     if (more || files > COMMON_FILES) {
       searches.push({ requirementId: requirement.id, layer: "C", query: name, hits: hits.length, rejected: "too common; its callers were not followed" });
-      incomplete.push(`the callers of ${name}, judged supporting code, were not followed (too common)`);
-      return { candidates, searches, incomplete };
+      notFollowed.push(`the callers of ${name}, judged supporting code, were not followed (too common)`);
+      return nothing();
     }
     searches.push({ requirementId: requirement.id, layer: "C", query: name, hits: hits.length });
     const changedLines = Discoverer.changedLines(change);
@@ -198,13 +210,15 @@ export class Discoverer {
       known.add(key);
       candidates.push({ ...placed, reasons: [`calls ${name}, which ${wrapper.reasons[0] ?? "is supporting code"}`] });
     }
-    if (candidates.length > limit) incomplete.push(`${candidates.length} callers of ${name} were found and only ${limit} were checked`);
-    return { candidates: candidates.slice(0, limit), searches, incomplete };
+    // Known by name and not judged: not scope but a gap, whatever the answers elsewhere say.
+    if (candidates.length > limit) blocking.push(`${candidates.length} callers of ${name} were found and only ${limit} were judged`);
+    return { candidates: candidates.slice(0, limit), searches, found: candidates.length, notFollowed, unjudged: [], blocking };
   }
 
   async discover(requirement: Requirement, change: ChangeAnalysis): Promise<Discovery> {
     const searches: SearchRecord[] = [];
-    const incomplete: string[] = [];
+    const notFollowed: string[] = [];
+    const unjudged: string[] = [];
     const found = new Map<string, Candidate & { score: number }>();
     const changedLines = Discoverer.changedLines(change);
     let skippedNonCode = 0;
@@ -230,8 +244,8 @@ export class Discoverer {
     // Layer A → C: references to every call the changed functions make. Every one, including calls
     // written on the changed lines: a pull request that rewrites `return createSession(...)`, or
     // adds a test calling it, still protects `createSession`, and leaving it out would leave its
-    // other callers unsearched with nothing to say so. Anything not followed makes the discovery
-    // incomplete, which withholds VERIFIED.
+    // other callers unsearched with nothing to say so. Anything not followed is recorded in
+    // `notFollowed` and travels with the result.
     if (this.#options.referenceSearch) {
       const seeds: { name: string; files: number; hits: Hit[] }[] = [];
       for (const symbol of change.calledSymbols) {
@@ -244,7 +258,7 @@ export class Discoverer {
         const refused = refuseWord(symbol.name, 3);
         if (refused) {
           searches.push({ requirementId: requirement.id, layer: "C", query: symbol.name, hits: 0, rejected: refused });
-          incomplete.push(`the callers of ${symbol.name} could not be searched (${refused})`);
+          notFollowed.push(`the callers of ${symbol.name} could not be searched (${refused})`);
           continue;
         }
         const { hits, more } = await this.search(symbol.name);
@@ -257,7 +271,7 @@ export class Discoverer {
         if (more || files > COMMON_FILES) {
           const why = more ? `more than ${HITS_PER_SEARCH} references` : `referenced from ${files} files outside tests`;
           searches.push({ requirementId: requirement.id, layer: "C", query: symbol.name, hits: hits.length, rejected: `${why}; its callers were not followed` });
-          incomplete.push(`the callers of ${symbol.name} were not followed (${why})`);
+          notFollowed.push(`the callers of ${symbol.name} were not followed (${why})`);
           continue;
         }
         seeds.push({ name: symbol.name, files, hits });
@@ -266,7 +280,7 @@ export class Discoverer {
       seeds.sort((a, b) => a.files - b.files || a.name.localeCompare(b.name));
       for (const [i, seed] of seeds.entries()) {
         if (i >= MAX_SEEDS) {
-          incomplete.push(`only the ${MAX_SEEDS} least common of ${seeds.length} calls in the changed code were followed`);
+          notFollowed.push(`only the ${MAX_SEEDS} least common of ${seeds.length} calls in the changed code were followed`);
           for (const skipped of seeds.slice(MAX_SEEDS)) searches.push({ requirementId: requirement.id, layer: "C", query: skipped.name, hits: skipped.hits.length, rejected: `not followed: only the ${MAX_SEEDS} least common calls are` });
           break;
         }
@@ -302,7 +316,7 @@ export class Discoverer {
         }
         if (used >= MAX_TERMS) {
           searches.push({ requirementId: requirement.id, layer: "B", query: term, hits: 0, rejected: `not searched: only the first ${MAX_TERMS} words are` });
-          if (!capped) incomplete.push(`only the first ${MAX_TERMS} search words were searched`);
+          if (!capped) notFollowed.push(`only the first ${MAX_TERMS} search words were searched`);
           capped = true;
           continue;
         }
@@ -311,7 +325,7 @@ export class Discoverer {
         const files = filesOutsideTests(hits);
         if (more || files > COMMON_FILES) {
           searches.push({ requirementId: requirement.id, layer: "B", query: term, hits: hits.length, rejected: "too common to narrow the search" });
-          incomplete.push(`the word ${term} is too common to search by`);
+          notFollowed.push(`the word ${term} is too common to search by`);
           continue;
         }
         const before = skippedNonCode;
@@ -322,9 +336,9 @@ export class Discoverer {
 
     const ranked = [...found.values()].sort((a, b) => b.score - a.score || a.path.localeCompare(b.path) || a.startLine - b.startLine);
     if (ranked.length > this.#options.maxCandidates) {
-      incomplete.push(`${ranked.length} places were found and only the first ${this.#options.maxCandidates} were checked (discovery.max_candidates_per_requirement)`);
+      unjudged.push(`${ranked.length} places were found and only the first ${this.#options.maxCandidates} were judged (discovery.max_candidates_per_requirement)`);
     }
     const candidates = ranked.slice(0, this.#options.maxCandidates).map(({ score: _score, ...candidate }) => candidate);
-    return { candidates, searches, incomplete };
+    return { candidates, searches, found: ranked.length, notFollowed, unjudged, blocking: [] };
   }
 }

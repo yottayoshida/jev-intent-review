@@ -52,15 +52,13 @@ const MARK: Record<CandidateOutcome, string> = {
   satisfies: "✓",
   violates: "✗",
   unknown: "?",
-  not_applicable: "–",
-  unrelated: "·",
+  aside: "·",
 };
 
-// VERIFIED is not here: its headline carries the path count (requirementSection).
+// VERIFIED is not here: its headline carries the scope it is a claim over (requirementSection).
 const HEADLINE: Record<Exclude<Status, "verified">, string> = {
   violation: "VIOLATION",
   unknown: "UNKNOWN",
-  not_applicable: "NOT APPLICABLE",
 };
 
 function plural(n: number, word: string): string {
@@ -70,7 +68,9 @@ function plural(n: number, word: string): string {
 function resultLine(report: ReviewReport): string {
   const total = report.requirements.length;
   const count = (status: Status) => report.requirements.filter((r) => r.status === status).length;
-  const paths = report.discovery.candidateCount;
+  // The paths the requirements were judged over, which is what "no violation found" covers —
+  // not every place a judgment was asked about.
+  const paths = report.requirements.reduce((n, r) => n + r.scope.paths, 0);
   switch (report.verdict) {
     case "violation":
       return `**Result: VIOLATION.** ${count("violation")} of ${plural(total, "requirement")} ${count("violation") === 1 ? "has" : "have"} a violation.`;
@@ -99,15 +99,30 @@ function candidateLine(result: CandidateResult): string[] {
   return lines;
 }
 
+/**
+ * What the result is a claim over, in the line under it. VERIFIED says how many paths it holds
+ * for, and every status says how many places were judged of how many were found, how many were
+ * set aside, and how many leads were not followed — a reader who takes the headline alone should
+ * at least see the size of what it covers.
+ */
+function scopeLine(result: RequirementResult): string {
+  const s = result.scope;
+  const parts = [`${s.judged} of ${s.found} place(s) judged`, `${s.paths} path(s)`, `${s.setAside} set aside`];
+  if (s.notFollowed.length > 0) parts.push(`${s.notFollowed.length} lead(s) not followed`);
+  if (s.unjudged.length > 0) parts.push(`${s.unjudged.length} reason(s) places went unjudged`);
+  return `Coverage: ${result.coverage} — ${parts.join(", ")}`;
+}
+
 function requirementSection(report: ReviewReport, result: RequirementResult): string[] {
   const requirement = report.intent.requirements.find((r) => r.id === result.requirementId);
-  const checked = result.candidates.filter((c) => c.outcome !== "unrelated").length;
-  const headline = result.status === "verified" ? `VERIFIED over ${plural(checked, "discovered path")}` : HEADLINE[result.status];
-  const lines = [`### ${result.requirementId} · ${headline}`, "", codeSpan(requirement?.text ?? ""), "", `Coverage: ${result.coverage}`, ""];
-  const shown = result.candidates.filter((c) => c.outcome !== "unrelated");
+  const headline = result.status === "verified" ? `VERIFIED over ${plural(result.scope.paths, "discovered path")}` : HEADLINE[result.status];
+  const lines = [`### ${result.requirementId} · ${headline}`, "", codeSpan(requirement?.text ?? ""), "", scopeLine(result), ""];
+  const shown = result.candidates.filter((c) => c.outcome !== "aside");
   for (const candidate of shown) lines.push(...candidateLine(candidate));
   const hidden = result.candidates.length - shown.length;
-  if (hidden > 0) lines.push(`- ${plural(hidden, "other candidate")} judged unrelated or only supporting`);
+  if (hidden > 0) lines.push(`- ${plural(hidden, "other place")} set aside: not a path this requirement holds or fails on`);
+  for (const text of result.scope.notFollowed) lines.push(`- Not followed: ${note(text)}`);
+  for (const text of result.scope.unjudged) lines.push(`- Not judged: ${note(text)}`);
   for (const text of result.notes) lines.push(`- ${note(text)}`);
   lines.push("");
   return lines;
@@ -150,7 +165,7 @@ export function renderMarkdown(report: ReviewReport): string {
   const count = (status: Status) => report.requirements.filter((r) => r.status === status).length;
   out.push("## Coverage", "");
   out.push(
-    `- Requirements: ${report.requirements.length} · verified ${count("verified")} · violation ${count("violation")} · unknown ${count("unknown")} · not applicable ${count("not_applicable")}`,
+    `- Requirements: ${report.requirements.length} · verified ${count("verified")} · violation ${count("violation")} · unknown ${count("unknown")}`,
   );
   out.push(`- Repository candidates examined: ${d.candidateCount} (in changed files ${d.changedCandidates}, in unchanged files ${d.unchangedCandidates})`);
   for (const reason of d.incompleteReasons) out.push(`- Incomplete: ${note(reason)}`);

@@ -61,15 +61,20 @@ export const CHANGE_QUESTIONS = {
   },
 } as const satisfies Questions;
 
-/** J5: a search-quality signal only; never read as proof that the search was complete. */
+/**
+ * J5: a search-quality signal only; never read as proof that the search was complete. It is asked
+ * only where the answer can change the outcome — a requirement whose every path is satisfied — and
+ * it now sees what the search left as well as what it found, because that is what the question is
+ * about. Until this build no run ever reached the point of asking it on real code.
+ */
 export const COMPLETENESS_QUESTIONS = {
   completeness: {
     type: "choice",
     instructions:
-      "`found` lists the code locations found for `requirement`. Does the list look like it covers the kinds of places the requirement names?",
+      "`found` lists the code locations judged to be paths of `requirement`, and `not_looked_at` says how much the search left: places found and not judged, places set aside as not paths, and leads it did not follow. Does `found` look like it covers the kinds of places the requirement names?",
     criteria: {
-      likely_complete: "Every kind of place the requirement names has at least one location in `found`",
-      likely_incomplete: "The requirement names a kind of place that has no location in `found`",
+      likely_complete: "Every kind of place the requirement names has at least one location in `found`, and nothing in `not_looked_at` names another kind of place it would apply to",
+      likely_incomplete: "The requirement names a kind of place that has no location in `found`, or something in `not_looked_at` is one",
       cannot_tell: "It cannot be told from the requirement which places it covers",
     },
   },
