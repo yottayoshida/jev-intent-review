@@ -1,5 +1,5 @@
 {
-  "description": "The pull request does what the issue asked — the token exchange retries once — and also shortens the session lifetime from 24 hours to 1, which no requirement asks for. The third change is a comment in oauth.ts, which is left out before anything is asked.",
+  "description": "The pull request does what the issue asked — the token exchange retries once — and also shortens the session lifetime from 24 hours to 1, which no requirement asks for, with a test of the shorter lifetime: a test does not turn an unasked-for change into one that was asked for. The last change is a comment in oauth.ts, which is left out before anything is asked.",
   "intent": "The OAuth token exchange should retry once when the provider drops a request.",
   "spec": {
     "version": 1,
@@ -17,7 +17,7 @@
   },
   "expected": {
     "head": {
-      "unrequested": ["src/session/store.ts"],
+      "unrequested": ["src/session/store.ts", "test/session-ttl.test.ts"],
       "not_unrequested": ["src/auth/exchange.ts"],
       "never_asked": ["src/auth/oauth.ts"]
     }

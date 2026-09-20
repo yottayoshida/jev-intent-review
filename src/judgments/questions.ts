@@ -38,7 +38,13 @@ export const CANDIDATE_QUESTIONS = {
   },
 } as const satisfies Questions;
 
-/** J4: is a change the pull request made explained by any requirement? */
+/**
+ * J4: is a change the pull request made explained by any requirement? The second option carries
+ * the work a requirement brings with it. Measured over ten real pull requests before this wording:
+ * of 32 changes called `unrelated`, nearly all were a test, a helper a test needs, or the comment
+ * on a function the change itself added — a report of those is a report about the work, not about
+ * scope creep.
+ */
 export const CHANGE_QUESTIONS = {
   justification: {
     type: "choice",
@@ -46,8 +52,10 @@ export const CHANGE_QUESTIONS = {
       "`change` shows code before and after the pull request. Is this change in behavior asked for by any entry in `requirements`?",
     criteria: {
       clearly_required: "An entry in `requirements` asks for exactly this change",
-      plausibly_required: "The change is a reasonable part of carrying out an entry in `requirements`",
-      unrelated: "No entry in `requirements` asks for or needs this change in behavior",
+      plausibly_required:
+        "The change is a reasonable part of carrying out an entry in `requirements`: a test of what an entry asks for, a helper or fixture such a test needs, or the comments and documentation on code that carrying out an entry added",
+      unrelated:
+        "No entry in `requirements` asks for or needs this change in behavior, and it is not a test, a fixture or a comment for a change an entry does ask for",
       cannot_tell: "It cannot be told from `change` what behavior changed",
     },
   },

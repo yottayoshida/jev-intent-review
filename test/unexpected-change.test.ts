@@ -54,8 +54,9 @@ test("scope-creep: the change no requirement asked for is reported, and the one 
   const { repo, change } = await changeOf("scope-creep");
   try {
     const review = await reviewChanges({ change, requirements: requirementsOf("scope-creep"), provider: scripted(/SESSION_TTL/), maxChars: 4000, threshold: 0.7, trace: () => {} });
-    assert.deepEqual(review.unexpected.map((u) => u.location.path), ["src/session/store.ts"]);
-    const reported = review.unexpected[0]!;
+    // The test of the shorter lifetime is part of the change nobody asked for, and is reported with it.
+    assert.deepEqual(review.unexpected.map((u) => u.location.path).sort(), ["src/session/store.ts", "test/session-ttl.test.ts"]);
+    const reported = review.unexpected.find((u) => u.location.path === "src/session/store.ts")!;
     assert.equal(reported.judgment, "unrequested");
     assert.deepEqual(reported.mappedRequirements, [], "which requirement would have asked for it is not guessed");
     // The lines themselves, not a sentence about them.
@@ -75,7 +76,7 @@ test("an unasked-for change Jev is not sure about is counted, not accused", asyn
     assert.ok(unsure.notes.some((n) => /judged and are not shown/.test(n)));
 
     const sure = await reviewChanges({ change, requirements: requirementsOf("scope-creep"), provider: scripted(/SESSION_TTL/, 0.7), maxChars: 4000, threshold: 0.7, trace: () => {} });
-    assert.equal(sure.unexpected.length, 1, "at the bar itself it is reported");
+    assert.equal(sure.unexpected.length, 2, "at the bar itself they are reported");
   } finally {
     repo.remove();
   }
@@ -203,7 +204,7 @@ test("a change the endpoint could not judge is counted once per kind, not once p
     assert.ok(review.sent.length >= 2);
     const lines = review.notes.filter((n) => /could not be judged/.test(n));
     assert.equal(lines.length, 1, review.notes.join(" | "));
-    assert.match(lines[0]!, /2 change\(s\) could not be judged \(bad_request\)/);
+    assert.match(lines[0]!, /3 change\(s\) could not be judged \(bad_request\)/);
     // The endpoint answered its own way, so the run knows it was reached and read nothing.
     assert.equal(review.reached, review.sent.length);
 
