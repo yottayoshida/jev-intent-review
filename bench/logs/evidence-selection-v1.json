@@ -1,0 +1,2025 @@
+{
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "commit": "bc43f6cf4ed1d5659a4a2ae553121922b62a230a",
+    "model": "typesafe/jev"
+  },
+  "plan": {
+    "path": "bench/plans/omamori-553-r2-evidence.json",
+    "hash": "896b9931779c",
+    "content": {
+      "planVersion": "1",
+      "writtenAt": "2026-09-20",
+      "note": "Written and committed before any request of this run. The question, the condition and the target body are the ones already fixed in bench/plans/omamori-553-r2.json and are not touched here; the only thing that varies is which related entries the packet carries.",
+      "question": "The v3 contract, unchanged: bench/check-questions-v3.ts, `returns_error` / `returns_success` / `cannot_determine`, bar 0.6, the control kept as a diagnostic and never aggregated.",
+      "condition": "The one in bench/plans/omamori-553-r2.json, unchanged and re-read from that file rather than copied.",
+      "whyThisRun": {
+        "from": "#15 measured the plan missing the mutant; #16 corrected the account of why. Emptying the related section fixed that mutant, but it removed four things at once: the caller `staging_info_at`, the callee `collect_listing`, a test carrying the expected result, and that test's duplicate.",
+        "question": "Which kind of related entry carries the wrong answer, and which kind does the question need?",
+        "notThisRun": "An unused real requirement. This is the development case from #15, and no result here counts as generalisation."
+      },
+      "target": {
+        "repository": "yottayoshida/omamori",
+        "file": "src/cli/doctor.rs",
+        "symbol": "staging_info_from",
+        "pinnedContent": "The base is commit 916d954607f1f22a4326feb59c76c2197f540bc9. The mutant and variant are that commit plus bench/fixtures/omamori-553-r2/{mutant,variant}.patch. **Their commit SHAs are not stable**: rebuilding with `git am` makes new commits, so what is pinned is the base commit and the two patches, and the log records the SHAs the run actually used.",
+        "neededReferents": [
+          "collect_listing"
+        ],
+        "whyThatReferent": "The shipped body reaches the caller through `crate::util::collect_listing(entries).map_err(...)?`. Whether a failure of `entries` becomes an `Err` is decided inside `collect_listing`, so a packet without it cannot answer the question — which is why `none` below is a diagnostic condition and not a candidate rule."
+      },
+      "howSelectionWorks": "One packet is built per code version with the product's `buildEvidence` at the default limits. Each related entry is classified once — `test` (a test path, or a line inside `BlockIndex.testRegions`), `needed_callee` (it defines a declared referent), `other`. The four conditions are **subsets of that one packet**. Nothing is rebuilt: a smaller budget would let other code into the freed room and the comparison would be between two collections rather than between what was kept.",
+      "selections": [
+        {
+          "id": "as-is",
+          "keeps": "every entry buildEvidence returned",
+          "isCandidateRule": false,
+          "why": "what the first measurement sent"
+        },
+        {
+          "id": "no-tests",
+          "keeps": "entries that are not test code",
+          "isCandidateRule": true,
+          "why": "the candidate: runtime code, without expectations written by a test"
+        },
+        {
+          "id": "callee-only",
+          "keeps": "only entries defining a declared referent",
+          "isCandidateRule": false,
+          "why": "the narrowest packet that can still answer; separates the caller from the callee"
+        },
+        {
+          "id": "none",
+          "keeps": "nothing",
+          "isCandidateRule": false,
+          "why": "diagnostic, and the comparison point from the earlier run. It drops the needed referent, so under the referent gate it would be withheld rather than answered."
+        }
+      ],
+      "phaseA": {
+        "what": "Two code versions × four selections × three runs = 24 requests.",
+        "versions": [
+          "correct",
+          "mutant"
+        ],
+        "expected": {
+          "correct": "returns_error in all four. It was returns_error 0.96-0.98 with the packet as-is, and removing evidence should not turn a correct implementation into a violation.",
+          "mutant": "returns_success in all four **if the tests were what carried the wrong answer**. Two of the cells are already known: as-is gave returns_error 0.51-0.60 (wrong), none gave returns_success 0.65-0.71 (right). The two new cells are what decide."
+        },
+        "howToRead": [
+          "`no-tests` right and `callee-only` right → the test expectations were the cause; the caller and callee are harmless.",
+          "`no-tests` wrong and `callee-only` right → the caller is a cause as well.",
+          "`callee-only` wrong → the callee is a cause, and the question cannot be asked with the referent it needs.",
+          "`no-tests` wrong and `callee-only` wrong → none of these three splits it; stop cutting the packet and look elsewhere."
+        ],
+        "stillConfounded": "Whether one copy of the test would mislead as much as two. Removing the test kind removes both copies, and no condition here keeps exactly one. It is left confounded on purpose: the rule that follows from either answer is the same — test code is not a runtime caller — so separating it would not change what gets built."
+      },
+      "phaseB": {
+        "what": "The candidate rule, checked on the four conditions a rule has to survive. Only the ones not already measured in phase A send requests.",
+        "cases": [
+          {
+            "id": "candidate/correct",
+            "expected": "returns_error",
+            "from": "phase A, no-tests, correct",
+            "sendsRequests": false
+          },
+          {
+            "id": "candidate/mutant",
+            "expected": "returns_success",
+            "from": "phase A, no-tests, mutant",
+            "sendsRequests": false
+          },
+          {
+            "id": "candidate/variant",
+            "expected": "returns_error",
+            "what": "the behaviour-preserving variant under the candidate rule",
+            "sendsRequests": true,
+            "runs": 3
+          },
+          {
+            "id": "candidate/referent-missing",
+            "expected": "withheld locally, no request",
+            "what": "the candidate packet with the needed callee removed",
+            "sendsRequests": false
+          }
+        ],
+        "passCondition": "Each sending case: the expected choice in 3 of 3 runs at 0.6 or above. `candidate/referent-missing` must be withheld by the referent gate with no request. A bar is not lowered afterwards, and a selection is not added after seeing an answer — that would be a new plan file."
+      },
+      "requestBudget": {
+        "oneJudgeCallIsOneHttpRequest": true,
+        "planned": {
+          "phaseA": 24,
+          "phaseB": 3,
+          "total": 27
+        },
+        "maxRetries": 0,
+        "hardLimit": 40,
+        "onLimit": "The run stops and writes what it has. No case is dropped to fit."
+      },
+      "outOfScope": [
+        "Changing `builder.ts` so the caller collection excludes test regions. That is the repair this run is meant to justify; making it first would mix it into the measurement.",
+        "runReview, the report format, the thresholds.",
+        "Any other requirement. The next unused one comes after the rule is fixed."
+      ]
+    }
+  },
+  "basePlan": {
+    "path": "bench/plans/omamori-553-r2.json",
+    "hash": "15f4e2b27fa2"
+  },
+  "questions": {
+    "on_error_result": {
+      "type": "choice",
+      "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function return to its caller?",
+      "criteria": {
+        "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+        "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+        "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+      }
+    },
+    "on_error_control": {
+      "type": "choice",
+      "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function do with the items the iterator would yield after that one?",
+      "criteria": {
+        "stops_there": "It stops at that item; the ones after it are never taken from the iterator",
+        "keeps_going": "It goes on taking the items after it",
+        "cannot_determine": "The code does not say what happens to the items after an error"
+      }
+    }
+  },
+  "questionsHash": "64011edea4c9",
+  "condition": {
+    "setup": "`dir` is a path and the function has just been entered.",
+    "operation": "The iterator `entries`",
+    "yields": "`Err(io_error)`",
+    "others": "Every other operation the function reaches succeeds.",
+    "finite": "The iterator is finite."
+  },
+  "bar": 0.6,
+  "candidateRule": "no-tests",
+  "neededReferents": [
+    "collect_listing"
+  ],
+  "commits": {
+    "correct": "916d954607f1f22a4326feb59c76c2197f540bc9",
+    "mutant": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+    "variant": "43f6170c745bdb5fa8db451a5256549a19da6642"
+  },
+  "relatedAsBuilt": {
+    "correct": [
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "663-695",
+        "kind": "other",
+        "chars": 1235
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2576-2600",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2576-2600",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/util.rs",
+        "lines": "317-328",
+        "kind": "needed_callee",
+        "defines": "collect_listing",
+        "chars": 355
+      }
+    ],
+    "mutant": [
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "663-695",
+        "kind": "other",
+        "chars": 1235
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2569-2593",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2569-2593",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/util.rs",
+        "lines": "317-328",
+        "kind": "needed_callee",
+        "defines": "collect_listing",
+        "chars": 355
+      }
+    ],
+    "variant": [
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "663-695",
+        "kind": "other",
+        "chars": 1235
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2573-2597",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/cli/doctor.rs",
+        "lines": "2573-2597",
+        "kind": "test",
+        "chars": 1064
+      },
+      {
+        "path": "src/util.rs",
+        "lines": "317-328",
+        "kind": "needed_callee",
+        "defines": "collect_listing",
+        "chars": 355
+      }
+    ]
+  },
+  "runs": 3,
+  "sent": {
+    "requests": 27,
+    "bytes": 149244,
+    "hardLimit": 40
+  },
+  "packets": {
+    "927283ba61ab": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "663-695",
+            "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+          },
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "2576-2600",
+            "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+          },
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "2576-2600",
+            "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+          },
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "dd5898a9e894": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "663-695",
+            "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+          },
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "9acf73d4a5b3": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "51862343ccd1": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "e08f68bf81a1": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "663-695",
+            "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+          },
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "2569-2593",
+            "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+          },
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "2569-2593",
+            "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+          },
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "e7337897427b": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "663-695",
+            "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+          },
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "71c018d497f5": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "ce42c7ff8ec4": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "9004071c010a": {
+      "requirement": {
+        "id": "omamori#553 R2",
+        "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-758",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(oldest_mtime.map_or(mtime, |prev| prev.min(mtime)));\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/cli/doctor.rs",
+            "lines": "663-695",
+            "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+          },
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    }
+  },
+  "log": [
+    {
+      "phase": "A",
+      "case": "correct/as-is",
+      "run": 1,
+      "branch": "correct",
+      "selection": "as-is",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "927283ba61ab",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.95,
+          "probabilities": {
+            "returns_error": 0.97,
+            "cannot_determine": 0.01,
+            "returns_success": 0.02
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/as-is",
+      "run": 2,
+      "branch": "correct",
+      "selection": "as-is",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "927283ba61ab",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.96,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.97,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/as-is",
+      "run": 3,
+      "branch": "correct",
+      "selection": "as-is",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2576-2600",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "927283ba61ab",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0.01,
+            "returns_error": 0.98
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/no-tests",
+      "run": 1,
+      "branch": "correct",
+      "selection": "no-tests",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "dd5898a9e894",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_success": 0.03,
+            "returns_error": 0.95
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.95,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/no-tests",
+      "run": 2,
+      "branch": "correct",
+      "selection": "no-tests",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "dd5898a9e894",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0.02,
+            "returns_error": 0.97
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/no-tests",
+      "run": 3,
+      "branch": "correct",
+      "selection": "no-tests",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "dd5898a9e894",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.94,
+          "probabilities": {
+            "returns_error": 0.96,
+            "returns_success": 0.03,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 1,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.96,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/callee-only",
+      "run": 1,
+      "branch": "correct",
+      "selection": "callee-only",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_success": 0.01,
+            "cannot_determine": 0.01,
+            "returns_error": 0.98
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/callee-only",
+      "run": 2,
+      "branch": "correct",
+      "selection": "callee-only",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0,
+            "returns_error": 1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/callee-only",
+      "run": 3,
+      "branch": "correct",
+      "selection": "callee-only",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9acf73d4a5b3",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.99,
+            "cannot_determine": 0.01,
+            "returns_success": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/none",
+      "run": 1,
+      "branch": "correct",
+      "selection": "none",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.93,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.95,
+            "cannot_determine": 0.03
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.97,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.02
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.95,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/none",
+      "run": 2,
+      "branch": "correct",
+      "selection": "none",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.85,
+          "probabilities": {
+            "returns_error": 0.9,
+            "cannot_determine": 0.07,
+            "returns_success": 0.03
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.97,
+            "keeps_going": 0.02,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.9,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "correct/none",
+      "run": 3,
+      "branch": "correct",
+      "selection": "none",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_error",
+      "sentStateHash": "51862343ccd1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.91,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.94,
+            "cannot_determine": 0.04
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "stops_there": 0.97,
+            "keeps_going": 0.02,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.94,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/as-is",
+      "run": 1,
+      "branch": "mutant",
+      "selection": "as-is",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e08f68bf81a1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.17,
+          "probabilities": {
+            "returns_success": 0.44,
+            "cannot_determine": 0.12,
+            "returns_error": 0.44
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0,
+            "stops_there": 0.99
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.44,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_error 0.44)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/as-is",
+      "run": 2,
+      "branch": "mutant",
+      "selection": "as-is",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e08f68bf81a1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.27,
+          "probabilities": {
+            "returns_error": 0.39,
+            "cannot_determine": 0.09,
+            "returns_success": 0.52
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0.01,
+            "stops_there": 0.99
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.52,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.52)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/as-is",
+      "run": 3,
+      "branch": "mutant",
+      "selection": "as-is",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "2569-2593",
+          "kind": "test"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e08f68bf81a1",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.31,
+          "probabilities": {
+            "returns_success": 0.37,
+            "returns_error": 0.54,
+            "cannot_determine": 0.09
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.54,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.98
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_error 0.54)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/no-tests",
+      "run": 1,
+      "branch": "mutant",
+      "selection": "no-tests",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e7337897427b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.26,
+          "probabilities": {
+            "returns_error": 0.39,
+            "returns_success": 0.51,
+            "cannot_determine": 0.1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.02,
+            "stops_there": 0.98,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.51,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.98
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.51)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/no-tests",
+      "run": 2,
+      "branch": "mutant",
+      "selection": "no-tests",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e7337897427b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.25,
+          "probabilities": {
+            "cannot_determine": 0.15,
+            "returns_success": 0.5,
+            "returns_error": 0.35
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.5,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.50)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/no-tests",
+      "run": 3,
+      "branch": "mutant",
+      "selection": "no-tests",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "e7337897427b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.29,
+          "probabilities": {
+            "cannot_determine": 0.11,
+            "returns_success": 0.53,
+            "returns_error": 0.36
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0,
+            "stops_there": 0.99
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.53,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.53)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/callee-only",
+      "run": 1,
+      "branch": "mutant",
+      "selection": "callee-only",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.22,
+          "probabilities": {
+            "returns_error": 0.45,
+            "cannot_determine": 0.07,
+            "returns_success": 0.48
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.48,
+        "choiceMatch": true,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.99
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_success 0.48)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/callee-only",
+      "run": 2,
+      "branch": "mutant",
+      "selection": "callee-only",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.34,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_success": 0.37,
+            "returns_error": 0.56
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "stops_there": 0.97,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.02
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.56,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "unknown",
+      "why": "the result answer did not clear 0.6 (returns_error 0.56)"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/callee-only",
+      "run": 3,
+      "branch": "mutant",
+      "selection": "callee-only",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_success",
+      "sentStateHash": "71c018d497f5",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.44,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_success": 0.63,
+            "returns_error": 0.34
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "keeps_going": 0.02,
+            "cannot_determine": 0.01,
+            "stops_there": 0.97
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.63,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.97
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/none",
+      "run": 1,
+      "branch": "mutant",
+      "selection": "none",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_success",
+      "sentStateHash": "ce42c7ff8ec4",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.53,
+          "probabilities": {
+            "cannot_determine": 0.17,
+            "returns_success": 0.6799999999999999,
+            "returns_error": 0.15
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.75,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "keeps_going": 0.1,
+            "stops_there": 0.84
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.6799999999999999,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.84
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/none",
+      "run": 2,
+      "branch": "mutant",
+      "selection": "none",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_success",
+      "sentStateHash": "ce42c7ff8ec4",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.56,
+          "probabilities": {
+            "returns_error": 0.12,
+            "cannot_determine": 0.18,
+            "returns_success": 0.7
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.79,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "stops_there": 0.86,
+            "keeps_going": 0.1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.7,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.86
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "phase": "A",
+      "case": "mutant/none",
+      "run": 3,
+      "branch": "mutant",
+      "selection": "none",
+      "commit": "e767e5cb2301f3d449002c47c6fffc35d7755a81",
+      "kept": [],
+      "referents": {
+        "ok": false,
+        "reason": "the packet does not carry collect_listing, which the question needs to be answerable"
+      },
+      "expected": "returns_success",
+      "sentStateHash": "ce42c7ff8ec4",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.47,
+          "probabilities": {
+            "cannot_determine": 0.21,
+            "returns_success": 0.64,
+            "returns_error": 0.15
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.73,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "keeps_going": 0.14,
+            "stops_there": 0.8099999999999999
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.64,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 0.8099999999999999
+      },
+      "verdict": "property_breaks",
+      "why": "an enumeration that failed is returned as a success"
+    },
+    {
+      "phase": "B",
+      "case": "candidate/variant",
+      "run": 1,
+      "branch": "variant",
+      "selection": "no-tests",
+      "commit": "43f6170c745bdb5fa8db451a5256549a19da6642",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9004071c010a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.95,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.97,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "B",
+      "case": "candidate/variant",
+      "run": 2,
+      "branch": "variant",
+      "selection": "no-tests",
+      "commit": "43f6170c745bdb5fa8db451a5256549a19da6642",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9004071c010a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0.03,
+            "returns_error": 0.96
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.96,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    {
+      "phase": "B",
+      "case": "candidate/variant",
+      "run": 3,
+      "branch": "variant",
+      "selection": "no-tests",
+      "commit": "43f6170c745bdb5fa8db451a5256549a19da6642",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        },
+        {
+          "path": "src/util.rs",
+          "lines": "317-328",
+          "kind": "needed_callee"
+        }
+      ],
+      "referents": {
+        "ok": true
+      },
+      "expected": "returns_error",
+      "sentStateHash": "9004071c010a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.96,
+          "probabilities": {
+            "returns_success": 0.02,
+            "cannot_determine": 0.01,
+            "returns_error": 0.97
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "control": {
+        "choice": "stops_there",
+        "probability": 1
+      },
+      "verdict": "property_holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    }
+  ],
+  "localDecisions": [
+    {
+      "phase": "B",
+      "case": "candidate/referent-missing",
+      "kept": [
+        {
+          "path": "src/cli/doctor.rs",
+          "lines": "663-695",
+          "kind": "other"
+        }
+      ],
+      "withheld": "the packet does not carry collect_listing, which the question needs to be answerable",
+      "met": true
+    }
+  ]
+}
