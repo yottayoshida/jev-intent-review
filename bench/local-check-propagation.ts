@@ -6,27 +6,51 @@
 // unchanged — a set that had to reword a question would be a different plan, and whether the same
 // one travels is the whole point of this file.
 //
-// The function here is `show_entries` (omamori#558's head), which walks the lines of the audit log
-// and propagates a read failure with `?`. Different pull request, different file, same shape: an
-// iterator whose items are each a value or an error.
+// The loop here is the read loop of `show_entries` (omamori#558's head), which walks the lines of
+// the audit log and propagates a read failure with `?`. Different pull request, different file,
+// same shape: an iterator whose items are each a value or an error.
+//
+// **What is judged below is not the shipped function.** The shipped `show_entries` takes
+// `(config: &AuditConfig, opts: &ShowOptions, out: &mut impl Write)`, returns `Result<(),
+// AuditError>` and writes what it read to `out`. `wrap()` lifts its read loop into a function that
+// returns the list instead, so that this case and `collect_listing` differ in their bodies and not
+// in their signatures. Every number here is about that simplified loop, and none of it is a check
+// of omamori#558 R1 on the code that shipped.
 //
 // What this covers is narrow, and narrower than the requirement it is drawn from: that a read
 // failure partway through the log does not leave the function as a successful list of the entries
 // it had. What `show_entries` then prints, and every other path into the log, are not read here.
 //
-// **It does not carry over: 6 of 18 runs, and the six are the shipped code.** Jev answers
-// `a_success_with_what_it_had` (0.87-0.93) about a function that propagates its read failure with
-// `?`, because this function handles *two* failures in the same loop — the line it could not read,
-// which it propagates, and the line it could not parse, which it skips — and the question says
-// only "one item is an error". `collect_listing` had one kind and the question was unambiguous
-// there. The expectations below are left as they were written, and the run exits non-zero: the
-// plan travelling is what was being measured, and it did not.
+// **It does not carry over: 6 of 18 runs, and the six are the behaviour the loop shipped with.**
+// Jev answers `a_success_with_what_it_had` (0.87-0.93) about a loop that hands its read failure
+// back with `?`. *Why* it does is not settled by these runs. Two readings are open:
+//
+//   (a) it answers about the other failure in the same loop — the line that is not JSON, which
+//       `Err(_) => continue` skips — because the question says only "one item is an error";
+//   (b) it reads `let line = line?;` itself as not returning an error to the caller.
+//
+// `skips-unparsable-lines` leaves both failures in place and only adds braces, so it is consistent
+// with (a) without discriminating against (b). Telling them apart needs a version with the parse
+// failure removed, or one where the propagation is spelled out as `match` + `return Err(…)` — a
+// separate experiment, not a re-reading of these numbers.
+//
+// No bar makes the plan *choose* the right answer for the correct loop. At 0.95 the shipped runs
+// (0.87-0.93) drop below it and become UNKNOWN while `stops-but-succeeds` (1.00) stays a VIOLATION,
+// so the two do come apart — but by withholding, never by reading the loop correctly. `an_error` is
+// not the chosen answer at any bar.
+//
+// The expectations below are left as they were written, and the run exits non-zero: the plan
+// travelling is what was being measured, and it did not.
 //
 // It fails towards calling correct code a violation, which is the direction that wastes a
 // reviewer's time rather than the one that hides a defect — but a plan that does that is not
 // ready to be pointed at anything. Rewording the question until this passes would be fitting the
 // question to the answer; a revised plan has to name which failure it asks about, and be measured
 // on both functions with its expectations written down first.
+//
+// What would *not* be a fix: treating `stops_there` + `a_success_with_what_it_had` as a
+// contradiction to be resolved in the aggregation. That pair is `stops-but-succeeds` below — a real
+// violation of the covered property, which the plan has to keep calling one.
 
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
@@ -40,17 +64,26 @@ import { BAR, MEANING, QUESTIONS, verdictOf, type Local } from "./local-check-pl
 const SOURCE = {
   requirement: "omamori#558 R1",
   quote: "The software should not drop checks that need no key, including tail-truncation detection, when a halt occurs.",
-  covered: "Not that clause, but the contract this function keeps while reading the log for it: a line that cannot be read does not leave the function as a successful list of the lines before it.",
+  covered: "Not that clause, but the contract the read loop keeps while reading the log for it: a line that cannot be read does not leave the function as a successful list of the lines before it.",
   notCovered: [
+    "The shipped function. What is judged is its read loop in a wrapper that returns the list (see `SHIPPED_AT.derivation`), so nothing here clears or faults `show_entries` as it stands.",
     "The clause itself: which checks keep running past a halt, and whether tail truncation is among them. That is the loop in `verify`, not this one.",
     "What `show_entries` prints for the entries it did read.",
     "Every other path that reads the same log.",
   ],
 };
 
-const SHIPPED_AT = { repository: "yottayoshida/omamori", commit: "a651d3c5e4fd9a38997df059e5442841c54049ae", path: "src/audit/verify.rs", lines: "1723-1732 of `show_entries`" };
+const SHIPPED_AT = {
+  repository: "yottayoshida/omamori",
+  commit: "a651d3c5e4fd9a38997df059e5442841c54049ae",
+  path: "src/audit/verify.rs",
+  lines: "1723-1732 of `show_entries`",
+  signature: "pub fn show_entries(config: &AuditConfig, opts: &ShowOptions, out: &mut impl Write) -> Result<(), AuditError>",
+  derivation:
+    "The loop is verbatim; the function around it is not. `wrap()` gives it a signature that returns the list, so this case and `collect_listing` differ in their bodies alone. The shipped function writes to `out` and returns `Result<(), AuditError>`.",
+};
 
-/** The loop as shipped, cut to the part the questions are about. */
+/** The read loop as shipped, verbatim, cut to the part the questions are about. */
 const SHIPPED = `    for line in reader.lines() {
         let line = line?;
         let trimmed = line.trim();
@@ -65,6 +98,7 @@ const SHIPPED = `    for line in reader.lines() {
     }
     Ok(entries)`;
 
+/** Not the shipped signature: it returns the list, so only the body differs from `collect_listing`. */
 const wrap = (body: string) => `pub fn show_entries(
     path: &Path,
     opts: &ShowOptions,
@@ -84,8 +118,8 @@ interface Case {
 
 const CASES: Case[] = [
   {
-    id: "shipped",
-    what: "As shipped: `let line = line?;` hands the read failure back to the caller at once.",
+    id: "shipped-loop",
+    what: "The read loop as shipped, in a wrapper that returns the list: `let line = line?;` hands the read failure back to the caller at once.",
     code: wrap(SHIPPED),
     expect: { control: "stops_there", result: "an_error", verdict: "covered_holds" },
   },
@@ -131,7 +165,7 @@ const CASES: Case[] = [
   },
   {
     id: "skips-unparsable-lines",
-    what: "Untouched behaviour that looks like the violation: a line that is not JSON is skipped, as shipped. Only a line that could not be *read* is the error the questions ask about.",
+    what: "Untouched behaviour that looks like the violation: a line that is not JSON is skipped, as shipped. Only a line that could not be *read* is the error the questions ask about. It leaves both failures in the loop, so it does not tell reading (a) from reading (b) at the top of this file.",
     code: wrap(SHIPPED.replace('            Err(_) => continue,', '            Err(_) => {\n                continue;\n            }')),
     expect: { control: "stops_there", result: "an_error", verdict: "covered_holds" },
   },
