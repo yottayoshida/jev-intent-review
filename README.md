@@ -13,7 +13,15 @@ them in. jev-intent-review starts from the stated intent (an issue, acceptance c
 you pass in), searches the repository after the change for every place that intent applies to,
 and asks [Jev](https://developers.cloudflare.com/ai/models/typesafe/jev/) — a model that answers
 fixed, typed questions — one small question per place. The result is a table of requirements
-against code locations, each marked `VERIFIED`, `VIOLATION`, `UNKNOWN` or `NOT_APPLICABLE`.
+against code locations, each marked `VERIFIED`, `VIOLATION` or `UNKNOWN`.
+
+VERIFIED means every place Jev judged, at `judgment.relevance_probability` or above, to be a path
+of the requirement satisfies it. It is a claim over those paths and nothing wider, so the section
+lists them and says what was set aside and what the search did not follow — including when there
+is only one of them: `VERIFIED over 1 discovered path`, with `Coverage: weak — 30 of 159 place(s)
+judged, 1 path(s), 29 set aside` under it.
+A place Jev does not call a path, or calls one too weakly to count, decides nothing either way:
+it is listed, not left to hold the requirement open.
 
 It reads the other direction as well: every change the pull request made that carries behaviour is
 held against the requirements, and the ones no requirement asked for are listed with their own
@@ -88,10 +96,13 @@ changes; turning an issue into requirements alone has taken up to 26 seconds.
 | §15, §27: 2,000 characters of code and 2,000 of context | 8,000 and 4,000 | Real functions are longer than 2,000 characters, and a cut function cannot be VERIFIED |
 | §15: split long evidence by semantic region | Cut long evidence and report it | Splitting separates a guard from the call it guards, which reads as a violation |
 | §14: ripgrep and the working tree | git objects only (`git grep <sha>`, `git cat-file blob`) | The before and after commits are read the same way, and nothing untracked or behind a symbolic link is read |
-| §13 Layer D: relevance first, then satisfaction | Both in one request; relevance decides what counts | One round trip. A candidate Jev calls `supporting` or `unrelated` is not a path, so it is neither a violation nor a reason to withhold VERIFIED. A violation needs Jev to call the code a path at `violation_probability` or above: a CI script on a real pull request was called one at 0.54 and drew `violates` at 0.81, where real violations were called paths at 0.98-0.99 |
+| §13 Layer D: relevance first, then satisfaction | Both in one request; relevance decides what counts, in both directions | One round trip. Only a place Jev calls a path at `relevance_probability` decides the requirement; everything else — supporting, unrelated, or a path named too weakly — is set aside with its reason and counted. Measured over 795 judged places on ten real pull requests: 19% were called paths at all, a median of 2 per requirement, so asking all ~30 to come back decided left VERIFIED at 0 of 38. A violation needs the path answer at `violation_probability` too: a CI script was called a path at 0.54 and drew `violates` at 0.81, where real violations were called paths at 0.98-0.99 |
 | §21 J4: is a change asked for by a requirement | The same four answers, with tests, fixtures and the comments on code the change added counted as part of carrying a requirement out | Measured on real pull requests: of 32 changes the first wording called unasked-for, nearly all were a test of the change, a helper it needed, or a comment on a function the change itself added. Naming them in the question left 24 over the same regions, and a test written for an unasked-for change is still reported with it |
-| §17 J5: a search-quality signal | Asked only when a requirement would be VERIFIED; anything but `likely_complete` at 0.5 or more withholds VERIFIED | It is never proof, but it can only make the result more cautious |
-| §13: follow references of the changed code | Every call the changed functions make is followed (rarest first, at most 8), and the callers of anything Jev calls a mere wrapper are followed one hop further; whatever is not followed makes the search incomplete, which withholds VERIFIED | A requirement is only as verified as the search that looked for its places |
+| §17 J5: a search-quality signal | Asked only when a requirement would be VERIFIED, and shown what the search left as well as what it found; anything but `likely_complete` at 0.5 or more withholds VERIFIED | It is never proof, but it can only make the result more cautious. Until this build no run reached the point of asking it on real code |
+| §13: follow references of the changed code | Every call the changed functions make is followed (rarest first, at most 8), and the callers of anything Jev calls a mere wrapper are followed one hop further, with room of their own | A requirement is only as verified as the search that looked for its places |
+| §20: "discovery confidence is adequate" | What the search left is reported and handed to J5, not each item blocking on its own. VERIFIED is withheld outright only for a path known by name and never judged, a run that stopped on its budget, or a change to this tool's configuration or workflows | Every one of 38 requirements on real pull requests carried at least one "not followed" reason (405 in all), so any-lead-blocks is unsatisfiable rather than strict. What is left is stated instead: the count of places found and not judged, of places set aside, and the leads themselves |
+| §19: truncated evidence makes a place UNKNOWN | Read by which part was cut. The place's own code cut voids every answer; only its surroundings cut voids `violates` alone; surroundings that may belong to another definition of the same name void `satisfies` as well | Missing surroundings can hide a check, so no violation can be claimed on them, but they cannot remove a check that was seen. Measured: of 116 cut packets across five pull requests, 111 had the place's own code whole |
+| §20: `NOT_APPLICABLE` as a requirement status | Removed | With only paths deciding a requirement, "does not apply here" cannot be told apart from "no place it applies to was found" (of 348 `not_applicable` answers, 3 were on a place called a path). A claim that cannot be told apart from ignorance is not made |
 | §24: `jev-intent-review review` | `jev-intent-review` | There is one command |
 
 ## Development
