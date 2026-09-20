@@ -1,0 +1,28 @@
+From 2d5f0f28bbf5440eca32b7d4cd929a88b5b2fda9 Mon Sep 17 00:00:00 2001
+From: yotta <yoshida02@gmail.com>
+Date: Sun, 20 Sep 2026 18:55:35 +0900
+Subject: [PATCH] variant: same oldest-mtime choice written with map_or/min
+
+---
+ src/cli/doctor.rs | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/cli/doctor.rs b/src/cli/doctor.rs
+index fdea375..55032da 100644
+--- a/src/cli/doctor.rs
++++ b/src/cli/doctor.rs
+@@ -741,10 +741,7 @@ fn staging_info_from(
+         count += 1;
+         bytes += m.len();
+         let mtime = m.modified().unwrap_or(now);
+-        oldest_mtime = Some(match oldest_mtime {
+-            Some(prev) if prev < mtime => prev,
+-            _ => mtime,
+-        });
++        oldest_mtime = Some(oldest_mtime.map_or(mtime, |prev| prev.min(mtime)));
+     }
+ 
+     let oldest_days_ago = oldest_mtime.and_then(|mt| {
+-- 
+2.39.5 (Apple Git-154)
+

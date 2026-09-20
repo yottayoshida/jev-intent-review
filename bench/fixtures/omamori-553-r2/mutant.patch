@@ -1,0 +1,39 @@
+From 5a8e2036079ebc4f0e684c532e3b813372bf1f6f Mon Sep 17 00:00:00 2001
+From: yotta <yoshida02@gmail.com>
+Date: Sun, 20 Sep 2026 18:55:09 +0900
+Subject: [PATCH] mutant: staging_info_from returns the partial listing as a
+ success
+
+---
+ src/cli/doctor.rs | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/src/cli/doctor.rs b/src/cli/doctor.rs
+index fdea375..9804d84 100644
+--- a/src/cli/doctor.rs
++++ b/src/cli/doctor.rs
+@@ -700,17 +700,10 @@ fn staging_info_from(
+     dir: &Path,
+     entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,
+ ) -> Result<StagingInfo, StagingUnreadable> {
+-    let names = crate::util::collect_listing(entries).map_err(|stop| {
+-        StagingUnreadable::new(
+-            "listing_stopped",
+-            format!(
+-                "the listing of {} stopped after {} entries: {}",
+-                dir.display(),
+-                stop.seen.len(),
+-                stop.err
+-            ),
+-        )
+-    })?;
++    let names = match crate::util::collect_listing(entries) {
++        Ok(names) => names,
++        Err(stop) => stop.seen,
++    };
+ 
+     let now = std::time::SystemTime::now();
+     let mut count = 0u64;
+-- 
+2.39.5 (Apple Git-154)
+

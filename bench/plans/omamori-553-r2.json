@@ -1,0 +1,143 @@
+{
+  "planVersion": "1",
+  "writtenAt": "2026-09-20",
+  "note": "Written and committed before any request was sent. Nothing below is adjusted after an answer; a change would be a new plan file and a new log.",
+
+  "requirement": {
+    "id": "omamori#553 R2",
+    "primarySource": {
+      "url": "https://github.com/yottayoshida/omamori/pull/553",
+      "kind": "pull request description",
+      "retrievedAt": "2026-09-20",
+      "issue": "https://github.com/yottayoshida/omamori/issues/485",
+      "quote": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`.",
+      "correspondence": "The same description names the mechanism: \"`doctor`'s staging section reads through `staging_info_at` / `staging_info_from` (an iterator seam, like `fold_key_dir_entries`'s)\", and lists \"listing stopped\" first among the ways of not reading the directory in full. Issue #485 states the same defect from the other side: \"That is a positive assertion about a directory that could not be read\", and measures why skipping a failed entry is not dropping one name — `std`'s ReadDir stops at the first `Err` (#477: 151 Oks, one Err, nothing after)."
+    },
+    "textSentToTheModel": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`.",
+    "whyThatTextAndNotTheCorpusOne": "`bench/corpus/omamori-553.spec.json` R2 is the requirement-writing model's output after mechanical repair, cut mid-sentence ('…and a'), and carries no ground-truth label. It is not treated as the original. The sentence above is quoted from the pull request description, which is where the property was written.",
+    "leakRisk": "The sentence says a failure is reported, so it is not free of the answer's direction. It is sent because the real pipeline sends the requirement in every packet, and removing it would measure a pipeline that does not exist. The mutant case is what detects parroting: the same sentence goes with it, so an answer copied from the requirement would say `returns_error` there too and fail that case."
+  },
+
+  "usageHistory": {
+    "requirement": "omamori#553 R2 has not been used in any local-check experiment. `bench/local-check.ts` used R1 (`collect_listing`), quoted in its SOURCE.requirement as 'omamori#553 R1'.",
+    "function": "`staging_info_from` has not appeared in any bench. `collect_listing` (R1's target) is called by it and will show up as related evidence, built by the tool from the real repository — as a caller's evidence, not as the target.",
+    "adjacency": "Same pull request, same issue, different clause and different function. Disclosed rather than presented as an unrelated case."
+  },
+
+  "target": {
+    "repository": "yottayoshida/omamori",
+    "workingCopy": "an isolated clone; the correct case is the real commit, the two variants are one commit each on top of it",
+    "file": "src/cli/doctor.rs",
+    "symbol": "staging_info_from",
+    "howTheBlockIsFound": "`Discoverer.search('staging_info_from')` at the case's commit, then the hit that `defines()` accepts, then `BlockIndex.enclosing()` for its extent. No line number is written in this plan.",
+    "enumerationOperation": "the `entries` parameter, `impl Iterator<Item = std::io::Result<std::ffi::OsString>>`",
+    "whyThatOperation": "It is the only iterator in the function whose items are each a value or an error. The pull request calls it the iterator seam, and the doc comment on the function says it takes names 'so a listing that stops partway is reachable from a test'."
+  },
+
+  "condition": {
+    "setup": "`dir` is a path and the function has just been entered.",
+    "operation": "The iterator `entries`",
+    "yields": "`Err(io_error)`",
+    "others": "Every other operation the function reaches succeeds.",
+    "finite": "The iterator is finite.",
+    "facts": [
+      "`entries` is a parameter, so nothing in the function produces or filters it before the loop.",
+      "The function contains a second kind of failure — `symlink_metadata` on a listed name — which 'every other operation the function reaches succeeds' excludes."
+    ],
+    "assumptions": [
+      "That no other operation fails. Not checked against any caller; it is a stipulation of the question, not a claim about production."
+    ],
+    "whyThePositionOfTheErrorIsNotPinned": "Under v3 the answer does not depend on it. Whether the `Err` is first or last, the correct code returns `Err(StagingUnreadable)` and the mutant returns `Ok(StagingInfo)`; both are exclusive options, so the property is uniquely determined by the condition as written. Under v2 it was not, because two of the four options were both successes."
+  },
+
+  "mapping": {
+    "returns_error": "property holds for this clause",
+    "returns_success": "property breaks for this clause",
+    "cannot_determine": "undecided",
+    "notInTheCondition": "The condition does not say what the function should do, does not use the words propagate, report, error-handling or correct, and does not name the expected answer."
+  },
+
+  "scope": {
+    "coveredByThisRun": "One clause of the requirement, at one function: when `entries` yields an error, `staging_info_from` does not return a success.",
+    "notCovered": [
+      "The printed line. `[Staging] cannot read: …` and `[Staging] empty` are produced by `staging_section_text`, which is not read here.",
+      "The `--json` shape: `summary.staging.status`, the null counts and the path-free reason.",
+      "The other five ways of not reading the directory in full named in the pull request: cannot list, cannot lstat, a symlink in its place, a non-directory in its place, an unresolvable HOME. Those are in `staging_info_at`, not in the function judged.",
+      "The listed staging file that cannot be stat'ed (`entry_unreadable`) — a real part of the requirement, and excluded from this run by the condition.",
+      "`fold_key_dir_entries`, the key directory's seam, which the same pull request changed.",
+      "The staging prune's count pass and `gc_stale_temps`, both named in the pull request.",
+      "Whether the requirement is satisfied end to end. A local answer about one function is not that."
+    ]
+  },
+
+  "cases": [
+    {
+      "id": "target/correct",
+      "branch": "correct",
+      "what": "The function as shipped at the pinned commit: `collect_listing(entries).map_err(...)?`.",
+      "expectedResult": "returns_error",
+      "expectedControl": "stops_there",
+      "expectedVerdict": "property_holds",
+      "sendsRequests": true
+    },
+    {
+      "id": "target/mutant",
+      "branch": "mutant",
+      "what": "One commit on top: the listing failure is taken as a success carrying what was seen (`Err(stop) => stop.seen`). The rest of the body is untouched.",
+      "expectedResult": "returns_success",
+      "expectedControl": "keeps_going",
+      "expectedVerdict": "property_breaks",
+      "sendsRequests": true
+    },
+    {
+      "id": "target/variant",
+      "branch": "variant",
+      "what": "One commit on top: the oldest-mtime choice written as `map_or(mtime, |prev| prev.min(mtime))`. Nothing on the enumeration-failure path is touched.",
+      "expectedResult": "returns_error",
+      "expectedControl": "stops_there",
+      "expectedVerdict": "property_holds",
+      "sendsRequests": true
+    },
+    {
+      "id": "target/evidence-cut",
+      "branch": "correct",
+      "what": "The same shipped function with `maxPrimaryChars` below its length, so its own body does not fit.",
+      "expectedResult": null,
+      "expectedControl": null,
+      "expectedVerdict": "unknown",
+      "sendsRequests": false,
+      "why": "`cut.own` means the body nobody sent is the body the question is about. Decided locally; no request is spent."
+    }
+  ],
+
+  "regression": {
+    "why": "v3 is a different question contract, so v2's numbers are not its numbers. Two known cases re-measure it: the one v2 read correctly, and the one whose two success options made v2's score wrong while its verdict was right.",
+    "note": "These two are the code strings from `bench/local-check.ts`, unchanged, so they are comparable with what was measured there. They are not built from a repository and are not part of the new target's score.",
+    "codeComesFrom": "bench/logs/local-check.json — the run log, so the string is byte-identical to what was measured under v1 and cannot drift. The runner checks each against the `codeHash` recorded beside it.",
+    "condition": {
+      "setup": "The function has just been entered.",
+      "operation": "The iterator `entries`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "finite": "The iterator is finite."
+    },
+    "cases": [
+      { "id": "regression/collect_listing-shipped", "expectedResult": "returns_error", "expectedVerdict": "property_holds" },
+      { "id": "regression/collect_listing-stops-but-succeeds", "expectedResult": "returns_success", "expectedVerdict": "property_breaks" }
+    ]
+  },
+
+  "measurement": {
+    "runsPerCase": 3,
+    "bar": 0.6,
+    "passCondition": "For every case that sends requests, the expected result choice in 3 of 3 runs with probability >= 0.6. One run off leaves that case unmet; a lower bar is not adopted afterwards.",
+    "scoring": "Choice match and choice-match-and-over-the-bar are recorded separately. The verdict reads the result answer only; the control answer is recorded and never aggregated.",
+    "requestBudget": {
+      "oneJudgeCallIsOneHttpRequest": true,
+      "planned": { "regression": 6, "target": 9, "evidenceCut": 0, "total": 15 },
+      "maxRetries": 0,
+      "hardLimit": 30,
+      "onLimit": "The run stops and writes what it has. Cases are not dropped to fit; if the budget is not enough the plan is rewritten and the failure stays in the log."
+    }
+  }
+}
