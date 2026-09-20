@@ -27,6 +27,13 @@
 //
 // The request budget is the product's own: `CloudflareClient` counts what goes over the wire,
 // retries included, and refuses past `maxRequests`. Nothing here counts separately.
+//
+// The log holds the redacted packet that was sent — once per distinct packet under `packets`, with
+// every run naming its own by hash. The first version of this file recorded none of it, and the
+// write-up said the failing packet was in the log in full, which was false; `bench/recount.ts` now
+// prints `packets: NOT RECORDED` for that log rather than letting it read as if they were there.
+// A packet rebuilt from the pinned commit afterwards is a reconstruction, not the run's record,
+// and is not written back into it.
 
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -216,6 +223,16 @@ interface Row {
   cut?: unknown;
   sent?: unknown;
   expected: { result: string | null; control: string | null; verdict: string };
+  /**
+   * The hash of the redacted packet this run actually sent. The body is under `packets` at the top
+   * of the file, once per distinct packet rather than once per run.
+   *
+   * The first version of this file recorded none of it — `located`, `cut` and the paths in `sent`,
+   * and nothing of what went over the wire — while `docs/real-requirement-check.md` said the
+   * failing packet was in the log in full. It was not. A packet rebuilt afterwards is not the same
+   * artefact as one that was recorded, so the fix is to record it, not to reconstruct it.
+   */
+  sentStateHash?: string;
   answers?: Record<string, ChoiceAnswer>;
   result?: { choice: string; probability: number; choiceMatch: boolean; counted: boolean };
   control?: { choice: string; probability: number; choiceMatch: boolean | null; counted: boolean | null };
@@ -234,8 +251,13 @@ function record(id: string, expectedResult: string | null) {
   return tally.get(id)!;
 }
 
+/** Every distinct redacted packet that was sent, by hash, so each run can name one without copying it. */
+const packets = new Map<string, unknown>();
+
 async function measure(group: "regression" | "target", id: string, state: unknown, qs: ReturnType<typeof questionsV3>, expected: Row["expected"], extra: Partial<Row>) {
   const t = record(id, expected.result);
+  const stateHash = hash(state);
+  packets.set(stateHash, state);
   for (let run = 1; run <= runs; run++) {
     try {
       const answers = (await provider.judge(state, qs)) as Record<string, ChoiceAnswer | undefined>;
@@ -255,6 +277,7 @@ async function measure(group: "regression" | "target", id: string, state: unknow
         run,
         ...extra,
         expected,
+        sentStateHash: stateHash,
         answers: answers as Record<string, ChoiceAnswer>,
         result: { choice: result?.choice ?? "none", probability: rp, choiceMatch: rs.choiceMatch, counted: rs.counted },
         control: {
@@ -274,7 +297,7 @@ async function measure(group: "regression" | "target", id: string, state: unknow
     } catch (e) {
       t.runs += 1;
       const message = e instanceof Error ? e.message : String(e);
-      rows.push({ group, case: id, run, ...extra, expected, error: message });
+      rows.push({ group, case: id, run, ...extra, expected, sentStateHash: stateHash, error: message });
       console.log(`FAIL ${id.padEnd(44)} run ${run}: ${message}`);
       if (/budget|maxRequests|request limit/i.test(message)) {
         console.log("the request budget stopped the run; what was measured is written to the log");
@@ -359,6 +382,9 @@ writeFileSync(
       runs,
       sent: { requests: client.sent.requests, bytes: client.sent.bytes, hardLimit },
       summary,
+      // What actually went over the wire, redacted by `buildEvidence` as the product does it, one
+      // entry per distinct packet. Each run above names its own by hash.
+      packets: Object.fromEntries(packets),
       log: rows,
     },
     null,
