@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "When a Linux run under --observe wrappers refuses oracle_missed_operation, next_step names re-running under --observe syscalls, together with where that mode's hazards are written, '.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#609",
+          "quote": "pass a flag"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R2",
+      "text": "The site had the two facts that point at the cause, so the step should be chosen based on these facts, '.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#599",
+          "quote": "the cause is known"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R3",
+      "text": "When the oracle's divergent operation carries a thread id the shim never recorded writing, the step should name re-running under --observe syscalls, '.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#599",
+          "quote": "the shim never saw"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R4",
+      "text": "The step should be chosen where the cause is known, and the cause is a second writing thread the shim never saw, so the step should name re-running under --observe syscalls, '.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#609",
+          "quote": "where the cause is known"
+        }
+      ],
+      "searchHints": []
+    },
+    {
+      "id": "R5",
+      "text": "The step may name re-running under --observe syscalls, together with where that mode's hazards are written, '.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#599",
+          "quote": "the step may name"
+        }
+      ],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": [
+    {
+      "id": "A1",
+      "text": "Dropped a requirement whose quote is not a statement in any source: The step is chosen where the cause is known and the cause is a second writing thread the shim never saw, so the step should name re-running under --observe syscalls when the oracle's divergent operati",
+      "sourceRefs": []
+    },
+    {
+      "id": "A2",
+      "text": "Dropped a requirement whose quote is not a statement in any source: The step should name one of the actions it may name according to the report schema, '",
+      "sourceRefs": []
+    },
+    {
+      "id": "A3",
+      "text": "Dropped a requirement whose quote is not a statement in any source: The step should be chosen at the site that raised the refusal, where the cause is known, '",
+      "sourceRefs": []
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "title": "",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Keep stderr output as a single JSON object when a command is blocked in --json-error mode.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#554",
+          "quote": "stderr stays a single JSON object"
+        }
+      ],
+      "searchHints": [
+        "stderr",
+        "json object",
+        "error handling"
+      ]
+    },
+    {
+      "id": "R2",
+      "text": "Modify SigningKey to carry warnings and change AuditLogger::from_config to return them, letting callers decide where to print warnings.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#494",
+          "quote": "Have `SigningKey` carry warnings and `AuditLogger::from_config` return them"
+        }
+      ],
+      "searchHints": [
+        "signing key",
+        "audit logger",
+        "warnings",
+        "error handling"
+      ]
+    },
+    {
+      "id": "R3",
+      "text": "Allow each caller of AuditLogger::from_config to decide where to print warnings.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "issue#494",
+          "quote": "each caller decide where they go"
+        }
+      ],
+      "searchHints": [
+        "audit logger",
+        "warnings",
+        "error handling",
+        "caller decision"
+      ]
+    },
+    {
+      "id": "R4",
+      "text": "Ensure blocked commands are recorded in the audit chain in the same way as in text mode.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#554",
+          "quote": "recorded in the audit chain exactly as in text mode"
+        }
+      ],
+      "searchHints": [
+        "audit chain",
+        "text mode",
+        "blocked commands"
+      ]
+    },
+    {
+      "id": "R5",
+      "text": "Prevent any text output from preceding the JSON object on stderr, to maintain the single JSON object contract.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#554",
+          "quote": "a line of text ahead of the JSON would have broken the one-object contract"
+        }
+      ],
+      "searchHints": [
+        "json object",
+        "stderr",
+        "text output",
+        "contract"
+      ]
+    },
+    {
+      "id": "R6",
+      "text": "Change the audit layer to return warnings instead of printing them.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#554",
+          "quote": "the audit layer printed its own operator warnings"
+        }
+      ],
+      "searchHints": [
+        "audit layer",
+        "warnings",
+        "error handling",
+        "printing"
+      ]
+    },
+    {
+      "id": "R7",
+      "text": "Implement a core that returns warnings and a wrapper that prints them, following the detector::repair_gate shape.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [
+        {
+          "sourceId": "pr#554",
+          "quote": "a core that returns warnings, a wrapper that prints them"
+        }
+      ],
+      "searchHints": [
+        "core",
+        "warnings",
+        "wrapper",
+        "printing"
+      ]
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": [
+    {
+      "id": "A1",
+      "text": "Dropped a requirement whose quote is not a statement in any source: Record blocked commands in the audit chain in --json-error mode, as in text mode, without breaking the single JSON object contract on stderr, with search hints: audit chain, json error, hook check, bl",
+      "sourceRefs": []
+    }
+  ]
+}
