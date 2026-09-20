@@ -39,7 +39,7 @@
 // right. They are not adjusted afterwards.
 //
 // ---------------------------------------------------------------------------
-// **Result: (a). 24 runs, three per cell.**
+// **Result: the wording decides, not the code form. 24 runs, three per cell.**
 //
 //   | code                        | current question                              | stated condition          |
 //   |-----------------------------|-----------------------------------------------|---------------------------|
@@ -47,6 +47,13 @@
 //   | `match` + `return Err(...)` | a success with what it had 0.49-0.59, under the bar, UNKNOWN — wrong | an error 1.00 — right |
 //   | skips the read failure      | a success 1.00, violation — right             | a success 0.93-0.94, violation — right |
 //   | stops and returns a success | a success 1.00, violation — right             | a success 0.95-0.97, violation — right |
+//
+// **What that settles, and what it does not.** Reading (b) is refuted: `?` *is* read as returning
+// to the caller, at 1.00, as soon as the condition is named. Reading (a) is **not** confirmed by
+// it. What the 24 runs support is that stating this condition got the returned-value answer right
+// for both code forms — not that the earlier wrong answers were about the parse failure
+// specifically. Some other property of the added wording could do the same work, and nothing here
+// separates those. That is left alone rather than chased: the useful claim is the narrow one.
 //
 // The prediction recorded in `because` was (b), and it was wrong. Writing the return out did not
 // help; it made the answer *less* decided, dropping it under the bar. That prediction came from
