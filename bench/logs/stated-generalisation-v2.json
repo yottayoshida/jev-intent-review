@@ -1,0 +1,2042 @@
+{
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "model": "typesafe/jev",
+    "currentHash": "1c12486d8355"
+  },
+  "sources": {
+    "listing": {
+      "repository": "yottayoshida/omamori",
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "path": "src/util.rs",
+      "lines": "317-328",
+      "derivation": "The whole function, verbatim."
+    },
+    "mapErr": {
+      "repository": "yottayoshida/omamori",
+      "commit": "a651d3c5e4fd9a38997df059e5442841c54049ae",
+      "path": "src/audit/verify.rs",
+      "lines": "1051-1054 of `verify_chain`",
+      "derivation": "The read-failure line is verbatim; the loop and function around it are the same wrapper the other read-loop cases use, so the evidence stays the same size. `verify_chain` itself is 762 lines and does not fit in one packet."
+    }
+  },
+  "conditions": {
+    "listing": {
+      "setup": "The function has just been entered.",
+      "iterator": "`entries`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "finite": "The iterator is finite."
+    },
+    "reader": {
+      "setup": "The file has been opened successfully.",
+      "iterator": "`reader.lines()`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "finite": "The iterator is finite."
+    }
+  },
+  "meaning": {
+    "an_error": {
+      "property": "holds",
+      "why": "the failed enumeration does not leave the function as a success"
+    },
+    "a_success_with_what_it_had": {
+      "property": "breaks",
+      "why": "the entries taken before the error are returned as though the listing were complete"
+    },
+    "a_success_with_nothing": {
+      "property": "breaks",
+      "why": "an enumeration that failed is returned as an empty listing"
+    },
+    "cannot_determine": {
+      "property": "undecided",
+      "why": "the code shown does not say what is returned"
+    }
+  },
+  "bar": 0.6,
+  "runs": 3,
+  "log": [
+    {
+      "questionSet": "current",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": null,
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0,
+            "an_error": 1,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": null,
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 1,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": null,
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0,
+            "an_error": 1
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": null,
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 1,
+            "stops_there": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": null,
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0,
+            "keeps_going": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": null,
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 0,
+            "keeps_going": 1,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.99,
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": null,
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 1,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "an_error": 0,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": null,
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 0,
+            "a_success_with_what_it_had": 1,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": null,
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 0,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 1
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": null,
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 1,
+            "stops_there": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": null,
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 0,
+            "cannot_determine": 0,
+            "keeps_going": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 1,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": null,
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 1,
+            "stops_there": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": null,
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.79,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.71,
+          "probabilities": {
+            "an_error": 0.18,
+            "a_success_with_what_it_had": 0.79,
+            "a_success_with_nothing": 0.02,
+            "cannot_determine": 0.01
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": null,
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.88,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.85,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.88,
+            "cannot_determine": 0.01,
+            "an_error": 0.09,
+            "a_success_with_nothing": 0.02
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": null,
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.87,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.84,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.87,
+            "a_success_with_nothing": 0.02,
+            "an_error": 0.1,
+            "cannot_determine": 0.01
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": null,
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.98,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.01,
+            "cannot_determine": 0,
+            "keeps_going": 0.99
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.97,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.98,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0,
+            "an_error": 0.02
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": null,
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.01,
+            "keeps_going": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.98,
+          "probabilities": {
+            "an_error": 0.01,
+            "a_success_with_what_it_had": 0.99,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "current",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": null,
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.98,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.98,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0.01,
+            "keeps_going": 0.99
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.97,
+          "probabilities": {
+            "an_error": 0.01,
+            "a_success_with_nothing": 0.01,
+            "a_success_with_what_it_had": 0.98,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 1,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 1,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_what_it_had": 0,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/shipped",
+      "what": "`collect_listing` as shipped: the first error returns, carrying what was seen inside the failure.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "34fe63c52df0",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 1,
+            "cannot_determine": 0,
+            "stops_there": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.99,
+            "cannot_determine": 0.01,
+            "an_error": 0,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 1,
+            "stops_there": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0.99,
+            "cannot_determine": 0.01,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/ignores-the-error",
+      "what": "The error arm continues, so the listing comes back short and successful.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => continue,\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "b8f029b57c52",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 1,
+            "cannot_determine": 0,
+            "stops_there": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0.01,
+            "a_success_with_what_it_had": 0.99,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "an_error": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0.99,
+            "a_success_with_nothing": 0.01
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "cannot_determine": 0,
+            "an_error": 0,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/stops-but-succeeds",
+      "what": "Stops at the error, as the shipped one does, and returns what it had as a success.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(_) => return Ok(seen),\n        }\n    }\n    Ok(seen)\n}",
+      "codeHash": "d1c975cbe56e",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "an_error": 0,
+            "a_success_with_what_it_had": 0.99,
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 1,
+            "cannot_determine": 0,
+            "stops_there": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0,
+            "keeps_going": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "listing/fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful listing of an enumeration that failed, so the covered property holds.",
+      "condition": {
+        "setup": "The function has just been entered.",
+        "iterator": "`entries`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    let mut failure = None;\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => {\n                if failure.is_none() {\n                    failure = Some(err);\n                }\n            }\n        }\n    }\n    match failure {\n        Some(err) => Err(ListingStopped { seen, err }),\n        None => Ok(seen),\n    }\n}",
+      "codeHash": "60b055df08c6",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0,
+            "cannot_determine": 0,
+            "keeps_going": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "an_error": 1,
+            "a_success_with_what_it_had": 0,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0.99,
+            "keeps_going": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.01,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 0.99
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 0.99,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.01,
+            "an_error": 0.99,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/propagates",
+      "what": "The third spelling, verbatim from `verify_chain`: `line.map_err(|e| ...)?` turns the read failure into the crate's error and hands it back.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        })?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "163c5a9972dd",
+      "correctReading": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 1,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0,
+            "an_error": 1
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.51,
+          "counted": false
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.94,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.26,
+          "probabilities": {
+            "stops_there": 0.48,
+            "keeps_going": 0.51,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.92,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.94,
+            "an_error": 0.04,
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.64,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.93,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.46,
+          "probabilities": {
+            "stops_there": 0.35,
+            "keeps_going": 0.64,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.91,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.93,
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01,
+            "an_error": 0.05
+          }
+        }
+      }
+    },
+    {
+      "questionSet": "stated",
+      "case": "map-err/discards",
+      "what": "The adversarial violation: the same `map_err` builds the error and `else { continue }` throws it away, so an unreadable log comes back as a shorter, successful list.",
+      "condition": {
+        "setup": "The file has been opened successfully.",
+        "iterator": "`reader.lines()`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "finite": "The iterator is finite."
+      },
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line.map_err(|e| AuditError::StoreInaccessible {\n            kind: \"log_read\",\n            reason: e.to_string(),\n        }) else {\n            continue;\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "1600bc15d222",
+      "correctReading": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.51,
+          "counted": false
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.96,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.27,
+          "probabilities": {
+            "keeps_going": 0.51,
+            "cannot_determine": 0.01,
+            "stops_there": 0.48
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.94,
+          "probabilities": {
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 0.96,
+            "an_error": 0.03
+          }
+        }
+      }
+    }
+  ]
+}

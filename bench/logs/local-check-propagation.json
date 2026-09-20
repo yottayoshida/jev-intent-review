@@ -1,0 +1,969 @@
+{
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "model": "typesafe/jev",
+    "questionsHash": "1c12486d8355"
+  },
+  "shippedAt": {
+    "repository": "yottayoshida/omamori",
+    "commit": "a651d3c5e4fd9a38997df059e5442841c54049ae",
+    "path": "src/audit/verify.rs",
+    "lines": "1723-1732 of `show_entries`"
+  },
+  "plan": {
+    "SOURCE": {
+      "requirement": "omamori#558 R1",
+      "quote": "The software should not drop checks that need no key, including tail-truncation detection, when a halt occurs.",
+      "covered": "Not that clause, but the contract this function keeps while reading the log for it: a line that cannot be read does not leave the function as a successful list of the lines before it.",
+      "notCovered": [
+        "The clause itself: which checks keep running past a halt, and whether tail truncation is among them. That is the loop in `verify`, not this one.",
+        "What `show_entries` prints for the entries it did read.",
+        "Every other path that reads the same log."
+      ]
+    },
+    "QUESTIONS": {
+      "on_error_control": {
+        "type": "choice",
+        "instructions": "`code` is one function that walks an iterator whose items are each either a value or an error. Take the case where one item is an error. What does the function do with the items after it?",
+        "criteria": {
+          "stops_there": "It stops at that item; the ones after it are never taken from the iterator",
+          "keeps_going": "It goes on taking the items after it",
+          "cannot_determine": "The code does not say what happens to the items after an error"
+        }
+      },
+      "on_error_result": {
+        "type": "choice",
+        "instructions": "Still `code`, still the case where one item is an error. What does the function return to its caller?",
+        "criteria": {
+          "an_error": "A failure — whatever the caller does with it, it is not a successful list",
+          "a_success_with_what_it_had": "A success carrying the items it managed to take, without the failure",
+          "a_success_with_nothing": "A success carrying no items",
+          "cannot_determine": "The code does not say what is returned when an item is an error"
+        }
+      }
+    },
+    "MEANING": {
+      "an_error": {
+        "property": "holds",
+        "why": "the failed enumeration does not leave the function as a success"
+      },
+      "a_success_with_what_it_had": {
+        "property": "breaks",
+        "why": "the entries taken before the error are returned as though the listing were complete"
+      },
+      "a_success_with_nothing": {
+        "property": "breaks",
+        "why": "an enumeration that failed is returned as an empty listing"
+      },
+      "cannot_determine": {
+        "property": "undecided",
+        "why": "the code shown does not say what is returned"
+      }
+    },
+    "BAR": 0.6
+  },
+  "runs": 3,
+  "log": [
+    {
+      "case": "shipped",
+      "what": "As shipped: `let line = line?;` hands the read failure back to the caller at once.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "e9db1ce184b4",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.93,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.91,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.93,
+            "an_error": 0.05,
+            "cannot_determine": 0.01,
+            "a_success_with_nothing": 0.01
+          }
+        }
+      }
+    },
+    {
+      "case": "shipped",
+      "what": "As shipped: `let line = line?;` hands the read failure back to the caller at once.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "e9db1ce184b4",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.91,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.88,
+          "probabilities": {
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01,
+            "a_success_with_what_it_had": 0.91,
+            "an_error": 0.07
+          }
+        }
+      }
+    },
+    {
+      "case": "shipped",
+      "what": "As shipped: `let line = line?;` hands the read failure back to the caller at once.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "e9db1ce184b4",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.87,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0,
+            "stops_there": 0.99
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.83,
+          "probabilities": {
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01,
+            "an_error": 0.11,
+            "a_success_with_what_it_had": 0.87
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unreadable-lines",
+      "what": "The `?` becomes a skip, so a log that stopped being readable comes back as a shorter, successful list.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { continue };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "57527e6ec5a3",
+      "expected": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.01,
+            "keeps_going": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unreadable-lines",
+      "what": "The `?` becomes a skip, so a log that stopped being readable comes back as a shorter, successful list.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { continue };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "57527e6ec5a3",
+      "expected": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.99,
+            "stops_there": 0.01,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unreadable-lines",
+      "what": "The `?` becomes a skip, so a log that stopped being readable comes back as a shorter, successful list.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { continue };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "57527e6ec5a3",
+      "expected": {
+        "control": "keeps_going",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.01,
+            "cannot_determine": 0,
+            "keeps_going": 0.99
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 1,
+            "an_error": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "stops-but-succeeds",
+      "what": "Stops at the unreadable line, as the shipped one does, and returns what it had as a success.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { break };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "b513622b3aba",
+      "expected": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "a_success_with_nothing": 0,
+            "an_error": 0,
+            "cannot_determine": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "stops-but-succeeds",
+      "what": "Stops at the unreadable line, as the shipped one does, and returns what it had as a success.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { break };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "b513622b3aba",
+      "expected": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "cannot_determine": 0,
+            "a_success_with_what_it_had": 1,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "stops-but-succeeds",
+      "what": "Stops at the unreadable line, as the shipped one does, and returns what it had as a success.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let Ok(line) = line else { break };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "b513622b3aba",
+      "expected": {
+        "control": "stops_there",
+        "result": "a_success_with_what_it_had",
+        "verdict": "violation"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 1,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0.99,
+            "keeps_going": 0.01
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.99,
+          "probabilities": {
+            "a_success_with_what_it_had": 1,
+            "cannot_determine": 0,
+            "a_success_with_nothing": 0,
+            "an_error": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful list of a log it could not read, so the covered property holds. Whether the requirement wants the earlier stop is not read here.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    let mut failure = None;\n    for line in reader.lines() {\n        let line = match line {\n            Ok(l) => l,\n            Err(e) => {\n                failure.get_or_insert(e);\n                continue;\n            }\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    match failure {\n        Some(e) => Err(AuditError::Io(e)),\n        None => Ok(entries),\n    }\n}",
+      "codeHash": "506aea75284c",
+      "expected": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 0.74,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0,
+            "keeps_going": 1
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.66,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "a_success_with_what_it_had": 0.24,
+            "a_success_with_nothing": 0.01,
+            "an_error": 0.74
+          }
+        }
+      }
+    },
+    {
+      "case": "fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful list of a log it could not read, so the covered property holds. Whether the requirement wants the earlier stop is not read here.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    let mut failure = None;\n    for line in reader.lines() {\n        let line = match line {\n            Ok(l) => l,\n            Err(e) => {\n                failure.get_or_insert(e);\n                continue;\n            }\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    match failure {\n        Some(e) => Err(AuditError::Io(e)),\n        None => Ok(entries),\n    }\n}",
+      "codeHash": "506aea75284c",
+      "expected": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 0.69,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 1,
+            "stops_there": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.59,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0.28,
+            "cannot_determine": 0.03,
+            "an_error": 0.69
+          }
+        }
+      }
+    },
+    {
+      "case": "fails-at-the-end",
+      "what": "Reads to the end and fails afterwards: never a successful list of a log it could not read, so the covered property holds. Whether the requirement wants the earlier stop is not read here.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    let mut failure = None;\n    for line in reader.lines() {\n        let line = match line {\n            Ok(l) => l,\n            Err(e) => {\n                failure.get_or_insert(e);\n                continue;\n            }\n        };\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => continue,\n        };\n        entries.push_back(event);\n    }\n    match failure {\n        Some(e) => Err(AuditError::Io(e)),\n        None => Ok(entries),\n    }\n}",
+      "codeHash": "506aea75284c",
+      "expected": {
+        "control": "keeps_going",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "keeps_going",
+          "probability": 1,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "an_error",
+          "probability": 0.78,
+          "counted": true
+        }
+      ],
+      "verdict": "covered_holds",
+      "why": "the failed enumeration does not leave the function as a success",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "keeps_going",
+          "confidence": 1,
+          "probabilities": {
+            "keeps_going": 1,
+            "cannot_determine": 0,
+            "stops_there": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "an_error",
+          "confidence": 0.71,
+          "probabilities": {
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01,
+            "a_success_with_what_it_had": 0.2,
+            "an_error": 0.78
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unparsable-lines",
+      "what": "Untouched behaviour that looks like the violation: a line that is not JSON is skipped, as shipped. Only a line that could not be *read* is the error the questions ask about.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => {\n                continue;\n            }\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "492d88dcf157",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.91,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0,
+            "stops_there": 0.99
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.89,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.91,
+            "cannot_determine": 0.01,
+            "an_error": 0.07,
+            "a_success_with_nothing": 0.01
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unparsable-lines",
+      "what": "Untouched behaviour that looks like the violation: a line that is not JSON is skipped, as shipped. Only a line that could not be *read* is the error the questions ask about.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => {\n                continue;\n            }\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "492d88dcf157",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.88,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "keeps_going": 0.01,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.84,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.88,
+            "a_success_with_nothing": 0.01,
+            "an_error": 0.1,
+            "cannot_determine": 0.01
+          }
+        }
+      }
+    },
+    {
+      "case": "skips-unparsable-lines",
+      "what": "Untouched behaviour that looks like the violation: a line that is not JSON is skipped, as shipped. Only a line that could not be *read* is the error the questions ask about.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    let file = std::fs::File::open(path)?;\n    let reader = std::io::BufReader::new(&file);\n    let mut entries: VecDeque<AuditEvent> = VecDeque::new();\n    for line in reader.lines() {\n        let line = line?;\n        let trimmed = line.trim();\n        if trimmed.is_empty() {\n            continue;\n        }\n        let event: AuditEvent = match serde_json::from_str(trimmed) {\n            Ok(e) => e,\n            Err(_) => {\n                continue;\n            }\n        };\n        entries.push_back(event);\n    }\n    Ok(entries)\n}",
+      "codeHash": "492d88dcf157",
+      "expected": {
+        "control": "stops_there",
+        "result": "an_error",
+        "verdict": "covered_holds"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "stops_there",
+          "probability": 0.99,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "a_success_with_what_it_had",
+          "probability": 0.91,
+          "counted": true
+        }
+      ],
+      "verdict": "violation",
+      "why": "the entries taken before the error are returned as though the listing were complete",
+      "asExpected": false,
+      "raw": {
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "keeps_going": 0.01,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "a_success_with_what_it_had",
+          "confidence": 0.89,
+          "probabilities": {
+            "an_error": 0.07,
+            "a_success_with_what_it_had": 0.91,
+            "a_success_with_nothing": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      }
+    },
+    {
+      "case": "no-body",
+      "what": "The evidence a run would have if the body did not fit.",
+      "run": 1,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    // (body not shown)\n}",
+      "codeHash": "b774f6e59ae1",
+      "expected": {
+        "control": "cannot_determine",
+        "result": "cannot_determine",
+        "verdict": "unknown"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "cannot_determine",
+          "probability": 0.97,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "cannot_determine",
+          "probability": 0.87,
+          "counted": true
+        }
+      ],
+      "verdict": "unknown",
+      "why": "the code shown does not say what is returned",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "cannot_determine",
+          "confidence": 0.96,
+          "probabilities": {
+            "cannot_determine": 0.97,
+            "stops_there": 0.03,
+            "keeps_going": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "cannot_determine",
+          "confidence": 0.83,
+          "probabilities": {
+            "cannot_determine": 0.87,
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0.01,
+            "an_error": 0.12
+          }
+        }
+      }
+    },
+    {
+      "case": "no-body",
+      "what": "The evidence a run would have if the body did not fit.",
+      "run": 2,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    // (body not shown)\n}",
+      "codeHash": "b774f6e59ae1",
+      "expected": {
+        "control": "cannot_determine",
+        "result": "cannot_determine",
+        "verdict": "unknown"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "cannot_determine",
+          "probability": 0.97,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "cannot_determine",
+          "probability": 0.86,
+          "counted": true
+        }
+      ],
+      "verdict": "unknown",
+      "why": "the code shown does not say what is returned",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "cannot_determine",
+          "confidence": 0.95,
+          "probabilities": {
+            "stops_there": 0.03,
+            "cannot_determine": 0.97,
+            "keeps_going": 0
+          }
+        },
+        "on_error_result": {
+          "choice": "cannot_determine",
+          "confidence": 0.81,
+          "probabilities": {
+            "a_success_with_what_it_had": 0.01,
+            "cannot_determine": 0.86,
+            "an_error": 0.13,
+            "a_success_with_nothing": 0
+          }
+        }
+      }
+    },
+    {
+      "case": "no-body",
+      "what": "The evidence a run would have if the body did not fit.",
+      "run": 3,
+      "code": "pub fn show_entries(\n    path: &Path,\n    opts: &ShowOptions,\n) -> Result<VecDeque<AuditEvent>, AuditError> {\n    // (body not shown)\n}",
+      "codeHash": "b774f6e59ae1",
+      "expected": {
+        "control": "cannot_determine",
+        "result": "cannot_determine",
+        "verdict": "unknown"
+      },
+      "locals": [
+        {
+          "question": "on_error_control",
+          "choice": "cannot_determine",
+          "probability": 0.96,
+          "counted": true
+        },
+        {
+          "question": "on_error_result",
+          "choice": "cannot_determine",
+          "probability": 0.85,
+          "counted": true
+        }
+      ],
+      "verdict": "unknown",
+      "why": "the code shown does not say what is returned",
+      "asExpected": true,
+      "raw": {
+        "on_error_control": {
+          "choice": "cannot_determine",
+          "confidence": 0.94,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 0.04,
+            "cannot_determine": 0.96
+          }
+        },
+        "on_error_result": {
+          "choice": "cannot_determine",
+          "confidence": 0.8,
+          "probabilities": {
+            "a_success_with_nothing": 0,
+            "a_success_with_what_it_had": 0.01,
+            "cannot_determine": 0.85,
+            "an_error": 0.14
+          }
+        }
+      }
+    }
+  ]
+}

@@ -119,7 +119,8 @@ const LISTING_AT = { repository: "yottayoshida/omamori", commit: "916d954607f1f2
  * plan decides moved. What the re-run improved is agreement with the expected label.
  *
  * The condition was rewritten anyway and **every** `stated` cell re-run rather than the one that
- * moved, with both logs kept (`…-v1.json`, `…-v2.json`). That re-run is a confirmation of the
+ * moved, with both logs kept (`bench/logs/stated-generalisation-v1.json` and `-v2.json`, checked
+ * in so this sentence stays true). That re-run is a confirmation of the
  * rewritten condition, not an independent measurement: the condition data is part of the question,
  * and this part of it was adjusted after seeing an answer. The template above it was not.
  *
