@@ -10,6 +10,7 @@ import { aggregate, decide, verdictOf } from "../src/review/requirement.ts";
 import { runReview } from "../src/review/run.ts";
 import { EXIT, ToolError, type CandidateResult, type IntentSpec, type Scope } from "../src/types.ts";
 import { answer, guardProvider, ScriptedProvider } from "./helpers/fakes.ts";
+import type { ChoiceAnswer } from "../src/types.ts";
 import { FIXTURES, fixtureRepo, tempRepo } from "./helpers/repo.ts";
 
 const T = { violation: 0.7, satisfaction: 0.5, relevance: 0.6 };
@@ -118,6 +119,24 @@ test("a place whose own code was cut is not counted as irrelevant: it is one the
   const withIt = aggregate("R1", [result("satisfies"), { ...result("aside"), aside: "unreadable" }], { ...NO_SCOPE, blocking: ["1 place(s) could not be read in full, so no answer about them stands"] }, 2);
   assert.equal(withIt.status, "unknown");
   assert.match(withIt.notes.join(" "), /could not be read in full/);
+});
+
+test("aggregate lists every reason VERIFIED is withheld, not only the deciding one", () => {
+  // A reader used to see one of them at a time: with an undecided path, the blockers were left
+  // out of the notes entirely, so "fix this one place" read as the whole story.
+  const r = aggregate(
+    "R1",
+    [result("satisfies"), result("unknown"), { ...result("aside"), aside: "unreadable" }],
+    { ...NO_SCOPE, blocking: ["the change edits this tool's configuration"] },
+    9,
+  );
+  assert.equal(r.status, "unknown");
+  const notes = r.notes.join(" | ");
+  assert.match(notes, /VERIFIED is withheld: the change edits this tool's configuration/);
+  assert.match(notes, /VERIFIED is withheld: 1 place\(s\) could not be read in full/);
+  assert.match(notes, /VERIFIED is withheld: 1 of 2 path\(s\) came back undecided/);
+  // A violation is not withholding anything; it is the answer.
+  assert.deepEqual(aggregate("R1", [result("violates")], { ...NO_SCOPE, blocking: ["x"] }, 1).notes, []);
 });
 
 test("verdictOf follows the policy: fail_on and unknown", () => {
