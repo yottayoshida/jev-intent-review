@@ -1,0 +1,633 @@
+{
+  "kind": "diagnostic",
+  "notAFirstMeasurement": "Run after seeing bench/logs/real-requirement-v3.json. It varies the packet to locate which part carries the answer; it does not re-score the plan.",
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "commit": "e1f874544106a8d0465584db6e04b63c100b1fec",
+    "model": "typesafe/jev"
+  },
+  "questions": {
+    "on_error_result": {
+      "type": "choice",
+      "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function return to its caller?",
+      "criteria": {
+        "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+        "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+        "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+      }
+    },
+    "on_error_control": {
+      "type": "choice",
+      "instructions": "Read `code`. Assume exactly this and nothing else: `dir` is a path and the function has just been entered. The iterator `entries` returns `Err(io_error)` at one iteration. Every other operation the function reaches succeeds. The iterator is finite. Under that condition: what does the function do with the items the iterator would yield after that one?",
+      "criteria": {
+        "stops_there": "It stops at that item; the ones after it are never taken from the iterator",
+        "keeps_going": "It goes on taking the items after it",
+        "cannot_determine": "The code does not say what happens to the items after an error"
+      }
+    }
+  },
+  "questionsHash": "64011edea4c9",
+  "condition": {
+    "setup": "`dir` is a path and the function has just been entered.",
+    "operation": "The iterator `entries`",
+    "yields": "`Err(io_error)`",
+    "others": "Every other operation the function reaches succeeds.",
+    "finite": "The iterator is finite."
+  },
+  "bar": 0.6,
+  "blankRequirement": "(not shown)",
+  "runs": 3,
+  "sent": {
+    "requests": 9,
+    "bytes": 58263,
+    "hardLimit": 15
+  },
+  "log": [
+    {
+      "case": "mutant/requirement-blanked",
+      "reads": "the requirement is `(not shown)`; the related evidence is the one the tool built",
+      "run": 1,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.22,
+          "probabilities": {
+            "cannot_determine": 0.09,
+            "returns_success": 0.43,
+            "returns_error": 0.48
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.48,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "verdict": "unknown"
+    },
+    {
+      "case": "mutant/requirement-blanked",
+      "reads": "the requirement is `(not shown)`; the related evidence is the one the tool built",
+      "run": 2,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.37,
+          "probabilities": {
+            "returns_success": 0.34,
+            "cannot_determine": 0.08,
+            "returns_error": 0.58
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.58,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "verdict": "unknown"
+    },
+    {
+      "case": "mutant/requirement-blanked",
+      "reads": "the requirement is `(not shown)`; the related evidence is the one the tool built",
+      "run": 3,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2569-2593",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.28,
+          "probabilities": {
+            "returns_success": 0.42,
+            "cannot_determine": 0.06,
+            "returns_error": 0.52
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.02,
+            "cannot_determine": 0.01,
+            "stops_there": 0.97
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.52,
+        "choiceMatch": false,
+        "counted": false
+      },
+      "verdict": "unknown"
+    },
+    {
+      "case": "mutant/related-emptied",
+      "reads": "the requirement is the real one; the related section is empty and the packet says it was cut",
+      "run": 1,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.57,
+          "probabilities": {
+            "returns_success": 0.71,
+            "returns_error": 0.12,
+            "cannot_determine": 0.17
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.73,
+          "probabilities": {
+            "stops_there": 0.82,
+            "keeps_going": 0.13,
+            "cannot_determine": 0.05
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.71,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "mutant/related-emptied",
+      "reads": "the requirement is the real one; the related section is empty and the packet says it was cut",
+      "run": 2,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.48,
+          "probabilities": {
+            "returns_success": 0.65,
+            "returns_error": 0.19,
+            "cannot_determine": 0.16
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.75,
+          "probabilities": {
+            "keeps_going": 0.11,
+            "stops_there": 0.84,
+            "cannot_determine": 0.05
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.65,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "mutant/related-emptied",
+      "reads": "the requirement is the real one; the related section is empty and the packet says it was cut",
+      "run": 3,
+      "commit": "5a8e2036079ebc4f0e684c532e3b813372bf1f6f",
+      "codeReallyReturns": "returns_success",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-754",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.52,
+          "probabilities": {
+            "cannot_determine": 0.18,
+            "returns_error": 0.15,
+            "returns_success": 0.67
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.71,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "keeps_going": 0.16,
+            "stops_there": 0.8
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.67,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "control/correct-requirement-blanked",
+      "reads": "the control: the shipped function with the requirement blanked, which must stay `returns_error`",
+      "run": 1,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "codeReallyReturns": "returns_error",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-761",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "control/correct-requirement-blanked",
+      "reads": "the control: the shipped function with the requirement blanked, which must stay `returns_error`",
+      "run": 2,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "codeReallyReturns": "returns_error",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-761",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.96,
+          "probabilities": {
+            "returns_error": 0.98,
+            "returns_success": 0,
+            "cannot_determine": 0.02
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "control/correct-requirement-blanked",
+      "reads": "the control: the shipped function with the requirement blanked, which must stay `returns_error`",
+      "run": 3,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "codeReallyReturns": "returns_error",
+      "state": {
+        "requirement": {
+          "id": "omamori#553 R2",
+          "text": "(not shown)"
+        },
+        "candidate": {
+          "path": "src/cli/doctor.rs",
+          "lines": "699-761",
+          "symbol": "staging_info_from",
+          "changed_by_pull_request": true
+        },
+        "evidence": {
+          "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+          "related": [
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "663-695",
+              "code": "fn staging_info_at(dir: &Path) -> Result<StagingInfo, StagingUnreadable> {\n    let meta = match std::fs::symlink_metadata(dir) {\n        Ok(meta) => meta,\n        // Nothing has been staged yet — every install before its first\n        // materialized command. The reading `scan_key_dir` gives a key\n        // directory that does not exist yet.\n        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {\n            return Ok(StagingInfo::default());\n        }\n        Err(e) => {\n            return Err(StagingUnreadable::new(\n                \"unreadable\",\n                format!(\"{}: {e}\", dir.display()),\n            ));\n        }\n    };\n    if meta.file_type().is_symlink() {\n        return Err(StagingUnreadable::new(\n            \"symlink\",\n            format!(\"{} is a symlink\", dir.display()),\n        ));\n    }\n    if !meta.is_dir() {\n        return Err(StagingUnreadable::new(\n            \"not_directory\",\n            format!(\"{} is not a directory\", dir.display()),\n        ));\n    }\n    let entries = std::fs::read_dir(dir).map_err(|e| {\n        StagingUnreadable::new(\"unlistable\", format!(\"cannot list {}: {e}\", dir.display()))\n    })?;\n    staging_info_from(dir, entries.map(|entry| entry.map(|e| e.file_name())))\n}"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/cli/doctor.rs",
+              "lines": "2576-2600",
+              "code": "    fn staging_listing_that_stops_partway_is_reported_as_unreadable() {\n        let dir = Path::new(\"/omamori-485-staging\");\n        let text = staging_section_text(staging_info_from(dir, listing_that_stops_after_three()));\n        assert!(\n            text.contains(\"[Staging] cannot read:\") && text.contains(\"stopped after 3 entries\"),\n            \"got {text:?}\"\n        );\n        assert!(\n            !text.contains(\"[Staging] empty\") && !text.contains(\"file(s)\"),\n            \"a partial listing must not be reported as a result: {text:?}\"\n        );\n\n        let json = staging_json_for(staging_info_from(dir, listing_that_stops_after_three()));\n        assert_eq!(json[\"status\"], \"error\");\n        assert!(\n            json[\"file_count\"].is_null(),\n            \"0 would claim it was seen empty: {json}\"\n        );\n        assert!(json[\"total_bytes\"].is_null());\n        assert_eq!(json[\"reason\"], \"listing_stopped\");\n        assert!(\n            !json.to_string().contains(\"omamori-485-staging\"),\n            \"--json stays path-free: {json}\"\n        );\n    }"
+            },
+            {
+              "path": "src/util.rs",
+              "lines": "317-328",
+              "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+            }
+          ],
+          "truncated": true
+        }
+      },
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.98,
+            "cannot_determine": 0.02
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    }
+  ]
+}
