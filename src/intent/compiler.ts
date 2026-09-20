@@ -238,10 +238,14 @@ export function readRequirementText(raw: string, cutAtLimit = false): { text: st
   text = text.replace(DEBRIS, "").trim().replace(/[,;]+$/, "").trim();
   if (!text.endsWith(".")) {
     // Only what this tool cut is cut back: `cutAtLimit` says the answer was longer than the
-    // requirement limit, so the tail is a clause that stops mid-word and says nothing. A sentence
-    // the model simply left unpunctuated is closed, not shortened — nothing is dropped on a guess.
+    // requirement limit, so the tail is a clause that stops mid-word and says nothing. With no
+    // earlier sentence to fall back to, it is left open rather than closed with a full stop: the
+    // one this repair used to add turned `…and instead report an '未` into something that reads
+    // like a finished requirement, which is the same trick the truncation played in the first
+    // place. A sentence the model simply left unpunctuated is closed — nothing was lost there.
     const cut = Math.max(text.lastIndexOf(". "), text.lastIndexOf(".\n"));
-    text = cutAtLimit && cut > 40 ? text.slice(0, cut + 1) : `${text.replace(/[\s,;-]+$/, "")}.`;
+    if (cutAtLimit) text = cut > 40 ? text.slice(0, cut + 1) : text;
+    else text = `${text.replace(/[\s,;-]+$/, "")}.`;
   }
   return { text: text.trim(), hints };
 }

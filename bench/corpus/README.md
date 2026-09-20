@@ -32,11 +32,17 @@ Because the hints never reached the field, the search fell back to the words of 
 `search_hints`, `quote` and `kind` among them.
 
 The repair is mechanical and adds nothing: the field names are stripped from the front, the hints
-are moved from the sentence into `searchHints`, the serialized fragments are cut from the end, and
-a sentence left open is closed at its last full stop. Requirements that repaired to the same
-sentence are kept once: 38 became 32, and `omamori-553`'s eight became two. `readRequirementText`
-in `src/intent/compiler.ts` now does the same thing at the source, with these four shapes as its
-tests.
+are moved from the sentence into `searchHints`, and the serialized fragments are cut from the end.
+Requirements that repaired to the same sentence are kept once: 38 became 32, and `omamori-553`'s
+eight became two. `readRequirementText` in `src/intent/compiler.ts` does the same thing at the
+source, with these shapes as its tests.
+
+**Fourteen of the 32 do not end in a full stop, and are left that way.** They were cut at the
+requirement limit with no earlier sentence to fall back to, so what is there is a clause that
+stops mid-phrase: `…and instead report an '未`, `…a path-free reason, and a`. An earlier version
+of this repair closed them with a full stop, which made them read like finished requirements — the
+same trick the truncation played, and two of them went into a measurement that way. A requirement
+that is visibly unfinished is more use than one that looks finished and is not.
 
 The unrepaired originals are the first measurement's record; they are not kept here, because a
 measurement run against them measures the compiler's output of that day and not the tool.
