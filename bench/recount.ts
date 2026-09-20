@@ -31,6 +31,7 @@ interface Row {
   why?: string;
   error?: string;
   commit?: string;
+  sentStateHash?: string;
   located?: { path: string; lines: string } | null;
 }
 
@@ -77,6 +78,18 @@ for (const group of groups) {
     }
   }
 }
+
+// Whether what was sent is in the file. `real-requirement-v3.json` was written before the runner
+// recorded packets, and the record that cites it once claimed they were there in full. A log that
+// does not hold them says so here rather than being read as if it did.
+const withPacket = rows.filter((r) => r.run !== null && r.sentStateHash !== undefined).length;
+const sentRuns = rows.filter((r) => r.run !== null).length;
+const store = (doc.packets ?? {}) as Record<string, unknown>;
+console.log(
+  withPacket === sentRuns && Object.keys(store).length > 0
+    ? `\npackets: ${sentRuns}/${sentRuns} runs name one, ${Object.keys(store).length} distinct packet(s) stored`
+    : `\npackets: NOT RECORDED — ${withPacket}/${sentRuns} runs name one and ${Object.keys(store).length} are stored. What was sent cannot be read back from this file; a packet rebuilt now is a reconstruction, not this run's record.`,
+);
 
 const sending = [...new Set(rows.filter((r) => r.run !== null).map((r) => r.case))];
 const unmet = sending.filter((c) => {
