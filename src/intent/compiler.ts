@@ -199,6 +199,53 @@ export function readModelJson(payload: unknown): unknown {
 type Obj = Record<string, unknown>;
 
 /** The model's answer as an IntentSpec, with every requirement whose quote is not in its source dropped. */
+/**
+ * The model does not always fill the shape it was given: measured over ten real pull requests,
+ * every one of 38 requirements came back with its search hints written into the sentence ("…, with
+ * search hints: stderr, json object"), nine of them with the record's own field names in front
+ * ("kind: behavior, quote: …"), and some with fragments of a serialized structure at the end
+ * ("…installed.', 'search_hints': '…'}], {"). Each was then cut to `MAX_REQUIREMENT_CHARS`, which
+ * hid the tail and left something that read like a long requirement. The hints never reached the
+ * field, so the search fell back to the words of the sentence — including `search_hints`, `quote`
+ * and `kind` themselves.
+ *
+ * What can be read off the sentence is taken (the hints); what is left is a requirement or it is
+ * not, and `isStatement` decides that as before.
+ */
+const FIELD_HEAD = /^\s*kind\s*:\s*\w+\s*,\s*quote\s*:\s*/i;
+const HINTS_TAIL = /[,;]?\s*(with\s+)?search[_ ]hints?\s*[:=]\s*(.*)$/is;
+// Only a serialized field name reads as debris: `', 'search_hints': …`. A quoted list in an
+// ordinary sentence — "accepts 'wrappers', 'syscalls' and rejects everything else" — is the
+// requirement, and cutting at the comma took two thirds of that one away.
+const DEBRIS = /(['"]\s*,\s*['"]?(?:search_hints|kind|quote|source|text)['"]?\s*:|['"]\s*\}|\}\s*\]|,\s*source\s*:).*$/s;
+
+export function readRequirementText(raw: string, cutAtLimit = false): { text: string; hints: string[] } {
+  // A sentence with none of the record's marks on it is the requirement as written: it is handed
+  // back untouched, so nothing here can shorten a requirement that was never contaminated.
+  if (!cutAtLimit && !FIELD_HEAD.test(raw) && !HINTS_TAIL.test(raw) && !DEBRIS.test(raw)) return { text: raw, hints: [] };
+  let text = raw.replace(FIELD_HEAD, "");
+  let hints: string[] = [];
+  const tail = HINTS_TAIL.exec(text);
+  if (tail) {
+    hints = (tail[2] ?? "")
+      .replace(/^[[\s'"]+|[\]\s'"}]+$/g, "")
+      .split(/[,\n]/)
+      .map((h) => h.trim().replace(/^['"[\]]+|['"[\]]+$/g, ""))
+      .filter((h) => h !== "" && h.length <= 40 && !/^(source|kind|quote)\s*:/i.test(h))
+      .slice(0, 4);
+    text = text.slice(0, tail.index);
+  }
+  text = text.replace(DEBRIS, "").trim().replace(/[,;]+$/, "").trim();
+  if (!text.endsWith(".")) {
+    // Only what this tool cut is cut back: `cutAtLimit` says the answer was longer than the
+    // requirement limit, so the tail is a clause that stops mid-word and says nothing. A sentence
+    // the model simply left unpunctuated is closed, not shortened — nothing is dropped on a guess.
+    const cut = Math.max(text.lastIndexOf(". "), text.lastIndexOf(".\n"));
+    text = cutAtLimit && cut > 40 ? text.slice(0, cut + 1) : `${text.replace(/[\s,;-]+$/, "")}.`;
+  }
+  return { text: text.trim(), hints };
+}
+
 export function toSpec(value: unknown, sources: IntentSource[]): IntentSpec {
   const answer = (value && typeof value === "object" ? value : {}) as Obj;
   const byId = new Map(sources.map((s) => [s.id, s]));
@@ -211,7 +258,10 @@ export function toSpec(value: unknown, sources: IntentSource[]): IntentSpec {
 
   const requirements: Requirement[] = [];
   for (const item of Array.isArray(answer.requirements) ? (answer.requirements as Obj[]) : []) {
-    const text = typeof item.text === "string" ? item.text.trim().slice(0, MAX_REQUIREMENT_CHARS) : "";
+    const whole = typeof item.text === "string" ? item.text.trim() : "";
+    const raw = whole.slice(0, MAX_REQUIREMENT_CHARS);
+    const read = readRequirementText(raw, whole.length > MAX_REQUIREMENT_CHARS);
+    const text = read.text;
     const quote = typeof item.quote === "string" ? item.quote.trim() : "";
     if (text === "") continue;
     if (!isStatement(text)) {
@@ -225,7 +275,8 @@ export function toSpec(value: unknown, sources: IntentSource[]): IntentSpec {
     }
     if (requirements.length >= MAX_REQUIREMENTS) break;
     const kind = REQUIREMENT_KINDS.includes(item.kind as never) ? (item.kind as Requirement["kind"]) : "behavior";
-    const hints = Array.isArray(item.search_hints) ? (item.search_hints as unknown[]).filter((h): h is string => typeof h === "string" && h.trim() !== "").map((h) => h.trim().slice(0, 100)).slice(0, 4) : [];
+    const given = Array.isArray(item.search_hints) ? (item.search_hints as unknown[]).filter((h): h is string => typeof h === "string" && h.trim() !== "").map((h) => h.trim().slice(0, 100)).slice(0, 4) : [];
+    const hints = given.length > 0 ? given : read.hints;
     requirements.push({ id: `R${requirements.length + 1}`, text, kind, priority: "required", sourceRefs: [{ sourceId: source.id, quote: quote.slice(0, 2000) }], searchHints: hints });
   }
   const nonGoals = (Array.isArray(answer.non_goals) ? (answer.non_goals as Obj[]) : [])
