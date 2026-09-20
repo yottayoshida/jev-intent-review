@@ -8,60 +8,120 @@ import { ProviderError } from "../src/judgments/cloudflare.ts";
 import { Git } from "../src/repository/git.ts";
 import { aggregate, decide, verdictOf } from "../src/review/requirement.ts";
 import { runReview } from "../src/review/run.ts";
-import { EXIT, ToolError, type CandidateResult, type IntentSpec } from "../src/types.ts";
+import { EXIT, ToolError, type CandidateResult, type IntentSpec, type Scope } from "../src/types.ts";
 import { answer, guardProvider, ScriptedProvider } from "./helpers/fakes.ts";
 import { FIXTURES, fixtureRepo, tempRepo } from "./helpers/repo.ts";
 
 const T = { violation: 0.7, satisfaction: 0.5, relevance: 0.6 };
 
-test("decide: supporting or unrelated code is not a path; a violation needs a path, the threshold and whole evidence", () => {
-  assert.equal(decide(answer("supporting", 0.7), answer("violates", 0.9), false, T).outcome, "unrelated");
-  assert.equal(decide(answer("unrelated", 0.7), answer("violates", 0.9), false, T).outcome, "unrelated");
-  assert.equal(decide(answer("supporting", 0.5), answer("violates", 0.9), false, T).outcome, "unknown", "below the relevance threshold it is not excluded, but not a violation either");
-  assert.equal(decide(answer("cannot_tell", 0.5), answer("violates", 0.9), false, T).outcome, "unknown");
-  assert.equal(decide(answer("may_violate", 0.9), answer("violates", 0.69), false, T).outcome, "unknown");
-  assert.equal(decide(answer("may_violate", 0.9), answer("violates", 0.9), true, T).outcome, "unknown");
-  assert.equal(decide(answer("may_violate", 0.9), answer("violates", 0.9), false, T).outcome, "violates");
-  // Called a path only weakly, as measured on omamori #559: a CI script at 0.54, doctor at 0.62.
-  assert.equal(decide(answer("may_violate", 0.54), answer("violates", 0.81), false, T).outcome, "unknown");
-  assert.equal(decide(answer("may_violate", 0.62), answer("violates", 0.87), false, T).outcome, "unknown");
-  assert.equal(decide(answer("directly_enforces", 0.7), answer("violates", 0.81), false, T).outcome, "violates", "both answers at the violation bar");
-  assert.equal(decide(answer("directly_enforces", 0.9), answer("satisfies", 0.55), false, T).outcome, "satisfies");
-  assert.equal(decide(answer("directly_enforces", 0.9), answer("satisfies", 0.45), false, T).outcome, "unknown");
-  assert.equal(decide(answer("may_violate", 0.9), answer("insufficient_evidence", 0.9), false, T).outcome, "unknown");
-  assert.equal(decide(answer("cannot_tell", 0.5), answer("not_applicable", 0.9), false, T).outcome, "not_applicable");
-  // Called a path, then "does not apply": contradictory, so unknown.
-  assert.equal(decide(answer("may_violate", 0.9), answer("not_applicable", 0.9), false, T).outcome, "unknown");
-  // On cut evidence no answer stands, whichever it is.
-  for (const choice of ["satisfies", "violates", "not_applicable"]) {
-    const d = decide(answer("cannot_tell", 0.5), answer(choice, 0.95), true, T);
-    assert.equal(d.outcome, "unknown", choice);
-    assert.match(d.notes[0] ?? "", /evidence was cut/);
+test("decide: only a place Jev calls a path of the requirement decides it, and cut evidence is read by which part was cut", () => {
+  const WHOLE = { own: false, context: false, ambiguous: false };
+  const CONTEXT = { own: false, context: true, ambiguous: false };
+  const AMBIGUOUS = { own: false, context: false, ambiguous: true };
+  const OWN = { own: true, context: false, ambiguous: false };
+
+  // Not a path: set aside with its reason, whatever the second answer says. The old rule let an
+  // unsure one hold the requirement open, which is why VERIFIED never came out on real code.
+  for (const [choice, p] of [["supporting", 0.7], ["unrelated", 0.7]] as const) {
+    const d = decide(answer(choice, p), answer("violates", 0.9), WHOLE, T);
+    assert.deepEqual([d.outcome, d.aside], ["aside", "not_a_path"], `${choice} ${p}`);
   }
-  // Not even "unrelated": the missing part could be the governed call itself.
-  assert.equal(decide(answer("unrelated", 0.9), answer("not_applicable", 0.9), true, T).outcome, "unknown");
-  assert.equal(decide(answer("supporting", 0.9), answer("not_applicable", 0.9), true, T).outcome, "unknown");
+  // Jev's own first answer decides what is set aside; the bar decides whether that was a confident
+  // "not a path" or one it was unsure about, which is the number a reader of a VERIFIED needs.
+  for (const [choice, p] of [["supporting", 0.5], ["cannot_tell", 0.5], ["unrelated", 0.31]] as const) {
+    const d = decide(answer(choice, p), answer("violates", 0.9), WHOLE, T);
+    assert.deepEqual([d.outcome, d.aside], ["aside", "unsure"], `${choice} ${p}`);
+  }
+  // Called a path, but too weakly to count as one: also set aside, and said so separately.
+  // Measured on omamori #559: a CI script called a path at 0.54, doctor at 0.62.
+  const weak = decide(answer("may_violate", 0.54), answer("violates", 0.81), WHOLE, T);
+  assert.deepEqual([weak.outcome, weak.aside], ["aside", "unsure"]);
+  assert.match(weak.notes[0] ?? "", /below judgment.relevance_probability/);
+  assert.equal(decide(answer("may_violate", 0.62), answer("violates", 0.87), WHOLE, T).outcome, "unknown", "0.62 clears the relevance bar, so it is a path — but not at the violation bar");
+
+  // A violation needs both answers at the violation bar, on evidence that was not cut.
+  assert.equal(decide(answer("may_violate", 0.9), answer("violates", 0.69), WHOLE, T).outcome, "unknown");
+  assert.equal(decide(answer("may_violate", 0.9), answer("violates", 0.9), WHOLE, T).outcome, "violates");
+  assert.equal(decide(answer("directly_enforces", 0.7), answer("violates", 0.81), WHOLE, T).outcome, "violates", "both answers at the violation bar");
+
+  // Missing surroundings can hide a check, so no violation can be claimed on them — but they
+  // cannot remove a check that was seen, so the satisfying answer stands.
+  const cutViolation = decide(answer("may_violate", 0.9), answer("violates", 0.9), CONTEXT, T);
+  assert.equal(cutViolation.outcome, "unknown");
+  assert.match(cutViolation.notes[0] ?? "", /the missing part could hold the check/);
+  assert.equal(decide(answer("directly_enforces", 0.9), answer("satisfies", 0.55), CONTEXT, T).outcome, "satisfies");
+  assert.equal(decide(answer("directly_enforces", 0.9), answer("satisfies", 0.55), WHOLE, T).outcome, "satisfies");
+  assert.equal(decide(answer("directly_enforces", 0.9), answer("satisfies", 0.45), WHOLE, T).outcome, "unknown");
+
+  // Unless the surroundings may belong to another definition of the same name: then the check
+  // that was seen may not be on this path at all.
+  const ambiguous = decide(answer("directly_enforces", 0.9), answer("satisfies", 0.9), AMBIGUOUS, T);
+  assert.equal(ambiguous.outcome, "unknown");
+  assert.match(ambiguous.notes[0] ?? "", /defined more than once/);
+
+  // The place's own code missing voids every answer about it, including "not a path".
+  for (const [rel, sat] of [["may_violate", "violates"], ["unrelated", "not_applicable"], ["directly_enforces", "satisfies"]] as const) {
+    const d = decide(answer(rel, 0.9), answer(sat, 0.95), OWN, T);
+    assert.deepEqual([d.outcome, d.aside], ["aside", "unreadable"], `${rel}/${sat}`);
+    assert.match(d.notes[0] ?? "", /own code was cut/);
+  }
+
+  // Called a path and then not answered about: undecided, not excluded.
+  assert.equal(decide(answer("may_violate", 0.9), answer("insufficient_evidence", 0.9), WHOLE, T).outcome, "unknown");
+  assert.equal(decide(answer("may_violate", 0.9), answer("not_applicable", 0.9), WHOLE, T).outcome, "unknown");
 });
 
-function result(outcome: CandidateResult["outcome"], truncated = false): CandidateResult {
-  return { candidate: { path: "a.ts", startLine: 1, endLine: 2, changed: false, reasons: [] }, outcome, truncated, evidence: [], notes: [] };
+function result(outcome: CandidateResult["outcome"], cut = { own: false, context: false, ambiguous: false }): CandidateResult {
+  return { candidate: { path: "a.ts", startLine: 1, endLine: 2, changed: false, reasons: [] }, outcome, truncated: cut.own || cut.context || cut.ambiguous, cut, evidence: [], notes: [] };
 }
 
-test("aggregate: one violation decides; VERIFIED needs every relevant path satisfied, whole, and nothing blocking", () => {
-  assert.equal(aggregate("R1", [result("satisfies"), result("violates"), result("unknown")], [], false).status, "violation");
-  assert.equal(aggregate("R1", [result("satisfies"), result("unknown")], [], false).status, "unknown");
-  assert.equal(aggregate("R1", [result("satisfies"), result("unrelated")], [], false).status, "verified");
-  assert.equal(aggregate("R1", [result("satisfies")], ["the change edits this tool's configuration"], false).status, "unknown");
-  assert.equal(aggregate("R1", [result("not_applicable"), result("unrelated")], [], false).status, "not_applicable");
-  assert.equal(aggregate("R1", [result("not_applicable")], ["discovery was cut short (x)"], true).status, "unknown", "does not apply anywhere is a claim about the whole search");
-  assert.equal(aggregate("R1", [result("unrelated")], [], false).status, "unknown");
-  assert.equal(aggregate("R1", [], [], false).coverage, "none");
-  assert.equal(aggregate("R1", [result("satisfies")], [], true).coverage, "weak");
-  assert.equal(aggregate("R1", [result("satisfies"), result("satisfies"), result("unknown")], [], false).coverage, "partial");
+const NO_SCOPE: Omit<Scope, "found" | "judged" | "paths" | "setAside"> = { notFollowed: [], unjudged: [], blocking: [] };
+
+test("aggregate: the paths decide the requirement; what was left travels with it and only a gap withholds VERIFIED", () => {
+  const of = (candidates: CandidateResult[], scope = NO_SCOPE, found?: number) => aggregate("R1", candidates, scope, found ?? candidates.length);
+
+  assert.equal(of([result("satisfies"), result("violates"), result("unknown")]).status, "violation");
+  assert.equal(of([result("satisfies"), result("unknown")]).status, "unknown");
+  assert.equal(of([result("satisfies"), result("aside")]).status, "verified");
+  // A place set aside is not a path, so it neither verifies nor blocks; a requirement with none
+  // at all is unknown, because nothing was found that it holds or fails on.
+  assert.equal(of([result("aside")]).status, "unknown");
+  assert.match(of([result("aside")]).notes[0] ?? "", /None of the 1 place\(s\) judged was called a path/);
+  assert.equal(of([]).status, "unknown");
+
+  // Only a gap withholds VERIFIED: a path known by name and never judged, or an edit to the
+  // tool's own configuration. Leads the search declined to follow do not, on their own.
+  assert.equal(of([result("satisfies")], { ...NO_SCOPE, blocking: ["3 callers of x were found and only 0 were judged"] }).status, "unknown");
+  assert.equal(of([result("satisfies")], { ...NO_SCOPE, notFollowed: ["the word log is too common to search by"] }).status, "verified");
+  assert.equal(of([result("satisfies")], { ...NO_SCOPE, unjudged: ["159 places were found and only the first 30 were judged"] }).status, "verified");
+
+  // The scope travels with the result whatever the status.
+  const scoped = of([result("satisfies"), result("aside"), result("aside")], { ...NO_SCOPE, notFollowed: ["a"] }, 90);
+  assert.deepEqual([scoped.scope.found, scoped.scope.judged, scoped.scope.paths, scoped.scope.setAside], [90, 3, 1, 2]);
+
+  // Coverage says how much the status is a statement about.
+  assert.equal(of([]).coverage, "none");
+  assert.equal(of([result("satisfies")]).coverage, "full");
+  assert.equal(of([result("satisfies")], { ...NO_SCOPE, notFollowed: ["a"] }).coverage, "partial");
+  assert.equal(of([result("satisfies")], NO_SCOPE, 90).coverage, "weak", "30 of 90 judged is not full coverage");
+  assert.equal(of([result("satisfies"), result("satisfies"), result("unknown")]).coverage, "partial");
+  assert.equal(of([result("satisfies"), result("unknown"), result("unknown")]).coverage, "weak", "more than half the paths undecided");
+});
+
+test("a place whose own code was cut is not counted as irrelevant: it is one the run could not judge", async () => {
+  // The whole reason this is not `aside: "not_a_path"` with the rest: Jev called it a path at 0.99
+  // and answered `violates`, and nothing of that stands when the place's own code was cut. Dropping
+  // it quietly would leave the other paths to carry a VERIFIED.
+  const cut = { own: true, context: false, ambiguous: false };
+  const d = decide(answer("directly_enforces", 0.99), answer("violates", 0.95), cut, T);
+  assert.deepEqual([d.outcome, d.aside], ["aside", "unreadable"]);
+  const withIt = aggregate("R1", [result("satisfies"), { ...result("aside"), aside: "unreadable" }], { ...NO_SCOPE, blocking: ["1 place(s) could not be read in full, so no answer about them stands"] }, 2);
+  assert.equal(withIt.status, "unknown");
+  assert.match(withIt.notes.join(" "), /could not be read in full/);
 });
 
 test("verdictOf follows the policy: fail_on and unknown", () => {
-  const v = (status: "violation" | "unknown" | "verified") => [{ requirementId: "R1", status, coverage: "full" as const, candidates: [], notes: [] }];
+  const v = (status: "violation" | "unknown" | "verified") => [{ requirementId: "R1", status, coverage: "full" as const, scope: { found: 0, judged: 0, paths: 0, setAside: 0, ...NO_SCOPE }, candidates: [], notes: [] }];
   assert.deepEqual(verdictOf(v("violation"), { fail_on: ["violation"], unknown: "warn" }), { verdict: "violation", exitCode: EXIT.violation });
   assert.deepEqual(verdictOf(v("violation"), { fail_on: [], unknown: "warn" }), { verdict: "violation", exitCode: EXIT.ok });
   assert.deepEqual(verdictOf(v("unknown"), { fail_on: ["violation"], unknown: "warn" }), { verdict: "unknown", exitCode: EXIT.ok });
@@ -125,6 +185,98 @@ test("runReview: every path fixed gives VERIFIED, unless the completeness signal
     assert.equal(doubtful.requirements[0]?.status, "unknown", signal);
     assert.match(doubtful.requirements[0]?.notes.join(" ") ?? "", /did not judge the list of places likely complete/);
   }
+});
+
+test("runReview: a place too long to read in full withholds VERIFIED, and the report says why", async () => {
+  // One of the two places that create a session is a function no block can be taken from (over
+  // three hundred lines), so nothing Jev answers about it stands. Setting it aside as irrelevant
+  // would leave the other place to carry a VERIFIED — which is what it used to do.
+  const repo = tempRepo();
+  try {
+    const filler = Array.from({ length: 360 }, (_, i) => `  const step${i} = ${i};`).join("\n");
+    repo.write({
+      "src/session/store.ts": "export function createSession(id: string) {\n  return { id };\n}\n",
+      "src/big.ts": `import { createSession } from "./session/store.ts";\n\nexport function bigPath(user: { id: string }) {\n${filler}\n  return createSession(user.id);\n}\n`,
+    });
+    const base = repo.commit("base");
+    repo.write({
+      "src/login.ts": 'import { createSession } from "./session/store.ts";\n\nexport function login(user: { id: string; disabledAt?: string }) {\n  if (user.disabledAt) throw new Error("account disabled");\n  return createSession(user.id);\n}\n',
+    });
+    const head = repo.commit("add a guarded login");
+    const git = await Git.open(repo.dir);
+    const loaded = await loadConfig(git, base, head);
+    const provider = guardProvider("createSession", "disabledAt");
+    const intent: IntentSpec = {
+      version: 1,
+      title: "t",
+      summary: "",
+      requirements: [{ id: "R1", text: "Disabled users cannot authenticate.", kind: "security", priority: "required", sourceRefs: [], searchHints: ["disabled"] }],
+      nonGoals: [],
+      ambiguities: [],
+    };
+    const report = await runReview({
+      git,
+      revisions: { before: base, after: head, how: "test" },
+      loaded,
+      intent,
+      sources: [{ id: "fixture", type: "spec", authority: 100, text: "" }],
+      prBodyOnly: false,
+      provider,
+      sent: () => ({ requests: provider.calls.length, bytes: 0 }),
+      repository: "o/r",
+      trace: () => {},
+    });
+    const r1 = report.requirements[0];
+    assert.ok(r1?.candidates.some((c) => c.aside === "unreadable"), JSON.stringify(r1?.candidates.map((c) => [c.candidate.path, c.outcome, c.aside])));
+    assert.match(r1?.scope.blocking.join(" ") ?? "", /could not be read in full/);
+    assert.equal(r1?.status, "unknown");
+    assert.match(r1?.notes.join(" ") ?? "", /VERIFIED is withheld: .*could not be read in full/);
+  } finally {
+    repo.remove();
+  }
+});
+
+test("runReview: with no room for the surroundings, a satisfying answer still counts but a violation does not", async () => {
+  // The room for context cut to nothing, so every packet is the place's own code alone — and says
+  // so, which is the point: a check the place performs itself still counts, while a violation
+  // cannot be claimed when the guard could be in a caller that was never shown.
+  const withoutContext = async (after: "head" | "fixed") => {
+    const repo = fixtureRepo("missed-path");
+    try {
+      repo.git("checkout", "-q", repo.base);
+      repo.write({ [CONFIG_PATH]: "evidence:\n  max_related_chars: 0\n" });
+      const base = repo.commit("no room for context");
+      const git = await Git.open(repo.dir);
+      const to = (after === "fixed" ? repo.fixed : repo.head) as string;
+      const loaded = await loadConfig(git, base, to);
+      const provider = guardProvider("createSession", "disabledAt");
+      return await runReview({
+        git,
+        revisions: { before: base, after: to, how: "test" },
+        loaded,
+        intent: intentOf("missed-path"),
+        sources: [{ id: "fixture", type: "spec", authority: 100, text: "" }],
+        prBodyOnly: false,
+        provider,
+        sent: () => ({ requests: provider.calls.length, bytes: 0 }),
+        repository: "o/r",
+        trace: () => {},
+      });
+    } finally {
+      repo.remove();
+    }
+  };
+
+  const head = await withoutContext("head");
+  const violations = head.requirements[0]?.candidates.filter((c) => c.outcome === "violates") ?? [];
+  assert.deepEqual(violations, [], "the guard could be in a caller that was not shown");
+  assert.match(head.requirements[0]?.candidates.flatMap((c) => c.notes).join(" ") ?? "", /the missing part could hold the check/);
+
+  // The same cut does not take away a check the place performs on itself.
+  const fixed = await withoutContext("fixed");
+  const satisfied = fixed.requirements[0]?.candidates.filter((c) => c.outcome === "satisfies") ?? [];
+  assert.ok(satisfied.length > 0, JSON.stringify(fixed.requirements[0]?.candidates.map((c) => [c.candidate.path, c.outcome])));
+  assert.ok(satisfied.every((c) => c.cut.context), "every one of them was judged on its own code alone");
 });
 
 test("runReview: the completeness question gets the requirement redacted, like every other packet", async () => {

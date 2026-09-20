@@ -54,6 +54,7 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
         requirementId: "R1",
         status: "violation",
         coverage: "full",
+        scope: { found: 3, judged: 3, paths: 2, setAside: 1, notFollowed: [], unjudged: [], blocking: [] },
         notes: [],
         candidates: [
           {
@@ -61,6 +62,7 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
             outcome: "satisfies",
             satisfaction: { choice: "satisfies", confidence: 0.99, probabilities: {} },
             truncated: false,
+            cut: { own: false, context: false, ambiguous: false },
             evidence: [],
             notes: [],
           },
@@ -69,19 +71,22 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
             outcome: "violates",
             satisfaction: { choice: "violates", confidence: 0.47, probabilities: { violates: 0.61 } },
             truncated: false,
+            cut: { own: false, context: false, ambiguous: false },
             evidence: [{ path: "src/auth/oauth.ts", startLine: 22, endLine: 22 }],
             notes: ["probability 0.61 <img src=x>"],
           },
           {
             candidate: { path: "src/ui/button.ts", startLine: 1, endLine: 9, changed: false, reasons: [] },
-            outcome: "unrelated",
+            outcome: "aside",
+            aside: "not_a_path",
             truncated: false,
+            cut: { own: false, context: false, ambiguous: false },
             evidence: [],
             notes: [],
           },
         ],
       },
-      { requirementId: "R2", status: "verified", coverage: "full", notes: [], candidates: [] },
+      { requirementId: "R2", status: "verified", coverage: "full", scope: { found: 0, judged: 0, paths: 0, setAside: 0, notFollowed: [], unjudged: [], blocking: [] }, notes: [], candidates: [] },
     ],
     unexpectedChanges: [],
     discovery: { candidateCount: 3, changedCandidates: 1, unchangedCandidates: 2, incompleteReasons: [], searches: [] },
@@ -93,7 +98,7 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
 
 test("the Markdown report leads with a result line drawn from the verdict alone", () => {
   assert.match(renderMarkdown(report()), /^# jev-intent-review\n\n\*\*Result: VIOLATION\.\*\* 1 of 2 requirements has a violation\./);
-  assert.match(renderMarkdown(report({ verdict: "no_violation_found" })), /\*\*Result: no violation found\*\* in 3 discovered paths\. This is not proof that the change is correct\./);
+  assert.match(renderMarkdown(report({ verdict: "no_violation_found" })), /\*\*Result: no violation found\*\* in 2 discovered paths\. This is not proof that the change is correct\./);
   assert.match(renderMarkdown(report({ verdict: "skipped", skipReason: "No credentials." })), /\*\*Result: skipped\.\*\* No credentials\./);
 });
 
@@ -103,7 +108,10 @@ test("the Markdown report shows each path, whether the change touched it, and th
   assert.match(text, /- ✓ satisfies · `src\/auth\/password\.ts:6-13` · `loginWithPassword` · changed in this pull request · p 0\.99/);
   // The probability the policy used (0.61), not Jev's `confidence` field (0.47).
   assert.match(text, /- ✗ violates · `src\/auth\/oauth\.ts:16-23` · p 0\.61\n  - evidence: `src\/auth\/oauth\.ts:22`/);
-  assert.match(text, /1 other candidate judged unrelated/);
+  assert.match(text, /1 other place set aside: not a path this requirement holds or fails on/);
+  // The headline is a claim over the paths, and the line under it says what that covers.
+  assert.match(text, /### R2 · VERIFIED over 0 discovered paths/);
+  assert.match(text, /Coverage: full — 3 of 3 place\(s\) judged, 2 path\(s\), 1 set aside/);
   assert.match(text, /Repository candidates examined: 3 \(in changed files 1, in unchanged files 2\)/);
   assert.ok(!text.includes("<img"), "notes cannot carry HTML");
   assert.match(text, /&lt;img src=x&gt;/);

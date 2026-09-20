@@ -25,6 +25,11 @@ async function discover(name: string, requirement: Requirement, after: "head" | 
 }
 
 // The plan's check 2a: discovery alone, no model.
+/** Everything the search left, whatever weight it carries: leads, unjudged places, gaps. */
+function left(d: { notFollowed: string[]; unjudged: string[]; blocking: string[] }): string[] {
+  return [...d.notFollowed, ...d.unjudged, ...d.blocking];
+}
+
 test("missed-path: discovery reaches the unchanged OAuth and WebSocket logins and not the unrelated invoice code", async () => {
   const { repo, found } = await discover("missed-path", spec("missed-path"));
   try {
@@ -35,7 +40,7 @@ test("missed-path: discovery reaches the unchanged OAuth and WebSocket logins an
     assert.deepEqual([oauth?.symbol, oauth?.changed], ["completeOAuthLogin", false]);
     assert.ok(oauth?.reasons.includes("calls createSession"));
     assert.equal(found.candidates.find((c) => c.path === "src/auth/password.ts")?.changed, true);
-    assert.deepEqual(found.incomplete, []);
+    assert.deepEqual(left(found), []);
   } finally {
     repo.remove();
   }
@@ -69,7 +74,7 @@ test("an error type the guard throws is not followed, and the search record says
     const authError = found.searches.find((s) => s.query === "AuthError" && s.layer === "C");
     assert.match(authError?.rejected ?? "", /an error type/);
     assert.ok(!found.candidates.some((c) => c.symbol === "exchangeCode"), "a helper that only throws the same error is not a candidate");
-    assert.deepEqual(found.incomplete, [], "a deliberate category, not a cut-short search");
+    assert.deepEqual(left(found), [], "a deliberate category, not a cut-short search");
   } finally {
     repo.remove();
   }
@@ -110,12 +115,12 @@ test("a call too common to follow makes the search incomplete; test files do not
   };
   const many = Object.fromEntries(Array.from({ length: 42 }, (_, i) => [`src/job${i}.ts`, `export function job${i}(r) {\n  return saveRecord(r);\n}\n`]));
   const common = await build(many);
-  assert.ok(common.incomplete.some((r) => /callers of saveRecord were not followed/.test(r)), JSON.stringify(common.incomplete));
+  assert.ok(left(common).some((r) => /callers of saveRecord were not followed/.test(r)), JSON.stringify(left(common)));
   assert.ok(common.searches.some((s) => s.query === "saveRecord" && s.rejected));
 
   const tests = Object.fromEntries(Array.from({ length: 42 }, (_, i) => [`test/job${i}.test.ts`, `saveRecord({ id: ${i} });\n`]));
   const fine = await build(tests);
-  assert.ok(!fine.incomplete.some((r) => /saveRecord/.test(r)), JSON.stringify(fine.incomplete));
+  assert.ok(!left(fine).some((r) => /saveRecord/.test(r)), JSON.stringify(left(fine)));
 });
 
 test("unknown-plugin: discovery reaches the plugin loader and the purge job", async () => {
@@ -182,7 +187,7 @@ test("discovery caps the candidate list and says so", async () => {
     const change = await analyzeChange(git, repo.base, repo.head, () => true);
     const found = await new Discoverer(git, repo.head, { include: () => true, maxCandidates: 2, lexicalSearch: true, referenceSearch: true }).discover(spec("missed-path"), change);
     assert.equal(found.candidates.length, 2);
-    assert.match(found.incomplete[0] ?? "", /only the first 2 were checked/);
+    assert.match(left(found)[0] ?? "", /only the first 2 were judged/);
   } finally {
     repo.remove();
   }
@@ -333,14 +338,14 @@ test("more calls in the changed code than are followed makes discovery incomplet
     }
   };
   const ten = await run(10);
-  assert.ok(ten.incomplete.some((r) => /only the 8 least common of 10 calls/.test(r)), JSON.stringify(ten.incomplete));
+  assert.ok(left(ten).some((r) => /only the 8 least common of 10 calls/.test(r)), JSON.stringify(left(ten)));
   assert.equal(ten.searches.filter((s) => /not followed: only the 8/.test(s.rejected ?? "")).length, 2);
-  assert.deepEqual((await run(8)).incomplete, [], "eight calls are all followed");
+  assert.deepEqual(left(await run(8)), [], "eight calls are all followed");
 
   // A test the pull request adds calls a helper only tests use: it has no caller that could be a
   // path, and must not push one of the eight real calls out.
   const withTest = await run(8, { "test/helpers.ts": fn("expectLogin"), "test/login.test.ts": "test(\"login\", () => {\n  expectLogin(1);\n});\n" });
-  assert.deepEqual(withTest.incomplete, [], JSON.stringify(withTest.incomplete));
+  assert.deepEqual(left(withTest), [], JSON.stringify(left(withTest)));
   assert.equal(withTest.searches.find((s) => s.query === "expectLogin")?.rejected, "used only in tests");
 });
 
@@ -358,7 +363,7 @@ test("a call is followed by its name however it is written: three letters, a met
     assert.match(record("AuthError")?.rejected ?? "", /an error type/, "made with throw new: how the guard stops a path");
     assert.ok(found.candidates.some((c) => c.symbol === "other"));
     // A name the search refuses leaves its callers unsearched, and that is said.
-    assert.ok(found.incomplete.includes(`the callers of ${LONG} could not be searched (longer than 80 characters)`), JSON.stringify(found.incomplete));
+    assert.ok(left(found).includes(`the callers of ${LONG} could not be searched (longer than 80 characters)`), JSON.stringify(left(found)));
   } finally {
     repo.remove();
   }
@@ -388,14 +393,14 @@ test("more search words than are searched, or a word too common to narrow anythi
     }
   };
   const nine = await run(words(9));
-  assert.ok(nine.incomplete.includes("only the first 8 search words were searched"), JSON.stringify(nine.incomplete));
+  assert.ok(left(nine).includes("only the first 8 search words were searched"), JSON.stringify(left(nine)));
   assert.match(nine.searches.find((s) => s.query === "keyword8")?.rejected ?? "", /only the first 8/);
-  assert.ok(!(await run(words(8))).incomplete.some((r) => /search words/.test(r)), "eight words are all searched");
+  assert.ok(!left(await run(words(8))).some((r) => /search words/.test(r)), "eight words are all searched");
 
   const everywhere = Object.fromEntries(Array.from({ length: 41 }, (_, i) => [`src/m${i}.ts`, fn(`m${i}`, "return sharedword;")]));
   const common = await run(["sharedword"], everywhere);
-  assert.ok(common.incomplete.includes("the word sharedword is too common to search by"), JSON.stringify(common.incomplete));
-  assert.ok(!(await run(["sharedword"], Object.fromEntries(Object.entries(everywhere).slice(0, 40)))).incomplete.some((r) => /sharedword/.test(r)), "forty files are not too common");
+  assert.ok(left(common).includes("the word sharedword is too common to search by"), JSON.stringify(left(common)));
+  assert.ok(!left(await run(["sharedword"], Object.fromEntries(Object.entries(everywhere).slice(0, 40)))).some((r) => /sharedword/.test(r)), "forty files are not too common");
 });
 
 test("the callers of a wrapper: a three-letter name is searched, too many or too common makes discovery incomplete", async () => {
@@ -410,13 +415,13 @@ test("the callers of a wrapper: a three-letter name is searched, too many or too
     }
   };
   const short = await run("pay", 1, 30);
-  assert.deepEqual([short.candidates.map((c) => c.symbol), short.incomplete], [["c0"], []]);
+  assert.deepEqual([short.candidates.map((c) => c.symbol), left(short)], [["c0"], []]);
   const over = await run("openSession", 3, 1);
   assert.equal(over.candidates.length, 1);
-  assert.ok(over.incomplete.includes("3 callers of openSession were found and only 1 were checked"), JSON.stringify(over.incomplete));
+  assert.ok(left(over).includes("3 callers of openSession were found and only 1 were judged"), JSON.stringify(left(over)));
   const common = await run("openSession", 41, 100);
   assert.deepEqual(common.candidates, []);
-  assert.ok(common.incomplete.some((r) => /callers of openSession, judged supporting code, were not followed \(too common\)/.test(r)), JSON.stringify(common.incomplete));
+  assert.ok(left(common).some((r) => /callers of openSession, judged supporting code, were not followed \(too common\)/.test(r)), JSON.stringify(left(common)));
 });
 
 test("evidence counts as cut when callers, definitions or a definition's size go past what a packet holds", async () => {
