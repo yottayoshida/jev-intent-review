@@ -164,6 +164,40 @@
       "bWhy": "The fixed call batch_to_decided(b) is inside the budget. The B target (initiate_rollback) is enumerated but held: the callee get_decided_from_anchor has a signature wrapped over several lines and is read as not returning a Result.",
       "c": "not checked",
       "d": "not checked"
+    },
+    {
+      "order": 21,
+      "ref": "Naoray/instruckt-tauri#9",
+      "a": "pass",
+      "requirement": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content.",
+      "source": "PR text: \"Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content\"."
+    },
+    {
+      "order": 22,
+      "ref": "dashpay/grovedb#501",
+      "a": "pass",
+      "requirement": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded.",
+      "source": "PR text: \"returned a `CostResult<(), Error>` that was silently discarded via `let _ =`. If `set_base_root_key` fails (e.g., due to a storage error), the restorer would continue operating on corrupt state\"."
+    },
+    {
+      "order": 23,
+      "ref": "dashpay/grovedb#500",
+      "a": "pass",
+      "requirement": "If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished.",
+      "source": "PR text: \"This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed\"."
+    },
+    {
+      "order": 24,
+      "ref": "TyRoXx/NonlocalityOS#433",
+      "a": "fail",
+      "why": "On a failed move the fix compares content hashes and cleans up; it is not a failure returned to the caller as an error."
+    },
+    {
+      "order": 25,
+      "ref": "iotaledger/iota#10136",
+      "a": "pass",
+      "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
+      "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\"."
     }
   ],
   "gateResult": {
@@ -173,5 +207,9 @@
     "atMostPassing": 2,
     "status": "not met — stopped at the gate and returned to the plan, as the rules say",
     "precheck": "bench/acceptance/precheck-shipped.json"
+  },
+  "gateExtension": {
+    "when": "2026-09-21, after the gate was not met at 20",
+    "ruling": "The owner chose to keep looking for a third case rather than measure two or stop: the cap goes from 20 to 40, the four conditions and the order stay as they were. The rest of the fixed external pool is examined newest merge first; if it runs out, one search term is added and recorded here before its results are read."
   }
 }
