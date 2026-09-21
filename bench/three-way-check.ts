@@ -12,7 +12,7 @@
 //   C  an ordinary review: one call that reads the requirement and the code and gives a verdict
 //
 // B and C use `COMPILER_MODEL`, the model the tool already uses to write requirements, on the same
-// endpoint — so `CloudflareClient.sent` counts every request of every method, plan generation
+// endpoint — so `JevClient.sent` counts every request of every method, plan generation
 // included. No price is claimed: Workers AI bills by neuron and the answer carries none.
 //
 // The question is v5, not the frozen v4: v4's template hard-codes an iterator's shape and neither
@@ -27,7 +27,7 @@ import { Discoverer } from "../src/discovery/discover.ts";
 import { buildEvidence, type Packet, type Related } from "../src/evidence/builder.ts";
 import { readModelJson } from "../src/intent/compiler.ts";
 import { SUPERSEDED_PLANNING_MODEL as COMPILER_MODEL } from "./superseded-models.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { Git } from "../src/repository/git.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
@@ -126,7 +126,7 @@ const hardLimit = comparison.requestBudget.hardLimit;
 
 const endpoint = endpointFromEnv();
 if (!endpoint && !dry) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
-const client = new CloudflareClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
+const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
 const provider = new JevProvider(client);
 const git = new Git(repoDir);
 

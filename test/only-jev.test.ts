@@ -4,7 +4,7 @@
 // instead — to compile requirements, to pick calls, to write a mapping's prose — and each reach
 // looked locally reasonable. None of them was announced; they were noticed by reading the code.
 //
-// So the rule is not a convention. `CloudflareClient.post` refuses any other model before the
+// So the rule is not a convention. `JevClient.post` refuses any other model before the
 // request is built, and the second test below runs the experimental path end to end against a
 // capturing endpoint and reads the model out of every body that was actually sent.
 
@@ -14,7 +14,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { CloudflareClient, ONLY_MODEL, ProviderError } from "../src/judgments/cloudflare.ts";
+import { JevClient, ONLY_MODEL, ProviderError } from "../src/judgments/client.ts";
 import { JEV_MODEL } from "../src/judgments/jev.ts";
 import { main, type Io } from "../src/cli/main.ts";
 import { tempRepo } from "./helpers/repo.ts";
@@ -31,7 +31,7 @@ test("a request for any other model does not reach the network, and is not count
     calls += 1;
     return new Response("{}", { status: 200 });
   }) as typeof globalThis.fetch;
-  const client = new CloudflareClient(ENDPOINT, { fetch });
+  const client = new JevClient(ENDPOINT, { fetch });
 
   for (const model of ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "typesafe/jev-preview", "", undefined]) {
     const error = await client.post({ model, input: {} }).catch((e: unknown) => e);

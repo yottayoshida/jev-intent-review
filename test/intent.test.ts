@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { checklistItems, compileChecklist, isStatement, quoteIsIn, readModelJson, readRequirementText, toSpec } from "../src/intent/compiler.ts";
 import { closedIssueNumbers, GitHub, NotFound, parseRepository } from "../src/intent/github.ts";
 import { resolveIntent } from "../src/intent/resolver.ts";
-import { CloudflareClient, ProviderError } from "../src/judgments/cloudflare.ts";
+import { JevClient, ProviderError } from "../src/judgments/client.ts";
 import { EXIT, ToolError, type IntentSource } from "../src/types.ts";
 import { tempRepo } from "./helpers/repo.ts";
 
@@ -132,5 +132,5 @@ function fakeClient(responses: unknown[]) {
     if (next instanceof Error) throw next;
     return new Response(JSON.stringify(next), { status: 200 });
   }) as typeof globalThis.fetch;
-  return { client: new CloudflareClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", source: "CLOUDFLARE_ACCOUNT_ID" }, { fetch, sleep: async () => {} }), bodies };
+  return { client: new JevClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", source: "CLOUDFLARE_ACCOUNT_ID" }, { fetch, sleep: async () => {} }), bodies };
 }

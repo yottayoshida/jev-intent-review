@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { CONFIG_PATH, defaultConfig, loadConfig } from "../src/config/config.ts";
 import { validateIntentSpec } from "../src/intent/schema.ts";
-import { ProviderError } from "../src/judgments/cloudflare.ts";
+import { ProviderError } from "../src/judgments/client.ts";
 import { Git } from "../src/repository/git.ts";
 import { aggregate, decide, verdictOf } from "../src/review/requirement.ts";
 import { runReview } from "../src/review/run.ts";

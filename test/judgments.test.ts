@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { inspect } from "node:util";
-import { CloudflareClient, EndpointError, endpointFromEnv, fromEndpoint, ProviderError, type Endpoint } from "../src/judgments/cloudflare.ts";
+import { JevClient, EndpointError, endpointFromEnv, fromEndpoint, ProviderError, type Endpoint } from "../src/judgments/client.ts";
 import { JevProvider, readChoice, unwrapAnswers } from "../src/judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider, type Questions } from "../src/judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, QUESTIONS_HASH } from "../src/judgments/questions.ts";
@@ -32,7 +32,7 @@ const json = (body: unknown, status = 200, headers: Record<string, string> = {})
 function client(responses: (Response | Error)[], maxRetries = 2) {
   const fake = fakeFetch(responses);
   const sleeps: number[] = [];
-  const c = new CloudflareClient(ENDPOINT, { fetch: fake.fn, maxRetries, sleep: async (ms) => void sleeps.push(ms) });
+  const c = new JevClient(ENDPOINT, { fetch: fake.fn, maxRetries, sleep: async (ms) => void sleeps.push(ms) });
   return { c, calls: fake.calls, sleeps };
 }
 
@@ -109,7 +109,7 @@ test("fromEndpoint flattens what the endpoint returns and never repeats the toke
 test("a key kept in the URL's query does not come back in what the endpoint says", async () => {
   const endpoint: Endpoint = { url: "https://judge.example.com/ai/run?key=secret-in-the-query", token: TOKEN, source: "JEV_API_URL" };
   const fake = fakeFetch([new Response("Cannot POST /ai/run?key=secret-in-the-query", { status: 404 })]);
-  const c = new CloudflareClient(endpoint, { fetch: fake.fn, maxRetries: 0 });
+  const c = new JevClient(endpoint, { fetch: fake.fn, maxRetries: 0 });
   const error = await providerError(c.post(JEV));
   assert.ok(!error.message.includes("secret-in-the-query"), error.message);
   assert.match(error.message, /\[REDACTED QUERY\]/);
@@ -244,12 +244,12 @@ test("a body that times out while being read is retried like any other timeout",
 
 test("the client starts nothing past its deadline and does not wait past it for a retry", async () => {
   const late = fakeFetch([json({})]);
-  const past = new CloudflareClient(ENDPOINT, { fetch: late.fn, deadline: 1000, now: () => 2000 });
+  const past = new JevClient(ENDPOINT, { fetch: late.fn, deadline: 1000, now: () => 2000 });
   assert.equal((await providerError(past.post(JEV))).kind, "budget");
   assert.equal(late.calls.length, 0);
 
   const busy = fakeFetch([json({}, 503), json({ result: 1 })]);
-  const tight = new CloudflareClient(ENDPOINT, { fetch: busy.fn, deadline: 1500, now: () => 1000, sleep: async () => {} });
+  const tight = new JevClient(ENDPOINT, { fetch: busy.fn, deadline: 1500, now: () => 1000, sleep: async () => {} });
   assert.equal((await providerError(tight.post(JEV))).kind, "budget");
   assert.equal(busy.calls.length, 1, "the retry would wait at least 1 s; only 0.5 s were left");
 });
@@ -334,13 +334,13 @@ test("LimitedProvider never runs more than `concurrency` calls at once", async (
 test("the request and byte budget counts what is actually sent, retries included", async () => {
   // One judgment that the server keeps refusing: four attempts, and a budget of one request.
   const busy = fakeFetch([json({}, 503), json({}, 503), json({}, 503), json({ result: 1 })]);
-  const one = new CloudflareClient(ENDPOINT, { fetch: busy.fn, maxRequests: 1, sleep: async () => {} });
+  const one = new JevClient(ENDPOINT, { fetch: busy.fn, maxRequests: 1, sleep: async () => {} });
   assert.equal((await providerError(one.post(JEV))).kind, "budget");
   assert.equal(busy.calls.length, 1);
   assert.equal(one.sent.requests, 1);
 
   const small = fakeFetch([json({})]);
-  const tiny = new CloudflareClient(ENDPOINT, { fetch: small.fn, maxBytes: 10 });
+  const tiny = new JevClient(ENDPOINT, { fetch: small.fn, maxBytes: 10 });
   assert.equal((await providerError(tiny.post({ ...JEV, big: "x".repeat(100) }))).kind, "budget");
   assert.equal(small.calls.length, 0, "refused before sending");
 });

@@ -89,7 +89,7 @@
 
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
 import { VERSION } from "../src/version.ts";
@@ -295,7 +295,7 @@ const runs = Number(process.argv[2] ?? 3);
 const out = process.argv[3] ?? "local-check-stated-generalisation.json";
 const endpoint = endpointFromEnv();
 if (!endpoint) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
-const provider = new JevProvider(new CloudflareClient(endpoint));
+const provider = new JevProvider(new JevClient(endpoint));
 const hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex").slice(0, 12);
 
 const log: unknown[] = [];

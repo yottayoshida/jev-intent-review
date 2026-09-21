@@ -147,7 +147,7 @@ export interface ClientOptions {
 
 const RETRYABLE = new Set([429, 500, 502, 503, 504]);
 
-export class CloudflareClient {
+export class JevClient {
   /** What actually went over the wire, retries included. */
   readonly sent = { requests: 0, bytes: 0 };
   /** Where it went: scheme, host and port, for the report and the trace. No path, no query. */

@@ -12,7 +12,7 @@
 
 import type { ChangeAnalysis, ChangedRegion } from "../change/seeds.ts";
 import { cut, isSensitivePath, redact } from "../evidence/redact.ts";
-import { FATAL_KINDS, ProviderError } from "../judgments/cloudflare.ts";
+import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import { CHANGE_QUESTIONS } from "../judgments/questions.ts";
 import type { ChangeJudgment, Location, Requirement, UnexpectedChange } from "../types.ts";

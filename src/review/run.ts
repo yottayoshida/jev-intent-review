@@ -9,7 +9,7 @@ import { isSensitivePath } from "../evidence/redact.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
-import { FATAL_KINDS, ProviderError } from "../judgments/cloudflare.ts";
+import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, COMPLETENESS_QUESTIONS, QUESTIONS_HASH } from "../judgments/questions.ts";
 import type { Git } from "../repository/git.ts";

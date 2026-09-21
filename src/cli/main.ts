@@ -8,7 +8,7 @@ import { loadConfig, type Config } from "../config/config.ts";
 import { compileChecklist } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
-import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/client.ts";
 import { JevProvider, JEV_MODEL } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
@@ -145,7 +145,7 @@ function parse(argv: string[]) {
 }
 
 function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
-  const client = new CloudflareClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
+  const client = new JevClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
     sent: () => ({ ...client.sent }),

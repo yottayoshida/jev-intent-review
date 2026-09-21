@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { analyzeChange } from "../src/change/seeds.ts";
-import { ProviderError } from "../src/judgments/cloudflare.ts";
+import { ProviderError } from "../src/judgments/client.ts";
 import { Git } from "../src/repository/git.ts";
 import { isSensitivePath } from "../src/evidence/redact.ts";
 import { changesBehaviour, reviewChanges } from "../src/review/unexpected-change.ts";

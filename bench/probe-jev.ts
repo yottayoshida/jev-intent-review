@@ -9,7 +9,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { enclosingBlock } from "../src/change/blocks.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { CANDIDATE_QUESTIONS } from "../src/judgments/questions.ts";
 import { FIXTURES } from "../test/helpers/repo.ts";
@@ -56,7 +56,7 @@ if (!endpoint) {
   console.error("set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
   process.exit(10);
 }
-const client = new CloudflareClient(endpoint);
+const client = new JevClient(endpoint);
 console.log(`endpoint ${client.origin} (from ${endpoint.source})`);
 const jev = new JevProvider(client);
 const runs = Number(process.argv[2] ?? 3);

@@ -2,7 +2,7 @@
 // https://developers.cloudflare.com/ai/models/typesafe/jev/
 
 import type { ChoiceAnswer } from "../types.ts";
-import { ONLY_MODEL, ProviderError, type CloudflareClient } from "./cloudflare.ts";
+import { ONLY_MODEL, ProviderError, type JevClient } from "./client.ts";
 import type { JudgmentProvider, Questions } from "./provider.ts";
 
 /** One constant, so the transport's guard and the model this asks for cannot drift apart. */
@@ -42,9 +42,9 @@ export function readChoice(key: string, raw: unknown, criteria: Record<string, s
 
 export class JevProvider implements JudgmentProvider {
   readonly model = JEV_MODEL;
-  readonly #client: CloudflareClient;
+  readonly #client: JevClient;
 
-  constructor(client: CloudflareClient) {
+  constructor(client: JevClient) {
     this.#client = client;
   }
 
