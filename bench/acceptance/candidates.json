@@ -214,6 +214,38 @@
       "note": "Held in reserve: examined only if one of 19, 20 or 23 fails condition (c).",
       "c": "fail",
       "cWhy": "The fixed calls are trait methods and common names (get_latest_checkpoint_sequence_number, BcsData::serialize, get_epoch_info) in a 470 MB monorepo, and the fixed crates build on iota-types with the Move VM. Cloning it to run the pre-check and building it for a probe are both far outside a one-crate probe."
+    },
+    {
+      "order": 26,
+      "ref": "armaxri/termiHub#2751",
+      "a": "fail",
+      "why": "The fixed sites are TypeScript .catch(() => {}) calls in the frontend, and the fix logs them; no Rust call returns its failure to the caller."
+    },
+    {
+      "order": 27,
+      "ref": "armaxri/termiHub#2732",
+      "a": "fail",
+      "why": "TypeScript frontend; failures are now logged and shown as a toast, not returned to a caller as an error."
+    },
+    {
+      "order": 28,
+      "ref": "ratazzi/quebec#136",
+      "a": "pass",
+      "requirement": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success.",
+      "source": "PR text: \"Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes\"."
+    },
+    {
+      "order": 29,
+      "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "a": "pass",
+      "requirement": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result.",
+      "source": "PR text: \"entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \\\"neither dir nor file\\\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read\"."
+    },
+    {
+      "order": 30,
+      "ref": "beboite/boite-legacy#187",
+      "a": "fail",
+      "why": "The swallowed results are now printed to stderr, not returned; the rest of the pull request is not failure handling."
     }
   ],
   "gateResult": {
