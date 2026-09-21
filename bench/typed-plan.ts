@@ -81,13 +81,35 @@ export function checkPlan(plan: unknown, candidates: Candidates): PlanCheck {
 export function conditionFrom(target: FunctionCandidate, call: CallCandidate): ConditionV5 {
   return {
     target: target.name,
-    setup: `Execution reaches the call to \`${call.callee}\` inside \`${target.name}\`.`,
+    setup: `Execution reaches the call \`${call.expression}\` inside \`${target.name}\`.`,
     occurrence: "There",
-    operation: `\`${call.callee}\``,
+    operation: `\`${call.expression}\``,
     yields: "an error",
     others: "Every other operation the function reaches succeeds.",
     extra: "",
   };
+}
+
+/**
+ * Whether this call can be pointed at in the body that is about to be judged.
+ *
+ * The expression is the identity the question carries, so it has to land on exactly one place in
+ * the code being asked about. None means the version moved it — the question would be about
+ * something that is not there. More than one means the question does not say which, and an answer
+ * would be about whichever the reader picked.
+ *
+ * Whitespace is flattened on both sides, so a call wrapped differently in one version still
+ * matches. Nothing else is normalised: a changed argument is a different call, and should be.
+ */
+export function locateCall(body: string, call: CallCandidate): { ok: boolean; found: number; reason?: string } {
+  if (!call.expressionComplete) return { ok: false, found: 0, reason: `the call ${call.id} does not close its parentheses within the scan, so it cannot be pointed at` };
+  const flat = body.replace(/\s+/g, " ");
+  const needle = call.expression.replace(/\s+/g, " ");
+  let found = 0;
+  for (let i = flat.indexOf(needle); i >= 0; i = flat.indexOf(needle, i + 1)) found += 1;
+  if (found === 0) return { ok: false, found, reason: `\`${needle}\` is not in this version of ${call.functionId}` };
+  if (found > 1) return { ok: false, found, reason: `\`${needle}\` appears ${found} times in this version, so the condition does not say which` };
+  return { ok: true, found };
 }
 
 /**

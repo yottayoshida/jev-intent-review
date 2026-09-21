@@ -39,7 +39,7 @@ import { VERSION } from "../src/version.ts";
 import { BAR_V3, score, verdictOfV3 } from "./check-questions-v3.ts";
 import { questionsV5 } from "./check-questions-v5.ts";
 import { enumerate, listingFor, type Candidates } from "./code-candidates.ts";
-import { PROPERTIES, checkPlan, conditionFrom, referentsFor, type TypedPlan } from "./typed-plan.ts";
+import { PROPERTIES, checkPlan, conditionFrom, locateCall, referentsFor, type TypedPlan } from "./typed-plan.ts";
 
 const HERE = import.meta.dirname;
 const hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex").slice(0, 12);
@@ -186,6 +186,15 @@ for (const c of CASES) {
       if (!built) {
         rows.push({ method, case: c.id, which, branch, problem: `${checked.target.name} not found at ${branch}` });
         console.log(`   SKIP ${method}/${which}: ${checked.target.name} not found`);
+        continue;
+      }
+      // The call the condition names has to be in *this* version's body, exactly once. None means
+      // the version moved it and the question would be about something that is not there; more
+      // than one means the condition does not say which. Decided before a request.
+      const located = locateCall(built.packet.evidence.code, checked.call);
+      if (!located.ok) {
+        rows.push({ method, case: c.id, which, branch, commit: built.commit, withheld: located.reason, found: located.found, requestsSpent: 0 });
+        console.log(`   HELD ${method}/${which.padEnd(8)} no request: ${located.reason}`);
         continue;
       }
       const stateHash = hash(built.packet);

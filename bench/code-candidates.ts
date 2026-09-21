@@ -29,10 +29,22 @@ export interface CallCandidate {
   id: string;
   functionId: string;
   line: number;
-  /** The source line, trimmed. What the model sees, and what the question will quote. */
+  /** The source line, trimmed. What the model sees in the listing. */
   text: string;
   /** The name being called, as written. */
   callee: string;
+  /**
+   * The call itself, from the callee through its closing parenthesis — `read_to_string_capped(&path, MAX)`.
+   *
+   * The callee alone is not enough to say which call is meant. Two calls to the same function in
+   * one body are one propagating and one swallowing often enough that it is the interesting case,
+   * and a condition built from the callee alone is the same sentence for both. The whole source
+   * line is no good either: the mutation rewrites it (`#22`). The call expression is what survives
+   * a change in how the result is handled and still tells two calls apart.
+   */
+  expression: string;
+  /** False when the parentheses did not close within the scan; such a call cannot be re-bound. */
+  expressionComplete: boolean;
 }
 
 export interface Candidates {
@@ -58,6 +70,40 @@ const isRustFunction = (line: string, name: string) => new RegExp(`\\bfn\\s+${na
 const CALL = /(?<![\w$])((?:[A-Za-z_][\w$]*::)*[A-Za-z_][\w$]*)\s*\(/g;
 // Control flow reads as a call and is not one. `Ok`/`Err`/`Some` construct rather than call out.
 const NOT_A_CALL = new Set(["if", "while", "for", "match", "return", "fn", "Ok", "Err", "Some", "None", "assert", "assert_eq", "println", "format", "vec", "panic", "write", "writeln"]);
+
+/** How far a call may run before this gives up on closing its parentheses. */
+const EXPRESSION_CHARS = 300;
+
+/**
+ * The call from `at` through its matching close parenthesis, with runs of whitespace flattened so
+ * a call split over lines and the same call on one line read alike.
+ *
+ * String literals are skipped rather than counted: `open("a(b")` closes where it looks like it
+ * does. Comments are not — a `(` in a trailing comment inside a call's arguments would confuse
+ * this, and `expressionComplete` is how that shows up rather than a wrong answer.
+ */
+function callExpression(source: string, at: number): { text: string; complete: boolean } {
+  let depth = 0;
+  let quote: string | null = null;
+  for (let i = at; i < Math.min(source.length, at + EXPRESSION_CHARS); i++) {
+    const ch = source[i]!;
+    if (quote) {
+      if (ch === "\\") i += 1;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      continue;
+    }
+    if (ch === "(") depth += 1;
+    else if (ch === ")") {
+      depth -= 1;
+      if (depth === 0) return { text: source.slice(at, i + 1).replace(/\s+/g, " ").trim(), complete: true };
+    }
+  }
+  return { text: source.slice(at, at + EXPRESSION_CHARS).replace(/\s+/g, " ").trim(), complete: false };
+}
 
 /**
  * Every function defined outside a test region, and the calls inside each.
@@ -106,7 +152,11 @@ export function enumerate(path: string, source: string): Candidates {
           omittedCalls += 1;
           continue;
         }
-        calls.push({ id: `call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee });
+        // From this line to a few below, so a call split over lines still closes. `m.index` is an
+        // offset into this line, which is where the window starts.
+        const window = lines.slice(l - 1, Math.min(fn.endLine, l + 5)).join("\n");
+        const expression = callExpression(window, m.index);
+        calls.push({ id: `call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee, expression: expression.text, expressionComplete: expression.complete });
         taken += 1;
       }
     }
