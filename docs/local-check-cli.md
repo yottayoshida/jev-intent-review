@@ -203,9 +203,38 @@ raw_override_disables  → not_answered: …
 `mapped` は**要求した回数**、`governed` は**採用できて `applies` だった数**で、別の数として
 出す——0 件が「聞かなかった」なのか「聞いたが答えが無かった」なのか、この 2 つで決まる。
 
-したがって**枠が戻るまで残るのは最後の実測だけ**——正例で対応付けが取れるか、取れたら
-5 枝を 1 回ずつ。終了条件は、両変異でそれぞれの欠陥候補が出て、正例・挙動不変版では
-出ないこと。
+したがって**枠が戻るまで残るのは最後の実測だけ**。
+
+### 最初の関門は「実行全体で governed > 0」ではない
+
+**既知の 2 対象それぞれに使える対応付けがあること**を見る。別の呼び出しにだけ `applies` が
+付いた run は、`governed` が 1 以上でも次へ進む条件を満たさない——`governed` は run 全体の数
+なので、両対象が未回答のまま「準備できている」ように見えてしまう。
+
+採点はコードでやる（`bench/mapping-gate.ts`。対象名は bench 側にあり、製品側には無い）。
+対象ごとに:
+
+1. 記録があり、`accepted` で `verdict: applies`、**聞いた id と返った id が一致**
+2. 引用が原文にある——**この道具が検査済みだから信じる、ではなく**、run 自身が記録した
+   原文に対してもう一度照合する
+3. 正例では、その対象に欠陥候補が立っていない
+
+両方揃って初めて残り 4 枝へ。**片方でも不明・不適用・通信失敗なら、記録して止める。**
+正例の事前確認が通常の CLI 実行でログも残っていれば、それを 5 枝の正例として兼用する。
+
+### 2026-09-21 時点: NOT READY
+
+```
+== gate-correct.json  (R1: asked 19, mapped 19, governed 0)
+   read_baseline            refused: the mapping was not answered (429 … daily free allocation …)
+   raw_override_disables    refused: 同上
+      finding on this branch: no
+NOT READY: at least one target has no usable mapping — record this and stop
+```
+
+**判定側は 19/19 答えている。** 止まっているのは対応付けと計画だけで、理由はモデルが別だから:
+判定は `typesafe/jev`、計画と対応付けは `@cf/meta/llama-3.3-70b-instruct-fp8-fast`。
+後者の無料枠が切れている。指示どおり**記録して止めた**——残り 4 枝は送っていない。
 
 **注意: `generate_baseline` を「意図的に読み飛ばすコードだから合法」と採点しない。**
 実装がそう動くことと、要件がそれを許すことは別。原文から確定できなければ `unknown` で、
