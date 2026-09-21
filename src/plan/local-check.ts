@@ -13,6 +13,7 @@
 // observation about one call is not a statement about the requirement. `describe` below keeps the
 // two apart.
 
+import { redact } from "../evidence/redact.ts";
 import type { ChoiceAnswer } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
 
@@ -85,7 +86,10 @@ export const questionsFor = (c: Condition) =>
 export function locateCall(body: string, call: CallCandidate): { ok: boolean; found: number; reason?: string } {
   if (!call.expressionComplete) return { ok: false, found: 0, reason: `the call does not close its parentheses within the scan, so it cannot be pointed at` };
   const flat = body.replace(/\s+/g, " ");
-  const needle = call.expression.replace(/\s+/g, " ");
+  // The body is the packet's, which is redacted; the expression is as the file has it. A call with
+  // a long opaque argument matched nothing, and the reason given for withholding was "this version
+  // moved it" — a true-sounding sentence about the wrong thing.
+  const needle = redact(call.expression).text.replace(/\s+/g, " ");
   let found = 0;
   for (let i = flat.indexOf(needle); i >= 0; i = flat.indexOf(needle, i + 1)) found += 1;
   if (found === 0) return { ok: false, found, reason: `\`${needle}\` is not in this version of ${call.functionId}` };

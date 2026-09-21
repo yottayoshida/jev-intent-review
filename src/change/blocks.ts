@@ -60,7 +60,17 @@ export function testRegions(lines: readonly string[]): { start: number; end: num
   const regions: { start: number; end: number }[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] as string;
-    const cfgTest = /^\s*#\[cfg\(test\)\]/.test(line);
+    // `#[cfg(test)]` and every predicate that reduces to it: `#[cfg(all(test, unix))]`,
+    // `#[cfg(any(test, feature = "…"))]`. Only the first form was matched, and a module behind a
+    // platform-qualified one was read as production code — its helpers became candidates and its
+    // `fn`s became definitions the applicability check resolved names against.
+    //
+    // Only what is **inside the parentheses** is read, and string literals in it are emptied
+    // first. The word alone, anywhere on the line, calls `#[cfg(unix)] // see the test in …` a
+    // test region, and `#[cfg(feature = "test-utils")]` too. `not(test)` is removed, because that
+    // attribute marks the code compiled when the tests are not.
+    const predicate = /^\s*#\[cfg\((.*)\)\]/.exec(line)?.[1] ?? "";
+    const cfgTest = /\btest\b/.test(predicate.replace(/"[^"]*"/g, '""').replace(/\bnot\s*\(\s*test\s*\)/g, ""));
     const zigTest = /^\s*test\s+("[^"]*"|[\w.]+)?\s*\{/.test(line);
     if (!cfgTest && !zigTest) continue;
     // The region is the block that opens on this line or the next one.

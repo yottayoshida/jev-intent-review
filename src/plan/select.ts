@@ -1,17 +1,26 @@
-// From the calls a plan picked to the calls a run will ask about.
+// From the places a run has found to the calls it will ask about.
 //
-// The picks name places the requirement governs; they are not always the place a defect is. On the
-// saved runs, the model reached the right *function* three times out of three and the right *call*
-// once — the other two picked `exists()` inside it. Widening by callee spread away from the target;
-// widening **inside the functions already picked** stays where the requirement was recognised and
-// costs no further judgment about what is relevant.
+// Two things find places, and they are not the same kind of thing.
 //
-// So: take the functions of the picks, enumerate their calls, keep those a question can be put to,
-// and spend the judgment budget one call per function at a time so a single busy function cannot
-// take the whole run.
+// The **change** knows where the work was done: the functions holding changed lines, and one hop
+// out, the functions that call them. It is a lead, not a statement that the requirement applies —
+// this tool's founding idea is that a diff is where to look, not what to conclude.
 //
-// Nothing here knows a function name, a helper name or an expected answer. What it knows is which
-// calls resolve to a definition that returns a `Result`.
+// The **planner** knows which calls a requirement talks about, and says so with a clause. Its picks
+// are the only sites whose answers are read against the requirement at all.
+//
+// Neither may veto the other. A pick the change did not reach is still asked; a changed function
+// the planner did not pick is still asked, because the planner chooses from files found by the
+// requirement's words, and a requirement names the symptom far more often than the mechanism.
+//
+// Around each of those functions the set widens to every call in the body: the picks say where the
+// requirement was recognised, and the defect is usually a different call in the same body (on the
+// saved runs, the right function three times in three and the right call once).
+//
+// Then applicability, then one budget for the whole requirement — round-robin over functions, so a
+// single busy body cannot take the run and so the file a function is in cannot either.
+//
+// Nothing here knows a function name, a helper name or an expected answer.
 
 import type { Applicability } from "./applicability.ts";
 import type { CallCandidate, Candidates, FunctionCandidate } from "./candidates.ts";
@@ -22,22 +31,50 @@ export interface Pick {
   clause?: string;
 }
 
-export type SiteOrigin = "picked" | "same_function";
+/**
+ * Why this call is in the set.
+ *
+ * `picked` is the planner naming it. `same_function` is widening around a pick. `changed` and
+ * `calls_changed` come from the diff — a function holding changed lines, and a caller of one.
+ */
+export type SiteOrigin = "picked" | "same_function" | "changed" | "calls_changed";
+
+/** How a *function* got into the set. A call inherits it unless the planner named the call. */
+export type FunctionOrigin = "picked" | "changed" | "calls_changed";
 
 export interface Site {
   call: CallCandidate;
   fn: FunctionCandidate;
   origin: SiteOrigin;
+  /**
+   * How the function got in, which is not the same as how the call did.
+   *
+   * A call the planner named inside a function the change touched has origin `picked`, and the
+   * packet told the judgment model the place was not changed by the pull request because it read
+   * the call's origin for it.
+   */
+  fnOrigin: FunctionOrigin;
   clause?: string;
   applicability?: Applicability;
 }
 
+/** One file's contribution: its listing, plus which of its functions each finder reached. */
+export interface SiteSource {
+  candidates: Candidates;
+  /** What the planner picked here, if it was asked about this file. */
+  picks?: readonly Pick[];
+  /** Ids of functions holding a line the change touched. */
+  changed?: readonly string[];
+  /** Ids of functions that call a function the change touched. */
+  callsChanged?: readonly string[];
+}
+
 export interface Selection {
-  /** Picks that named a call in the listing. */
+  /** Picks that named a call in a listing. */
   picked: Site[];
   /** Picks that did not, with why — kept so a plan's misses are visible. */
   rejected: { callId: string; reason: string }[];
-  /** Every call in the picked functions, picks included. The set, before any budget. */
+  /** Every call in every function the finders reached. The set, before any budget. */
   widened: Site[];
   /** Of those, the ones a question can be put to. */
   applicable: Site[];
@@ -47,13 +84,19 @@ export interface Selection {
   overBudget: Site[];
   /** In the set and not askable, with why. */
   held: Site[];
+  /**
+   * How many functions each finder contributed. A function both the change and the planner
+   * reached counts under the change: `picked` is the functions only the planner found.
+   */
+  functions: Record<FunctionOrigin, number>;
 }
 
 /**
  * One call per function at a time, in order, until the budget is full.
  *
- * A function with twenty calls would otherwise fill the run on its own, and the picks named more
- * than one function for a reason.
+ * A function with twenty calls would otherwise fill the run on its own, and the finders named more
+ * than one function for a reason. Grouping is by the function's id, which carries its path — two
+ * files' `function-1` are two functions.
  */
 export function roundRobin(sites: readonly Site[], budget: number): { taken: Site[]; left: Site[] } {
   const byFunction = new Map<string, Site[]>();
@@ -79,40 +122,75 @@ export function roundRobin(sites: readonly Site[], budget: number): { taken: Sit
 }
 
 /**
- * The selection, given the planner's picks and a way to decide applicability.
+ * The selection over every source, under one budget.
+ *
+ * The budget is per requirement and not per file. Spending it once per file meant a requirement
+ * that opened three files could ask three times its stated budget, and that the last file's calls
+ * were never crowded out by the first's however many there were.
  *
  * `decide` is passed in rather than imported so this stays testable without a repository; the CLI
  * hands it `applicabilityOf` bound to the commit being read.
  */
 export async function selectSites(
-  candidates: Candidates,
-  picks: readonly Pick[],
+  sources: readonly SiteSource[],
   decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Applicability>,
   budget: number,
 ): Promise<Selection> {
-  const fnOf = (call: CallCandidate) => candidates.functions.find((f) => f.id === call.functionId)!;
-
   const picked: Site[] = [];
   const rejected: { callId: string; reason: string }[] = [];
-  for (const p of picks) {
-    const call = candidates.calls.find((k) => k.id === p.callId);
-    if (!call) {
-      rejected.push({ callId: String(p.callId), reason: "not a call in the listing" });
-      continue;
-    }
-    if (picked.some((s) => s.call.id === call.id)) continue;
-    picked.push({ call, fn: fnOf(call), origin: "picked", clause: p.clause });
-  }
+  const pickedCallIds = new Set<string>();
+  // Which finder reached each function. A function the change touched keeps that label even when
+  // the planner also named a call in it: the label is a fact about the diff, and reading it off
+  // whoever got there first told the judgment model a changed place was unchanged.
+  const origins = new Map<string, FunctionOrigin>();
+  for (const source of sources) for (const id of source.callsChanged ?? []) origins.set(id, "calls_changed");
+  for (const source of sources) for (const id of source.changed ?? []) origins.set(id, "changed");
 
-  // Every call in the functions the picks named, the picks first so they keep their clause.
-  const functions = new Map(picked.map((s) => [s.fn.id, s.fn]));
-  const widened: Site[] = [...picked];
-  for (const fn of functions.values()) {
-    for (const call of candidates.calls.filter((k) => k.functionId === fn.id)) {
-      if (widened.some((s) => s.call.id === call.id)) continue;
-      widened.push({ call, fn, origin: "same_function" });
+  // Functions in the order they will take their turns: the planner's first, then the changed
+  // functions, then their callers. With a budget large enough for one call each, the order does
+  // not decide what is asked; with a small one it decides what is asked first.
+  const seeds = new Map<string, { fn: FunctionCandidate; candidates: Candidates }>();
+  const seed = (candidates: Candidates, id: string) => {
+    const fn = candidates.functions.find((f) => f.id === id);
+    if (!fn || seeds.has(id)) return;
+    if (!origins.has(id)) origins.set(id, "picked");
+    seeds.set(id, { fn, candidates });
+  };
+
+  for (const source of sources) {
+    for (const p of source.picks ?? []) {
+      const call = source.candidates.calls.find((k) => k.id === p.callId);
+      if (!call) {
+        rejected.push({ callId: String(p.callId), reason: "not a call in the listing" });
+        continue;
+      }
+      if (pickedCallIds.has(call.id)) continue;
+      pickedCallIds.add(call.id);
+      const fn = source.candidates.functions.find((f) => f.id === call.functionId)!;
+      seed(source.candidates, fn.id);
+      picked.push({ call, fn, origin: "picked", fnOrigin: origins.get(fn.id)!, ...(p.clause !== undefined ? { clause: p.clause } : {}) });
     }
   }
+  for (const source of sources) for (const id of source.changed ?? []) seed(source.candidates, id);
+  for (const source of sources) for (const id of source.callsChanged ?? []) seed(source.candidates, id);
+
+  // Every call in every seeded function. A call the planner named keeps its origin and its clause;
+  // the rest inherit how their function was found.
+  const byPickedCall = new Map(picked.map((s) => [s.call.id, s]));
+  const widened: Site[] = [];
+  const functions: Record<FunctionOrigin, number> = { picked: 0, changed: 0, calls_changed: 0 };
+  for (const { fn, candidates } of seeds.values()) {
+    const fnOrigin = origins.get(fn.id)!;
+    functions[fnOrigin] += 1;
+    const calls = candidates.calls.filter((k) => k.functionId === fn.id);
+    // The picks first, so a small budget spends its turn on the call a clause was written for.
+    for (const call of [...calls].sort((a, b) => Number(byPickedCall.has(b.id)) - Number(byPickedCall.has(a.id)))) {
+      widened.push(byPickedCall.get(call.id) ?? { call, fn, fnOrigin, origin: fnOrigin === "picked" ? "same_function" : fnOrigin });
+    }
+  }
+  // A pick whose function was dropped by the listing cap would otherwise vanish; it cannot happen
+  // today (a call is listed only under a listed function) and is cheap to keep true.
+  for (const s of picked) if (!widened.some((w) => w.call.id === s.call.id)) widened.push(s);
 
   const applicable: Site[] = [];
   const held: Site[] = [];
@@ -123,5 +201,5 @@ export async function selectSites(
   }
 
   const { taken, left } = roundRobin(applicable, budget);
-  return { picked, rejected, widened, applicable, budgeted: taken, overBudget: left, held };
+  return { picked, rejected, widened, applicable, budgeted: taken, overBudget: left, held, functions };
 }

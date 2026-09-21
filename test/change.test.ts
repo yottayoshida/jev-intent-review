@@ -166,6 +166,26 @@ test("a definition inside a test region is not one a path outside it reaches", (
   assert.deepEqual(new BlockIndex(rust).testRegions, [{ start: 5, end: 10 }], "the index carries them");
 });
 
+test("a test module behind a platform-qualified cfg is still a test module", () => {
+  // `#[cfg(all(test, unix))]` is the same module as `#[cfg(test)]`. Matching only the literal
+  // first form read one of omamori's modules as production code: its helpers became candidates to
+  // ask about, and its `fn`s became definitions the applicability check resolved names against.
+  for (const attribute of ["#[cfg(all(test, unix))]", "#[cfg(any(test, feature = \"probe\"))]", "#[cfg(test)]"]) {
+    const lines = [attribute, "mod tests {", "    fn helper() {}", "}", "pub fn production() {}"];
+    assert.deepEqual(testRegions(lines), [{ start: 1, end: 4 }], attribute);
+  }
+  // Things that look alike and are not. The word has to be inside the parentheses: reading it off
+  // the whole line makes a trailing comment decide what is production code.
+  for (const line of [
+    '#[cfg(feature = "test-utils")]',
+    "#[cfg(not(test))]",
+    "#[cfg(unix)] // see the test in tests/foo.rs",
+    '#[cfg(feature = "serde")] // only used in test builds',
+  ]) {
+    assert.deepEqual(testRegions([line, "pub fn production() {}"]), [], line);
+  }
+});
+
 test("a line that only closes brackets belongs to the block it closes", () => {
   const rust = ["mod tests {", "    #[test]", "    fn works() {", "        check(1);", "    }", "}"];
   const block = enclosingBlock(rust, 5);

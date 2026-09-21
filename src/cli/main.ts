@@ -17,7 +17,7 @@ import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
 import { modelPlanner } from "../plan/planner.ts";
 import type { Planner } from "../review/local-check-run.ts";
-import { renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
+import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
 import { runReview } from "../review/run.ts";
 import { EXIT, ToolError, type IntentSource, type ReviewReport } from "../types.ts";
@@ -46,11 +46,15 @@ Change:
 
 Experimental:
   --experimental-local-check
-                        instead of the usual report, ask about particular calls: for each
-                        requirement, pick the calls it governs, add the others in the same
-                        functions, and observe what each function returns when that call
-                        fails. Reports observations and what it did not check, never a
-                        violation. Nothing about a target is given on the command line.
+                        instead of the usual report, ask about particular calls: start from
+                        the functions the change touched and the functions that call them,
+                        add the calls the requirement's own words lead the planner to, and
+                        observe what each function returns when one of its calls fails.
+                        Reports observations and what it did not check, never a violation.
+                        Nothing about a target is given on the command line.
+  --experimental-candidates-only
+                        with the above: build the set and stop. Prints which calls are
+                        reachable and which fit the budget, and asks no model at all.
 
 Output:
   --json                print the report as JSON instead of Markdown
@@ -107,6 +111,7 @@ function parse(argv: string[]) {
         base: { type: "string" },
         head: { type: "string" },
         "experimental-local-check": { type: "boolean", default: false },
+        "experimental-candidates-only": { type: "boolean", default: false },
         json: { type: "boolean", default: false },
         trace: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
@@ -287,6 +292,28 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, []));
     }
 
+    if (args["experimental-candidates-only"]) {
+      // Before the credentials gate on purpose: this asks nothing, so it must not need an account
+      // to run. The planner and the judge are stubs that throw — if the path ever reaches one, the
+      // run fails loudly rather than quietly making the request this flag promises not to make.
+      if (!args["experimental-local-check"]) throw new ToolError("--experimental-candidates-only only applies with --experimental-local-check", EXIT.config);
+      if (!resolved.spec) throw new ToolError("--experimental-candidates-only asks no model, so the requirements have to come from --intent-spec", EXIT.intent);
+      const asksNothing = () => {
+        throw new Error("--experimental-candidates-only reached a model");
+      };
+      const results = await runLocalCheck(
+        git,
+        revisions,
+        resolved.spec.requirements,
+        { pick: asksNothing } as unknown as Planner,
+        { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
+        pathFilter(config.repository.include, config.repository.ignore),
+        { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
+      );
+      io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
+      return EXIT.ok;
+    }
+
     if (!endpoint) {
       if (config.policy.missing_credentials === "fail") throw new ToolError("no credentials for the judgments: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN", EXIT.provider);
       return output(skippedReport("No credentials for the judgments (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN) were available, so nothing was judged.", revisions, repository, loaded.source, resolved.sources));
@@ -304,7 +331,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // violation, and it does not go through `runReview`.
       const include = pathFilter(config.repository.include, config.repository.ignore);
       const planner = judges.planner ?? modelPlanner(new CloudflareClient(endpoint, { deadline }));
-      const results = await runLocalCheck(git, revisions.after, intent.requirements, planner, judges.provider, include);
+      // `--experimental-candidates-only` returned above, before the credentials gate, so there is
+      // nothing to pass through here.
+      const results = await runLocalCheck(git, revisions, intent.requirements, planner, judges.provider, include, DEFAULT_LOCAL_CHECK);
       io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
       return EXIT.ok;
     }

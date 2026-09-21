@@ -71,6 +71,13 @@ All notable changes to this project are recorded here. The format follows
 
 ### Fixed
 
+- A test module behind a platform-qualified `cfg` is read as a test module. Only the literal
+  `#[cfg(test)]` was matched, so `#[cfg(all(test, unix))]` and `#[cfg(any(test, feature = "…"))]`
+  left the module looking like production code: its helpers could be judged as places, and the
+  `fn`s it defines counted as definitions of names found elsewhere — which is what decides whether
+  a name resolves to one definition or several. A feature whose *name* contains "test", and the
+  `not(test)` attribute that marks what is compiled when the tests are not, are still not test
+  regions.
 - `--pr` now compares the commits the pull request changed. The base came from resolving the base
   branch by name, so for a pull request merged with a merge commit — where the branch has since
   come to contain the head — the merge base of the two was the head itself, and the tool reviewed

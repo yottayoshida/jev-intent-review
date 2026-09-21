@@ -120,10 +120,20 @@ export class Discoverer {
     return result;
   }
 
+  /**
+   * The file's blocks, cached, or null — including for a path the configuration or the name rules
+   * exclude.
+   *
+   * `redact.ts` states it as an invariant: files are excluded by name before they are read. That
+   * held because every path reaching here had come through `search`, which filters. It stopped
+   * holding when a path could arrive from the diff instead, which is filtered by the
+   * configuration's include list alone. Refusing here makes it true of every caller rather than of
+   * the callers that happen to come the long way round.
+   */
   index(path: string): Promise<BlockIndex | null> {
     let index = this.#indexes.get(path);
     if (!index) {
-      index = this.#git.readText(this.#after, path).then((text) => (text === null ? null : new BlockIndex(text.split("\n"))));
+      index = this.#allowed(path) ? this.#git.readText(this.#after, path).then((text) => (text === null ? null : new BlockIndex(text.split("\n")))) : Promise.resolve(null);
       this.#indexes.set(path, index);
     }
     return index;
