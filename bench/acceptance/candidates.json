@@ -232,14 +232,18 @@
       "ref": "ratazzi/quebec#136",
       "a": "pass",
       "requirement": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success.",
-      "source": "PR text: \"Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes\"."
+      "source": "PR text: \"Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes\".",
+      "b": "fail",
+      "bWhy": "The pre-check reports \"the change touched no Rust function at this commit\": the fixed calls in enqueue_job are not in the enumeration at all."
     },
     {
       "order": 29,
       "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
       "a": "pass",
       "requirement": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result.",
-      "source": "PR text: \"entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \\\"neither dir nor file\\\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read\"."
+      "source": "PR text: \"entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \\\"neither dir nor file\\\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read\".",
+      "b": "fail",
+      "bWhy": "The fixed call is held: file_type has no definition in the repository (it is the standard library's). The B target is held too, its callee read as not returning a Result because the signature wraps."
     },
     {
       "order": 30,
@@ -282,7 +286,9 @@
       "ref": "getappz/agentflare#229",
       "a": "pass",
       "requirement": "If flushing, syncing or setting the permissions of a credential file fails during an atomic write, the failure must reach the caller as an error. It must not return a successful result.",
-      "source": "PR text: \"A dropped `sync_all` means the \\\"durable\\\" write may never reach disk; a dropped `set_permissions` means a credential file ... can silently be left world-readable. These now propagate via `?`\"."
+      "source": "PR text: \"A dropped `sync_all` means the \\\"durable\\\" write may never reach disk; a dropped `set_permissions` means a credential file ... can silently be left world-readable. These now propagate via `?`\".",
+      "b": "fail",
+      "bWhy": "Every fixed call goes to the standard library (flush, sync_all, set_permissions, read_to_string: no definition in the repository, grep). applicabilityOf holds a call whose callee has no definition, so this is settled without running the pre-check."
     },
     {
       "order": 37,
@@ -295,7 +301,9 @@
       "ref": "Davidslv/cce-rust#168",
       "a": "pass",
       "requirement": "If the sync marker exists but cannot be read, the failure must reach the caller as an error. It must not be treated as a missing marker and the pull allowed to overwrite the index.",
-      "source": "PR text: \"`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \\\"never pulled\\\", disarming the ... overwrite guard ... `Err` (naming `--force`) for a corrupt one\"."
+      "source": "PR text: \"`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \\\"never pulled\\\", disarming the ... overwrite guard ... `Err` (naming `--force`) for a corrupt one\".",
+      "b": "fail",
+      "bWhy": "The fixed call SyncState::load_strict goes to a name defined twice (src/sync/commands.rs and src/sync/knowledge_commands.rs, grep). applicabilityOf holds a call whose callee is defined more than once; settled without running the pre-check."
     },
     {
       "order": 39,
@@ -308,13 +316,22 @@
       "ref": "AndreaBozzo/dataprof#370",
       "a": "pass",
       "requirement": "If decoding a value fails, the failure must reach the caller as an error. It must not be folded into a default value that is reported as the profile.",
-      "source": "PR text: \"removes silent fallback behavior that could turn malformed input into plausible profile values\"; \"decode paths surface errors instead of folding them into default values\"."
+      "source": "PR text: \"removes silent fallback behavior that could turn malformed input into plausible profile values\"; \"decode paths surface errors instead of folding them into default values\".",
+      "b": "fail",
+      "bWhy": "The only fixed call to a function defined in the repository, count_table_rows, goes to a name defined four times (a trait and three connectors, grep); the rest go to serde_json and the standard library. Settled without running the pre-check. The shipped fix also still returns 0 for that call, with a warning."
     }
   ],
   "gateResult": {
     "examined": 40,
     "cap": 40,
-    "status": "the cap is reached; candidates 36, 38 and 40 are still to be checked against (b)-(d)"
+    "passedA": 12,
+    "passedB": 3,
+    "passedC": 2,
+    "passingAll": [
+      19,
+      23
+    ],
+    "status": "not met at the cap of 40: two cases pass every condition"
   },
   "gateExtension": {
     "when": "2026-09-21, after the gate was not met at 20",
