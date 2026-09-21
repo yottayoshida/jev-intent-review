@@ -11,19 +11,24 @@
 // from the changed code, so they only ever follow `-e`, and revisions follow `--end-of-options`.
 
 import { execFile, spawn } from "node:child_process";
+import { JUDGMENT_ENV } from "../judgments/client.ts";
 import { EXIT, ToolError } from "../types.ts";
 
 const MAX_OUTPUT = 64 * 1024 * 1024;
 export const MAX_BLOB_BYTES = 1024 * 1024;
 
 // git needs none of this run's secrets; a token in its environment would only be one more place
-// it could surface. `JEV_API_URL` is named as well: it is not a secret by its name, but a key can
-// be kept in its query string, and a filter or textconv driver would see the whole environment.
-const SECRET_NAME = /TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|PRIVATE_KEY|^JEV_API_URL$/i;
+// it could surface. Every variable that decides where judgments go is left out as well, whether or
+// not its name says secret: a key can be kept in `JEV_API_URL`'s query string, and a filter or
+// textconv driver would see the whole environment.
+const SECRET_NAME = /TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|API_KEY|PRIVATE_KEY/i;
+const JUDGMENT_NAMES: ReadonlySet<string> = new Set(JUDGMENT_ENV);
 
 function gitEnv(): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {};
-  for (const [key, value] of Object.entries(process.env)) if (!SECRET_NAME.test(key)) env[key] = value;
+  // Upper-cased: on Windows `process.env` reads a name whatever its case, so `Jev_Api_Url` is read
+  // by `endpointFromEnv` and must be left out here as well.
+  for (const [key, value] of Object.entries(process.env)) if (!SECRET_NAME.test(key) && !JUDGMENT_NAMES.has(key.toUpperCase())) env[key] = value;
   return { ...env, GIT_CONFIG_NOSYSTEM: "1", GIT_TERMINAL_PROMPT: "0", LC_ALL: "C" };
 }
 

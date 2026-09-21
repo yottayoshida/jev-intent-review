@@ -2,6 +2,7 @@
 // model several times. No discovery, no aggregation: only whether the judgment itself is right.
 //
 //   CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=... node bench/probe-jev.ts [runs]
+//   JEV_PROVIDER=typesafe TYPESAFE_API_KEY=... node bench/probe-jev.ts [runs]   (or vercel, AI_GATEWAY_API_KEY)
 //   JEV_API_URL=... JEV_API_TOKEN=... node bench/probe-jev.ts [runs]
 //
 // Expected: oauth and websocket `violates`; password and api-key not `violates`.
@@ -9,7 +10,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { enclosingBlock } from "../src/change/blocks.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { CANDIDATE_QUESTIONS } from "../src/judgments/questions.ts";
 import { FIXTURES } from "../test/helpers/repo.ts";
@@ -53,11 +54,11 @@ const cases: Case[] = [
 
 const endpoint = endpointFromEnv();
 if (!endpoint) {
-  console.error("set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
+  console.error("set JEV_PROVIDER and that host's key, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
   process.exit(10);
 }
-const client = new CloudflareClient(endpoint);
-console.log(`endpoint ${client.origin} (from ${endpoint.source})`);
+const client = new JevClient(endpoint);
+console.log(`endpoint ${client.where}, model ${client.model}`);
 const jev = new JevProvider(client);
 const runs = Number(process.argv[2] ?? 3);
 
@@ -77,7 +78,7 @@ for (const c of cases) {
     const violates = a.satisfaction?.choice === "violates";
     if (violates === c.expectViolation) right += 1;
     rows.push(
-      `    run ${i + 1}: relevance ${a.relevance?.choice} ${a.relevance?.confidence.toFixed(2)} · satisfaction ${a.satisfaction?.choice} ${a.satisfaction?.confidence.toFixed(2)} ${JSON.stringify(a.satisfaction?.probabilities)} · ${Date.now() - started} ms`,
+      `    run ${i + 1}: relevance ${a.relevance?.choice} ${a.relevance?.probability.toFixed(2)} · satisfaction ${a.satisfaction?.choice} ${a.satisfaction?.probability.toFixed(2)} ${JSON.stringify(a.satisfaction?.probabilities)} · ${Date.now() - started} ms`,
     );
   }
   if (right !== runs) failures += 1;

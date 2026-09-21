@@ -262,15 +262,25 @@ test("git runs without the secrets in this process's environment", async () => {
   process.env.JIR_TEST_API_TOKEN = "must-not-reach-git";
   // Not a secret by its name, but a key can be kept in its query string.
   process.env.JEV_API_URL = "https://judge.example.com/ai/run?key=must-not-reach-git-either";
+  // Every variable that decides where judgments go, secret by its name or not.
+  process.env.TYPESAFE_API_KEY = "must-not-reach-git-typesafe";
+  process.env.AI_GATEWAY_API_KEY = "must-not-reach-git-vercel";
+  process.env.JEV_PROVIDER = "typesafe";
+  // Where `process.env` reads a name whatever its case (Windows), this is JEV_PROVIDER: left out too.
+  process.env.Jev_Provider = "must-not-reach-git-in-any-case";
   try {
     const git = await Git.open(repo.dir);
     const env = await git.text(["-c", "alias.envdump=!env", "envdump"]);
     assert.ok(env.includes("GIT_CONFIG_NOSYSTEM=1"), "the alias did run");
     assert.ok(!env.includes("must-not-reach-git"));
-    assert.ok(!env.includes("JEV_API_URL"), env.split("\n").filter((l) => l.startsWith("JEV")).join(" "));
+    for (const name of ["JEV_API_URL", "TYPESAFE_API_KEY", "AI_GATEWAY_API_KEY", "JEV_PROVIDER", "Jev_Provider"]) assert.ok(!env.includes(`${name}=`), env.split("\n").filter((l) => /^(JEV|TYPESAFE|AI_GATEWAY)/i.test(l)).join(" "));
   } finally {
     delete process.env.JIR_TEST_API_TOKEN;
     delete process.env.JEV_API_URL;
+    delete process.env.TYPESAFE_API_KEY;
+    delete process.env.AI_GATEWAY_API_KEY;
+    delete process.env.JEV_PROVIDER;
+    delete process.env.Jev_Provider;
     repo.remove();
   }
 });

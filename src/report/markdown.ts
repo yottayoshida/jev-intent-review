@@ -3,6 +3,7 @@
 // requirement text, code, author names) is put inside a code span or code block, where GitHub
 // renders neither Markdown nor HTML. The result line is drawn from the verdict enum only.
 
+import { hostName } from "../judgments/client.ts";
 import { probabilityOf } from "../review/requirement.ts";
 import type { CandidateOutcome, CandidateResult, Location, ReviewReport, RequirementResult, Status } from "../types.ts";
 
@@ -131,8 +132,6 @@ function requirementSection(report: ReviewReport, result: RequirementResult): st
   return lines;
 }
 
-const CLOUDFLARE_ORIGIN = "https://api.cloudflare.com";
-
 export function renderMarkdown(report: ReviewReport): string {
   const out: string[] = ["# jev-intent-review", "", resultLine(report), ""];
 
@@ -142,10 +141,11 @@ export function renderMarkdown(report: ReviewReport): string {
     const sources = report.sources.map((s) => `${codeSpan(s.id)}${s.author ? ` by ${codeSpan(s.author)}` : ""}`);
     out.push(`Intent from ${sources.join(", ")}`);
   }
-  // Whoever answers the judgments decides this report, so an endpoint other than the default is
-  // said where a reader of the summary sees it, not only in the section at the end.
-  if (report.sent.endpoint !== undefined && report.sent.endpoint !== CLOUDFLARE_ORIGIN) {
-    out.push(`Judged by ${codeSpan(report.sent.endpoint)}, not ${codeSpan(CLOUDFLARE_ORIGIN)}`);
+  // Whoever answers the judgments decides this report, so an endpoint the user pointed at by URL,
+  // rather than one of the named hosts, is said where a reader of the summary sees it. Decided by
+  // how it was chosen, not by its origin: a URL that happens to be Cloudflare's is still a URL.
+  if (report.sent.endpoint !== undefined && report.sent.host === "custom") {
+    out.push(`Judged by ${codeSpan(report.sent.endpoint)}, an endpoint set by JEV_API_URL`);
   }
   out.push("");
 
@@ -177,7 +177,7 @@ export function renderMarkdown(report: ReviewReport): string {
 
   out.push("## Sent to the judgment model", "");
   out.push(`- ${plural(report.sent.requests, "request")}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
-  if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}`);
+  if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}${report.sent.host === undefined ? "" : ` (${hostName(report.sent.host)})`}`);
   if (report.sent.locations.length > 0) {
     out.push("", `<details><summary>${plural(report.sent.locations.length, "location")} sent</summary>`, "");
     for (const location of report.sent.locations) out.push(`- ${where(location)}`);

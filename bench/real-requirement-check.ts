@@ -25,7 +25,7 @@
 // `staging_listing_that_stops_partway_is_reported_as_unreadable` with `got "  [Staging] empty\n"`,
 // which is the defect issue #485 was filed about, reproduced. The results are in the log.
 //
-// The request budget is the product's own: `CloudflareClient` counts what goes over the wire,
+// The request budget is the product's own: `JevClient` counts what goes over the wire,
 // retries included, and refuses past `maxRequests`. Nothing here counts separately.
 //
 // The log holds the redacted packet that was sent — once per distinct packet under `packets`, with
@@ -41,7 +41,7 @@ import { dirname, join } from "node:path";
 import { defines } from "../src/change/blocks.ts";
 import { Discoverer } from "../src/discovery/discover.ts";
 import { buildEvidence, type EvidenceLimits } from "../src/evidence/builder.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { Git } from "../src/repository/git.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
@@ -202,9 +202,9 @@ const hardLimit = plan.measurement.requestBudget.hardLimit;
 const dry = process.env.DRY_RUN === "1";
 
 const endpoint = endpointFromEnv();
-if (!endpoint && !dry) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
+if (!endpoint && !dry) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
 // The product's own budget: retries included, and it refuses rather than overrunning.
-const client = new CloudflareClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
+const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", host: "custom" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
 const provider = new JevProvider(client);
 
 const git = new Git(repoDir);

@@ -60,7 +60,7 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
           {
             candidate: { path: "src/auth/password.ts", startLine: 6, endLine: 13, symbol: "loginWithPassword", changed: true, reasons: [] },
             outcome: "satisfies",
-            satisfaction: { choice: "satisfies", confidence: 0.99, probabilities: {} },
+            satisfaction: { choice: "satisfies", probability: 0.99, confidence: 0.99, probabilities: {} },
             truncated: false,
             cut: { own: false, context: false, ambiguous: false },
             evidence: [],
@@ -69,7 +69,7 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
           {
             candidate: { path: "src/auth/oauth.ts", startLine: 16, endLine: 23, changed: false, reasons: [] },
             outcome: "violates",
-            satisfaction: { choice: "violates", confidence: 0.47, probabilities: { violates: 0.61 } },
+            satisfaction: { choice: "violates", probability: 0.61, confidence: 0.47, probabilities: { violates: 0.61 } },
             truncated: false,
             cut: { own: false, context: false, ambiguous: false },
             evidence: [{ path: "src/auth/oauth.ts", startLine: 22, endLine: 22 }],
@@ -117,17 +117,27 @@ test("the Markdown report shows each path, whether the change touched it, and th
   assert.match(text, /&lt;img src=x&gt;/);
 });
 
-test("the report names the endpoint, and says so at the top when it is not the default", () => {
+test("the report names the endpoint and its host, and says so at the top when it was set by JEV_API_URL", () => {
   const plain = renderMarkdown(report());
   assert.ok(!plain.includes("Endpoint:"), "nothing to say when the run did not record one");
 
-  const cloudflare = renderMarkdown(report({ sent: { ...report().sent, endpoint: "https://api.cloudflare.com" } }));
-  assert.match(cloudflare, /- Endpoint: `https:\/\/api\.cloudflare\.com`/);
-  assert.ok(!cloudflare.includes("Judged by"), "the default endpoint needs no warning");
+  // The three named hosts are equals: each is named, none is warned about.
+  for (const [host, endpoint, name] of [
+    ["cloudflare", "https://api.cloudflare.com", "Cloudflare Workers AI"],
+    ["typesafe", "https://api.typesafe.ai", "TypeSafe"],
+    ["vercel", "https://ai-gateway.vercel.sh", "Vercel AI Gateway"],
+  ] as const) {
+    const text = renderMarkdown(report({ sent: { ...report().sent, endpoint, host } }));
+    assert.ok(text.includes(`- Endpoint: \`${endpoint}\` (${name})`), text);
+    assert.ok(!text.includes("Judged by"), `${host} needs no warning`);
+  }
 
-  // Whoever answers the judgments decides the verdict, so another endpoint is named up front.
-  const other = renderMarkdown(report({ sent: { ...report().sent, endpoint: "https://judge.example.com" } }));
-  assert.match(other, /Judged by `https:\/\/judge\.example\.com`, not `https:\/\/api\.cloudflare\.com`/);
+  // Whoever answers the judgments decides the verdict, so an endpoint the user pointed at by URL is
+  // named up front — decided by how it was chosen, so a URL on Cloudflare's own origin still is.
+  for (const endpoint of ["https://judge.example.com", "https://api.cloudflare.com"]) {
+    const other = renderMarkdown(report({ sent: { ...report().sent, endpoint, host: "custom" } }));
+    assert.ok(other.includes(`Judged by \`${endpoint}\`, an endpoint set by JEV_API_URL`), other);
+  }
 });
 
 test("a note cannot become a link, whatever the text in it came from", () => {

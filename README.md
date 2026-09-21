@@ -71,7 +71,7 @@ typed Jev judgments
 calls worth checking
 ```
 
-[Jev](https://developers.cloudflare.com/ai/models/typesafe/jev/) is used for small, fixed questions with probability distributions rather than open-ended review prose.
+[Jev](https://docs.typesafe.ai/introduction) is used for small, fixed questions with probability distributions rather than open-ended review prose.
 
 The evidence and judgments are kept visible so a finding can be inspected or rejected by a human.
 
@@ -135,19 +135,22 @@ Use `--json` for the full machine-readable report.
 
 ## Jev endpoint
 
-The current implementation calls `typesafe/jev` through Cloudflare Workers AI or another endpoint implementing the same run-request API.
+Jev is served by Cloudflare Workers AI, by TypeSafe itself, and by Vercel AI Gateway. Set `JEV_PROVIDER` to `cloudflare`, `typesafe` or `vercel` and that host's key, and this tool sends every judgment in that host's documented request form to that host's fixed URL, and to no other (Vercel AI Gateway then routes it to a provider of Jev; as of September 2026 that is TypeSafe only).
+
+| `JEV_PROVIDER` | Key | Sent to | Jev's name there |
+|---|---|---|---|
+| `cloudflare` | `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` | `https://api.cloudflare.com/client/v4/accounts/<id>/ai/run` | `typesafe/jev` |
+| `typesafe` | `TYPESAFE_API_KEY` | `https://api.typesafe.ai/v1/systemone` | `jev-latest` |
+| `vercel` | `AI_GATEWAY_API_KEY` | `https://ai-gateway.vercel.sh/typesafe/v1/systemone` | `typesafe-ai/jev` |
 
 ```sh
-export CLOUDFLARE_ACCOUNT_ID=...
-export CLOUDFLARE_API_TOKEN=...
+export JEV_PROVIDER=typesafe
+export TYPESAFE_API_KEY=...
 ```
 
-or:
+Without `JEV_PROVIDER`, the Cloudflare pair alone still selects Cloudflare, as before, and `JEV_API_URL` with `JEV_API_TOKEN` selects an endpoint of your own that serves the Workers AI run request. `TYPESAFE_API_KEY` or `AI_GATEWAY_API_KEY` on its own selects nothing: a key kept in the environment for something else does not start sending your code anywhere.
 
-```sh
-export JEV_API_URL=...
-export JEV_API_TOKEN=...
-```
+**Only Cloudflare has been called for real.** The TypeSafe and Vercel requests follow their documentation ([TypeSafe](https://docs.typesafe.ai/api), [Vercel](https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe)) and are tested against a stand-in, but the maintainer has no key for either: both addresses were checked with a deliberately invalid key, and each refused it with a JSON `authentication_error` (401) at the documented path and answered 404 one path segment off, but no judgment has been received from either. If a run fails there, the error names the host and what it answered; please [open an issue](https://github.com/yottayoshida/jev-intent-review/issues) with it. The published measurements were taken with `typesafe/jev` on Cloudflare; `jev-latest` may be a different version of Jev.
 
 No other model is sent requests by this tool.
 

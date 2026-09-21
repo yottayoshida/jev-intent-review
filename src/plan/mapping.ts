@@ -80,7 +80,7 @@ export interface MappingAnswer {
 export function acceptMapping(answer: ChoiceAnswer | undefined): MappingAnswer {
   if (!answer) return { verdict: "no_answer", probability: 0, probabilities: {}, governs: false };
   const verdict = (Object.hasOwn(MAPPING_CRITERIA, answer.choice) ? answer.choice : "unknown") as MappingVerdict;
-  const probability = answer.probabilities[answer.choice] ?? answer.confidence;
+  const probability = answer.probability;
   return { verdict, probability, probabilities: { ...answer.probabilities }, governs: verdict === "applies" && probability >= MAPPING_BAR };
 }
 

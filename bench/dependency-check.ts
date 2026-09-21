@@ -24,7 +24,7 @@ import { dirname, join } from "node:path";
 import { defines } from "../src/change/blocks.ts";
 import { Discoverer } from "../src/discovery/discover.ts";
 import { buildEvidence, type Packet, type Related } from "../src/evidence/builder.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { Git } from "../src/repository/git.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
@@ -129,8 +129,8 @@ const dry = process.env.DRY_RUN === "1";
 const hardLimit = plan.requestBudget.hardLimit;
 
 const endpoint = endpointFromEnv();
-if (!endpoint && !dry) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
-const client = new CloudflareClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
+if (!endpoint && !dry) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
+const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", host: "custom" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
 const provider = new JevProvider(client);
 const git = new Git(repoDir);
 
@@ -171,7 +171,7 @@ async function measure(version: VersionId, id: string, state: Packet, truth: str
       const p = result ? probabilityOf(result, result.choice) : 0;
       const s = score(result?.choice ?? "none", p, truth);
       const { verdict, why } = verdictOfV3(result?.choice, p);
-      const pTrue = result?.probabilities?.[truth] ?? (result?.choice === truth ? result.confidence : 0);
+      const pTrue = result?.probabilities?.[truth] ?? (result?.choice === truth ? result.probability : 0);
       t.runs += 1;
       if (s.choiceMatch) t.choiceMatch += 1;
       if (s.counted) t.counted += 1;

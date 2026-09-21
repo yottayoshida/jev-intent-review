@@ -35,7 +35,7 @@ import { Discoverer } from "../src/discovery/discover.ts";
 import { buildEvidence, type Packet } from "../src/evidence/builder.ts";
 import { readModelJson } from "../src/intent/compiler.ts";
 import { SUPERSEDED_PLANNING_MODEL as COMPILER_MODEL } from "./superseded-models.ts";
-import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
+import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import { Git } from "../src/repository/git.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
@@ -100,8 +100,8 @@ const dry = process.env.DRY_RUN === "1";
 const HARD_LIMIT = 100;
 
 const endpoint = endpointFromEnv();
-if (!endpoint && !dry) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
-const client = new CloudflareClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : HARD_LIMIT });
+if (!endpoint && !dry) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
+const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", host: "custom" }, { maxRetries: 0, maxRequests: dry ? 0 : HARD_LIMIT });
 const provider = new JevProvider(client);
 const git = new Git(repoDir);
 

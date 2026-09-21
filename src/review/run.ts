@@ -9,7 +9,7 @@ import { isSensitivePath } from "../evidence/redact.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
-import { FATAL_KINDS, ProviderError } from "../judgments/cloudflare.ts";
+import { FATAL_KINDS, ProviderError, type Host } from "../judgments/client.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, COMPLETENESS_QUESTIONS, QUESTIONS_HASH } from "../judgments/questions.ts";
 import type { Git } from "../repository/git.ts";
@@ -32,6 +32,7 @@ export interface RunInput {
   trace: (line: string) => void;
   notes?: string[]; // from resolving the intent, for the report
   endpoint?: string; // where the judgments were sent: scheme, host and port
+  host?: Host; // which host that is, as the user chose it
 }
 
 const BUDGET = "the run's request, byte or time budget ran out";
@@ -254,7 +255,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     requirements,
     unexpectedChanges: changes.unexpected,
     discovery: { candidateCount, changedCandidates, unchangedCandidates: candidateCount - changedCandidates, incompleteReasons, searches },
-    sent: { requests: sent.requests, bytes: sent.bytes, locations: [...sentLocations.values()], ...(input.endpoint ? { endpoint: input.endpoint } : {}) },
+    sent: { requests: sent.requests, bytes: sent.bytes, locations: [...sentLocations.values()], ...(input.endpoint ? { endpoint: input.endpoint } : {}), ...(input.host ? { host: input.host } : {}) },
     metadata: {
       repository: input.repository,
       base: revisions.before,

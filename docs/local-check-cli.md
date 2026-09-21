@@ -82,7 +82,9 @@ One repository (omamori `#468` / PR `#476`), two requirements that state how a f
 handled, five branches, one run each: the shipped code, two single-call mutations and two
 behaviour-preserving rewrites of the same calls. Each mutation was listed at its own call and
 nowhere else; the shipped code and both rewrites listed nothing — ten cells of ten, against a table
-fixed before the first request. 76 requests per run, 380 in all, every one to `typesafe/jev`.
+fixed before the first request. 76 requests per run, 380 in all, every one to `typesafe/jev` on
+Cloudflare Workers AI. TypeSafe's `jev-latest` and Vercel's `typesafe-ai/jev` were not measured, and
+may be a different version of Jev.
 
 Reproducible from what is committed, without sending anything:
 
@@ -97,9 +99,11 @@ itself as the governed call, not the functions that receive it (`bench/logs/jev-
 
 ## Only Jev
 
-The transport refuses any model but `typesafe/jev` before a request is built, so nothing else can
-be reached from this tool. `test/only-jev.test.ts` checks it at the transport and over a whole run
-against a capturing endpoint.
+The transport refuses any model but Jev's name on the host it sends to — `typesafe/jev` on
+Cloudflare and for `JEV_API_URL`, `jev-latest` on TypeSafe, `typesafe-ai/jev` on Vercel AI Gateway —
+before a request is built, so nothing else can be reached from this tool. `test/only-jev.test.ts`
+checks it at the transport on every host, and over a whole run against a capturing endpoint and
+against a stand-in for each named host.
 
 ## Record of the experiments
 

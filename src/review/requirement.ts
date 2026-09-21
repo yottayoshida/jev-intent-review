@@ -20,9 +20,8 @@ export interface Thresholds {
 }
 
 export function probabilityOf(answer: ChoiceAnswer, choice: string): number {
-  const p = answer.probabilities[choice];
-  if (typeof p === "number") return p;
-  return answer.choice === choice ? answer.confidence : 0;
+  if (answer.choice === choice) return answer.probability;
+  return answer.probabilities[choice] ?? 0;
 }
 
 const fixed = (n: number) => n.toFixed(2);

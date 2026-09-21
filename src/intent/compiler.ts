@@ -5,7 +5,7 @@
 // in the text it names is dropped and recorded, never kept.
 
 import { cut, redact } from "../evidence/redact.ts";
-import { ProviderError, type CloudflareClient } from "../judgments/cloudflare.ts";
+import { ProviderError, type JevClient } from "../judgments/client.ts";
 import { EXIT, REQUIREMENT_KINDS, ToolError, type Ambiguity, type IntentSource, type IntentSpec, type Requirement } from "../types.ts";
 import { MAX_REQUIREMENT_CHARS, validateIntentSpec } from "./schema.ts";
 

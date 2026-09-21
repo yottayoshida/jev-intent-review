@@ -1,10 +1,10 @@
 // The judgment interface (spec §29) and the wrapper that limits how many judgments run at once.
 // Adapters other than Jev implement JudgmentProvider; nothing else changes. The request, byte and
-// time budget is enforced by the transport (CloudflareClient), the only place that sees every
+// time budget is enforced by the transport (JevClient), the only place that sees every
 // request actually sent, retries included.
 
 import type { ChoiceAnswer } from "../types.ts";
-import { ProviderError } from "./cloudflare.ts";
+import { ProviderError } from "./client.ts";
 
 export interface ChoiceQuestion {
   type: "choice";

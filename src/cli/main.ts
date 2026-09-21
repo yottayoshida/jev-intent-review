@@ -8,8 +8,8 @@ import { loadConfig, type Config } from "../config/config.ts";
 import { compileChecklist } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
-import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
-import { JevProvider, JEV_MODEL } from "../judgments/jev.ts";
+import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedProvider, PROVIDER_KEYS, ProviderError, type Endpoint } from "../judgments/client.ts";
+import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
@@ -69,17 +69,21 @@ Output:
   -h, --help            show this help
   --version             show the version
 
-Model: typesafe/jev, and nothing else. A request for any other model is refused before it
-is built, so no other model can be reached from here.
+Model: Jev, and nothing else -- typesafe/jev on Cloudflare and for JEV_API_URL, jev-latest on
+TypeSafe, typesafe-ai/jev on Vercel AI Gateway. A request for any other model is refused
+before it is built, so no other model can be reached from here.
 
 Intent: --intent-spec, or an acceptance-criteria list in the issue, the pull request or
 --intent (a heading such as "Acceptance criteria" and one item per line). Ordinary prose is
 not turned into requirements -- no model writes them -- and a run given only prose stops
 and says which two forms do work.
 
-Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for Cloudflare Workers AI, or
-JEV_API_URL and JEV_API_TOKEN for any other endpoint that serves a Workers AI run request;
-GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr and --issue.
+Environment: JEV_PROVIDER names where Jev is asked -- cloudflare (CLOUDFLARE_ACCOUNT_ID and
+CLOUDFLARE_API_TOKEN), typesafe (TYPESAFE_API_KEY) or vercel (AI_GATEWAY_API_KEY). Each key
+goes only to its own host's fixed address. Without JEV_PROVIDER: JEV_API_URL and JEV_API_TOKEN
+for an endpoint that serves a Workers AI run request, else the Cloudflare pair; TYPESAFE_API_KEY
+or AI_GATEWAY_API_KEY alone is not used. GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr
+and --issue.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
 10 configuration error, 11 intent could not be resolved, 12 judgment provider failed
@@ -105,6 +109,8 @@ function flat(text: string): string {
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
   judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; sent: () => { requests: number; bytes: number }; origin: string };
+  /** The network under the real client: a test stands in for a host here and keeps the wiring from host to request shape. */
+  fetch?: typeof fetch;
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -144,8 +150,8 @@ function parse(argv: string[]) {
   return { ...values, prNumber: number("pr"), issueNumber: number("issue") };
 }
 
-function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
-  const client = new CloudflareClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
+function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, fetch?: typeof globalThis.fetch) {
+  const client = new JevClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes, ...(fetch ? { fetch } : {}) });
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
     sent: () => ({ ...client.sent }),
@@ -202,7 +208,7 @@ async function baseOf(git: Git, pr: PullRequest, head: string): Promise<string> 
   return best?.rev ?? shared ?? known ?? pr.baseRefName;
 }
 
-function skippedReport(reason: string, revisions: Revisions, repository: string, configSource: string, sources: IntentSource[]): ReviewReport {
+function skippedReport(reason: string, revisions: Revisions, repository: string, configSource: string, sources: IntentSource[], model: string): ReviewReport {
   return {
     version: 1,
     tool: { name: "jev-intent-review", version: VERSION },
@@ -215,7 +221,7 @@ function skippedReport(reason: string, revisions: Revisions, repository: string,
     unexpectedChanges: [],
     discovery: { candidateCount: 0, changedCandidates: 0, unchangedCandidates: 0, incompleteReasons: [], searches: [] },
     sent: { requests: 0, bytes: 0, locations: [] },
-    metadata: { repository, base: revisions.before, head: revisions.after, model: JEV_MODEL, questionsHash: QUESTIONS_HASH, configSource, notes: [] },
+    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: [] },
   };
 }
 
@@ -251,7 +257,16 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     } catch (error) {
       throw new ToolError(error instanceof EndpointError ? error.message : String(error), EXIT.config);
     }
-    if (endpoint) trace(`judgments go to ${new URL(endpoint.url).origin} (from ${endpoint.source})`);
+    if (endpoint) trace(`judgments go to ${hostName(endpoint.host)} (${new URL(endpoint.url).origin})`);
+    // What a skipped report says would have been asked: Jev under the chosen host's name, which is
+    // the named host's even when its key is missing. And what is missing, said as exactly as it can
+    // be: a secret name mistyped in a workflow is otherwise a green run that judged nothing.
+    const named = namedProvider(io.env);
+    const model = jevModel(endpoint?.host ?? named ?? "cloudflare");
+    const needed =
+      named === undefined
+        ? "JEV_PROVIDER and that host's key, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN"
+        : `${PROVIDER_KEYS[named].join(" and ")}, which JEV_PROVIDER=${named} needs`;
 
     const git = await Git.open(io.cwd);
     const origin = await git.text(["remote", "get-url", "origin"], [0, 2, 128]).catch(() => "");
@@ -301,7 +316,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     for (const source of resolved.sources) trace(`intent source ${source.id} (${source.type}, authority ${source.authority}${source.author ? `, by ${source.author}` : ""})`);
     if (resolved.sources.length === 0) {
       if (config.policy.no_intent === "fail") throw new ToolError("no intent was found: the pull request links no issue and has no description, and no --intent was given", EXIT.intent);
-      return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, []));
+      return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, [], model));
     }
 
     if (args["experimental-candidates-only"]) {
@@ -326,11 +341,11 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     }
 
     if (!endpoint) {
-      if (config.policy.missing_credentials === "fail") throw new ToolError("no credentials for the judgments: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN", EXIT.provider);
-      return output(skippedReport("No credentials for the judgments (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN) were available, so nothing was judged.", revisions, repository, loaded.source, resolved.sources));
+      if (config.policy.missing_credentials === "fail") throw new ToolError(`no credentials for the judgments: set ${needed}`, EXIT.provider);
+      return output(skippedReport(`No credentials for the judgments (${needed}) were available, so nothing was judged.`, revisions, repository, loaded.source, resolved.sources, model));
     }
     const deadline = Date.now() + config.limits.max_seconds * 1000;
-    const judges = (deps.judges ?? defaultJudges)(endpoint, config, deadline);
+    const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, deps.fetch);
 
     // No model writes the requirements. Jev answers typed questions; it does not author a spec,
     // and reaching for a general instruct model to do it is how a second model got in. Prose that
@@ -358,7 +373,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       return EXIT.ok;
     }
 
-    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes, endpoint: judges.origin });
+    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes, endpoint: judges.origin, host: endpoint.host });
     return output(report);
   } catch (error) {
     if (error instanceof ToolError) {

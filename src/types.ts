@@ -1,6 +1,8 @@
 // Shapes shared across stages. `ReviewReport` is what `--json` prints, so a change here is a
 // change to the tool's output contract.
 
+import type { Host } from "./judgments/client.ts";
+
 export const REQUIREMENT_KINDS = [
   "behavior",
   "invariant",
@@ -101,7 +103,10 @@ export interface Candidate extends Location {
 
 export interface ChoiceAnswer {
   choice: string;
-  confidence: number;
+  /** The chosen option's probability, checked to be within 0..1: every decision reads this one. */
+  probability: number;
+  /** As the host gave it, when it did. */
+  confidence?: number;
   probabilities: Record<string, number>;
 }
 
@@ -202,7 +207,8 @@ export interface ReviewReport {
     incompleteReasons: string[];
     searches: SearchRecord[];
   };
-  sent: { requests: number; bytes: number; locations: Location[]; endpoint?: string };
+  /** `host`: which host `endpoint` is — `custom` when it was set by `JEV_API_URL`. */
+  sent: { requests: number; bytes: number; locations: Location[]; endpoint?: string; host?: Host };
   metadata: {
     repository: string;
     base: string;

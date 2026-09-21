@@ -36,6 +36,7 @@ import { analyzeChange } from "../change/seeds.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
+import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import type { Candidate, Requirement } from "../types.ts";
@@ -261,7 +262,15 @@ export async function runLocalCheck(
 
       // Two questions, two requests. The mapping is about the requirement's words and must not be
       // asked under the failure the observation assumes — nor in the same breath as it.
-      const mappingAnswers = await judge.judge(evidence.packet, mappingQuestionFor(site.fn, site.call, expression)).catch(() => ({}) as Record<string, never>);
+      let unanswered = "the mapping question was not answered";
+      const mappingAnswers = await judge.judge(evidence.packet, mappingQuestionFor(site.fn, site.call, expression)).catch((error: unknown) => {
+        // A failure that ends the run ends it here. Any other is this call's alone, and the report
+        // says what kind it was and which host it came from — never the host's own words, which
+        // would be printed as Markdown.
+        if (!(error instanceof ProviderError) || FATAL_KINDS.has(error.kind)) throw error;
+        unanswered = `the mapping question was not answered (${error.kind}${error.where === undefined ? "" : ` from ${error.where}`})`;
+        return {} as Record<string, never>;
+      });
       mapped += 1;
       const mapping = acceptMapping(mappingAnswers.requirement_governs);
       mappings.push({
@@ -276,7 +285,7 @@ export async function runLocalCheck(
         governs: mapping.governs,
         why:
           mapping.verdict === "no_answer"
-            ? "the mapping question was not answered"
+            ? unanswered
             : mapping.governs
               ? `the requirement is read as requiring this of the call (${mapping.probability.toFixed(2)})`
               : `read as \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}), which is below the bar of ${MAPPING_BAR} or not a requirement of this call`,
