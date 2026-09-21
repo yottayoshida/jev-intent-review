@@ -1,0 +1,84 @@
+{
+  "planVersion": "1",
+  "writtenAt": "2026-09-21",
+  "note": "Method A's plans: what a person decided, written and committed before any request of the comparison. Method B never sees this file — it is the thing B is being compared against.",
+
+  "questionVersion": "v5 (bench/check-questions-v5.ts). The frozen v4 hard-codes an iterator's shape ('at one iteration', a `finite` field) and neither new target iterates, so the template had to give up one field. Recorded in the spec's own terms: the frozen question did not travel to the first new kind it met, and v4's numbers are not v5's.",
+
+  "whoDecidedWhat": {
+    "requirement and its quote": "person (from the primary source, before the cases were built)",
+    "target file and symbol": "person",
+    "the failing operation": "person",
+    "the condition": "person",
+    "needed referents": "person",
+    "what is out of scope": "person",
+    "the mutations and their expected behaviour": "person, verified by running the code",
+    "the answer for any packet": "the model, never the person"
+  },
+
+  "regression": {
+    "why": "v5 is a different wording, so the case v4 met its exit condition on is measured again rather than carried over.",
+    "case": "omamori#553 R2 × `staging_info_from`, from bench/fixtures/omamori-553-r2/",
+    "conditions": ["correct", "target-mutant"],
+    "condition": {
+      "target": "staging_info_from",
+      "setup": "`dir` is a path and the function has just been entered.",
+      "occurrence": "At one iteration",
+      "operation": "the iterator `entries`",
+      "yields": "`Err(io_error)`",
+      "others": "Every other operation the function reaches succeeds.",
+      "extra": "The iterator is finite."
+    },
+    "neededReferents": ["collect_listing"],
+    "expected": { "correct": "returns_error", "target-mutant": "returns_success" }
+  },
+
+  "cases": [
+    {
+      "id": "omamori-read-baseline",
+      "file": "src/integrity.rs",
+      "symbol": "read_baseline",
+      "neededReferents": ["read_to_string_capped"],
+      "condition": {
+        "target": "read_baseline",
+        "setup": "`base_dir` is a directory, and the baseline file under it exists.",
+        "occurrence": "When it is called",
+        "operation": "`crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "extra": ""
+      },
+      "whyThatOperation": "It is the only call in the function that can fail with an io error, and it is the one PR #476 routed through the shared helper. The `path.exists()` check above it is why the condition says the file exists — without that, the function returns `Ok(None)` before reaching the read, for a reason that is not the one under test.",
+      "notCovered": [
+        "Every other caller of `read_to_string_capped`, and the other paths #468 lists (`audit.jsonl.hwm`, `break-glass.json`, `config.toml`).",
+        "Whether `write_baseline` refuses the same way.",
+        "What the callers of `read_baseline` do with either answer.",
+        "The JSON parse failure below the read, which the condition excludes."
+      ]
+    },
+    {
+      "id": "omamori-raw-override-disables",
+      "file": "src/config.rs",
+      "symbol": "raw_override_disables",
+      "neededReferents": ["read_to_string_capped"],
+      "condition": {
+        "target": "raw_override_disables",
+        "setup": "`path` names a file that exists.",
+        "occurrence": "When it is called",
+        "operation": "`crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)`",
+        "yields": "`Err(io_error)`",
+        "others": "Every other operation the function reaches succeeds.",
+        "extra": ""
+      },
+      "whyThatOperation": "Same helper, at the config path, which #468 lists among the ones that hang. The function also swallows a TOML parse failure on purpose; 'every other operation the function reaches succeeds' keeps that path out, as the condition did for the parse failure in the earlier work.",
+      "notCovered": [
+        "The deliberate swallow of a TOML parse failure, which is not a defect and is excluded by the condition.",
+        "`config enable`'s redirect, which is what the function's doc comment says the answer is for.",
+        "The two sibling functions in the same file with the same shape — grep found three call sites of this helper with `?` in `config.rs`.",
+        "Every other path #468 lists."
+      ]
+    }
+  ],
+
+  "sharedSource": "Both cases come from omamori#468 / PR#476. The third case, in another repository, was dropped in #19 because its mutated branch is unreachable on this machine. Two cases from one requirement is thinner than intended and is disclosed rather than presented as two independent requirements."
+}
