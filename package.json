@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Check a pull request against requirements that state how a failure must be handled, by asking Jev about particular calls",
   "license": "MIT OR Apache-2.0",
-  "private": true,
   "type": "module",
   "engines": {
     "node": ">=22.18"
@@ -42,5 +41,8 @@
     "workers-ai",
     "jev",
     "rust"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
