@@ -5,6 +5,13 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-21
+
+### Changed
+
+- **The README says what the tool is for before what v0.1 does.** It leads with the idea — the diff is a search hint, not the review boundary: start from the requirement, find where in the repository it applies, and ask whether the code after the pull request satisfies it, including code the diff did not touch. v0.1's constraints (Rust, requirements about how failures propagate, changed functions and callers one hop out, explicit requirements, Jev only) are stated as the current scope, and the Jev endpoint as a constraint of this implementation. The package description is at the same level. The measurement, the output sections and the exit-code rules moved, unchanged in substance, to the English reference at the top of `docs/local-check-cli.md`. No code changed.
+- `--help` and the reference now list intent failures (exit 11) among the ones that end a run nonzero; the wording before this left them out.
+
 ## [0.1.0] - 2026-09-21
 
 ### Added
@@ -30,5 +37,6 @@ All notable changes to this project are recorded here. The format follows
 - A test module behind a platform-qualified `cfg` is read as a test module: `#[cfg(all(test, unix))]` left the module looking like production code, so its helpers could be judged as places and the `fn`s it defines counted as definitions of names found elsewhere — which is what decides whether a name resolves to one definition or several. Only a predicate that cannot hold outside the tests is read that way. `any(test, feature = "…")` is compiled in an ordinary build with that feature on and is **not** a test region, and neither is `not(test)`, a feature whose name contains "test", or anything the reading does not recognise — code left in is visible, and code excluded is silently absent.
 - `--pr` compares the commits the pull request changed. The base came from resolving the base branch by name, so for a pull request merged with a merge commit — where the branch has since come to contain the head — the merge base of the two was the head itself, and the tool reviewed a commit against itself: no changed files, no seeds for the search, and a report that said only that it found nothing, with no error. The base is now the latest commit the head still shares with one of the places it could be — the base branch, the branch as `origin` has it, and the base commit GitHub records for the pull request — which is right whether the branch has moved past the head, the head took the branch in later, or the clone's copy of the branch is behind. A run whose two commits are the same stops with exit 10 instead of reporting on an empty change. Measured on the ten pull requests of the first measurement: the five merged with a merge commit (sideeye) compare the commits the pull request changed, with the changed files matching GitHub's own list exactly, and the squash-merged ones (omamori) resolve to the same base as before.
 
-[Unreleased]: https://github.com/yottayoshida/jev-intent-review/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/yottayoshida/jev-intent-review/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/yottayoshida/jev-intent-review/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/yottayoshida/jev-intent-review/releases/tag/v0.1.0

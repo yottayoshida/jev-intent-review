@@ -1,6 +1,6 @@
 {
   "name": "jev-intent-review",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Review pull requests against their intent beyond the boundaries of the diff, using typed judgments from Jev",
   "license": "MIT OR Apache-2.0",
   "type": "module",
