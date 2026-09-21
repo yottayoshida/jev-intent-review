@@ -170,21 +170,29 @@
       "ref": "Naoray/instruckt-tauri#9",
       "a": "pass",
       "requirement": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content.",
-      "source": "PR text: \"Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content\"."
+      "source": "PR text: \"Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content\".",
+      "b": "fail",
+      "bWhy": "All five fixed calls are held before the budget: to_string_pretty has no definition in the repository (it is serde_json's)."
     },
     {
       "order": 22,
       "ref": "dashpay/grovedb#501",
       "a": "pass",
       "requirement": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded.",
-      "source": "PR text: \"returned a `CostResult<(), Error>` that was silently discarded via `let _ =`. If `set_base_root_key` fails (e.g., due to a storage error), the restorer would continue operating on corrupt state\"."
+      "source": "PR text: \"returned a `CostResult<(), Error>` that was silently discarded via `let _ =`. If `set_base_root_key` fails (e.g., due to a storage error), the restorer would continue operating on corrupt state\".",
+      "b": "fail",
+      "bWhy": "The fixed call is held: set_base_root_key returns CostResult<(), Error>, which the Result check does not accept. The B target is held too, its callee process_chunk read as not returning a Result because the signature wraps."
     },
     {
       "order": 23,
       "ref": "dashpay/grovedb#500",
       "a": "pass",
       "requirement": "If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished.",
-      "source": "PR text: \"This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed\"."
+      "source": "PR text: \"This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed\".",
+      "b": "pass",
+      "bWhy": "The fixed call rewrite_heights(grove_version) is inside the budget. The B target finalize(grove_version) in apply_chunk does not appear in the enumeration: apply_chunk lists exactly 40 calls, the per-function cap.",
+      "c": "not checked",
+      "d": "B and C fixed"
     },
     {
       "order": 24,
@@ -197,15 +205,22 @@
       "ref": "iotaledger/iota#10136",
       "a": "pass",
       "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
-      "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\"."
+      "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\".",
+      "b": "not checked",
+      "note": "Held in reserve: examined only if one of 19, 20 or 23 fails condition (c)."
     }
   ],
   "gateResult": {
-    "examined": 20,
-    "passedA": 3,
-    "passedB": 2,
-    "atMostPassing": 2,
-    "status": "not met — stopped at the gate and returned to the plan, as the rules say",
+    "examined": 25,
+    "cap": 40,
+    "passedA": 7,
+    "passedB": 3,
+    "passingB": [
+      19,
+      20,
+      23
+    ],
+    "status": "three pass (b); condition (c) not yet checked",
     "precheck": "bench/acceptance/precheck-shipped.json"
   },
   "gateExtension": {

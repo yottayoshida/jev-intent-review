@@ -764,6 +764,802 @@
           "why": "context has no definition in this repository, so what it returns is not established here"
         }
       ]
+    },
+    "instruckt-tauri-9": {
+      "revisions": {
+        "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
+        "after": "a808734a5b264a433e74f96126b9a8159c19e641",
+        "how": "merge base of 78617c77e44238d05f19300b4b31a4d5cb0db64c and a808734a5b264a433e74f96126b9a8159c19e641"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 9,
+          "calls_changed": 2
+        },
+        "calls": 170,
+        "applicable": 7,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 163
+      },
+      "notes": [
+        "29 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": [
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    },
+    "grovedb-501": {
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e",
+        "how": "merge base of 43f4253c33ccb2f74fcc212c9d6e532f78ec95f5 and e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 3
+        },
+        "calls": 68,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 66
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "10 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "vec_bytes_as_traversal_instruction(chunk_id)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "decode_vec_ops(chunk_data)",
+          "origin": "calls_changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "get(chunk_id)",
+          "origin": "changed",
+          "why": "get is defined 35 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "ok_or(Error::ChunkRestoringError(ChunkError::UnexpectedChunk))",
+          "origin": "changed",
+          "why": "ok_or has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "Error::ChunkRestoringError(ChunkError::UnexpectedChunk)",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "Self::verify_chunk(chunk, expected_root_hash, &parent_key_value_hash)",
+          "origin": "changed",
+          "why": "verify_chunk does not return a Result (merk/src/merk/restore.rs:170), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))",
+          "origin": "changed",
+          "why": "set_base_root_key does not return a Result (merk/src/merk/mod.rs:560), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "key()",
+          "origin": "changed",
+          "why": "key has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "map(|k| k.to_vec())",
+          "origin": "changed",
+          "why": "map does not return a Result (costs/src/context.rs:65), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "to_vec()",
+          "origin": "changed",
+          "why": "to_vec has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "rewrite_parent_link( chunk_id, &root_traversal_instruction, &chunk_tree, grove_version, )",
+          "origin": "changed",
+          "why": "rewrite_parent_link does not return a Result (merk/src/merk/restore.rs:352), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "write_chunk(chunk_tree, &mut root_traversal_instruction)",
+          "origin": "changed",
+          "why": "write_chunk does not return a Result (merk/src/merk/restore.rs:229), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_ok()",
+          "origin": "changed",
+          "why": "is_ok has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "remove(chunk_id)",
+          "origin": "changed",
+          "why": "remove is defined 18 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "contains(chunk_id)",
+          "origin": "calls_changed",
+          "why": "contains does not return a Result (grovedb-query/src/query_item/mod.rs:514), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::InternalError( \"Incoming global_chunk_id not expected\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "remove(chunk_id)",
+          "origin": "calls_changed",
+          "why": "remove is defined 18 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "process_chunk(chunk_id, ops, grove_version)",
+          "origin": "calls_changed",
+          "why": "process_chunk does not return a Result (merk/src/merk/restore.rs:88), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "insert(next_chunk_id.clone())",
+          "origin": "calls_changed",
+          "why": "insert does not return a Result (docs/crates/grovedb.md:110), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "clone()",
+          "origin": "calls_changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "push(next_chunk_id)",
+          "origin": "calls_changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::InternalError( \"Unable to process incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::CorruptedData( \"Unable to decode incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    },
+    "grovedb-500": {
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+        "how": "merge base of 43f4253c33ccb2f74fcc212c9d6e532f78ec95f5 and c0e02819ac99a545e70a858208f2095c5fb461c7"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 215,
+        "applicable": 8,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "verify_height(grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunks)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "verify(self.merk.tree_type != TreeType::NormalTree, grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunks)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+          "origin": "calls_changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError( ChunkError::RestorationNotComplete, )",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+          "origin": "changed",
+          "why": "load_base_root does not return a Result (merk/src/merk/mod.rs:577), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+          "origin": "changed",
+          "why": "map_err does not return a Result (costs/src/context.rs:98), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"failed to load base root during finalize\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_err()",
+          "origin": "changed",
+          "why": "is_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+          "origin": "changed",
+          "why": "load_base_root does not return a Result (merk/src/merk/mod.rs:577), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+          "origin": "changed",
+          "why": "map_err does not return a Result (costs/src/context.rs:98), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"failed to reload base root after height rewrite\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"restored tree invalid\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"restored tree invalid\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::CorruptedData( \"Unsupported state sync protocol version\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::CorruptedData( \"Unsupported state sync protocol version\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_vec()",
+          "origin": "calls_changed",
+          "why": "to_vec has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(unpack_nested_bytes(packed_global_chunk_ids)?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(unpack_nested_bytes(packed_global_chunks)?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Packed num of global chunkIDs and chunks are not matching\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"GroveDB is not in syncing mode\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "zip(nested_global_chunks.iter())",
+          "origin": "calls_changed",
+          "why": "zip has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "let (chunk_prefix, _, _, nested_local_chunk_ids)",
+          "origin": "calls_changed",
+          "why": "let has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_slice()",
+          "origin": "calls_changed",
+          "why": "as_slice does not return a Result (grovedb/src/batch/key_info.rs:122), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_slice()",
+          "origin": "calls_changed",
+          "why": "as_slice does not return a Result (grovedb/src/batch/key_info.rs:122), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Packed num of chunkIDs and chunks are not matching #2\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_mut()",
+          "origin": "calls_changed",
+          "why": "as_mut has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "current_prefixes()",
+          "origin": "calls_changed",
+          "why": "current_prefixes does not return a Result (grovedb/src/replication/state_sync_session.rs:317), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "get_mut(&chunk_prefix)",
+          "origin": "calls_changed",
+          "why": "get_mut has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Unable to process incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "zip(current_nested_chunk_data.iter())",
+          "origin": "calls_changed",
+          "why": "zip has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(subtree_state_sync.apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+          "origin": "calls_changed",
+          "why": "apply_inner_chunk does not return a Result (grovedb/src/replication/state_sync_session.rs:94), so it has no error to assume"
+        }
+      ]
     }
   }
 }
