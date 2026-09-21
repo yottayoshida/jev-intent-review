@@ -474,13 +474,49 @@ test("a requirement that does not settle the call, and a mapping that did not co
   assert.match(broken.text, /was not answered \(the endpoint timed out\)/);
 });
 
-test("a mapping is refused when it names a call this run never offered, or quotes what is not there", async () => {
+test("a mapping is refused when it answers another call, or quotes what is not there", async () => {
   const elsewhere = await findings(scriptedMapper(() => ({ raw: { callId: "src/nowhere.rs:call-9", verdict: "applies", quote: QUOTE, reason: "…" } })).mapper);
   const invented = await findings(scriptedMapper((r) => ({ raw: { callId: r.callId, verdict: "applies", quote: "must never be swallowed under any circumstances", reason: "…" } })).mapper);
   assert.equal(elsewhere.r.findings.length, 0);
   assert.equal(invented.r.findings.length, 0);
-  assert.match(elsewhere.text, /is not a call this run offered/);
+  assert.match(elsewhere.text, /not about src\/integrity\.rs:call-\d+/);
   assert.match(invented.text, /the quote is not in the requirement's text/);
+});
+
+test("an answer about one call is not filed against another, even when both are being asked about", async () => {
+  // The check used to be membership of this run's set, so an answer naming a *different* real
+  // candidate passed every test and the finding was filed against whichever call was in hand.
+  // Here every answer after the first repeats the first call's id, with a quote that really is in
+  // the requirement and a reason really about that first call.
+  let first: string | undefined;
+  const crossed = scriptedMapper((r) => {
+    const callId = first ?? r.callId;
+    first ??= r.callId;
+    return { raw: { callId, verdict: "applies", quote: QUOTE, reason: "an answer about the first call" } };
+  });
+  const { r, text } = await findings(crossed.mapper);
+  const swallowing = r.mappings.find((m) => m.function === "read_baseline");
+  assert.ok(swallowing, `read_baseline was asked about: ${JSON.stringify(r.mappings.map((m) => m.function))}`);
+  assert.equal(swallowing.accepted, false);
+  assert.equal(swallowing.refusedAs, "wrong_call");
+  assert.notEqual(swallowing.returnedCallId, swallowing.askedCallId);
+  assert.equal(r.findings.filter((f) => f.function === "read_baseline").length, 0, "the swallowing call gets no finding from an answer about another call");
+  assert.match(text, /another call in this run's set/);
+});
+
+test("the mapping is recorded whether or not anything came of it", async () => {
+  // A run on holding code finds nothing, and what has to be readable there is the mapping itself.
+  const { mapper } = scriptedMapper();
+  const { r, text } = await findings(mapper, fakeGit);
+  assert.equal(r.findings.length, 0);
+  assert.equal(r.counts.mapped, r.mappings.length, "one record per request");
+  assert.equal(r.counts.governed, r.mappings.filter((m) => m.accepted && m.verdict === "applies").length);
+  const kept = r.mappings.find((m) => m.accepted && m.verdict === "applies");
+  assert.ok(kept, JSON.stringify(r.mappings));
+  assert.equal(kept.quote, QUOTE);
+  assert.equal(kept.askedCallId, kept.returnedCallId);
+  assert.ok(kept.reason && kept.reason.length > 0);
+  assert.match(text, /### Read as governed by the requirement/);
 });
 
 test("the mapping is asked before the judgment and is never told the answer", async () => {

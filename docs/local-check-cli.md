@@ -137,9 +137,14 @@ daily free allocation of 10,000 neurons …), so no call there carries a clause
 
 | 検査 | 不合格なら |
 |---|---|
-| `callId` がこの run が出した呼び出しか | `unknown_call` |
+| `callId` が**今聞いた呼び出しそのもの**か | `wrong_call` |
 | 引用が**本当に原文にある**か（`applies` のとき必須、12 字以上） | `quote_not_in_requirement` |
 | `applies` / `does_not_apply` / `unknown` と必須欄の形 | `bad_shape` |
+
+**1 つ目は最初「この run が出した候補集合にあるか」だった。** それだと `beta` について聞いて
+`alpha` の id が返ったとき——引用は本当に原文にあり、理由も本当に `alpha` についてのまま——
+**全部の検査を通って `beta` の欠陥候補になる**。実在する別候補の id だったほうが悪い:
+下流には区別する手がかりが何も無い。**別の問いへの答えは、この問いへの弱い答えではない。**
 
 **通ったことは正しいことではない。** 実在の呼び出しを名指し、原文を正確に引用したまま、
 文が何を要求しているかについて間違っていられる。テストに、全部の検査を通る**明らかに
@@ -157,9 +162,14 @@ daily free allocation of 10,000 neurons …), so no call there carries a clause
 - **Why that disagrees**: …
 ```
 
-**要件全体の VERIFIED も、新しい失敗 exit code も入れていない。** 対応付けが取れないもの
-（適用外・不明・拒否・通信失敗）は**それぞれ別の理由**で「Read, but not answered against the
-requirement」に残る。
+**要件全体の VERIFIED も、新しい失敗 exit code も入れていない。**
+
+**対応付けは、指摘が出たかどうかに関係なく全件記録する**（`mappings`）。聞いた呼び出し id・
+返ってきた id・採否・verdict・引用・理由・拒否の種別。指摘が 0 件の run で読む必要があるのは
+**対応付けそのもの**——どの語を引用し、なぜ支配すると言ったか——で、食い違ったときだけ残す形は
+成功側を読めなくしていた。レポートの 2 節（`Read as governed by the requirement` と
+`Read, but not answered against the requirement`）は**同じ 1 本のリスト**から出しているので、
+片方にあって片方に無い呼び出しは作れない。
 
 ### 通信なしで確かめた出力
 
@@ -182,14 +192,16 @@ requirement」に残る。
 正例 1 回を実行:
 
 ```
-counts: budget 20, asked 19, mapped 19, findings 0
-read_baseline          → the mapping was not answered (429 … used up your daily free allocation)
-raw_override_disables  → the mapping was not answered (429 … )
+counts: asked 19, mapped 19, governed 0, findings 0
+mappings: {"not_answered": 19}
+read_baseline          → not_answered: … answered 429: … used up your daily free allocation …
+raw_override_disables  → not_answered: …
 ```
 
 **両対象とも対応付けの入力に入っている**（19 件の判定対象すべてが対応付けにも渡った）。
-**対応付けのモデルだけが 429** で、判定側は 19 件すべて答えている。0 件の理由は**呼び出し
-ごとに記録**されていて、無言ではない。
+**対応付けのモデルだけが 429** で、判定側は 19 件すべて答えている。
+`mapped` は**要求した回数**、`governed` は**採用できて `applies` だった数**で、別の数として
+出す——0 件が「聞かなかった」なのか「聞いたが答えが無かった」なのか、この 2 つで決まる。
 
 したがって**枠が戻るまで残るのは最後の実測だけ**——正例で対応付けが取れるか、取れたら
 5 枝を 1 回ずつ。終了条件は、両変異でそれぞれの欠陥候補が出て、正例・挙動不変版では

@@ -40,7 +40,7 @@ import { applicabilityOf, type Applicability } from "../plan/applicability.ts";
 import { listingFor, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, conditionFor, describe, locateCall, questionsFor, type LocalResult } from "../plan/local-check.ts";
-import { checkMapping, type Mapper, type Mapping } from "../plan/mapping.ts";
+import { checkMapping, type Mapper, type Mapping, type MappingVerdict } from "../plan/mapping.ts";
 import { selectSites, type FunctionOrigin, type Pick, type Site, type SiteSource } from "../plan/select.ts";
 import { probabilityOf } from "./requirement.ts";
 
@@ -109,6 +109,33 @@ export interface Finding {
   disagreement: string;
 }
 
+/**
+ * What the mapping was asked and what came back, for every call that was asked — whether or not a
+ * finding came out of it.
+ *
+ * A run on holding code produces no findings, and the thing that needs reading there is *the
+ * mapping itself*: which words it quoted, why it said the requirement governs the call. Keeping it
+ * only when it disagreed with the code left the successful case unreadable, which is the half the
+ * next measurement has to check first.
+ */
+export interface MappingRecord {
+  requirementId: string;
+  /** The call the question was about. */
+  askedCallId: string;
+  file: string;
+  function: string;
+  call: string;
+  /** What came back, when the answer had one at all. */
+  returnedCallId?: string;
+  accepted: boolean;
+  verdict?: MappingVerdict;
+  quote?: string;
+  reason?: string;
+  /** Why it was not used. `not_answered` is a request that did not come back. */
+  refusedAs?: "wrong_call" | "quote_not_in_requirement" | "bad_shape" | "not_answered";
+  why?: string;
+}
+
 export interface LocalCheckResult {
   requirementId: string;
   requirementText: string;
@@ -127,8 +154,8 @@ export interface LocalCheckResult {
   wouldAsk: { file: string; function: string; call: string; origin: Site["origin"] }[];
   observed: Observed[];
   unchecked: Unchecked[];
-  /** Calls that were observed but carry no usable mapping: not applicable, not settled, not answered. */
-  unmapped: Unchecked[];
+  /** Every mapping asked for, accepted or not. The report's two mapping sections are read off this. */
+  mappings: MappingRecord[];
   findings: Finding[];
   /** The set and the budget, so a report never leaves the size of either to be guessed. */
   counts: {
@@ -137,7 +164,10 @@ export interface LocalCheckResult {
     calls: number;
     applicable: number;
     asked: number;
+    /** Mapping requests made — one per call asked about, whatever came back. */
     mapped: number;
+    /** Of those, the ones accepted and saying the requirement governs the call. */
+    governed: number;
     overBudget: number;
     notApplicable: number;
   };
@@ -246,7 +276,7 @@ export async function runLocalCheck(
     const picks: LocalCheckResult["picks"] = [];
     const observed: Observed[] = [];
     const unchecked: Unchecked[] = [];
-    const unmapped: Unchecked[] = [];
+    const mappings: MappingRecord[] = [];
     const findings: Finding[] = [];
 
     // The change's sources are shared between requirements, so each requirement gets its own
@@ -330,14 +360,27 @@ export async function runLocalCheck(
       });
       mapped += 1;
       const place = { file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin };
+      const returnedCallId = typeof (answered.raw as { callId?: unknown } | undefined)?.callId === "string" ? ((answered.raw as { callId: string }).callId) : undefined;
+      const record: MappingRecord = { requirementId: requirement.id, askedCallId: site.call.id, file: place.file, function: place.function, call: place.call, accepted: false, ...(returnedCallId !== undefined ? { returnedCallId } : {}) };
       let mapping: Mapping | undefined;
-      if (answered.failed) unmapped.push({ ...place, why: `the mapping was not answered (${answered.failed})` });
-      else {
-        const checked = checkMapping(answered.raw, { callIds: offered, requirementId: requirement.id, requirementText: requirement.text });
-        if (!checked.ok) unmapped.push({ ...place, why: `the mapping was refused: ${checked.reason}` });
-        else if (checked.mapping.verdict !== "applies") unmapped.push({ ...place, why: `the mapping says the requirement ${checked.mapping.verdict === "does_not_apply" ? "does not govern this call" : "does not settle this call"}: ${checked.mapping.reason}` });
-        else mapping = checked.mapping;
+      if (answered.failed) {
+        record.refusedAs = "not_answered";
+        record.why = `the mapping was not answered (${answered.failed})`;
+      } else {
+        const checked = checkMapping(answered.raw, { callId: site.call.id, offered, requirementId: requirement.id, requirementText: requirement.text });
+        if (!checked.ok) {
+          record.refusedAs = checked.kind;
+          record.why = `the mapping was refused: ${checked.reason}`;
+        } else {
+          record.accepted = true;
+          record.verdict = checked.mapping.verdict;
+          record.quote = checked.mapping.quote;
+          record.reason = checked.mapping.reason;
+          if (checked.mapping.verdict === "applies") mapping = checked.mapping;
+          else record.why = `the requirement ${checked.mapping.verdict === "does_not_apply" ? "does not govern this call" : "does not settle this call"}: ${checked.mapping.reason}`;
+        }
       }
+      mappings.push(record);
 
       const answers = await judge.judge(evidence.packet, questionsFor(condition));
       const answer = answers.on_error_result;
@@ -372,7 +415,7 @@ export async function runLocalCheck(
       wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
-      unmapped,
+      mappings,
       findings,
       counts: {
         budget: options.budget,
@@ -381,6 +424,7 @@ export async function runLocalCheck(
         applicable: selection.applicable.length,
         asked,
         mapped,
+        governed: mappings.filter((m) => m.accepted && m.verdict === "applies").length,
         overBudget: selection.overBudget.length,
         notApplicable: selection.held.length,
       },
@@ -447,9 +491,16 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
       lines.push(`  - when that call fails: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
       lines.push(`  - ${bears}`);
     }
-    if (r.unmapped.length > 0) {
+    // Both sections come off the same list, so a call cannot be in one reading and not the other.
+    const governed = r.mappings.filter((m) => m.accepted && m.verdict === "applies");
+    const notGoverned = r.mappings.filter((m) => !(m.accepted && m.verdict === "applies"));
+    if (governed.length > 0) {
+      lines.push("", "### Read as governed by the requirement", "", "Whether or not the reading of the call agreed with it. A run that finds nothing is still a run that read something, and this is what it read.", "");
+      for (const m of governed) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: "${m.quote}" — ${m.reason}`);
+    }
+    if (notGoverned.length > 0) {
       lines.push("", "### Read, but not answered against the requirement", "");
-      for (const u of r.unmapped) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\`: ${u.why}`);
+      for (const m of notGoverned) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why ?? "no mapping"}`);
     }
     if (r.unchecked.length > 0) {
       lines.push("", "### Not checked", "");

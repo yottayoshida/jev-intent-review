@@ -9,7 +9,8 @@ import { test } from "node:test";
 import { checkMapping, MAPPING_PROPERTY } from "../src/plan/mapping.ts";
 
 const context = {
-  callIds: new Set(["src/integrity.rs:call-3"]),
+  callId: "src/integrity.rs:call-3",
+  offered: new Set(["src/integrity.rs:call-3", "src/config.rs:call-8"]),
   requirementId: "R1",
   requirementText: "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of being silently treated as an empty file.",
 };
@@ -34,13 +35,19 @@ test("accepted is a shape, not a correct reading", () => {
   assert.equal(r.ok, true);
 });
 
-test("a call this run did not offer is refused", () => {
-  const r = checkMapping({ ...good, callId: "src/elsewhere.rs:call-1" }, context);
-  assert.equal(r.ok, false);
-  if (!r.ok) {
-    assert.equal(r.kind, "unknown_call");
-    assert.match(r.reason, /is not a call this run offered/);
+test("an answer about a different call is refused, and most of all when that call is real", () => {
+  // Checking membership of this run's set let an answer about one call be filed against another:
+  // every check passed, the quote was genuinely in the requirement, and the finding named the
+  // wrong function. An answer to a different question is not a weaker answer to this one.
+  const invented = checkMapping({ ...good, callId: "src/elsewhere.rs:call-1" }, context);
+  assert.equal(invented.ok, false);
+  if (!invented.ok) {
+    assert.equal(invented.kind, "wrong_call");
+    assert.match(invented.reason, /not about src\/integrity\.rs:call-3/);
   }
+  const otherCandidate = checkMapping({ ...good, callId: "src/config.rs:call-8" }, context);
+  assert.equal(otherCandidate.ok, false);
+  if (!otherCandidate.ok) assert.match(otherCandidate.reason, /another call in this run's set/);
 });
 
 test("a quote that is not in the requirement is refused, and so is one too short to be one", () => {
