@@ -1,0 +1,769 @@
+{
+  "what": "--experimental-candidates-only on each case at the pull request base..head, before any branch was built. Counts, notes, and every enumerated call in the functions that hold a fixed target.",
+  "cases": {
+    "whatsapp-rust-759": {
+      "revisions": {
+        "before": "0cb4ca5cd99efa87183b07519748621a43adce20",
+        "after": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+        "how": "merge base of 0df74ff98e7b1933376c403b745f8a3240a024fe and f46e703543e434c91fe3031184a48eebb7b63d1b"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 0
+        },
+        "calls": 0,
+        "applicable": 0,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 0
+      },
+      "notes": [
+        "wacore/src/appstate_sync.rs: 17 calls were left out of the listing by its cap",
+        "6 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": []
+    },
+    "moltis-1064": {
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "4106d46dad04481a932597141739e42a5452cc86",
+        "how": "merge base of be4431a57851b001ba1af13a3f7354ba6aa9aefb and 4106d46dad04481a932597141739e42a5452cc86"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "origin": "changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read(session_key)",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "len()",
+          "origin": "changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "context(\"failed to read session history\")",
+          "origin": "changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(session_key)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|e| e.model)",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read()",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read()",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_deref()",
+          "origin": "changed",
+          "why": "as_deref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|id| reg.get(id))",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(id)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "is_some()",
+          "origin": "changed",
+          "why": "is_some has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "is_none()",
+          "origin": "changed",
+          "why": "is_none has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "list_models()",
+          "origin": "changed",
+          "why": "list_models does not return a Result (crates/providers/src/registry/registration.rs:1281), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "iter()",
+          "origin": "changed",
+          "why": "iter has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "map(|m| m.id.as_str())",
+          "origin": "changed",
+          "why": "map has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_str()",
+          "origin": "changed",
+          "why": "as_str is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "collect()",
+          "origin": "changed",
+          "why": "collect has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "unwrap_or_default()",
+          "origin": "changed",
+          "why": "unwrap_or_default has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_deref()",
+          "origin": "changed",
+          "why": "as_deref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|id| reg.get(id))",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(id)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "or(from_session)",
+          "origin": "changed",
+          "why": "or has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "or_else(|| reg.first())",
+          "origin": "changed",
+          "why": "or_else has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "first()",
+          "origin": "changed",
+          "why": "first has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::model::values_to_chat_messages(&history)",
+          "origin": "changed",
+          "why": "values_to_chat_messages is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "upsert(session_key, Some(title.clone()))",
+          "origin": "changed",
+          "why": "upsert is defined 13 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "clone()",
+          "origin": "changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "with_context(|| format!(\"failed to persist title for session {session_key}\"))",
+          "origin": "changed",
+          "why": "with_context is defined 6 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "broadcast( state, \"session\", serde_json::json!({ \"kind\": \"patched\", \"sessionKey\": session_key,",
+          "origin": "changed",
+          "why": "broadcast is defined 5 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "BroadcastOpts::default()",
+          "origin": "changed",
+          "why": "default has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "get()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ok_or_else(|| ChannelError::unavailable(\"gateway not ready\"))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::unavailable(\"gateway not ready\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "as_ref()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ok_or_else(|| ChannelError::unavailable(\"session metadata not available\"))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::unavailable(\"session metadata not available\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "resolve_channel_session(&reply_to, session_metadata)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "strip_prefix('/')",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "unwrap_or(command)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "split_whitespace()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "next()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "unwrap_or(\"\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "trim()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_new( state, session_metadata, &session_key, &reply_to, sender_id,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_fork(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_clear(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_compact(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_context(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_sessions( state, session_metadata, &session_key, &reply_to, args,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_attach(state, session_metadata, &session_key, &reply_to, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_approvals(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_approve_deny( state, &session_key, &reply_to, sender_id, cmd,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_agent(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_mode(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_model(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_sandbox(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_sh(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_stop(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_peek(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_tts(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_update(state, &reply_to, sender_id, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_rollback(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_btw(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_fast(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_insights(state, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_steer(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_queue(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::invalid_input(format!( \"unknown command: /{cmd}\" ))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        }
+      ]
+    },
+    "kontor-385": {
+      "revisions": {
+        "before": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f",
+        "after": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+        "how": "merge base of 99cfbdfd4b0bccc60c2bc6476c3636e82995af2f and 5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 11
+        },
+        "calls": 633,
+        "applicable": 47,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 27,
+        "notApplicable": 586
+      },
+      "notes": [
+        "core/indexer/src/reactor/batches.rs: 6 calls were left out of the listing by its cap",
+        "core/indexer/src/reactor/mod.rs: 36 calls were left out of the listing by its cap",
+        "core/indexer/src/reactor/reactor_cluster_tests.rs: 25 calls were left out of the listing by its cap",
+        "core/indexer/src/runtime/call.rs: 41 calls were left out of the listing by its cap",
+        "only the first 12 of 23 changed functions had their callers looked up",
+        "16 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "origin": "changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+          "origin": "changed",
+          "why": "select_batches_in_range does not return a Result (core/indexer/src/database/queries.rs:575), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "as_u64()",
+          "origin": "changed",
+          "why": "as_u64 is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "as_u64()",
+          "origin": "changed",
+          "why": "as_u64 is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "context(\"Failed to query batches for sync range\")",
+          "origin": "changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "Vec::new()",
+          "origin": "changed",
+          "why": "new has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "let (mut value, cert)",
+          "origin": "changed",
+          "why": "let does not return a Result (core/indexer/src/api/error.rs:39), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "load_raw_txs_if_unfinalized(conn, b.anchor_height, b.consensus_height)",
+          "origin": "changed",
+          "why": "load_raw_txs_if_unfinalized does not return a Result (core/indexer/src/reactor/consensus_state.rs:416), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "set_raw_txs(raw_txs)",
+          "origin": "changed",
+          "why": "set_raw_txs does not return a Result (core/indexer/src/consensus/value.rs:197), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "push((value, cert))",
+          "origin": "changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "db_conn()",
+          "origin": "calls_changed",
+          "why": "db_conn does not return a Result (core/indexer/src/reactor/mod.rs:113), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "origin": "calls_changed",
+          "why": "get_decided_from_anchor does not return a Result (core/indexer/src/reactor/consensus_state.rs:370), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "context(\"Failed to load replay batches for rollback\")",
+          "origin": "calls_changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len does not return a Result (core/indexer/src/consensus/validator_set.rs:67), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len does not return a Result (core/indexer/src/consensus/validator_set.rs:67), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "into()",
+          "origin": "calls_changed",
+          "why": "into has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "retain(|tx| !excluded_txids.contains(&tx.txid()))",
+          "origin": "calls_changed",
+          "why": "retain has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "contains(&tx.txid())",
+          "origin": "calls_changed",
+          "why": "contains does not return a Result (kontor-ts/src/component/kontor-ts.js:699), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "txid()",
+          "origin": "calls_changed",
+          "why": "txid does not return a Result (core/indexer/src/consensus/value.rs:20), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "retain(|b| b.anchor_height < from_anchor)",
+          "origin": "calls_changed",
+          "why": "retain has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "origin": "calls_changed",
+          "why": "replay_blocks_from is defined 4 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "context(\"Failed to send replay request\")",
+          "origin": "calls_changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    }
+  }
+}

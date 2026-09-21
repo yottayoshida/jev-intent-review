@@ -13,54 +13,165 @@
       "pool": "Closed issues, state reason completed, newest first.",
       "titleScreen": "Titles matching (?i)fail|error|silent|swallow|ignore|treated as|as if|empty|missing|unreadable|refus|fail-open|fail open|fail-closed|propagat|Err|Ok\\(|default|fallback|corrupt|partial|truncat, read in order; titles naming a refactor, documentation, test harness, packaging or labels were screened out without reading.",
       "excluded": {
+        "465": "closed by PR 557, in bench/corpus",
         "468": "the measurement v0.1 was tuned on (bench/fixtures/omamori-468)",
+        "470": "closed by PR 558, whose read loop bench/local-check-propagation.ts was tuned on",
+        "474": "closed by PR 559, named in bench/",
         "477": "the ReadDir truncation family the development case omamori-553-r2 comes from",
         "482": "same family as 477",
         "485": "closed by PR 553, the development case",
-        "470": "closed by PR 558, whose read loop bench/local-check-propagation.ts was tuned on",
-        "474": "closed by PR 559, named in bench/",
-        "465": "closed by PR 557, in bench/corpus",
         "494": "closed by PR 554, in bench/corpus",
         "526": "closed by PR 551, in bench/corpus"
       }
     },
     "external": {
       "pool": "The two GitHub pull request searches run while the plan was written (2026-09-21): `gh search prs --language rust --merged -- \"propagate error instead of silently\"` and `gh search prs --language rust --merged -- \"error treated as success\"`. Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success. Newest merge first.",
-      "excludedByLicense": ["limn-works/scp#736 (NOASSERTION)"]
+      "excludedByLicense": [
+        "limn-works/scp#736 (NOASSERTION)"
+      ]
     }
   },
   "candidates": [
-    { "order": 1, "ref": "yottayoshida/omamori#556", "a": "fail", "why": "The call that fails is a typed peek, and it fails legitimately on a genuinely torn line. The requirement is to classify a line that declares an unrecognised chain version, not to return a failed call as an error." },
-    { "order": 2, "ref": "yottayoshida/omamori#461", "a": "fail", "why": "A design concern about pruning past unverifiable entries; no failed call is turned into a success." },
-    { "order": 3, "ref": "yottayoshida/omamori#514", "a": "fail", "why": "A predicate that asks readability where writability is meant; not a failed call reaching the caller." },
-    { "order": 4, "ref": "yottayoshida/omamori#490", "a": "fail", "why": "The suggested fix carries the failed write in the result and keeps returning success, so the two options of the v0.1 question cannot tell the fixed code from the defect." },
-    { "order": 5, "ref": "yottayoshida/omamori#483", "a": "fail", "why": "A recording-policy decision; the issue rejects returning an error on these paths." },
-    { "order": 6, "ref": "yottayoshida/omamori#506", "a": "fail", "why": "The opposite direction: the fix turns an error into a partial result that reports truncation." },
-    { "order": 7, "ref": "yottayoshida/omamori#487", "a": "fail", "why": "How a state is reported on three surfaces, not a failed call returned as a success." },
-    { "order": 8, "ref": "yottayoshida/omamori#391", "a": "fail", "why": "The proposed fix resolves the nearest existing ancestor instead of returning an error, and the check returns a boolean." },
-    { "order": 9, "ref": "yottayoshida/omamori#114", "a": "fail", "why": "Read with PR #127: an audit write failure becomes a warning and the command continues, returning success, unless strict mode is on. In the default mode the fixed code and the defect both return success." },
-    { "order": 10, "ref": "yottayoshida/omamori#111", "a": "fail", "why": "Read with PR #125: malformed input is classified into a variant that blocks (exit 2). The fix is a classification that blocks, not an error returned to the caller." },
-    { "order": 11, "ref": "yottayoshida/omamori#99", "a": "fail", "why": "One error mapped to another error; nothing becomes a success." },
-    { "order": 12, "ref": "yottayoshida/omamori#75", "a": "fail", "why": "Same shape as #111: the fix answers deny, which is a result, not an error returned to the caller." },
-    { "order": 13, "ref": "yottayoshida/omamori#60", "a": "fail", "why": "The fix adds a warning; the skip stays a success." },
-    { "order": 14, "ref": "yottayoshida/omamori#323", "a": "fail", "why": "The failure is an absent environment variable (an Option), not a failed call returning a Result." },
-    { "order": 15, "ref": "yottayoshida/omamori#182", "a": "fail", "why": "An unrecognised tool name routed to allow; no call fails." },
-    { "order": 16, "ref": "yottayoshida/omamori#271", "a": "fail", "why": "Environment findings in a sandbox; no code path turns a failure into a success." },
-    { "order": 17, "ref": "yottayoshida/omamori#387", "a": "fail", "why": "A missing backstop rule; no failed call." },
     {
-      "order": 18, "ref": "oxidezap/whatsapp-rust#759", "a": "pass",
+      "order": 1,
+      "ref": "yottayoshida/omamori#556",
+      "a": "fail",
+      "why": "The call that fails is a typed peek, and it fails legitimately on a genuinely torn line. The requirement is to classify a line that declares an unrecognised chain version, not to return a failed call as an error."
+    },
+    {
+      "order": 2,
+      "ref": "yottayoshida/omamori#461",
+      "a": "fail",
+      "why": "A design concern about pruning past unverifiable entries; no failed call is turned into a success."
+    },
+    {
+      "order": 3,
+      "ref": "yottayoshida/omamori#514",
+      "a": "fail",
+      "why": "A predicate that asks readability where writability is meant; not a failed call reaching the caller."
+    },
+    {
+      "order": 4,
+      "ref": "yottayoshida/omamori#490",
+      "a": "fail",
+      "why": "The suggested fix carries the failed write in the result and keeps returning success, so the two options of the v0.1 question cannot tell the fixed code from the defect."
+    },
+    {
+      "order": 5,
+      "ref": "yottayoshida/omamori#483",
+      "a": "fail",
+      "why": "A recording-policy decision; the issue rejects returning an error on these paths."
+    },
+    {
+      "order": 6,
+      "ref": "yottayoshida/omamori#506",
+      "a": "fail",
+      "why": "The opposite direction: the fix turns an error into a partial result that reports truncation."
+    },
+    {
+      "order": 7,
+      "ref": "yottayoshida/omamori#487",
+      "a": "fail",
+      "why": "How a state is reported on three surfaces, not a failed call returned as a success."
+    },
+    {
+      "order": 8,
+      "ref": "yottayoshida/omamori#391",
+      "a": "fail",
+      "why": "The proposed fix resolves the nearest existing ancestor instead of returning an error, and the check returns a boolean."
+    },
+    {
+      "order": 9,
+      "ref": "yottayoshida/omamori#114",
+      "a": "fail",
+      "why": "Read with PR #127: an audit write failure becomes a warning and the command continues, returning success, unless strict mode is on. In the default mode the fixed code and the defect both return success."
+    },
+    {
+      "order": 10,
+      "ref": "yottayoshida/omamori#111",
+      "a": "fail",
+      "why": "Read with PR #125: malformed input is classified into a variant that blocks (exit 2). The fix is a classification that blocks, not an error returned to the caller."
+    },
+    {
+      "order": 11,
+      "ref": "yottayoshida/omamori#99",
+      "a": "fail",
+      "why": "One error mapped to another error; nothing becomes a success."
+    },
+    {
+      "order": 12,
+      "ref": "yottayoshida/omamori#75",
+      "a": "fail",
+      "why": "Same shape as #111: the fix answers deny, which is a result, not an error returned to the caller."
+    },
+    {
+      "order": 13,
+      "ref": "yottayoshida/omamori#60",
+      "a": "fail",
+      "why": "The fix adds a warning; the skip stays a success."
+    },
+    {
+      "order": 14,
+      "ref": "yottayoshida/omamori#323",
+      "a": "fail",
+      "why": "The failure is an absent environment variable (an Option), not a failed call returning a Result."
+    },
+    {
+      "order": 15,
+      "ref": "yottayoshida/omamori#182",
+      "a": "fail",
+      "why": "An unrecognised tool name routed to allow; no call fails."
+    },
+    {
+      "order": 16,
+      "ref": "yottayoshida/omamori#271",
+      "a": "fail",
+      "why": "Environment findings in a sandbox; no code path turns a failure into a success."
+    },
+    {
+      "order": 17,
+      "ref": "yottayoshida/omamori#387",
+      "a": "fail",
+      "why": "A missing backstop rule; no failed call."
+    },
+    {
+      "order": 18,
+      "ref": "oxidezap/whatsapp-rust#759",
+      "a": "pass",
       "requirement": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
-      "source": "PR text: \"logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations\"; \"propagate download/decode failures\"; \"an empty patch is never applied\"."
+      "source": "PR text: \"logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations\"; \"propagate download/decode failures\"; \"an empty patch is never applied\".",
+      "b": "fail",
+      "bWhy": "The enumeration listed no call at all: one changed function was found, the fixed file hit the listing cap (17 calls left out), and six references to changed functions sit where this path does not read (impl methods among them). The fixed call cannot be asked."
     },
     {
-      "order": 19, "ref": "moltis-org/moltis#1064", "a": "pass",
+      "order": 19,
+      "ref": "moltis-org/moltis#1064",
+      "a": "pass",
       "requirement": "If generating a session's automatic title fails, the failure must reach the caller as an error. It must not return a successful result with no label.",
-      "source": "PR text: \"Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.\""
+      "source": "PR text: \"Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.\"",
+      "b": "pass",
+      "bWhy": "The fixed call moltis_agents::title::generate_title(provider, &chat_msgs) is inside the budget. The B target (dispatch_command) is enumerated but held: its return type ChannelResult<String> is an alias the Result check does not recognise.",
+      "c": "not checked",
+      "d": "not checked"
     },
     {
-      "order": 20, "ref": "KontorProtocol/Kontor#385", "a": "pass",
+      "order": 20,
+      "ref": "KontorProtocol/Kontor#385",
+      "a": "pass",
       "requirement": "If parsing a transaction, querying the database, or encoding a value or a certificate fails, the failure must reach the caller as an error. It must not skip the item that failed and return a successful result.",
-      "source": "PR text: \"failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped\"; \"failing fast on invalid staking data rather than skipping validators\"."
+      "source": "PR text: \"failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped\"; \"failing fast on invalid staking data rather than skipping validators\".",
+      "b": "pass",
+      "bWhy": "The fixed call batch_to_decided(b) is inside the budget. The B target (initiate_rollback) is enumerated but held: the callee get_decided_from_anchor has a signature wrapped over several lines and is read as not returning a Result.",
+      "c": "not checked",
+      "d": "not checked"
     }
-  ]
+  ],
+  "gateResult": {
+    "examined": 20,
+    "passedA": 3,
+    "passedB": 2,
+    "atMostPassing": 2,
+    "status": "not met — stopped at the gate and returned to the plan, as the rules say",
+    "precheck": "bench/acceptance/precheck-shipped.json"
+  }
 }
