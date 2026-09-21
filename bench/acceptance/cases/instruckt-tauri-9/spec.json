@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "Naoray/instruckt-tauri#9 — failure handling stated by the pull request",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}
