@@ -29,7 +29,9 @@ import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.t
 import { Git } from "../src/repository/git.ts";
 import { VERSION } from "../src/version.ts";
 import { enumerate, listingFor, type CallCandidate, type Candidates, type FunctionCandidate } from "./code-candidates.ts";
-import { applicability, reachesTheDefect, type GroundTruth } from "./set-scoring.ts";
+import { reachesTheDefect, type GroundTruth } from "./set-scoring.ts";
+import { applicabilityOf } from "../src/plan/applicability.ts";
+import { Discoverer } from "../src/discovery/discover.ts";
 
 const HERE = import.meta.dirname;
 const hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex").slice(0, 12);
@@ -40,8 +42,8 @@ const comparison = JSON.parse(readFileSync(join(HERE, "plans/three-way-compariso
 const summary = JSON.parse(readFileSync(join(HERE, "plans/omamori-476-summary.json"), "utf8")) as { text: string; rule: string; source: string; namesTheHelper: boolean };
 
 const CASES = [
-  { id: "omamori-read-baseline", file: "src/integrity.rs", truth: { functionName: "read_baseline", callee: "read_to_string_capped" } satisfies GroundTruth },
-  { id: "omamori-raw-override-disables", file: "src/config.rs", truth: { functionName: "raw_override_disables", callee: "read_to_string_capped" } satisfies GroundTruth },
+  { id: "omamori-read-baseline", file: "src/integrity.rs", target: { functionName: "read_baseline", callee: "read_to_string_capped" } },
+  { id: "omamori-raw-override-disables", file: "src/config.rs", target: { functionName: "raw_override_disables", callee: "read_to_string_capped" } },
 ] as const;
 
 const MAX_PICKS = 4;
@@ -109,9 +111,11 @@ for (const c of CASES) {
   const shipped = await git.resolve("correct");
   const source = (await git.readText(shipped, c.file)) ?? "";
   const candidates = enumerate(c.file, source);
-  const lines = source.split("\n");
   const fnOf = (call: CallCandidate) => candidates.functions.find((f) => f.id === call.functionId)!;
-  const theCall = candidates.calls.find((k) => fnOf(k).name === c.truth.functionName && k.callee.split("::").pop() === c.truth.callee);
+  const theCall = candidates.calls.find((k) => fnOf(k).name === c.target.functionName && k.callee.split("::").pop() === c.target.callee);
+  // The ground truth is the call expression at this commit, not the callee name (`#25` review).
+  const truth: GroundTruth = { functionName: c.target.functionName, callExpression: theCall?.expression ?? "" };
+  const discoverer = new Discoverer(git, shipped, { include: () => true, maxCandidates: 20, lexicalSearch: true, referenceSearch: true });
   console.log(`-- ${c.id}: the call the patch changes is ${theCall ? `${theCall.id} (${theCall.expression.slice(0, 50)})` : "NOT IN THE LISTING"}`);
 
   for (const material of ["A", "B"] as const) {
@@ -150,15 +154,17 @@ for (const c of CASES) {
       }
       const stages = stagesOf(stated, candidates, fnOf);
       const reach = {
-        picked: reachesTheDefect(stages.picked, c.truth),
-        widened: reachesTheDefect(stages.widened, c.truth),
-        withinBudget: reachesTheDefect(stages.withinBudget, c.truth),
+        picked: reachesTheDefect(stages.picked, truth),
+        widened: reachesTheDefect(stages.widened, truth),
+        withinBudget: reachesTheDefect(stages.withinBudget, truth),
       };
       // Every site stays in the set; this only records which of them a question could be put to.
-      const applicable = stages.withinBudget.map((s) => {
-        const a = applicability(s.fn, s.call, lines[s.call.line - 1] ?? "");
-        return { callId: s.call.id, function: s.fn.name, expression: s.call.expression, related: s.related, hasClause: s.clause !== undefined, applicable: a.ok, reason: a.ok ? null : a.reason };
-      });
+      const applicable = await Promise.all(
+        stages.withinBudget.map(async (s) => {
+          const a = await applicabilityOf(discoverer, s.fn, s.call);
+          return { callId: s.call.id, function: s.fn.name, expression: s.call.expression, related: s.related, hasClause: s.clause !== undefined, applicable: a.ok, reason: a.ok ? null : a.reason };
+        }),
+      );
       rows.push({
         case: c.id,
         material,
