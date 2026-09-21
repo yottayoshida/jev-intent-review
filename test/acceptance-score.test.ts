@@ -70,6 +70,18 @@ test("(d) a target inside the budget whose body did not fit stops after the budg
   assert.equal(reading.observation, undefined);
 });
 
+test("a run that sent no answer about the target is never counted as right, even where nothing was expected", () => {
+  const c = oneCase("x", "r", { shipped: version({ A: "not_listed" }) });
+  const unanswered = [
+    run({ unchecked: [{ ...T, why: "the body of load did not fit the evidence limit" }] }),
+    run({ mappings: [{ ...T, verdict: "no_answer", probability: 0, governs: false }] }),
+    run({ observed: [{ ...T, result: { observation: "returns_error", probability: 0.9 } }], mappings: [{ ...T, verdict: "applies", probability: 0.9, governs: true }] }),
+  ];
+  const [row] = scoreVersion(c, "shipped", liveLog(unanswered));
+  assert.equal(row!.right, 1);
+  assert.equal(row!.agrees, false);
+});
+
 test("(e) a mapping that got no answer is its own stage, not a reading below the bar", () => {
   const noAnswer = readRun(T, run({ mappings: [{ ...T, verdict: "no_answer", probability: 0, governs: false }], observed: [{ ...T, result: { observation: "returns_error", probability: 0.95 } }] }));
   assert.equal(noAnswer.stage, "no_answer");
@@ -123,7 +135,14 @@ test("the undetermined version is right only when no confident reading came back
 // ---- 3. The table refuses to print what the claim would not hold of -----------------------------
 
 const good = (): { cases: CaseFile[]; log: AcceptanceLog } => {
-  const three = (listed: boolean) => [0, 1, 2].map(() => run(listed ? { findings: [{ ...T, requirementId: "R1" }] } : {}));
+  // Each run answers about the target, as a real run does: a listing needs both answers.
+  const answered = (listed: boolean) =>
+    run({
+      mappings: [{ ...T, verdict: "applies", probability: 0.99, governs: true }],
+      observed: [{ ...T, result: { observation: listed ? "returns_success" : "returns_error", probability: 0.95 } }],
+      ...(listed ? { findings: [{ ...T, requirementId: "R1" }] } : {}),
+    });
+  const three = (listed: boolean) => [0, 1, 2].map(() => answered(listed));
   const cases = [
     oneCase("one", "https://example.com/one", { shipped: version({ A: "not_listed" }), "defect-B": version({ A: "listed" }, "B") }),
     oneCase("two", "https://example.com/two", { shipped: version({ A: "not_listed" }) }),
@@ -164,6 +183,15 @@ test("one repository, no target outside the diff, fewer than three runs, zero ru
   const none = good();
   none.log.cases.two!.versions.shipped!.runs = [];
   assert.throws(() => render(none.cases, none.log, candidates), /0 times to completion/);
+
+  const unmeasured = good();
+  delete unmeasured.log.cases.two;
+  assert.throws(() => render(unmeasured.cases, unmeasured.log, candidates), /no measurement in the log/);
+
+  const extra = good();
+  delete extra.cases[1]!.versions.shipped;
+  extra.cases[1]!.versions.other = version({ A: "not_listed" });
+  assert.throws(() => render(extra.cases, extra.log, candidates), /in the log and not in case\.json/);
 
   const moved = good();
   moved.log.cases.two!.versions.shipped!.base = "c".repeat(40);

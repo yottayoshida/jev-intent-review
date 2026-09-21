@@ -1560,6 +1560,217 @@
           "why": "apply_inner_chunk does not return a Result (grovedb/src/replication/state_sync_session.rs:94), so it has no error to assume"
         }
       ]
+    },
+    "quebec-136": {
+      "revisions": {
+        "before": "aa6c8094345db28af71d42a3b7a4cd80252dfe2a",
+        "after": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+        "how": "merge base of aa6c8094345db28af71d42a3b7a4cd80252dfe2a and 33cd86eea40565d08b2cd662d8c9c31e7a3de147"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 0,
+          "calls_changed": 0
+        },
+        "calls": 0,
+        "applicable": 0,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 0
+      },
+      "notes": [
+        "1 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "the change touched no Rust function at this commit"
+      ],
+      "wouldAsk": [],
+      "unchecked": []
+    },
+    "pybun-428": {
+      "revisions": {
+        "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
+        "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+        "how": "merge base of 7190a54f41ca1d0672b8f719767fca26a20c3aa9 and cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 5,
+          "calls_changed": 13
+        },
+        "calls": 396,
+        "applicable": 11,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 385
+      },
+      "notes": [
+        "src/drift.rs: 77 calls were left out of the listing by its cap",
+        "1 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "src/commands/project.rs: 28 calls were left out of the listing by its cap",
+        "src/mcp/schema.rs: 17 calls were left out of the listing by its cap",
+        "src/mcp/tools/maintenance.rs: 296 calls were left out of the listing by its cap",
+        "src/commands/mod.rs: 336 calls were left out of the listing by its cap",
+        "src/commands/run.rs: 441 calls were left out of the listing by its cap",
+        "src/installer.rs: 7 calls were left out of the listing by its cap",
+        "src/resolver.rs: 21 functions were left out of the listing by its cap",
+        "src/resolver.rs: 104 calls were left out of the listing by its cap",
+        "21 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": [
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "fs::read_dir(current)",
+          "origin": "changed",
+          "why": "read_dir has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: current.to_path_buf(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_path_buf()",
+          "origin": "changed",
+          "why": "to_path_buf has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: current.to_path_buf(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_path_buf()",
+          "origin": "changed",
+          "why": "to_path_buf has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "path()",
+          "origin": "changed",
+          "why": "path has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "file_name()",
+          "origin": "changed",
+          "why": "file_name has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_string_lossy()",
+          "origin": "changed",
+          "why": "to_string_lossy has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "file_type()",
+          "origin": "changed",
+          "why": "file_type has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: path.clone(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "clone()",
+          "origin": "changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "is_dir()",
+          "origin": "changed",
+          "why": "is_dir has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "contains(name.as_ref())",
+          "origin": "changed",
+          "why": "contains does not return a Result (src/snapshot.rs:123), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "collect_inputs_recursive(&path, ignore, inputs)",
+          "origin": "changed",
+          "why": "collect_inputs_recursive does not return a Result (src/build.rs:202), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "is_file()",
+          "origin": "changed",
+          "why": "is_file has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "push(path)",
+          "origin": "changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "Vec::new()",
+          "origin": "calls_changed",
+          "why": "new has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "ignored_dirs()",
+          "origin": "calls_changed",
+          "why": "ignored_dirs does not return a Result (src/build.rs:240), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "collect_inputs_recursive(project_root, &ignore, &mut inputs)",
+          "origin": "calls_changed",
+          "why": "collect_inputs_recursive does not return a Result (src/build.rs:202), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "sort()",
+          "origin": "calls_changed",
+          "why": "sort has no definition in this repository, so what it returns is not established here"
+        }
+      ]
     }
   }
 }

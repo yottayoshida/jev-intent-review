@@ -4,7 +4,7 @@ Requirement, written from the pull request text before its diff was opened (cand
 
 > If generating a session's automatic title fails, the failure must reach the caller as an error. It must not return a successful result with no label.
 
-Pull request: https://github.com/moltis-org/moltis/pull/1064 — merge base `a30a6b6`, head `4106d46`. The patches in this directory contain excerpts of moltis, MIT License, Copyright (c) 2025 Fabien Penso.
+Pull request: https://github.com/moltis-org/moltis/pull/1064 — merge base `a30a6b6`, head `4106d46`. The patches in this directory contain excerpts of moltis, MIT License, Copyright (c) 2025 Fabien Penso; the full license is in `LICENSE.upstream`.
 
 This case also carries the defects outside the diff (candidates.json, `whichCaseCarriesBAndC` in targets-fixed.json).
 
@@ -17,9 +17,9 @@ This case also carries the defects outside the diff (candidates.json, `whichCase
 | rewrite-A | `rewrite-A.head.patch` | `match …generate_title(…).await { Ok(title) => title, Err(e) => return Err(e) }` |
 | hidden-A | `hidden-A.base.patch`, `hidden-A.head.patch` | `settle_step(…generate_title(…).await)?`, with `settle_step<T, E>` returning its argument, placed at the merge base |
 | defect-B | `defect-B.base.patch` | `dispatch_command`, a caller of the changed `handle_title` that the pull request did not touch: `.or_else(\|_\| Ok(String::new()))` on the `"title"` arm — at the merge base, so the pull request did not fix it |
-| defect-C | `defect-C.base.patch` | `moltis_agents::title::generate_title`, called by nothing the pull request changed and changing nothing: the `Err` arm of the model call returns `Ok(String::new())` — at the merge base |
+| defect-C | `defect-C.base.patch` | `moltis_agents::title::generate_title`, which the pull request did not change and which calls nothing it changed (the changed `generate_title_for_session` calls it; v0.1 lists callers of changed functions, not what they call): the `Err` arm of the model call returns `Ok(String::new())` — at the merge base |
 
-Every version changes the same seven functions as the shipped one (`changed-functions.ts`).
+Every version changes the same functions as the shipped one, checked with `changed-functions.ts` from the diff before the commits were fixed.
 
 ## Behaviour, observed
 

@@ -88,11 +88,16 @@ failed is the first result. Twenty-eight of the forty do not fit v0.1's question
 the fix logs the failure, warns, blocks, or reports it in the result instead of returning it, and a
 question about whether a failure reaches the caller as a success cannot tell such a fix from the
 defect; the rest are about something other than a failed call. Of the twelve that fit, the fixed
-call could be asked about in three. The others go to the standard library or another crate, to a
-name defined more than once in the repository, or to a `Result` under another name (`CostResult`),
-and in two the tool found no changed function to ask about (one of the nine, iota#10136, is
-judged from its source without running the tool). Of the three, two could be built and
-run to observe the defect; the third needs a WebAssembly toolchain to build at all.
+call could be asked about in three. Eight could not: the call goes to the standard library or
+another crate, to a name defined more than once in the repository, or to a `Result` under another
+name (`CostResult`), or it never entered the tool's listing at all — a cap on the fixed file and
+methods the listing does not read in one case, a change the tool reports as touching no Rust
+function in another. Three of the eight were settled from the definitions of the callee, the count
+`applicabilityOf` uses, without running the tool. The twelfth, iota#10136, was not run through the
+tool: building it for a probe is far outside a one-crate test. Of the three, two could be built and
+run to observe the defect; the third needs a WebAssembly toolchain to build at all. At forty
+candidates, the cap, the owner chose to measure the two rather than stop
+(`bench/acceptance/candidates.json`, `gateExtension`).
 
 The two cases are moltis-org/moltis#1064 and dashpay/grovedb#500. Each has four versions: the
 shipped code, a defect at the fixed call whose effect was observed by running it, a rewrite that
@@ -128,14 +133,17 @@ What it shows, and no more than that:
 - **Inside the diff, v0.1 read both unseen cases right.** Each defect was listed at its own call in
   three runs of three, and neither the shipped code nor the rewrite listed it, or anything else.
   That is two requirements from two repositories.
-- **Outside the diff, nothing was asked.** The unchanged caller was held before any question: its
-  return type is `ChannelResult<String>`, a `Result` alias the check does not recognise, and the
-  report says it does not return a `Result`. The other function is outside what v0.1 enumerates by
-  construction; the table says "cap or structure" because the rule fixed beforehand gives that
-  label whenever a cap fired in the run. Among the three candidates whose fixed call could be
-  asked, the unchanged caller reached no question in any: held for the alias here, held for a
-  callee signature wrapped past four lines in Kontor#385, and dropped by the forty-call cap of its
-  function in grovedb#500 (`bench/acceptance/precheck-shipped.json`).
+- **No question reached a defect placed outside the diff.** The unchanged caller in moltis was held
+  before any question: its return type is `ChannelResult<String>`, a `Result` alias the check does
+  not recognise, and the report says it does not return a `Result`. The other function is outside
+  what v0.1 enumerates by construction; the table says "cap or structure" because the rule fixed
+  beforehand gives that label whenever a cap fired in the run. Among the three candidates whose
+  fixed call could be asked, the call from the unchanged caller to the changed function reached no
+  question in any: held for the alias here, held for a callee signature wrapped past four lines in
+  Kontor#385, and dropped by the forty-call cap of its function in grovedb#500
+  (`bench/acceptance/precheck-shipped.json`). The unchanged caller itself is reached: in grovedb#500
+  three other calls in it were asked about in every run, and read as not governed by the
+  requirement.
 - **Jev reads through a helper it was not shown.** With the decision moved into a helper whose body
   was not sent, Jev answered `returns_error` at 0.92–0.96 in every run of both cases. The helpers do
   pass the failure through, so the reading happens to be right, but nothing Jev was sent

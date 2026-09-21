@@ -211,7 +211,7 @@
       "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
       "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\".",
       "b": "not checked with the tool",
-      "note": "Held in reserve: examined only if one of 19, 20 or 23 fails condition (c).",
+      "note": "Dropped at (c) without running the tool; its (b) has no verdict.",
       "c": "fail",
       "cWhy": "The fixed calls are trait methods and common names (get_latest_checkpoint_sequence_number, BcsData::serialize, get_epoch_info) in a 470 MB monorepo, and the fixed crates build on iota-types with the Move VM. Cloning it to run the pre-check and building it for a probe are both far outside a one-crate probe."
     },
@@ -331,7 +331,7 @@
       19,
       23
     ],
-    "status": "not met at the cap of 40: two cases pass every condition"
+    "status": "not met at the cap of 40: two cases pass every condition; measured on the owner's ruling (gateExtension.rulingAtCap)"
   },
   "gateExtension": {
     "when": "2026-09-21, after the gate was not met at 20",
@@ -340,6 +340,10 @@
       "term": "gh search prs --language rust --merged --limit 60 -- \"swallowed error\"",
       "recordedBefore": "its results were read",
       "rule": "Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success. Newest merge first. Candidates already examined are skipped."
+    },
+    "rulingAtCap": {
+      "when": "2026-09-21, after the cap of 40 was reached with two cases passing",
+      "ruling": "The owner chose to measure the two cases that passed every condition (moltis#1064, grovedb#500) rather than stop or raise the cap again. The target of three is not met, and the documents say so."
     }
   }
 }

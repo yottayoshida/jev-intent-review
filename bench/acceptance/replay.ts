@@ -31,11 +31,15 @@ export function loadCases(dir = join(HERE, "cases")): CaseFile[] {
   return readdirSync(dir, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .flatMap((d) => {
+      let text: string;
       try {
-        return [JSON.parse(readFileSync(join(dir, d.name, "case.json"), "utf8")) as CaseFile];
-      } catch {
-        return []; // a case directory with no case.json yet was examined and not built
+        text = readFileSync(join(dir, d.name, "case.json"), "utf8");
+      } catch (error) {
+        // A case directory with no case.json was examined and not built. Anything else is an error.
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+        throw error;
       }
+      return [JSON.parse(text) as CaseFile];
     });
 }
 
@@ -67,7 +71,8 @@ function result(row: Row): string {
 
 /** The whole block, or a ScoringError naming the condition that does not hold. */
 export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidates: Candidates): string {
-  const measured = cases.filter((c) => c.role === "unseen" && log.cases[c.id]);
+  const measured = cases.filter((c) => c.role === "unseen");
+  for (const c of measured) if (!log.cases[c.id]) throw new ScoringError(`${c.id} is an unseen case with no measurement in the log`);
   const repos = new Set(measured.map((c) => c.repo));
   if (repos.size < 2) throw new ScoringError(`the log covers ${repos.size} repository, and the claim needs two or more`);
 
@@ -79,6 +84,9 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
   let runs = 0;
   for (const c of measured) {
     const versions = log.cases[c.id]!.versions;
+    for (const versionId of Object.keys(versions)) {
+      if (!c.versions[versionId]) throw new ScoringError(`${c.id} ${versionId} is in the log and not in case.json, so it would drop out of the table unseen`);
+    }
     for (const [versionId, version] of Object.entries(c.versions)) {
       const v = versions[versionId];
       if (!v) throw new ScoringError(`${c.id} ${versionId} is in case.json and not in the log`);

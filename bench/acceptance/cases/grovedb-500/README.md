@@ -4,7 +4,7 @@ Requirement, written from the pull request text before its diff was opened (cand
 
 > If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished.
 
-Pull request: https://github.com/dashpay/grovedb/pull/500 — merge base `43f4253`, head `c0e0281`. The patches in this directory contain excerpts of grovedb, MIT License, Copyright (c) 2021 Dash Core Group.
+Pull request: https://github.com/dashpay/grovedb/pull/500 — merge base `43f4253`, head `c0e0281`. The patches in this directory contain excerpts of grovedb, MIT License, Copyright (c) 2021 Dash Core Group; the full license is in `LICENSE.upstream`.
 
 ## Versions
 

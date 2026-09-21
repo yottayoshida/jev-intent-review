@@ -157,6 +157,9 @@ export function readRun(target: Target, run: RunRecord): RunReading {
 
 /** Whether one run's reading of a target matches what the table said beforehand. */
 export function isRight(expected: Expected, reading: RunReading, bar = BAR): boolean {
+  // A run that sent no answer about the target confirms nothing, whatever the table expected: the
+  // stages keep "an answer came back" apart from "the answer was right" (bench/acceptance/README.md).
+  if (reading.stage !== "answered") return false;
   if (expected === "listed") return reading.listed;
   if (expected === "not_listed") return !reading.listed;
   // `undetermined`: the code the question needs was not sent, so no confident reading is right.

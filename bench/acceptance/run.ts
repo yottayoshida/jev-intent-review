@@ -168,9 +168,12 @@ function distil(r: LocalCheck.LocalCheckResult) {
 
 async function measure(id: string, clone: string, limit: number) {
   const d = await dist();
+  const self = await d.git.Git.open(join(HERE, "..", ".."));
+  // The log names the commit it was taken at; a working tree with changes would make that a lie.
+  if ((await self.text(["status", "--porcelain"])).trim() !== "") throw new Error("the working tree has uncommitted changes; commit them first so the log's tool commit is the code that ran");
   const c = readCase(id);
   const log: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
-  const toolCommit = (await (await d.git.Git.open(join(HERE, "..", ".."))).text(["rev-parse", "HEAD"])).trim();
+  const toolCommit = (await self.text(["rev-parse", "HEAD"])).trim();
   const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
   const conditions = { tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
   if (Object.keys(log.conditions).length > 0 && JSON.stringify(log.conditions) !== JSON.stringify(conditions)) {
@@ -235,7 +238,7 @@ async function measure(id: string, clone: string, limit: number) {
       } catch {
         finished = false;
       }
-      v.runs.push({ finished, requirements, ...({ started, exit: code, requests: counted.requests, bytes: counted.bytes, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
+      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
       writeJson(LOG, log);
       console.log(`${id} ${versionId} run ${v.runs.length}: exit ${code}, ${counted.requests} requests, finished=${finished}, ${spent}/${limit} spent`);
     }

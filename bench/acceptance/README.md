@@ -24,7 +24,9 @@ A case is kept only if all four hold:
 - **(d)** a function outside the diff is governed by the same requirement.
 
 The set is the first three that pass, from at least two repositories. If twenty examined
-candidates do not yield three, the work stops there and says so. Candidates that fail are counted:
+candidates do not yield three, the work stops there and says so, and goes on only on the owner's
+ruling, recorded in `candidates.json` (`gateExtension`). This set went on twice: the cap was raised to
+forty, and at forty, with two cases passing, the owner chose to measure those two. Candidates that fail are counted:
 how often a real repository's failure handling fits v0.1's question is itself a result.
 
 The same requirement on another function does not count as a second requirement. A case that is

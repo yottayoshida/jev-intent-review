@@ -12043,5 +12043,9 @@
         }
       }
     }
-  }
+  },
+  "annotations": [
+    "Written after the run, 2026-09-21: every run went to Cloudflare Workers AI (https://api.cloudflare.com). The environment held CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN only; JEV_PROVIDER, JEV_API_URL, TYPESAFE_API_KEY and AI_GATEWAY_API_KEY were unset. run.ts did not yet record the endpoint per run; it does from the next run on (run.endpoint).",
+    "The enumerations were distilled afterwards with keepForTargets (introduced in the commit that added this log). No run, answer or count was changed; the table replay.ts prints was compared before and after and is identical."
+  ]
 }
