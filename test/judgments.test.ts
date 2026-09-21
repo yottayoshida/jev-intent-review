@@ -6,6 +6,9 @@ import { JevProvider, readChoice, unwrapAnswers } from "../src/judgments/jev.ts"
 import { LimitedProvider, type JudgmentProvider, type Questions } from "../src/judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, QUESTIONS_HASH } from "../src/judgments/questions.ts";
 
+/** Every request the transport lets through asks for this model; the guard is tested in `only-jev`. */
+const JEV = { model: "typesafe/jev" };
+
 const ACCOUNT = "0123456789abcdef0123456789abcdef";
 const TOKEN = "test-token-value-that-must-never-leak";
 const CLOUDFLARE_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/ai/run`;
@@ -107,14 +110,14 @@ test("a key kept in the URL's query does not come back in what the endpoint says
   const endpoint: Endpoint = { url: "https://judge.example.com/ai/run?key=secret-in-the-query", token: TOKEN, source: "JEV_API_URL" };
   const fake = fakeFetch([new Response("Cannot POST /ai/run?key=secret-in-the-query", { status: 404 })]);
   const c = new CloudflareClient(endpoint, { fetch: fake.fn, maxRetries: 0 });
-  const error = await providerError(c.post({}));
+  const error = await providerError(c.post(JEV));
   assert.ok(!error.message.includes("secret-in-the-query"), error.message);
   assert.match(error.message, /\[REDACTED QUERY\]/);
 });
 
 test("the client posts to the account's endpoint with the token, and retries 429 and 5xx", async () => {
   const { c, calls, sleeps } = client([json({}, 429, { "retry-after": "2" }), json({}, 503), json({ result: { ok: 1 } })]);
-  assert.deepEqual(await c.post({ a: 1 }), { result: { ok: 1 } });
+  assert.deepEqual(await c.post({ ...JEV, a: 1 }), { result: { ok: 1 } });
   assert.equal(calls.length, 3);
   assert.equal(calls[0]?.url, `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/ai/run`);
   assert.equal((calls[0]?.init.headers as Record<string, string>).Authorization, `Bearer ${TOKEN}`);
@@ -129,7 +132,7 @@ test("the client does not retry auth, payment or bad requests, and names what we
     [400, "bad_request"],
   ] as const) {
     const { c, calls } = client([json({ errors: [] }, status)]);
-    const error = await providerError(c.post({}));
+    const error = await providerError(c.post(JEV));
     assert.equal(error.kind, kind);
     assert.equal(calls.length, 1);
   }
@@ -138,12 +141,12 @@ test("the client does not retry auth, payment or bad requests, and names what we
 test("a redirect or a 404 is the endpoint's answer about itself: no retry, and nothing is sent after it", async () => {
   for (const first of [json({}, 302, { location: "https://elsewhere.example.com/" }), json({}, 404), json({}, 405)]) {
     const { c, calls } = client([first, json({ result: 1 }), json({ result: 1 })]);
-    const error = await providerError(c.post({}));
+    const error = await providerError(c.post(JEV));
     assert.equal(error.kind, "endpoint", String(first.status));
     assert.equal(calls.length, 1);
     assert.equal((calls[0]?.init as RequestInit).redirect, "manual", "a redirect is never followed with the token attached");
     // The latch: the eight judgments in flight and the queue behind them stop too.
-    const again = await providerError(c.post({}));
+    const again = await providerError(c.post(JEV));
     assert.equal(again, error);
     assert.equal(calls.length, 1, "nothing was sent after the endpoint refused");
   }
@@ -155,8 +158,8 @@ test("a redirect or a 404 is the endpoint's answer about itself: no retry, and n
     [400, "bad_request", 2],
   ] as const) {
     const { c, calls } = client([json({}, status), json({ result: 1 })]);
-    assert.equal((await providerError(c.post({}))).kind, kind);
-    await c.post({}).catch(() => {});
+    assert.equal((await providerError(c.post(JEV))).kind, kind);
+    await c.post(JEV).catch(() => {});
     assert.equal(calls.length, after, `${status} ${kind}`);
   }
 });
@@ -171,59 +174,59 @@ test("a second answer it cannot use, with none read yet, is the endpoint and not
   for (const [i, first] of unusable.entries()) {
     for (const second of unusable) {
       const { c, calls } = client([first(), second(), json({ result: 1 })], 0);
-      await providerError(c.post({ a: 1 }));
-      const error = await providerError(c.post({ b: 2 }));
+      await providerError(c.post({ ...JEV, a: 1 }));
+      const error = await providerError(c.post({ ...JEV, b: 2 }));
       assert.equal(error.kind, "endpoint", `${i}`);
       assert.match(error.message, /not a Workers AI run endpoint/);
-      await c.post({ c: 3 }).catch(() => {});
+      await c.post({ ...JEV, c: 3 }).catch(() => {});
       assert.equal(calls.length, 2, "the rest of the run is not sent");
     }
   }
 
   // An answer that could be read, not merely a 200, is what makes the next failure one packet's.
   const working = client([json({ result: 1 }), json({ errors: [] }, 400), new Response("<html>", { status: 200 }), json({ result: 2 })], 0);
-  await working.c.post({});
-  assert.equal((await providerError(working.c.post({}))).kind, "bad_request");
-  assert.equal((await providerError(working.c.post({}))).kind, "bad_response");
-  assert.deepEqual(await working.c.post({}), { result: 2 });
+  await working.c.post(JEV);
+  assert.equal((await providerError(working.c.post(JEV))).kind, "bad_request");
+  assert.equal((await providerError(working.c.post(JEV))).kind, "bad_response");
+  assert.deepEqual(await working.c.post(JEV), { result: 2 });
   assert.equal(working.calls.length, 4);
 
   // "Not now" is not "not here": a rate limit and a server error never stand for the endpoint.
   const busy = client([json({}, 429), json({}, 503), json({ result: 1 })], 0);
-  assert.equal((await providerError(busy.c.post({}))).kind, "rate_limited");
-  assert.equal((await providerError(busy.c.post({}))).kind, "server");
-  assert.deepEqual(await busy.c.post({}), { result: 1 });
+  assert.equal((await providerError(busy.c.post(JEV))).kind, "rate_limited");
+  assert.equal((await providerError(busy.c.post(JEV))).kind, "server");
+  assert.deepEqual(await busy.c.post(JEV), { result: 1 });
 });
 
 test("nothing the endpoint returns can forge a log line or hand the token back", async () => {
   const { c } = client([new Response(`{"broken"\n::error::forged\ntoken ${TOKEN}`, { status: 500 })], 0);
-  const error = await providerError(c.post({}));
+  const error = await providerError(c.post(JEV));
   assert.ok(!error.message.includes(TOKEN), error.message);
   assert.ok(!/[\r\n]/.test(error.message), error.message);
   assert.match(error.message, /https:\/\/api\.cloudflare\.com answered 500/);
 
   // A failure the endpoint reports in its own JSON goes through the same treatment.
   const reported = client([json({ success: false, errors: [{ message: `no\n::add-mask::${TOKEN}` }] })], 0);
-  const second = await providerError(reported.c.post({}));
+  const second = await providerError(reported.c.post(JEV));
   assert.ok(!second.message.includes(TOKEN) && !/[\r\n]/.test(second.message), second.message);
 });
 
 test("the client gives up after its retries, and reports timeouts, non-JSON and success:false", async () => {
   const net = client([new TypeError("fetch failed"), new TypeError("fetch failed"), new TypeError("fetch failed")]);
-  assert.equal((await providerError(net.c.post({}))).kind, "network");
+  assert.equal((await providerError(net.c.post(JEV))).kind, "network");
   assert.equal(net.calls.length, 3);
 
   const timeout = Object.assign(new Error("timed out"), { name: "TimeoutError" });
-  assert.equal((await providerError(client([timeout], 0).c.post({}))).kind, "timeout");
-  assert.equal((await providerError(client([json({}, 500)], 0).c.post({}))).kind, "server");
-  assert.equal((await providerError(client([new Response("<html>", { status: 200 })]).c.post({}))).kind, "bad_response");
-  assert.equal((await providerError(client([json({ success: false, errors: [{ message: "nope" }] })]).c.post({}))).kind, "bad_response");
+  assert.equal((await providerError(client([timeout], 0).c.post(JEV))).kind, "timeout");
+  assert.equal((await providerError(client([json({}, 500)], 0).c.post(JEV))).kind, "server");
+  assert.equal((await providerError(client([new Response("<html>", { status: 200 })]).c.post(JEV))).kind, "bad_response");
+  assert.equal((await providerError(client([json({ success: false, errors: [{ message: "nope" }] })]).c.post(JEV))).kind, "bad_response");
 });
 
 test("the client counts every request it actually sends, retries included", async () => {
   const { c } = client([json({}, 429), json({ result: 1 })]);
-  await c.post({ a: 1 });
-  assert.deepEqual(c.sent, { requests: 2, bytes: 2 * Buffer.byteLength(JSON.stringify({ a: 1 })) });
+  await c.post({ ...JEV, a: 1 });
+  assert.deepEqual(c.sent, { requests: 2, bytes: 2 * Buffer.byteLength(JSON.stringify({ ...JEV, a: 1 })) });
 });
 
 test("a body that times out while being read is retried like any other timeout", async () => {
@@ -235,19 +238,19 @@ test("a body that times out while being read is retried like any other timeout",
     }),
   );
   const { c, calls } = client([failing, json({ result: "second" })]);
-  assert.deepEqual(await c.post({}), { result: "second" });
+  assert.deepEqual(await c.post(JEV), { result: "second" });
   assert.equal(calls.length, 2);
 });
 
 test("the client starts nothing past its deadline and does not wait past it for a retry", async () => {
   const late = fakeFetch([json({})]);
   const past = new CloudflareClient(ENDPOINT, { fetch: late.fn, deadline: 1000, now: () => 2000 });
-  assert.equal((await providerError(past.post({}))).kind, "budget");
+  assert.equal((await providerError(past.post(JEV))).kind, "budget");
   assert.equal(late.calls.length, 0);
 
   const busy = fakeFetch([json({}, 503), json({ result: 1 })]);
   const tight = new CloudflareClient(ENDPOINT, { fetch: busy.fn, deadline: 1500, now: () => 1000, sleep: async () => {} });
-  assert.equal((await providerError(tight.post({}))).kind, "budget");
+  assert.equal((await providerError(tight.post(JEV))).kind, "budget");
   assert.equal(busy.calls.length, 1, "the retry would wait at least 1 s; only 0.5 s were left");
 });
 
@@ -332,13 +335,13 @@ test("the request and byte budget counts what is actually sent, retries included
   // One judgment that the server keeps refusing: four attempts, and a budget of one request.
   const busy = fakeFetch([json({}, 503), json({}, 503), json({}, 503), json({ result: 1 })]);
   const one = new CloudflareClient(ENDPOINT, { fetch: busy.fn, maxRequests: 1, sleep: async () => {} });
-  assert.equal((await providerError(one.post({}))).kind, "budget");
+  assert.equal((await providerError(one.post(JEV))).kind, "budget");
   assert.equal(busy.calls.length, 1);
   assert.equal(one.sent.requests, 1);
 
   const small = fakeFetch([json({})]);
   const tiny = new CloudflareClient(ENDPOINT, { fetch: small.fn, maxBytes: 10 });
-  assert.equal((await providerError(tiny.post({ big: "x".repeat(100) }))).kind, "budget");
+  assert.equal((await providerError(tiny.post({ ...JEV, big: "x".repeat(100) }))).kind, "budget");
   assert.equal(small.calls.length, 0, "refused before sending");
 });
 

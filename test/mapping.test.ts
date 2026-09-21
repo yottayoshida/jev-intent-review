@@ -1,80 +1,71 @@
-// What code can check about a mapping, and what it deliberately cannot.
+// The question put to Jev about what a requirement requires of a call, and the rule for acting on
+// the answer.
 //
-// The point of these is the boundary: every one of the accepted mappings below passes every check
-// this file has, and one of them is plainly wrong about the sentence. Passing is a shape, not a
-// correctness claim, and the report says so where it prints one.
+// The rule is fixed here, before the measurement it will be read with: `applies`, at or above the
+// same bar the reading of the code clears.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { checkMapping, MAPPING_PROPERTY } from "../src/plan/mapping.ts";
+import { acceptMapping, mappingQuestionFor, MAPPING_BAR, MAPPING_CRITERIA } from "../src/plan/mapping.ts";
+import { BAR } from "../src/plan/local-check.ts";
+import { enumerate } from "../src/plan/candidates.ts";
+import type { ChoiceAnswer } from "../src/types.ts";
 
-const context = {
-  callId: "src/integrity.rs:call-3",
-  offered: new Set(["src/integrity.rs:call-3", "src/config.rs:call-8"]),
-  requirementId: "R1",
-  requirementText: "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of being silently treated as an empty file.",
-};
+const SOURCE = `pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {
+    let content = read_capped(base_dir, MAX)?;
+    Ok(Some(content))
+}
+`;
+const c = enumerate("src/integrity.rs", SOURCE);
+const fn = c.functions[0]!;
+const call = c.calls.find((k) => k.callee === "read_capped")!;
 
-const good = { callId: "src/integrity.rs:call-3", verdict: "applies", quote: "refused by name instead of being silently treated as an empty file", reason: "this is the read the sentence is about" };
+const answer = (choice: string, p: number): ChoiceAnswer => ({ choice, confidence: p, probabilities: { [choice]: p } });
 
-test("a mapping that names a real call and quotes the requirement is accepted", () => {
-  const r = checkMapping(good, context);
-  assert.equal(r.ok, true);
-  if (r.ok) {
-    assert.equal(r.mapping.requirementId, "R1");
-    assert.equal(r.mapping.property, MAPPING_PROPERTY);
-    assert.equal(r.mapping.verdict, "applies");
-  }
+test("the question is three options with fixed criteria — which is what Jev answers", () => {
+  const q = mappingQuestionFor(fn, call, "read_capped(base_dir, MAX)");
+  assert.deepEqual(Object.keys(q), ["requirement_governs"]);
+  assert.equal(q.requirement_governs!.type, "choice");
+  assert.deepEqual(Object.keys(q.requirement_governs!.criteria).sort(), ["applies", "does_not_apply", "unknown"]);
+  assert.deepEqual(q.requirement_governs!.criteria, MAPPING_CRITERIA);
 });
 
-test("accepted is a shape, not a correct reading", () => {
-  // Every check here passes, and the reason given is nonsense about the sentence. Nothing in this
-  // file can tell the difference, which is why the report attributes a finding to a model rather
-  // than stating it.
-  const r = checkMapping({ ...good, reason: "because the word 'file' appears twice" }, context);
-  assert.equal(r.ok, true);
+test("the question names the call and the function, and assumes nothing about run time", () => {
+  const { instructions } = mappingQuestionFor(fn, call, "read_capped(base_dir, MAX)").requirement_governs!;
+  assert.match(instructions, /read_capped\(base_dir, MAX\)/);
+  assert.match(instructions, /read_baseline/);
+  assert.match(instructions, /Assume nothing about what happens at run time/);
+  // The reading of the code is asked under an assumed failure. This one must not be: what a
+  // requirement asks of a call is settled by its words, not by what the code does.
+  assert.ok(!/Assume exactly this/.test(instructions), "this is not the condition the observation is asked under");
 });
 
-test("an answer about a different call is refused, and most of all when that call is real", () => {
-  // Checking membership of this run's set let an answer about one call be filed against another:
-  // every check passed, the quote was genuinely in the requirement, and the finding named the
-  // wrong function. An answer to a different question is not a weaker answer to this one.
-  const invented = checkMapping({ ...good, callId: "src/elsewhere.rs:call-1" }, context);
-  assert.equal(invented.ok, false);
-  if (!invented.ok) {
-    assert.equal(invented.kind, "wrong_call");
-    assert.match(invented.reason, /not about src\/integrity\.rs:call-3/);
-  }
-  const otherCandidate = checkMapping({ ...good, callId: "src/config.rs:call-8" }, context);
-  assert.equal(otherCandidate.ok, false);
-  if (!otherCandidate.ok) assert.match(otherCandidate.reason, /another call in this run's set/);
+test("the rule is applies, at or above the same bar the code's reading clears", () => {
+  assert.equal(MAPPING_BAR, BAR);
+  assert.equal(acceptMapping(answer("applies", 0.9)).governs, true);
+  assert.equal(acceptMapping(answer("applies", MAPPING_BAR)).governs, true, "at the bar counts");
+  assert.equal(acceptMapping(answer("applies", MAPPING_BAR - 0.01)).governs, false);
+  assert.equal(acceptMapping(answer("does_not_apply", 0.99)).governs, false);
+  assert.equal(acceptMapping(answer("unknown", 0.99)).governs, false);
 });
 
-test("a quote that is not in the requirement is refused, and so is one too short to be one", () => {
-  const invented = checkMapping({ ...good, quote: "must never be swallowed under any circumstances" }, context);
-  assert.equal(invented.ok, false);
-  if (!invented.ok) assert.equal(invented.kind, "quote_not_in_requirement");
-  const tiny = checkMapping({ ...good, quote: "a FIFO" }, context);
-  assert.equal(tiny.ok, false);
-  if (!tiny.ok) assert.match(tiny.reason, /too short/);
+test("every option's probability is kept, so a reading near the bar can be re-read later", () => {
+  const rich: ChoiceAnswer = { choice: "applies", confidence: 0.62, probabilities: { applies: 0.62, does_not_apply: 0.3, unknown: 0.08 } };
+  const m = acceptMapping(rich);
+  assert.equal(m.probability, 0.62);
+  assert.deepEqual(m.probabilities, { applies: 0.62, does_not_apply: 0.3, unknown: 0.08 });
+  assert.equal(m.governs, true);
 });
 
-test("whitespace and case in a quote are not what decides", () => {
-  const r = checkMapping({ ...good, quote: "REFUSED BY NAME\n  instead of being   silently treated as an empty file" }, context);
-  assert.equal(r.ok, true, r.ok ? "" : r.reason);
+test("no answer is its own verdict, not a quiet does_not_apply", () => {
+  const none = acceptMapping(undefined);
+  assert.equal(none.verdict, "no_answer");
+  assert.equal(none.governs, false);
+  assert.notEqual(none.verdict, "does_not_apply");
 });
 
-test("a verdict that does not apply needs no quote: there may be nothing to point at", () => {
-  const r = checkMapping({ ...good, verdict: "does_not_apply", quote: "" }, context);
-  assert.equal(r.ok, true, r.ok ? "" : r.reason);
-  const unknown = checkMapping({ ...good, verdict: "unknown", quote: "" }, context);
-  assert.equal(unknown.ok, true, unknown.ok ? "" : unknown.reason);
-});
-
-test("anything that is not one of the three verdicts, or not the shape asked for, is refused", () => {
-  for (const bad of [{ ...good, verdict: "violates" }, { ...good, verdict: "yes" }, { callId: "src/integrity.rs:call-3" }, null, "applies", 7]) {
-    const r = checkMapping(bad, context);
-    assert.equal(r.ok, false, JSON.stringify(bad));
-    if (!r.ok) assert.equal(r.kind, "bad_shape");
-  }
+test("a choice outside the three is read as unknown rather than acted on", () => {
+  const m = acceptMapping(answer("violates", 0.99));
+  assert.equal(m.verdict, "unknown");
+  assert.equal(m.governs, false);
 });

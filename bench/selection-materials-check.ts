@@ -24,7 +24,8 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { COMPILER_MODEL, readModelJson } from "../src/intent/compiler.ts";
+import { readModelJson } from "../src/intent/compiler.ts";
+import { SUPERSEDED_PLANNING_MODEL as COMPILER_MODEL } from "./superseded-models.ts";
 import { CloudflareClient, endpointFromEnv } from "../src/judgments/cloudflare.ts";
 import { Git } from "../src/repository/git.ts";
 import { VERSION } from "../src/version.ts";

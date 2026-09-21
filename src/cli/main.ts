@@ -5,7 +5,7 @@ import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadConfig, type Config } from "../config/config.ts";
-import { compileChecklist, WorkersAiCompiler, type IntentCompiler } from "../intent/compiler.ts";
+import { compileChecklist } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
 import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
@@ -15,9 +15,6 @@ import { QUESTIONS_HASH } from "../judgments/questions.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
-import { modelPlanner } from "../plan/planner.ts";
-import { modelMapper, type Mapper } from "../plan/mapping.ts";
-import type { Planner } from "../review/local-check-run.ts";
 import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
 import { runReview } from "../review/run.ts";
@@ -94,7 +91,7 @@ function flat(text: string): string {
 
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string; planner?: Planner; mapper?: Mapper };
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; sent: () => { requests: number; bytes: number }; origin: string };
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -138,9 +135,6 @@ function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
   const client = new CloudflareClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
-    compiler: new WorkersAiCompiler(client),
-    planner: modelPlanner(client),
-    mapper: modelMapper(client),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
   };
@@ -310,8 +304,6 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         git,
         revisions,
         resolved.spec.requirements,
-        { pick: asksNothing } as unknown as Planner,
-        { map: asksNothing } as unknown as Mapper,
         { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
         pathFilter(config.repository.include, config.repository.ignore),
         { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
@@ -327,7 +319,17 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const deadline = Date.now() + config.limits.max_seconds * 1000;
     const judges = (deps.judges ?? defaultJudges)(endpoint, config, deadline);
 
-    const intent = resolved.spec ?? compileChecklist(resolved.sources) ?? (await judges.compiler.compile(resolved.sources));
+    // No model writes the requirements. Jev answers typed questions; it does not author a spec,
+    // and reaching for a general instruct model to do it is how a second model got in. Prose that
+    // is not an acceptance-criteria list is refused with the two forms that do work, rather than
+    // guessed at.
+    const intent = resolved.spec ?? compileChecklist(resolved.sources);
+    if (!intent) {
+      throw new ToolError(
+        "the intent could not be read without asking a model to write it: give the requirements with --intent-spec (a spec file), or state them in the issue or pull request as an acceptance-criteria list, one checkable statement per item",
+        EXIT.intent,
+      );
+    }
     if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
     for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
 
@@ -336,15 +338,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // about particular calls. It reports observations and what it did not check, never a
       // violation, and it does not go through `runReview`.
       const include = pathFilter(config.repository.include, config.repository.ignore);
-      // The planner and the mapper are the same model doing two different jobs, so they share one
-      // client and one budget: choosing where to look, and saying whether the requirement governs
-      // what was found. The judgment provider is separate and is never asked either question.
-      const client = judges.planner && judges.mapper ? null : new CloudflareClient(endpoint, { deadline });
-      const planner = judges.planner ?? modelPlanner(client!);
-      const mapper = judges.mapper ?? modelMapper(client!);
-      // `--experimental-candidates-only` returned above, before the credentials gate, so there is
-      // nothing to pass through here.
-      const results = await runLocalCheck(git, revisions, intent.requirements, planner, mapper, judges.provider, include, DEFAULT_LOCAL_CHECK);
+      // One provider, two questions. Both go to Jev; there is nothing else to send to.
+      // `--experimental-candidates-only` returned above, before the credentials gate.
+      const results = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, DEFAULT_LOCAL_CHECK);
       io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
       return EXIT.ok;
     }

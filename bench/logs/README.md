@@ -17,6 +17,7 @@ not in it.
 
 | file | experiment | runs | what it establishes |
 |---|---|---|---|
+| `jev-only-v1.json` | `--experimental-local-check`, shipped branch, mapping asked of Jev | 1 | The first run with no model but Jev in it. Jev reads both measured targets as `does_not_apply` (0.51, 0.63) and the calls that perform the refusal itself as `applies` (0.90, 0.77). Every probability kept; nothing scored. |
 | `diff-reach-v1.json` | `--experimental-local-check`, five branches of omamori `#468` | 5 | The diff reaches both target calls inside a budget of 20 on every branch, and the answers match what the program does in ten cells of ten. **Distilled**: counts, notes, the budgeted set and every observation with its probability — not the 700-odd calls that were held. |
 | `local-check.json` | `bench/local-check.ts` | 18 | The first plan on `collect_listing`: 18/18 as written down beforehand. |
 | `local-check-propagation.json` | `bench/local-check-propagation.ts` | 18 | The same plan on the `show_entries` read loop: 12/18, and the six that miss are the shipped behaviour. |

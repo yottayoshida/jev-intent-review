@@ -1,0 +1,507 @@
+{
+ "what": "The first run with the mapping asked of Jev rather than a general instruct model. Shipped branch of omamori PR#476, base 52a58fa, head e58c04f.",
+ "settings": {
+  "budget": 20,
+  "bar": 0.6,
+  "mappingBar": 0.6,
+  "model": "typesafe/jev",
+  "note": "Every request in this run asked for typesafe/jev; the transport refuses anything else."
+ },
+ "requirement": {
+  "id": "R1",
+  "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+ },
+ "counts": {
+  "budget": 20,
+  "functions": {
+   "changed": 23,
+   "calls_changed": 20
+  },
+  "calls": 739,
+  "applicable": 37,
+  "asked": 19,
+  "mapped": 19,
+  "governed": 3,
+  "overBudget": 17,
+  "notApplicable": 702
+ },
+ "targets": [
+  "read_baseline",
+  "raw_override_disables"
+ ],
+ "reading": "Jev read both measured targets as does_not_apply, and read the calls that perform the refusal itself as applies. Not scored either way: settling it needs a fixed reading of the requirement, which has not been done.",
+ "mappings": [
+  {
+   "requirementId": "R1",
+   "callId": "src/atomic_file.rs:call-38",
+   "file": "src/atomic_file.rs",
+   "function": "open_read_regular",
+   "call": "reject_non_regular(&file, path)",
+   "verdict": "applies",
+   "probability": 0.9,
+   "probabilities": {
+    "does_not_apply": 0.05,
+    "unknown": 0.05,
+    "applies": 0.9
+   },
+   "governs": true,
+   "why": "the requirement is read as requiring this of the call (0.90)"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/atomic_file.rs:call-51",
+   "file": "src/atomic_file.rs",
+   "function": "read_to_string_capped",
+   "call": "open_read_regular(path)",
+   "verdict": "applies",
+   "probability": 0.53,
+   "probabilities": {
+    "does_not_apply": 0.27,
+    "unknown": 0.2,
+    "applies": 0.53
+   },
+   "governs": false,
+   "why": "read as `applies` (0.53), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/secret.rs:call-140",
+   "file": "src/audit/secret.rs",
+   "function": "read_secret",
+   "call": "open_read_nofollow(path)",
+   "verdict": "does_not_apply",
+   "probability": 0.6799999999999999,
+   "probabilities": {
+    "unknown": 0.29,
+    "applies": 0.03,
+    "does_not_apply": 0.6799999999999999
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.68), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/secret.rs:call-174",
+   "file": "src/audit/secret.rs",
+   "function": "open_read_nofollow",
+   "call": "crate::atomic_file::open_read_regular(path)",
+   "verdict": "applies",
+   "probability": 0.57,
+   "probabilities": {
+    "unknown": 0.2,
+    "applies": 0.57,
+    "does_not_apply": 0.23
+   },
+   "governs": false,
+   "why": "read as `applies` (0.57), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/secret.rs:call-185",
+   "file": "src/audit/secret.rs",
+   "function": "open_audit_rw",
+   "call": "crate::atomic_file::reject_non_regular(&file, path)",
+   "verdict": "applies",
+   "probability": 0.77,
+   "probabilities": {
+    "does_not_apply": 0.14,
+    "unknown": 0.09,
+    "applies": 0.77
+   },
+   "governs": true,
+   "why": "the requirement is read as requiring this of the call (0.77)"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/cli/config_cmd.rs:call-251",
+   "file": "src/cli/config_cmd.rs",
+   "function": "run_override_disable",
+   "call": "guard_ai_config_modification(\"override disable\")",
+   "verdict": "does_not_apply",
+   "probability": 0.96,
+   "probabilities": {
+    "applies": 0,
+    "unknown": 0.04,
+    "does_not_apply": 0.96
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/config.rs:call-20",
+   "file": "src/config.rs",
+   "function": "load_config",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+   "verdict": "does_not_apply",
+   "probability": 0.64,
+   "probabilities": {
+    "unknown": 0.2,
+    "does_not_apply": 0.64,
+    "applies": 0.16
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.64), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/config.rs:call-28",
+   "file": "src/config.rs",
+   "function": "raw_rule_names",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "verdict": "applies",
+   "probability": 0.41,
+   "probabilities": {
+    "does_not_apply": 0.37,
+    "applies": 0.41,
+    "unknown": 0.22
+   },
+   "governs": false,
+   "why": "read as `applies` (0.41), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/config.rs:call-41",
+   "file": "src/config.rs",
+   "function": "read_raw_rule_state",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "verdict": "does_not_apply",
+   "probability": 0.69,
+   "probabilities": {
+    "unknown": 0.2,
+    "applies": 0.11,
+    "does_not_apply": 0.69
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.69), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/config.rs:call-60",
+   "file": "src/config.rs",
+   "function": "raw_override_disables",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "verdict": "does_not_apply",
+   "probability": 0.63,
+   "probabilities": {
+    "applies": 0.13,
+    "does_not_apply": 0.63,
+    "unknown": 0.24
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.63), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/integrity.rs:call-25",
+   "file": "src/integrity.rs",
+   "function": "generate_baseline",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+   "verdict": "does_not_apply",
+   "probability": 0.75,
+   "probabilities": {
+    "unknown": 0.15,
+    "applies": 0.1,
+    "does_not_apply": 0.75
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.75), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/integrity.rs:call-44",
+   "file": "src/integrity.rs",
+   "function": "read_baseline",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+   "verdict": "does_not_apply",
+   "probability": 0.51,
+   "probabilities": {
+    "does_not_apply": 0.51,
+    "unknown": 0.23,
+    "applies": 0.26
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.51), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/mod.rs:call-58",
+   "file": "src/audit/mod.rs",
+   "function": "append",
+   "call": "open_audit_rw(&self.path)",
+   "verdict": "does_not_apply",
+   "probability": 0.5599999999999999,
+   "probabilities": {
+    "does_not_apply": 0.5599999999999999,
+    "unknown": 0.16,
+    "applies": 0.28
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.56), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/secret.rs:call-193",
+   "file": "src/audit/secret.rs",
+   "function": "rotate_key_locked",
+   "call": "read_secret(&secret_path)",
+   "verdict": "does_not_apply",
+   "probability": 0.66,
+   "probabilities": {
+    "unknown": 0.18,
+    "does_not_apply": 0.66,
+    "applies": 0.16
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.66), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/break_glass.rs:call-94",
+   "file": "src/break_glass.rs",
+   "function": "activate",
+   "call": "write_state(&state)",
+   "verdict": "does_not_apply",
+   "probability": 0.98,
+   "probabilities": {
+    "does_not_apply": 0.98,
+    "unknown": 0.02,
+    "applies": 0
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/break_glass.rs:call-107",
+   "file": "src/break_glass.rs",
+   "function": "clear_rule",
+   "call": "remove_state_file()",
+   "verdict": "does_not_apply",
+   "probability": 0.97,
+   "probabilities": {
+    "does_not_apply": 0.97,
+    "unknown": 0.03,
+    "applies": 0
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.97), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/break_glass.rs:call-115",
+   "file": "src/break_glass.rs",
+   "function": "clear_all",
+   "call": "remove_state_file()",
+   "verdict": "does_not_apply",
+   "probability": 0.97,
+   "probabilities": {
+    "applies": 0,
+    "unknown": 0.03,
+    "does_not_apply": 0.97
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.97), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/cli/config_cmd.rs:call-37",
+   "file": "src/cli/config_cmd.rs",
+   "function": "run_override_command",
+   "call": "run_override_disable(rule_name)",
+   "verdict": "does_not_apply",
+   "probability": 0.98,
+   "probabilities": {
+    "applies": 0,
+    "does_not_apply": 0.98,
+    "unknown": 0.02
+   },
+   "governs": false,
+   "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+  },
+  {
+   "requirementId": "R1",
+   "callId": "src/audit/verify.rs:call-56",
+   "file": "src/audit/verify.rs",
+   "function": "show_entries",
+   "call": "open_read_nofollow(&path)",
+   "verdict": "applies",
+   "probability": 0.65,
+   "probabilities": {
+    "applies": 0.65,
+    "does_not_apply": 0.21,
+    "unknown": 0.14
+   },
+   "governs": true,
+   "why": "the requirement is read as requiring this of the call (0.65)"
+  }
+ ],
+ "findings": [],
+ "observed": [
+  {
+   "file": "src/atomic_file.rs",
+   "function": "open_read_regular",
+   "call": "reject_non_regular(&file, path)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/atomic_file.rs",
+   "function": "read_to_string_capped",
+   "call": "open_read_regular(path)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/audit/secret.rs",
+   "function": "read_secret",
+   "call": "open_read_nofollow(path)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/audit/secret.rs",
+   "function": "open_read_nofollow",
+   "call": "crate::atomic_file::open_read_regular(path)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/audit/secret.rs",
+   "function": "open_audit_rw",
+   "call": "crate::atomic_file::reject_non_regular(&file, path)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.98
+  },
+  {
+   "file": "src/cli/config_cmd.rs",
+   "function": "run_override_disable",
+   "call": "guard_ai_config_modification(\"override disable\")",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.98
+  },
+  {
+   "file": "src/config.rs",
+   "function": "load_config",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.9299999999999999
+  },
+  {
+   "file": "src/config.rs",
+   "function": "raw_rule_names",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/config.rs",
+   "function": "read_raw_rule_state",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/config.rs",
+   "function": "raw_override_disables",
+   "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/integrity.rs",
+   "function": "generate_baseline",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_success",
+   "probability": 0.96
+  },
+  {
+   "file": "src/integrity.rs",
+   "function": "read_baseline",
+   "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+   "origin": "changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/audit/mod.rs",
+   "function": "append",
+   "call": "open_audit_rw(&self.path)",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/audit/secret.rs",
+   "function": "rotate_key_locked",
+   "call": "read_secret(&secret_path)",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 1
+  },
+  {
+   "file": "src/break_glass.rs",
+   "function": "activate",
+   "call": "write_state(&state)",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 1
+  },
+  {
+   "file": "src/break_glass.rs",
+   "function": "clear_rule",
+   "call": "remove_state_file()",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 1
+  },
+  {
+   "file": "src/break_glass.rs",
+   "function": "clear_all",
+   "call": "remove_state_file()",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 0.99
+  },
+  {
+   "file": "src/cli/config_cmd.rs",
+   "function": "run_override_command",
+   "call": "run_override_disable(rule_name)",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 0.79
+  },
+  {
+   "file": "src/audit/verify.rs",
+   "function": "show_entries",
+   "call": "open_read_nofollow(&path)",
+   "origin": "calls_changed",
+   "observation": "returns_error",
+   "probability": 0.88
+  }
+ ],
+ "notes": [
+  "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+  "src/config.rs: 61 calls were left out of the listing by its cap",
+  "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+  "src/integrity.rs: 80 calls were left out of the listing by its cap",
+  "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+  "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+  "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+  "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+  "only the first 12 of 23 changed functions had their callers looked up",
+  "29 more callers were found than the cap of 20 functions allows",
+  "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+ ]
+}

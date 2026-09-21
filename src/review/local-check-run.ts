@@ -9,17 +9,19 @@
 // The shape:
 //
 //   1. the change offers the functions holding changed lines, and one hop out their callers
-//   2. the requirement's own words open files, through the same lexical search the tool already
-//      has, and the planner picks calls in those files by id, each with the clause it checks
-//   3. every call in every function either finder reached is added — a finder says where to look,
-//      and the defect is usually a different call in the same body
-//   4. calls whose callee resolves here to something returning a `Result` are askable; the rest are
+//   2. every call in every one of those functions is added — the diff says which body, and the
+//      defect is usually a different call in it
+//   3. calls whose callee resolves here to something returning a `Result` are askable; the rest are
 //      held, with the reason, in the report
-//   5. **one** judgment budget for the requirement, spent round-robin over functions, so neither a
+//   4. **one** judgment budget for the requirement, spent round-robin over functions, so neither a
 //      busy body nor a busy file can take the run
-//   6. each of those calls is put to the mapping — does the requirement require anything of it? —
-//      and where the answer is yes and the reading of the call contradicts it, the call is listed
-//      as worth checking
+//   5. each of those calls gets two Jev questions, asked separately: does the requirement require
+//      that this call's failure not reach the caller as a success, and what does the function
+//      return when it does fail. Where both clear the bar and disagree, the call is listed
+//
+// **Only Jev is asked anything.** A second model used to open files, pick calls and write the
+// mapping's prose; the transport refuses every model but Jev now, and what that model was giving
+// comes from the input and from the run's own record instead.
 //
 // Nothing in this file knows a function name, a helper name or an expected answer.
 //
@@ -30,44 +32,35 @@
 // finding is two readings that disagree, printed with everything needed to disagree with them.
 
 import { analyzeChange } from "../change/seeds.ts";
-import { Discoverer, requirementWords } from "../discovery/discover.ts";
+import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import type { Candidate, Requirement } from "../types.ts";
 import { applicabilityOf, type Applicability } from "../plan/applicability.ts";
-import { listingFor, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
+import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, conditionFor, describe, locateCall, questionsFor, type LocalResult } from "../plan/local-check.ts";
-import { checkMapping, type Mapper, type Mapping, type MappingVerdict } from "../plan/mapping.ts";
-import { selectSites, type FunctionOrigin, type Pick, type Site, type SiteSource } from "../plan/select.ts";
+import { acceptMapping, mappingQuestionFor, MAPPING_BAR, MAPPING_PROPERTY, type MappingAnswer, type MappingVerdict, whyListed } from "../plan/mapping.ts";
+import { selectSites, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
 import { probabilityOf } from "./requirement.ts";
 
-export interface Planner {
-  /** Picks calls from a listing. Given the requirement's text and the listing; never the answers. */
-  /** `failed` separates "nothing here is governed" from "the request did not come back". */
-  pick(input: { requirement: string; file: string; listing: ReturnType<typeof listingFor> }): Promise<{ picks: Pick[]; notCovered?: string[]; failed?: string }>;
-}
-
 export interface LocalCheckOptions {
-  /** How many calls a requirement may be judged at, over every file it reached. */
+  /** How many calls a requirement may be judged at, over every file the change reached. */
   budget: number;
-  /** How many files the requirement's words may open for the planner. */
-  maxFiles: number;
   maxPrimaryChars: number;
   maxRelatedChars: number;
   /**
-   * Build the set and stop: no planner, no judgments, no request of any kind.
+   * Build the set and stop: no questions of any kind, no request of any kind.
    *
    * What it answers is whether a call is reachable and inside the budget, which is the question to
-   * settle before spending anything. The planner is not consulted, so the picks that would share
-   * the budget on a real run are absent — the report says so rather than implying the set is final.
+   * settle before spending anything.
    */
   candidatesOnly?: boolean;
 }
 
-export const DEFAULT_LOCAL_CHECK: LocalCheckOptions = { budget: 20, maxFiles: 2, maxPrimaryChars: 8000, maxRelatedChars: 0 };
+export const DEFAULT_LOCAL_CHECK: LocalCheckOptions = { budget: 20, maxPrimaryChars: 8000, maxRelatedChars: 0 };
 
 export interface Observed {
   file: string;
@@ -97,16 +90,20 @@ export interface Unchecked {
 export interface Finding {
   requirementId: string;
   file: string;
+  /** Where in the file, so a reader can open it rather than search for it. */
+  lines: string;
   function: string;
   call: string;
-  /** From the requirement's own text, checked to be in it. */
+  /** The requirement, as it was given. Not a fragment a model chose out of it. */
   quote: string;
-  reason: string;
   /** The condition that was assumed when the function was read. */
   condition: string;
+  property: typeof MAPPING_PROPERTY;
+  mapping: MappingAnswer;
   observation: LocalResult["observation"];
   probability: number;
-  disagreement: string;
+  /** Assembled from the parts above. No sentence here was written by a model. */
+  why: string;
 }
 
 /**
@@ -120,29 +117,23 @@ export interface Finding {
  */
 export interface MappingRecord {
   requirementId: string;
-  /** The call the question was about. */
-  askedCallId: string;
+  callId: string;
   file: string;
   function: string;
   call: string;
-  /** What came back, when the answer had one at all. */
-  returnedCallId?: string;
-  accepted: boolean;
-  verdict?: MappingVerdict;
-  quote?: string;
-  reason?: string;
-  /** Why it was not used. `not_answered` is a request that did not come back. */
-  refusedAs?: "wrong_call" | "quote_not_in_requirement" | "bad_shape" | "not_answered";
-  why?: string;
+  verdict: MappingVerdict | "no_answer";
+  probability: number;
+  /** Every option, as Jev gave it, so a reading near the bar can be re-read later. */
+  probabilities: Record<string, number>;
+  /** Whether the run acted on it: `applies`, at or above the bar. */
+  governs: boolean;
+  /** Said in the report's words, assembled rather than written. */
+  why: string;
 }
 
 export interface LocalCheckResult {
   requirementId: string;
   requirementText: string;
-  filesOpened: string[];
-  /** What the planner picked, and what it said each call checks. */
-  picks: { call: string; function: string; clause?: string }[];
-  rejectedPicks: { callId: string; reason: string }[];
   /**
    * What the budget selected, before anything was asked.
    *
@@ -164,45 +155,14 @@ export interface LocalCheckResult {
     calls: number;
     applicable: number;
     asked: number;
-    /** Mapping requests made — one per call asked about, whatever came back. */
+    /** Mapping questions asked — one per call asked about, whatever came back. */
     mapped: number;
-    /** Of those, the ones accepted and saying the requirement governs the call. */
+    /** Of those, the ones that cleared the bar saying the requirement governs the call. */
     governed: number;
     overBudget: number;
     notApplicable: number;
   };
   notes: string[];
-}
-
-/** What the schema asks the planner for; nothing enforces it on the way back. */
-const MAX_CLAUSE = 300;
-
-/**
- * A backtick or a control character. Built from a string of escapes rather than written as a
- * regular expression literal, because writing an escape for one of these into a source file
- * writes the character itself. The line and paragraph separators are not listed: the whitespace
- * pass below already covers them.
- */
-const UNPRINTABLE = new RegExp("[`\\u0000-\\u001f\\u007f-\\u009f]", "g");
-
-/**
- * The planner's own words, made safe to put in a report.
- *
- * A clause is model prose that goes straight into Markdown, and the only thing keeping a verdict
- * out of this path was that `describe` has no field one fits in. The clause field is a field one
- * fits in. It cannot be filtered for meaning — a clause quotes a requirement, and a requirement
- * may say "must not be silently treated as…" — so it is contained instead: one line, bounded, no
- * code span to break out of, and rendered in quotes as something the plan said rather than
- * something this tool concluded.
- */
-export function statedClause(text: string | undefined): string | undefined {
-  if (text === undefined) return undefined;
-  const flat = redact(text)
-    .text.replace(UNPRINTABLE, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (flat.length === 0) return undefined;
-  return flat.length > MAX_CLAUSE ? `${flat.slice(0, MAX_CLAUSE - 1)}…` : flat;
 }
 
 /**
@@ -214,21 +174,6 @@ export function statedClause(text: string | undefined): string | undefined {
  */
 const shown = (call: CallCandidate) => redact(call.expression).text;
 
-/** Files the requirement's own words find, most hits first. The tool's existing lexical search. */
-async function filesFor(discoverer: Discoverer, requirement: Requirement, max: number): Promise<string[]> {
-  const counts = new Map<string, number>();
-  const words = [...new Set([...requirementWords(requirement.text), ...requirement.searchHints])];
-  for (const word of words.slice(0, 8)) {
-    const { hits } = await discoverer.search(word);
-    for (const hit of hits) counts.set(hit.path, (counts.get(hit.path) ?? 0) + 1);
-  }
-  return [...counts.entries()]
-    .filter(([path]) => /\.(rs)$/.test(path))
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, max)
-    .map(([path]) => path);
-}
-
 export interface LocalCheckRevisions {
   before: string;
   after: string;
@@ -238,8 +183,6 @@ export async function runLocalCheck(
   git: Git,
   revisions: LocalCheckRevisions,
   requirements: readonly Requirement[],
-  planner: Planner,
-  mapper: Mapper,
   judge: JudgmentProvider,
   include: (path: string) => boolean,
   options: LocalCheckOptions = DEFAULT_LOCAL_CHECK,
@@ -273,52 +216,20 @@ export async function runLocalCheck(
   const out: LocalCheckResult[] = [];
   for (const requirement of requirements) {
     const notes = [...changeNotes];
-    const picks: LocalCheckResult["picks"] = [];
     const observed: Observed[] = [];
     const unchecked: Unchecked[] = [];
     const mappings: MappingRecord[] = [];
     const findings: Finding[] = [];
 
-    // The change's sources are shared between requirements, so each requirement gets its own
-    // shallow copy to hang its picks on.
-    const sources = new Map<string, SiteSource>([...fromChange.sources].map(([path, source]) => [path, { ...source }]));
-
-    const opened = options.candidatesOnly ? [] : await filesFor(discoverer, requirement, options.maxFiles);
-    if (options.candidatesOnly) notes.push("the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent");
-    else if (opened.length === 0) notes.push("the requirement's own words found no Rust file at this commit");
-
-    for (const file of opened) {
-      const candidates = await files.of(file);
-      if (!candidates) {
-        notes.push(`${file} could not be read at this commit`);
-        continue;
-      }
-      if (candidates.omitted.functions > 0) notes.push(`${file}: ${candidates.omitted.functions} functions were left out of the listing by its cap`);
-      if (candidates.omitted.calls > 0) notes.push(`${file}: ${candidates.omitted.calls} calls were left out of the listing by its cap`);
-      // The requirement's text goes out with the listing; both are redacted on the way, the same
-      // as an evidence packet is.
-      const chosen = await planner.pick({ requirement: redact(requirement.text).text, file, listing: listingFor(candidates) });
-      if (chosen.failed) notes.push(`the planner did not answer about ${file} (${chosen.failed}), so no call there carries a clause`);
-      else if (chosen.picks.length === 0) notes.push(`the planner read ${file} and named no call the requirement governs`);
-      // What the planner says its own picks leave unchecked. It was asked for, schema and all,
-      // and then read by nobody.
-      for (const gap of chosen.notCovered ?? []) notes.push(`the planner says its picks in ${file} leave this unchecked: ${gap}`);
-      const picked = chosen.picks.map((p) => {
-        const clause = statedClause(p.clause);
-        return { callId: p.callId, ...(clause !== undefined ? { clause } : {}) };
-      });
-      const source = sources.get(file);
-      if (source) source.picks = picked;
-      else sources.set(file, { candidates, picks: picked });
-    }
-
-    const selection = await selectSites([...sources.values()], decide, options.budget);
-    for (const p of selection.picked) picks.push({ call: shown(p.call), function: p.fn.name, ...(p.clause ? { clause: p.clause } : {}) });
+    const selection = await selectSites([...fromChange.sources.values()], decide, options.budget);
     for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
     for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: `the budget of ${options.budget} was already spent` });
 
-    // Every call this run offers the mapping. A mapping naming anything else is refused.
-    const offered = new Set(selection.budgeted.map((s) => s.call.id));
+    // The requirement as the report will quote it: the text that was given, not a fragment a model
+    // picked out of it. A model choosing the fragment was the only reason a quote ever had to be
+    // checked against the text.
+    const quote = redact(requirement.text).text.replace(/\s+/g, " ").trim();
+
     let asked = 0;
     let mapped = 0;
     for (const site of options.candidatesOnly ? [] : selection.budgeted) {
@@ -327,8 +238,6 @@ export async function runLocalCheck(
         startLine: site.fn.startLine,
         endLine: site.fn.endLine,
         symbol: site.fn.name,
-        // The function's own origin, not the call's: a call the planner named inside a changed
-        // function is `picked`, and reading it for this told the model the place was untouched.
         changed: site.fnOrigin === "changed",
         reasons: [`a call in ${site.fn.name}, which the run reached by ${site.origin}`],
       };
@@ -346,62 +255,55 @@ export async function runLocalCheck(
         continue;
       }
       const condition = conditionFor(site.fn, site.call);
-
-      // The mapping is asked **before** the judgment and is given no part of it. An answer that
-      // knew what the code does would be free to agree with it, and the whole value of the link is
-      // that it is about the sentence rather than about the code's behaviour.
-      const answered = await mapper.map({
-        requirementId: requirement.id,
-        requirementText: requirement.text,
-        callId: site.call.id,
-        call: condition.operation.replace(/`/g, ""),
-        function: site.fn.name,
-        body,
-      });
-      mapped += 1;
+      const expression = condition.operation.replace(/`/g, "");
       const place = { file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin };
-      const returnedCallId = typeof (answered.raw as { callId?: unknown } | undefined)?.callId === "string" ? ((answered.raw as { callId: string }).callId) : undefined;
-      const record: MappingRecord = { requirementId: requirement.id, askedCallId: site.call.id, file: place.file, function: place.function, call: place.call, accepted: false, ...(returnedCallId !== undefined ? { returnedCallId } : {}) };
-      let mapping: Mapping | undefined;
-      if (answered.failed) {
-        record.refusedAs = "not_answered";
-        record.why = `the mapping was not answered (${answered.failed})`;
-      } else {
-        const checked = checkMapping(answered.raw, { callId: site.call.id, offered, requirementId: requirement.id, requirementText: requirement.text });
-        if (!checked.ok) {
-          record.refusedAs = checked.kind;
-          record.why = `the mapping was refused: ${checked.reason}`;
-        } else {
-          record.accepted = true;
-          record.verdict = checked.mapping.verdict;
-          record.quote = checked.mapping.quote;
-          record.reason = checked.mapping.reason;
-          if (checked.mapping.verdict === "applies") mapping = checked.mapping;
-          else record.why = `the requirement ${checked.mapping.verdict === "does_not_apply" ? "does not govern this call" : "does not settle this call"}: ${checked.mapping.reason}`;
-        }
-      }
-      mappings.push(record);
+
+      // Two questions, two requests. The mapping is about the requirement's words and must not be
+      // asked under the failure the observation assumes — nor in the same breath as it.
+      const mappingAnswers = await judge.judge(evidence.packet, mappingQuestionFor(site.fn, site.call, expression)).catch(() => ({}) as Record<string, never>);
+      mapped += 1;
+      const mapping = acceptMapping(mappingAnswers.requirement_governs);
+      mappings.push({
+        requirementId: requirement.id,
+        callId: site.call.id,
+        file: place.file,
+        function: place.function,
+        call: place.call,
+        verdict: mapping.verdict,
+        probability: mapping.probability,
+        probabilities: mapping.probabilities,
+        governs: mapping.governs,
+        why:
+          mapping.verdict === "no_answer"
+            ? "the mapping question was not answered"
+            : mapping.governs
+              ? `the requirement is read as requiring this of the call (${mapping.probability.toFixed(2)})`
+              : `read as \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}), which is below the bar of ${MAPPING_BAR} or not a requirement of this call`,
+      });
 
       const answers = await judge.judge(evidence.packet, questionsFor(condition));
       const answer = answers.on_error_result;
       const p = answer ? probabilityOf(answer, answer.choice) : 0;
       asked += 1;
-      const result = describe(answer, p, site.clause);
+      const result = describe(answer, p);
       observed.push({ ...place, result });
 
-      // A finding needs both halves: a requirement that governs this call, and an observation that
-      // contradicts what it requires. Either alone is not one, and neither is a reading below the
-      // bar — that is an unread answer, not a disagreement.
-      if (mapping && result.observation === "returns_success") {
+      // A finding needs both halves, each over the same bar: a requirement read as requiring this
+      // of the call, and a reading of the call that returns a success anyway.
+      if (mapping.governs && result.observation === "returns_success") {
         findings.push({
           requirementId: requirement.id,
-          ...place,
-          quote: mapping.quote,
-          reason: mapping.reason,
+          file: place.file,
+          lines: `${site.fn.startLine}-${site.fn.endLine}`,
+          function: place.function,
+          call: place.call,
+          quote,
           condition: `${condition.setup} ${condition.occurrence}, ${condition.operation} returns ${condition.yields}. ${condition.others}`,
+          property: MAPPING_PROPERTY,
+          mapping,
           observation: result.observation,
           probability: result.probability,
-          disagreement: `the requirement is read as requiring that this failure not come back as a success, and \`${site.fn.name}\` was read as returning one`,
+          why: whyListed(site.fn.name, mapping, result.observation, result.probability),
         });
       }
     }
@@ -409,9 +311,6 @@ export async function runLocalCheck(
     out.push({
       requirementId: requirement.id,
       requirementText: requirement.text,
-      filesOpened: opened,
-      picks,
-      rejectedPicks: selection.rejected,
       wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
@@ -424,7 +323,7 @@ export async function runLocalCheck(
         applicable: selection.applicable.length,
         asked,
         mapped,
-        governed: mappings.filter((m) => m.accepted && m.verdict === "applies").length,
+        governed: mappings.filter((m) => m.governs).length,
         overBudget: selection.overBudget.length,
         notApplicable: selection.held.length,
       },
@@ -436,42 +335,46 @@ export async function runLocalCheck(
 }
 
 const ORIGIN_WORDS: Record<Site["origin"], string> = {
-  picked: "the plan named this call",
-  same_function: "in a function the plan named",
   changed: "in a function the change touched",
   calls_changed: "in a function that calls one the change touched",
 };
 
 /**
- * The report: what is worth checking, then what was observed, then what was not checked and why.
+ * The report: what is worth checking, then what was read, then what was not checked and why.
  *
- * No requirement-level verdict appears anywhere in it. A finding is about one call, and it is
- * printed as two model readings that disagree, with everything needed to disagree with them —
- * not as this tool concluding that a requirement is violated.
+ * Every sentence in it is this file's or the input's. Nothing is a model's prose — the two model
+ * answers appear as a choice and a number, named as Jev's, and the reasoning between them is
+ * assembled from the parts. No requirement-level verdict appears anywhere.
  */
 export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
-  const lines: string[] = ["# Local check (experimental)", "", `Each line is one call, under the condition that the call fails. The bar is ${BAR}.`, "", "**A local observation is not a statement about the requirement.** It bears on the requirement only where the plan said which clause governs that call; everything else is an observation about code.", ""];
+  const lines: string[] = [
+    "# Local check (experimental)",
+    "",
+    `Two questions are put to Jev about each call, separately: whether the requirement requires that a failure of it not reach the caller as a success, and what the function returns when it does fail. The bar for each is ${BAR}.`,
+    "",
+    "**Nothing here is a requirement verdict.** A call is listed when both answers clear the bar and disagree; the two answers do not check each other, and everything either of them rests on is printed.",
+    "",
+  ];
   for (const r of results) {
     const c = r.counts;
     lines.push(`## ${r.requirementId}`, "", `> ${r.requirementText}`, "");
-    lines.push(`Files the requirement's words opened: ${r.filesOpened.join(", ") || "none"}`);
-    lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those, ${c.functions.picked} only the plan named.`);
-    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} asked, ${c.overBudget} left over, ${c.notApplicable} not applicable.`, "");
+    lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
+    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`, "");
 
     if (r.findings.length > 0) {
-      lines.push("### Worth checking", "", "Each of these is a requirement read as governing a call, and a reading of that call that contradicts it. **Two model answers stand behind each one, and neither checks the other** — what follows is everything needed to disagree with it.", "");
+      lines.push("### Worth checking", "");
       for (const f of r.findings) {
-        lines.push(`#### ${f.file} · ${f.function} — \`${f.call}\``);
-        lines.push(`- **The requirement says**: "${f.quote}"`);
-        lines.push(`- **Read as governing this call because**: ${f.reason}`);
+        lines.push(`#### ${f.file}:${f.lines} · ${f.function} — \`${f.call}\``);
+        lines.push(`- **Requirement ${f.requirementId}**: "${f.quote}"`);
         lines.push(`- **Assumed**: ${f.condition}`);
-        lines.push(`- **Read as returning**: ${f.observation} (${f.probability.toFixed(2)})`);
-        lines.push(`- **Why that disagrees**: ${f.disagreement}`, "");
+        lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
+        lines.push(`- **Jev, on what the function returns**: ${f.observation} (${f.probability.toFixed(2)})`);
+        lines.push(`- **Why it is listed**: ${f.why}`, "");
       }
     }
 
     if (r.observed.length === 0) {
-      lines.push("_Nothing was asked._", "");
+      lines.push("_Nothing was read._", "");
       // Only the ones that are not already below with a reason of their own. A budgeted call every
       // one of which was held reads, otherwise, as a list of calls nothing was asked about for no
       // stated reason — while the real reasons sit in the next section.
@@ -484,31 +387,23 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
       }
     }
     for (const o of r.observed) {
-      // The clause is the plan's sentence, not this tool's. It is quoted so a reader can see whose
-      // words they are, and `statedClause` has already made it one line that cannot break out.
-      const bears = o.result.bearsOnRequirement ? `bears on the requirement. The plan said this call checks: "${o.result.clause}"` : "an observation about code; no clause was stated for this call, so it is not read against the requirement";
       lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
       lines.push(`  - when that call fails: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
-      lines.push(`  - ${bears}`);
     }
     // Both sections come off the same list, so a call cannot be in one reading and not the other.
-    const governed = r.mappings.filter((m) => m.accepted && m.verdict === "applies");
-    const notGoverned = r.mappings.filter((m) => !(m.accepted && m.verdict === "applies"));
+    const governed = r.mappings.filter((m) => m.governs);
+    const rest = r.mappings.filter((m) => !m.governs);
     if (governed.length > 0) {
-      lines.push("", "### Read as governed by the requirement", "", "Whether or not the reading of the call agreed with it. A run that finds nothing is still a run that read something, and this is what it read.", "");
-      for (const m of governed) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: "${m.quote}" — ${m.reason}`);
+      lines.push("", "### Read as required by the requirement", "", "Whether or not the reading of the call agreed with it. A run that lists nothing still read something, and this is what it read.", "");
+      for (const m of governed) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why}`);
     }
-    if (notGoverned.length > 0) {
-      lines.push("", "### Read, but not answered against the requirement", "");
-      for (const m of notGoverned) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why ?? "no mapping"}`);
+    if (rest.length > 0) {
+      lines.push("", "### Read, but not required of by the requirement", "");
+      for (const m of rest) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why}`);
     }
     if (r.unchecked.length > 0) {
       lines.push("", "### Not checked", "");
       for (const u of r.unchecked) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\` _(${ORIGIN_WORDS[u.origin]})_: ${u.why}`);
-    }
-    if (r.rejectedPicks.length > 0) {
-      lines.push("", "### The plan named calls that are not in the listing", "");
-      for (const p of r.rejectedPicks) lines.push(`- ${p.callId}: ${p.reason}`);
     }
     if (r.notes.length > 0) {
       lines.push("", "### Notes", "");

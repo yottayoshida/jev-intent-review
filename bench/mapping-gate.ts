@@ -2,14 +2,16 @@
 //
 //   node bench/mapping-gate.ts <run.json> [<run.json> ...]
 //
-// Not "the run produced some mapping somewhere". A run can accept an `applies` about a call
-// nobody is measuring and look ready while both targets went unanswered, and the number that
-// would show it — `governed` — counts the whole run. So each target is read on its own:
+// Not "the run produced some mapping somewhere". A run can read an `applies` about a call nobody
+// is measuring and look ready while both targets went unanswered, and the number that would show
+// it — `governed` — counts the whole run. So each target is read on its own:
 //
-//   1. a mapping record exists for it, accepted, `applies`, and answering the id it was asked;
-//   2. its quote is in the requirement — checked here again, against the run's own recorded text,
-//      rather than trusted because the tool already checked it;
+//   1. a mapping record exists for it;
+//   2. Jev answered `applies` at or above the bar the run recorded acting on;
 //   3. on the shipped branch, no finding stands against it.
+//
+// The probabilities are printed whatever the verdict: a target settled at 0.58 and one settled at
+// 0.05 are both "not ready", and only one of them is a bar away from ready.
 //
 // The target names live here and not in `src/`: they are what this evaluation happens to be
 // about, and the product has no business knowing them.
@@ -17,15 +19,14 @@
 import { readFileSync } from "node:fs";
 
 interface Record_ {
-  askedCallId: string;
-  returnedCallId?: string;
-  accepted: boolean;
-  verdict?: string;
-  quote?: string;
-  reason?: string;
+  callId: string;
+  verdict: string;
+  probability: number;
+  probabilities: Record<string, number>;
+  governs: boolean;
   function: string;
   call: string;
-  why?: string;
+  why: string;
 }
 
 interface Run {
@@ -44,8 +45,6 @@ const TARGETS = [
   { function: "raw_override_disables", callee: "read_to_string_capped" },
 ];
 
-const flat = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
-
 function gate(path: string): boolean {
   const run = JSON.parse(readFileSync(path, "utf8")) as Run;
   const r = run.requirements[0];
@@ -62,18 +61,11 @@ function gate(path: string): boolean {
       ready = false;
       continue;
     }
-    const answersItsOwn = m.returnedCallId === m.askedCallId;
-    const usable = m.accepted && m.verdict === "applies" && answersItsOwn;
-    const quoted = typeof m.quote === "string" && m.quote.length > 0 && flat(r.requirementText).includes(flat(m.quote));
     const finding = r.findings.find((f) => f.function === target.function && f.call.includes(target.callee));
-    const state = usable ? (quoted ? "USABLE" : "QUOTE NOT IN THE TEXT") : m.accepted ? `accepted but ${m.verdict}` : `refused: ${m.why ?? "?"}`;
-    console.log(`   ${target.function.padEnd(24)} ${state}`);
-    if (usable && quoted) {
-      console.log(`      quote : "${m.quote}"`);
-      console.log(`      reason: ${m.reason}`);
-    }
+    console.log(`   ${target.function.padEnd(24)} ${m.governs ? "USABLE" : "NOT USABLE"} — ${m.why}`);
+    console.log(`      every option: ${JSON.stringify(m.probabilities)}`);
     console.log(`      finding on this branch: ${finding ? "yes" : "no"}`);
-    if (!usable || !quoted) ready = false;
+    if (!m.governs) ready = false;
   }
   return ready;
 }

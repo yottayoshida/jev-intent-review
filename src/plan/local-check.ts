@@ -110,24 +110,22 @@ export interface LocalResult {
   /** What was observed about this one call, at this one place. */
   observation: Observation;
   probability: number;
+  /** Every option's probability as Jev gave it, so a reading near the bar can be re-read later. */
+  probabilities: Record<string, number>;
   /** Why, in the report's words. */
   why: string;
-  /**
-   * Whether this observation is allowed to stand as a statement about the requirement.
-   *
-   * It is not, unless the planner said which clause governs this call. Resolving that a callee
-   * returns a `Result` makes a question askable; it does not make the requirement apply here. A
-   * function that records a failure and carries on is a real shape, and nothing in the code says
-   * which kind a place is.
-   */
-  bearsOnRequirement: boolean;
-  clause?: string;
 }
 
-export function describe(answer: ChoiceAnswer | undefined, probability: number, clause: string | undefined): LocalResult {
-  const bears = clause !== undefined && clause.trim().length > 0;
-  if (!answer) return { observation: "withheld", probability: 0, why: "no answer was read", bearsOnRequirement: false, ...(clause ? { clause } : {}) };
-  if (probability < BAR) return { observation: "cannot_determine", probability, why: `the answer did not clear ${BAR} (${answer.choice} ${probability.toFixed(2)})`, bearsOnRequirement: false, ...(clause ? { clause } : {}) };
+/**
+ * The reading, with no claim about the requirement attached.
+ *
+ * Whether the requirement requires this of the call is a separate question, asked separately, and
+ * joined to this one only where both answers clear the bar.
+ */
+export function describe(answer: ChoiceAnswer | undefined, probability: number): LocalResult {
+  if (!answer) return { observation: "withheld", probability: 0, probabilities: {}, why: "no answer was read" };
+  const probabilities = { ...answer.probabilities };
+  if (probability < BAR) return { observation: "cannot_determine", probability, probabilities, why: `the answer did not clear ${BAR} (${answer.choice} ${probability.toFixed(2)})` };
   const choice = answer.choice as Observation;
   const why =
     choice === "returns_success"
@@ -135,5 +133,5 @@ export function describe(answer: ChoiceAnswer | undefined, probability: number, 
       : choice === "returns_error"
         ? "the failed call is not returned as a success"
         : "the code shown does not settle what is returned";
-  return { observation: choice, probability, why, bearsOnRequirement: bears, ...(clause ? { clause } : {}) };
+  return { observation: choice, probability, probabilities, why };
 }

@@ -13,7 +13,21 @@ export type ProviderErrorKind =
   | "network"
   | "bad_request"
   | "bad_response"
+  | "refused" // a model this tool does not send to: nothing leaves the process
   | "budget"; // this run's own request / byte / time limit
+
+/**
+ * The only model this tool sends anything to.
+ *
+ * It lives at the transport rather than beside the callers, because a caller that wants a second
+ * model is exactly the thing being prevented. Every request — the CLI's, a bench script's, a
+ * retry — goes through `post`, so this is the one place that sees all of them.
+ *
+ * The tool exists to ask Jev small typed questions. Reaching for a general instruct model to write
+ * a plan, or a mapping, or a sentence of prose, quietly makes it a different tool, and each of
+ * those reaches looked locally reasonable at the time.
+ */
+export const ONLY_MODEL = "typesafe/jev";
 
 /** The kinds that make every later request pointless: the run ends rather than asking again. */
 export const FATAL_KINDS: ReadonlySet<ProviderErrorKind> = new Set<ProviderErrorKind>(["auth", "payment", "endpoint"]);
@@ -195,6 +209,13 @@ export class CloudflareClient {
    * fewer attempts than a typed judgment.
    */
   async post(body: unknown, options: { timeoutMs?: number; maxRetries?: number } = {}): Promise<unknown> {
+    // Before the stop latch, before the budget, before anything: a request for another model does
+    // not leave this process, is not counted, and does not end the run for the requests that are
+    // right. The check is on the body that is about to be serialised, not on what a caller meant.
+    const model = (body as { model?: unknown } | null)?.model;
+    if (model !== ONLY_MODEL) {
+      throw new ProviderError("refused", `this tool sends only ${ONLY_MODEL}; a request for ${typeof model === "string" ? model : "no model at all"} was refused before anything was sent`);
+    }
     if (this.#stopped) throw this.#stopped;
     const url = this.#endpoint.url;
     const payload = JSON.stringify(body);

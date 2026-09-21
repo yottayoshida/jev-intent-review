@@ -7,6 +7,16 @@ All notable changes to this project are recorded here. The format follows
 
 ### Changed
 
+- **Only Jev is asked anything.** `CloudflareClient` refuses every other model before a request is
+  built, so nothing leaves the process and nothing is counted as sent; the CLI and the bench
+  scripts go through the same place. Three uses of a general instruct model are gone with it: the
+  requirements are no longer written by a model — they come from `--intent-spec` or from an
+  acceptance-criteria list read as written, and prose that is neither stops the run naming those
+  two forms — the experimental path's call-picking model is removed, and whether a requirement
+  governs a call is now Jev's own three-option answer with a probability, at the same bar as the
+  reading of the code. Nothing in a report is model prose any more: a quote is the requirement as
+  it was given, and the reasoning between the two answers is assembled from them.
+
 - **VERIFIED is a claim about the paths Jev named, not about every place the search found.** A
   place counts towards a requirement only when Jev calls it a path of that requirement at
   `judgment.relevance_probability`; everything else — supporting, unrelated, or a path named too

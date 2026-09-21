@@ -124,121 +124,63 @@ the planner did not answer about src/audit/mod.rs (… answered 429: … you hav
 daily free allocation of 10,000 neurons …), so no call there carries a clause
 ```
 
-## 観測を要件に対応付けて、根拠付きの欠陥候補を返す（2026-09-21 追記）
+## Jev 以外に何も送らない（2026-09-21）
 
-観測は**コードについての事実**で、それだけでは誰かが見るべきものにならない。足りない環が
-1 つある——**この要件はこの呼び出しに何かを要求しているのか。**
+**この道具は Jev に小さな型付きの問いを聞くもの**なのに、一般の instruct モデル（llama-3.3-70b）
+を 3 箇所で使っていた。要件のコンパイル（元から）、計画（#26 で私が）、対応付け（#28 で私が）。
+どれもその場では妥当に見え、**どれも宣言されていなかった**。
 
-そこで対応付け（`src/plan/mapping.ts`）を**別に**聞く。渡すのは要件原文・対象の呼び出し・
-関数本体だけで、**局所の回答も確率も渡さない**。コードの挙動を知っている答えは、それに
-合わせる自由を持ってしまう。
-
-**コードで検査できることと、正しさは別。** 検査するのは 3 つだけ:
-
-| 検査 | 不合格なら |
+| 直し | 中身 |
 |---|---|
-| `callId` が**今聞いた呼び出しそのもの**か | `wrong_call` |
-| 引用が**本当に原文にある**か（`applies` のとき必須、12 字以上） | `quote_not_in_requirement` |
-| `applies` / `does_not_apply` / `unknown` と必須欄の形 | `bad_shape` |
+| 送信境界で拒否 | `CloudflareClient.post` が `typesafe/jev` 以外を**組み立てる前に**拒む。CLI も bench も同じ経路を通る。件数にもバイト数にも数えない |
+| 要件のコンパイル | モデルに書かせない。`--intent-spec` か、**コードで読める受け入れ条件の箇条書き**。それ以外の散文は理由と使える 2 つの形を案内して止まる |
+| 計画 | **廃止**。候補は差分・参照探索・適用検査・予算配分だけで作る（要件の語でファイルを開く経路も消えた） |
+| 対応付け | **Jev の 3 択**（`applies` / `does_not_apply` / `unknown`）。確率分布を全部保存し、採用規則は実測前に固定（`applies` かつ 0.6 以上） |
+| 引用と説明 | **別モデルを残さない**。引用は入力原文そのもの、説明は原文・コード位置・仮定・2 つの答えから定型的に組み立てる。**モデルが書いたようには表示しない** |
+| CI | 実 API を使わず、**送信された全ボディのモデル名**を読む。実験経路を通しで走らせて全件 Jev を確認 |
 
-**1 つ目は最初「この run が出した候補集合にあるか」だった。** それだと `beta` について聞いて
-`alpha` の id が返ったとき——引用は本当に原文にあり、理由も本当に `alpha` についてのまま——
-**全部の検査を通って `beta` の欠陥候補になる**。実在する別候補の id だったほうが悪い:
-下流には区別する手がかりが何も無い。**別の問いへの答えは、この問いへの弱い答えではない。**
+**消えた欠陥が 1 つある。** Jev の回答に `callId` は無いので、「別の呼び出しへの回答が結合する」
+（#29）という形が**検査されるのではなく存在しなくなった**。Jev は送った state について、
+送った問いに答える。
 
-**通ったことは正しいことではない。** 実在の呼び出しを名指し、原文を正確に引用したまま、
-文が何を要求しているかについて間違っていられる。テストに、全部の検査を通る**明らかに
-おかしい理由**の例を 1 本置いてある。
+**引用を原文に照合する検査も要らなくなった。** モデルが断片を選ぶからこそ必要だった検査で、
+引用が要件そのものなら照合するものが無い。
 
-**欠陥候補は両輪が揃ったときだけ出る**——要件がその呼び出しを支配すると読めて、かつ
-その呼び出しの読みがそれに反すること。出力は 5 つ:
-
-```
-#### src/integrity.rs · read_baseline — `crate::atomic_file::read_to_string_capped(&path, MAX)`
-- **The requirement says**: "…"          ← 原文の該当箇所（原文にあることを検査済み）
-- **Read as governing this call because**: …
-- **Assumed**: Execution reaches the call … ← 置いた失敗条件
-- **Read as returning**: returns_success (0.97)
-- **Why that disagrees**: …
-```
-
-**要件全体の VERIFIED も、新しい失敗 exit code も入れていない。**
-
-**対応付けは、指摘が出たかどうかに関係なく全件記録する**（`mappings`）。聞いた呼び出し id・
-返ってきた id・採否・verdict・引用・理由・拒否の種別。指摘が 0 件の run で読む必要があるのは
-**対応付けそのもの**——どの語を引用し、なぜ支配すると言ったか——で、食い違ったときだけ残す形は
-成功側を読めなくしていた。レポートの 2 節（`Read as governed by the requirement` と
-`Read, but not answered against the requirement`）は**同じ 1 本のリスト**から出しているので、
-片方にあって片方に無い呼び出しは作れない。
-
-### 通信なしで確かめた出力
-
-模擬の対応付けと保存した観測で、CLI の出力まで（`test/cli.test.ts` と
-`test/local-check-run.test.ts`）:
-
-| 場合 | 出力 |
-|---|---|
-| 支配する × 飲み込む | **欠陥候補**（5 項目すべて） |
-| 支配する × 伝播する | 出ない |
-| **支配しない**（原文が続行を許す） | 出ない。理由付きで残る |
-| 不明 / 通信失敗 | 出ない。**互いに別の理由**で残る |
-| 実在しない呼び出し / 原文に無い引用 | 拒否。理由付きで残る |
-
-**「支配しない」の fixture はコードを一切変えていない**——観測は同じ `returns_success` のまま、
-対応付けだけが違う。指摘が出るかどうかを決めているのが対応付けだと分かる形にしてある。
-
-### 実機で確かめたところと、止まったところ
-
-正例 1 回を実行:
+## 対応付けを Jev に聞いた最初の実測（2026-09-21、正例）
 
 ```
-counts: asked 19, mapped 19, governed 0, findings 0
-mappings: {"not_answered": 19}
-read_baseline          → not_answered: … answered 429: … used up your daily free allocation …
-raw_override_disables  → not_answered: …
+asked 19, mapped 19, governed 3, findings 0
+verdicts: applies 6（うち 0.6 以上が 3）, does_not_apply 13
 ```
 
-**両対象とも対応付けの入力に入っている**（19 件の判定対象すべてが対応付けにも渡った）。
-**対応付けのモデルだけが 429** で、判定側は 19 件すべて答えている。
-`mapped` は**要求した回数**、`governed` は**採用できて `applies` だった数**で、別の数として
-出す——0 件が「聞かなかった」なのか「聞いたが答えが無かった」なのか、この 2 つで決まる。
+**既知の 2 対象は、どちらも `does_not_apply`。**
 
-したがって**枠が戻るまで残るのは最後の実測だけ**。
+| 対象 | 読み | 全選択肢 |
+|---|---|---|
+| `read_baseline` の `read_to_string_capped` | `does_not_apply` 0.51 | applies 0.26 / unknown 0.23 |
+| `raw_override_disables` の同じ呼び出し | `does_not_apply` 0.63 | applies 0.13 / unknown 0.24 |
 
-### 最初の関門は「実行全体で governed > 0」ではない
+**関門は NOT READY。記録して止めた**——残り 4 枝は送っていない。
 
-**既知の 2 対象それぞれに使える対応付けがあること**を見る。別の呼び出しにだけ `applies` が
-付いた run は、`governed` が 1 以上でも次へ進む条件を満たさない——`governed` は run 全体の数
-なので、両対象が未回答のまま「準備できている」ように見えてしまう。
+**Jev が `applies` と読んだのは、拒否そのものを行う呼び出しだった:**
 
-採点はコードでやる（`bench/mapping-gate.ts`。対象名は bench 側にあり、製品側には無い）。
-対象ごとに:
+| 関数 | 呼び出し | 確率 |
+|---|---|---|
+| `open_read_regular` | `reject_non_regular(&file, path)` | 0.90 |
+| `open_audit_rw` | `crate::atomic_file::reject_non_regular(&file, path)` | 0.77 |
+| `show_entries` | `open_read_nofollow(&path)` | 0.65 |
 
-1. 記録があり、`accepted` で `verdict: applies`、**聞いた id と返った id が一致**
-2. 引用が原文にある——**この道具が検査済みだから信じる、ではなく**、run 自身が記録した
-   原文に対してもう一度照合する
-3. 正例では、その対象に欠陥候補が立っていない
+原文は「a path omamori reads **is now refused by name**」と書いてある。`reject_non_regular` は
+**その拒否**で、`read_baseline` は拒否を受け取る側。Jev の読みは**もっともらしい**——
+そして**この評価が置いていた前提**（2 対象が要件に支配される）と食い違う。
 
-両方揃って初めて残り 4 枝へ。**片方でも不明・不適用・通信失敗なら、記録して止める。**
-正例の事前確認が通常の CLI 実行でログも残っていれば、それを 5 枝の正例として兼用する。
+`read_baseline` は 0.51 対 0.26 で、**定まっていない**。0.05 で切れているのとは違う状態なので、
+関門は確率を全部印字する。
 
-### 2026-09-21 時点: NOT READY
-
-```
-== gate-correct.json  (R1: asked 19, mapped 19, governed 0)
-   read_baseline            refused: the mapping was not answered (429 … daily free allocation …)
-   raw_override_disables    refused: 同上
-      finding on this branch: no
-NOT READY: at least one target has no usable mapping — record this and stop
-```
-
-**判定側は 19/19 答えている。** 止まっているのは対応付けと計画だけで、理由はモデルが別だから:
-判定は `typesafe/jev`、計画と対応付けは `@cf/meta/llama-3.3-70b-instruct-fp8-fast`。
-後者の無料枠が切れている。指示どおり**記録して止めた**——残り 4 枝は送っていない。
-
-**注意: `generate_baseline` を「意図的に読み飛ばすコードだから合法」と採点しない。**
-実装がそう動くことと、要件がそれを許すことは別。原文から確定できなければ `unknown` で、
-それは失敗ではなく正しい答え。
+**この結果を「対応付けの失敗」とも「要件の正しい読み」とも採点しない。** どちらかを決めるには
+原文の読み方そのものを固定する必要があり、それはまだしていない。分かったのは、
+**原文が症状（FIFO・ディレクトリ・symlink が拒否される）を書いていて、その拒否を受け取った側が
+何を返すかは書いていない**ということ。#27 で測った 2 対象は後者にある。
 
 ## 列挙そのものが取りこぼしている量
 
