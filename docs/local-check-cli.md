@@ -1,4 +1,113 @@
-# 実験用 CLI（2026-09-21）
+# The local check (v0.1)
+
+This is the reference for `--experimental-local-check`: what to give it, how to read what comes
+back, what the exit code means, and what has been measured. The README says what the tool is for;
+this says exactly what v0.1 does. The sections after [the record](#record-of-the-experiments) are
+the working record of how v0.1 got here, in Japanese.
+
+## Writing a requirement
+
+One checkable sentence per requirement, saying what must happen when something fails. No file
+name, no function name, no expected answer.
+
+```json
+{
+  "version": 1, "title": "", "summary": "", "nonGoals": [], "ambiguities": [],
+  "requirements": [{
+    "id": "R1",
+    "text": "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists.",
+    "kind": "behavior", "priority": "required", "sourceRefs": [], "searchHints": []
+  }]
+}
+```
+
+An acceptance-criteria list in the issue or the pull request works too — a heading such as
+`## Acceptance criteria` and one item per line, read as written. Ordinary prose is not turned into
+requirements: no model writes them, so a description that is neither a spec file nor such a list
+stops the run and names those two forms.
+
+## What it asks
+
+For each requirement it takes the Rust functions the change touched and the functions that call
+them, one hop out, and every call inside those functions whose callee is defined in the repository
+and returns a `Result`. Each such call, up to a budget of 20 per requirement, gets two questions to
+Jev, in separate requests:
+
+1. does the requirement require that a failure of this call not reach the caller as a success?
+   (`applies` / `does_not_apply` / `unknown`)
+2. when this call fails, what does the function return? (`returns_error` / `returns_success` /
+   `cannot_determine`)
+
+Both are read at 0.6. `--experimental-candidates-only` stops before the first question and prints
+which calls are inside the budget and which are not, with a reason each; it needs no credentials.
+
+## Reading the output
+
+```
+### Worth checking
+
+#### src/integrity.rs:210-220 · read_baseline — `crate::atomic_file::read_to_string_capped(&path, MAX)`
+- **Requirement R1**: "If reading an existing integrity baseline fails, …"
+- **Assumed**: Execution reaches the call … There, `…` returns an error. Every other operation …
+- **Jev, on whether the requirement requires it here**: applies (0.96)
+- **Jev, on what the function returns**: returns_success (1.00)
+- **Why it is listed**: … Both are Jev's readings and neither checks the other.
+```
+
+| section | what it holds |
+|---|---|
+| **Worth checking** | both answers cleared the bar and disagree |
+| **Read as required by the requirement** | Jev read the requirement as applying to this call. The behavior observation is reported separately — a call under *Worth checking* is in here too |
+| **Read, but not required of by the requirement** | `does_not_apply`, `unknown`, below the bar, or no answer — each says which |
+| **Not checked** | the callee has no definition here, the target returns no `Result`, the body did not fit, the call could not be located, or the budget was spent |
+| **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
+
+A listed call rests on two Jev readings that do not check each other. Everything either of them
+used is printed so it can be thrown out. `--json` carries every mapping, every reading and every
+option's probability.
+
+## Exit codes
+
+Findings do not cause a nonzero exit code. Configuration, intent, repository and provider failures
+can (10, 11, 13 and 12). **Exit 0 does not establish that the requirement holds.**
+
+"Nothing listed" means no call met the conditions for being listed — both answers over the bar and
+disagreeing. It covers calls whose mapping or whose behaviour came back undetermined, below the
+bar, or unanswered, as well as calls that agreed. What was not reached is under *Not checked*, and
+the enumeration's own caps are counted in the notes.
+
+## What has been measured
+
+One repository (omamori `#468` / PR `#476`), two requirements that state how a failure must be
+handled, five branches, one run each: the shipped code, two single-call mutations and two
+behaviour-preserving rewrites of the same calls. Each mutation was listed at its own call and
+nowhere else; the shipped code and both rewrites listed nothing — ten cells of ten, against a table
+fixed before the first request. 76 requests per run, 380 in all, every one to `typesafe/jev`.
+
+Reproducible from what is committed, without sending anything:
+
+```sh
+node bench/replay-scoring.ts bench/logs/stated-requirements-v1.json
+```
+
+That is the whole of it: **one repository, two requirements, one run per branch.** Nothing
+measures a second language, a second kind of requirement, or how stable a reading is across runs.
+The same targets asked under PR `#476`'s own sentence did **not** pass — Jev read the refusal
+itself as the governed call, not the functions that receive it (`bench/logs/jev-only-v1.json`).
+
+## Only Jev
+
+The transport refuses any model but `typesafe/jev` before a request is built, so nothing else can
+be reached from this tool. `test/only-jev.test.ts` checks it at the transport and over a whole run
+against a capturing endpoint.
+
+## Record of the experiments
+
+以下は v0.1 に至るまでの作業記録（日本語）。
+
+---
+
+### 実験用 CLI（2026-09-21）
 
 `docs/selection-materials.md` の続き。もう一枚の選択成績表ではなく、**コードを渡すと根拠付きの
 結果が返るコマンド**。
@@ -11,7 +120,7 @@ jev-intent-review --experimental-local-check --experimental-candidates-only ... 
 **利用者は対象ファイル・関数・call ID・期待回答を入力しない。** 製品コードに評価用の名前も
 入っていない。
 
-## 経路
+### 経路
 
 候補を出すものが **2 つ**あり、性質が違う。
 
@@ -35,7 +144,7 @@ jev-intent-review --experimental-local-check --experimental-candidates-only ... 
 **要件全体の判定（VERIFIED）は出さない。指摘が出ても終了コードは 0 のまま**——ただし設定・リポジトリ・エンドポイントの失敗は 0 以外で終わる。
 出るのは「**要確認の欠陥候補**」——根拠を全部添えて、読んだ人が否定できる形で。
 
-## 実機の結果（omamori #468 / PR #476）
+### 実機の結果（omamori #468 / PR #476）
 
 **base は 5 枝すべて `52a58fa`**——PR #476 が squash された先の親。正例から変異版への差分を
 渡すと、変異した場所を探索器に教えることになるので、base を揃える。
@@ -64,7 +173,7 @@ v-read-baseline が 738、v-raw-override が 740）——挙動不変版は書�
 |---|---|---|
 | 5 枝すべて | はい | はい |
 
-### 正例でも `returns_success` になるマスが 1 つある
+#### 正例でも `returns_success` になるマスが 1 つある
 
 `src/integrity.rs · generate_baseline` は **5 枝すべてで returns_success（0.94–0.97）**。
 実際のコードが
@@ -80,7 +189,7 @@ if let Ok(content) = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKE
 要件がそれを許すことは別の問いで、後者はここでは答えていない。原文から確定できなければ
 `unknown` で残す。
 
-## 途中で見つけて直したもの
+### 途中で見つけて直したもの
 
 **① モデルへ送る一覧が秘匿処理を通っていなかった。** `listingFor` は数百行のソース行を
 そのまま出していた。定数に書かれた鍵がちょうどそこに来る。証拠パケットと同じ処理を通す。
@@ -124,7 +233,7 @@ the planner did not answer about src/audit/mod.rs (… answered 429: … you hav
 daily free allocation of 10,000 neurons …), so no call there carries a clause
 ```
 
-## Jev 以外に何も送らない（2026-09-21）
+### Jev 以外に何も送らない（2026-09-21）
 
 **この道具は Jev に小さな型付きの問いを聞くもの**なのに、一般の instruct モデル（llama-3.3-70b）
 を 3 箇所で使っていた。要件のコンパイル（元から）、計画（#26 で私が）、対応付け（#28 で私が）。
@@ -146,7 +255,7 @@ daily free allocation of 10,000 neurons …), so no call there carries a clause
 **引用を原文に照合する検査も要らなくなった。** モデルが断片を選ぶからこそ必要だった検査で、
 引用が要件そのものなら照合するものが無い。
 
-## 対応付けを Jev に聞いた最初の実測（2026-09-21、正例、PR #476 の原文）
+### 対応付けを Jev に聞いた最初の実測（2026-09-21、正例、PR #476 の原文）
 
 ```
 asked 19, mapped 19, governed 3, findings 0
@@ -160,7 +269,7 @@ asked 19, mapped 19, governed 3, findings 0
 **この結果は変更しない。** 下は**別の評価入力**での測定で、原文の忠実な言い換えではないし、
 原文からの推論が成功したとも主張しない。
 
-## 失敗時の扱いを明示した要件での実測（2026-09-21）
+### 失敗時の扱いを明示した要件での実測（2026-09-21）
 
 確かめたのは「**利用者が失敗時の扱いを明示した要件を、この CLI が検査できるか**」。
 
@@ -181,7 +290,7 @@ call ID・期待回答は書いていない**）:
 
 採点の単位は**要件 ID・ファイル・関数・呼び出し式**。関数名だけでは判定しない。
 
-### 結果: 10 マスすべて一致
+#### 結果: 10 マスすべて一致
 
 | 枝 | R1 `read_baseline` | R2 `raw_override_disables` |
 |---|---|---|
@@ -206,7 +315,7 @@ node bench/replay-scoring.ts bench/logs/stated-requirements-v1.json
 証拠パケット（送った関数本体）は保存していない——固定コミットの git オブジェクトから
 再構成できるため。秘匿処理は保存物にもそのまま効いている。
 
-### 関門で直したもの
+#### 関門で直したもの
 
 正例の関門が **`requirements[0]` だけを読んでいた**。要件が 2 つある spec では R2 の対象が
 R1 の答えで採点される。要件 ID ごとに照合する形に直した。
@@ -215,7 +324,7 @@ R1 の答えで採点される。要件 ID ごとに照合する形に直した�
 正例は他の 4 枝を比べる基準なので、そこで指摘が立っていれば表はもう壊れている。
 **両方（使える対応付け・指摘なし）**を要求する形にし、手書きのログで回帰テストにした。
 
-### 言えること
+#### 言えること
 
 **失敗時の扱いを明示した要件について、場所を利用者が指定せずに、既知の欠陥候補まで到達した。**
 
@@ -223,7 +332,7 @@ R1 の答えで採点される。要件 ID ごとに照合する形に直した�
 `bench/logs/jev-only-v1.json` の原文による測定は NOT READY のまま残してある——
 **原文の言い換えが成功したのではなく、別の入力で成立した**ということ。
 
-## 列挙そのものが取りこぼしている量
+### 列挙そのものが取りこぼしている量
 
 上限を note に出すようにしたら、**1 関数 40 件の上限で 261 件の呼び出しが落ちていた**ことが
 分かった（7 ファイル、`src/integrity.rs` だけで 80 件）。加えて、変更された関数への参照
@@ -231,7 +340,7 @@ R1 の答えで採点される。要件 ID ごとに照合する形に直した�
 対象 2 件には届いているが、**列挙は完全ではない**。数えられていなかった間は、
 短い一覧と短いファイルの区別が付かなかった。
 
-## 節（clause）はモデルの文である
+### 節（clause）はモデルの文である
 
 `clause` は**モデルの散文がそのまま Markdown に入る唯一の欄**だった。schema には
 `maxLength: 300` があるが、`readModelJson` は `JSON.parse` するだけで**強制していない**。
@@ -244,7 +353,7 @@ R1 の答えで採点される。要件 ID ごとに照合する形に直した�
 入る）。なので**封じ込める**: 1 行・300 字・コードスパンなし、そして
 `The plan said this call checks: "…"` と**引用して誰の文かを示す**。
 
-## 測っていないこと
+### 測っていないこと
 
 **節（clause）は今回 1 件も付かなかった。理由は 2 つあり、片方は確定している。**
 
@@ -275,7 +384,7 @@ R1 の答えで採点される。要件 ID ごとに照合する形に直した�
 `--intent`（自由文）だと要件を書くモデルが毎回別の文に直すので、**開くファイルが run ごとに
 変わる**。比較するときは `--intent-spec` で固定する。
 
-## 終了条件に対して
+### 終了条件に対して
 
 | 条件 | 状態 |
 |---|---|

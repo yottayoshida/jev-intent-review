@@ -1,7 +1,7 @@
 {
   "name": "jev-intent-review",
   "version": "0.1.0",
-  "description": "Check a pull request against requirements that state how a failure must be handled, by asking Jev about particular calls",
+  "description": "Review pull requests against their intent beyond the boundaries of the diff, using typed judgments from Jev",
   "license": "MIT OR Apache-2.0",
   "type": "module",
   "engines": {
