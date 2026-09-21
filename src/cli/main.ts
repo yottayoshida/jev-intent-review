@@ -16,6 +16,7 @@ import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
 import { modelPlanner } from "../plan/planner.ts";
+import { modelMapper, type Mapper } from "../plan/mapping.ts";
 import type { Planner } from "../review/local-check-run.ts";
 import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
@@ -50,7 +51,10 @@ Experimental:
                         the functions the change touched and the functions that call them,
                         add the calls the requirement's own words lead the planner to, and
                         observe what each function returns when one of its calls fails.
-                        Reports observations and what it did not check, never a violation.
+                        Where a requirement is read as governing such a call and the
+                        reading contradicts it, the call is listed as worth checking, with
+                        the words, the code, the condition and the reading. Never a
+                        requirement verdict, and never a failing exit code.
                         Nothing about a target is given on the command line.
   --experimental-candidates-only
                         with the above: build the set and stop. Prints which calls are
@@ -90,7 +94,7 @@ function flat(text: string): string {
 
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string; planner?: Planner };
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string; planner?: Planner; mapper?: Mapper };
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -136,6 +140,7 @@ function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
     compiler: new WorkersAiCompiler(client),
     planner: modelPlanner(client),
+    mapper: modelMapper(client),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
   };
@@ -306,6 +311,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         revisions,
         resolved.spec.requirements,
         { pick: asksNothing } as unknown as Planner,
+        { map: asksNothing } as unknown as Mapper,
         { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
         pathFilter(config.repository.include, config.repository.ignore),
         { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
@@ -330,10 +336,15 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // about particular calls. It reports observations and what it did not check, never a
       // violation, and it does not go through `runReview`.
       const include = pathFilter(config.repository.include, config.repository.ignore);
-      const planner = judges.planner ?? modelPlanner(new CloudflareClient(endpoint, { deadline }));
+      // The planner and the mapper are the same model doing two different jobs, so they share one
+      // client and one budget: choosing where to look, and saying whether the requirement governs
+      // what was found. The judgment provider is separate and is never asked either question.
+      const client = judges.planner && judges.mapper ? null : new CloudflareClient(endpoint, { deadline });
+      const planner = judges.planner ?? modelPlanner(client!);
+      const mapper = judges.mapper ?? modelMapper(client!);
       // `--experimental-candidates-only` returned above, before the credentials gate, so there is
       // nothing to pass through here.
-      const results = await runLocalCheck(git, revisions, intent.requirements, planner, judges.provider, include, DEFAULT_LOCAL_CHECK);
+      const results = await runLocalCheck(git, revisions, intent.requirements, planner, mapper, judges.provider, include, DEFAULT_LOCAL_CHECK);
       io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
       return EXIT.ok;
     }

@@ -11,6 +11,7 @@ import { DEFAULT_LOCAL_CHECK, runLocalCheck, renderLocalCheck, type LocalCheckOp
 import type { Git } from "../src/repository/git.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { ChoiceAnswer, Requirement } from "../src/types.ts";
+import type { Mapper, MappingRequest } from "../src/plan/mapping.ts";
 
 /** The changed file. Line 9 is the call the change introduced. */
 const INTEGRITY = `use std::path::Path;
@@ -117,6 +118,24 @@ function scriptedPlanner(): { planner: Planner; asked: Asked[] } {
   return { planner, asked };
 }
 
+/** A quote that is really in the requirement, so `checkMapping` accepts it. */
+const QUOTE = "cannot be collected is not reported as an empty summary";
+
+/**
+ * Says the requirement governs every call it is asked about. The default for tests that are not
+ * about the mapping; the ones that are pass their own.
+ */
+function scriptedMapper(answer?: (r: MappingRequest) => { raw?: unknown; failed?: string }): { mapper: Mapper; seen: MappingRequest[] } {
+  const seen: MappingRequest[] = [];
+  const mapper: Mapper = {
+    async map(request) {
+      seen.push(request);
+      return answer ? answer(request) : { raw: { callId: request.callId, verdict: "applies", quote: QUOTE, reason: "the summary is what this call collects" } };
+    },
+  };
+  return { mapper, seen };
+}
+
 /** Answers from the body: the condition's own call followed by `?` propagates. */
 function scriptedJudge(): { judge: JudgmentProvider; seen: string[]; packets: { symbol?: string; changed: boolean }[] } {
   const seen: string[] = [];
@@ -144,8 +163,9 @@ function scriptedJudge(): { judge: JudgmentProvider; seen: string[]; packets: { 
 
 async function run(options?: Partial<LocalCheckOptions>) {
   const { planner, asked } = scriptedPlanner();
+  const { mapper } = scriptedMapper();
   const { judge, seen, packets } = scriptedJudge();
-  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], planner, judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
+  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], planner, mapper, judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
   return { result: results[0]!, results, asked, seen, packets };
 }
 
@@ -171,6 +191,7 @@ test("one hop out: a caller of a changed function is a candidate too", async () 
 });
 
 test("a changed function is told to the model as changed, even when the plan also named it", async () => {
+  const { mapper } = scriptedMapper();
   // The packet's flag came from the *call's* origin, and a call the planner named has origin
   // `picked` wherever it sits — so a function the pull request rewrote was handed over as
   // untouched, to a model being asked what it returns.
@@ -183,7 +204,7 @@ test("a changed function is told to the model as changed, even when the plan als
   };
   // Open the file the change is in, so the planner is asked about it at all.
   const aboutTheMechanism = { ...requirement, searchHints: ["baseline"] };
-  await runLocalCheck(fakeGit, REVISIONS, [aboutTheMechanism], picksTheChangedCall, judge, () => true, DEFAULT_LOCAL_CHECK);
+  await runLocalCheck(fakeGit, REVISIONS, [aboutTheMechanism], picksTheChangedCall, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   const sent = packets.find((p) => p.symbol === "read_baseline");
   assert.ok(sent, `read_baseline should have been judged: ${JSON.stringify(packets)}`);
   assert.equal(sent.changed, true);
@@ -192,13 +213,14 @@ test("a changed function is told to the model as changed, even when the plan als
 });
 
 test("what the planner says its picks leave unchecked is reported", async () => {
+  const { mapper } = scriptedMapper();
   const { judge } = scriptedJudge();
   const withGaps: Planner = {
     async pick() {
       return { picks: [], notCovered: ["every other call site of the same helper"] };
     },
   };
-  const [r] = await runLocalCheck(fakeGit, REVISIONS, [requirement], withGaps, judge, () => true, DEFAULT_LOCAL_CHECK);
+  const [r] = await runLocalCheck(fakeGit, REVISIONS, [requirement], withGaps, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   assert.ok(r!.notes.some((n) => /every other call site of the same helper/.test(n)), r!.notes.join(" | "));
 });
 
@@ -222,6 +244,7 @@ test("the budget is spent once for the requirement, not once per file", async ()
 });
 
 test("nothing secret-shaped leaves in a request, packet or question, nor in the report", async () => {
+  const { mapper } = scriptedMapper();
   // A request is the packet *and* the questions. Only the packet was being cleaned, and the
   // question text carries the call expression — so a call with a secret-shaped argument went out
   // in the one field nothing touched. The hold that used to cover this was `locateCall` failing
@@ -251,7 +274,7 @@ test("nothing secret-shaped leaves in a request, packet or question, nor in the 
     },
   };
   const { planner } = scriptedPlanner();
-  const results = await runLocalCheck(git, REVISIONS, [requirement], planner, recording, () => true, DEFAULT_LOCAL_CHECK);
+  const results = await runLocalCheck(git, REVISIONS, [requirement], planner, mapper, recording, () => true, DEFAULT_LOCAL_CHECK);
   assert.ok(sent.length > 0, "something was judged");
   const asked = sent.find((s) => s.includes("read_capped"));
   assert.ok(asked, "including the call that carries it");
@@ -260,10 +283,11 @@ test("nothing secret-shaped leaves in a request, packet or question, nor in the 
 });
 
 test("what goes to the planner is redacted, the requirement's text and the listing alike", async () => {
+  const { mapper } = scriptedMapper();
   const secretish = "0123456789abcdef0123456789abcdef0123456789abcdef";
   const { planner, asked } = scriptedPlanner();
   const { judge } = scriptedJudge();
-  await runLocalCheck(fakeGit, REVISIONS, [{ ...requirement, text: `${requirement.text} See ${secretish}.` }], planner, judge, () => true, DEFAULT_LOCAL_CHECK);
+  await runLocalCheck(fakeGit, REVISIONS, [{ ...requirement, text: `${requirement.text} See ${secretish}.` }], planner, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   assert.ok(asked.length > 0, "the planner was asked about at least one file");
   for (const a of asked) {
     assert.ok(!a.listing.includes(secretish), "a long opaque string in the source does not go out in the listing");
@@ -281,9 +305,10 @@ test("a body that did not fit is held, not answered about half of itself", async
 });
 
 test("candidates only: the set and the budget, with no model asked at all", async () => {
+  const { mapper } = scriptedMapper();
   const { planner, asked } = scriptedPlanner();
   const { judge, seen } = scriptedJudge();
-  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], planner, judge, () => true, { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true });
+  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], planner, mapper, judge, () => true, { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true });
   const r = results[0]!;
   assert.equal(asked.length, 0, "the planner was not consulted");
   assert.equal(seen.length, 0, "nothing was judged");
@@ -311,16 +336,20 @@ test("calls whose callee is not resolvable here are unchecked, with the reason",
   assert.match(held.why, /no definition in this repository/);
 });
 
-test("the report separates what was observed from what was not checked, and reports no violation", async () => {
+test("the report separates what was observed from what was not checked, and states no verdict", async () => {
   const { results } = await run();
   const text = renderLocalCheck(results);
   assert.match(text, /A local observation is not a statement about the requirement/);
   assert.match(text, /### Not checked/);
   assert.match(text, /Functions reached: 1 the change touched/);
-  assert.ok(!/violat/i.test(text), "this path does not report violations");
+  // What is ruled out is this tool concluding something about the requirement as a whole. A
+  // finding, when there is one, is printed as two readings that disagree — see the tests below.
+  assert.ok(!/violat/i.test(text), "no verdict of the tool's own");
+  assert.ok(!/VERIFIED|NOT_VERIFIED/.test(text), "and no requirement-level status");
 });
 
 test("the plan's clause is model prose, and is contained before it reaches the report", async () => {
+  const { mapper } = scriptedMapper();
   // Nothing enforces the schema on the way back: `readModelJson` parses and returns. The clause
   // was the one field where a model's sentence went into the Markdown untouched — which is also
   // the only field a verdict would fit in, on a path whose whole promise is that it states none.
@@ -334,7 +363,7 @@ test("the plan's clause is model prose, and is contained before it reaches the r
       return { picks: call ? [{ callId: call.id, clause: hostile }] : [] };
     },
   };
-  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], loud, judge, () => true, DEFAULT_LOCAL_CHECK);
+  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], loud, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   const clause = results[0]!.observed.find((o) => o.result.bearsOnRequirement)!.result.clause!;
   assert.ok(!clause.includes("\n"), "one line: a newline would end the bullet it sits in");
   assert.ok(!clause.includes("`"), "no code span to break out of");
@@ -346,25 +375,27 @@ test("the plan's clause is model prose, and is contained before it reaches the r
 });
 
 test("a planner that could not answer is not reported as a planner that found nothing", async () => {
+  const { mapper } = scriptedMapper();
   // Both end in no call carrying a clause, and a report that shows them alike is a failed request
   // dressed as a decision — the same shape as the checks this path had to take apart.
   const { judge } = scriptedJudge();
   const quiet: Planner = { async pick() { return { picks: [] }; } };
   const broken: Planner = { async pick() { return { picks: [], failed: "the endpoint timed out" }; } };
-  const [a] = await runLocalCheck(fakeGit, REVISIONS, [requirement], quiet, judge, () => true, DEFAULT_LOCAL_CHECK);
-  const [b] = await runLocalCheck(fakeGit, REVISIONS, [requirement], broken, judge, () => true, DEFAULT_LOCAL_CHECK);
+  const [a] = await runLocalCheck(fakeGit, REVISIONS, [requirement], quiet, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
+  const [b] = await runLocalCheck(fakeGit, REVISIONS, [requirement], broken, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   assert.ok(a!.notes.some((n) => /named no call the requirement governs/.test(n)), a!.notes.join(" | "));
   assert.ok(b!.notes.some((n) => /did not answer about .*the endpoint timed out/.test(n)), b!.notes.join(" | "));
 });
 
 test("a planner that picks nothing still leaves the change's own candidates", async () => {
+  const { mapper } = scriptedMapper();
   const nothing: Planner = {
     async pick() {
       return { picks: [] };
     },
   };
   const { judge } = scriptedJudge();
-  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], nothing, judge, () => true, DEFAULT_LOCAL_CHECK);
+  const results = await runLocalCheck(fakeGit, REVISIONS, [requirement], nothing, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
   const r = results[0]!;
   assert.equal(r.picks.length, 0);
   assert.ok(
@@ -372,4 +403,102 @@ test("a planner that picks nothing still leaves the change's own candidates", as
     "the changed call is not dropped because the planner did not name it",
   );
   for (const o of r.observed) assert.equal(o.result.bearsOnRequirement, false);
+});
+
+// ---------------------------------------------------------------------------
+// From an observation to something worth checking.
+//
+// A finding needs both halves: a requirement read as governing this call, and a reading of the
+// call that contradicts it. These fix one half at a time and watch the other decide.
+// ---------------------------------------------------------------------------
+
+/** The same repository, with the changed call swallowing its failure — the shape a mutant has. */
+const SWALLOWING = INTEGRITY.replace("let content = crate::atomic_file::read_capped(&path, MAX)?;", "let Ok(content) = crate::atomic_file::read_capped(&path, MAX) else { return Ok(None) };");
+
+function swallowingGit(): Git {
+  const files: Record<string, string> = { ...FILES, "src/integrity.rs": SWALLOWING };
+  return {
+    ...fakeGit,
+    async readText(rev: string, path: string) {
+      if (rev === "BEFORE" && path === "src/integrity.rs") return INTEGRITY_BEFORE;
+      return files[path] ?? null;
+    },
+    async grep(_rev: string, pattern: string) {
+      const hits = Object.entries(files).flatMap(([path, text]) =>
+        text.split("\n").flatMap((line, i) => (new RegExp(`(?<![\\w$])${pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`, "i").test(line) ? [{ path, line: i + 1, text: line }] : [])),
+      );
+      return { hits, more: false };
+    },
+  } as unknown as Git;
+}
+
+async function findings(mapper: Mapper, git: Git = swallowingGit()) {
+  const { planner } = scriptedPlanner();
+  const { judge } = scriptedJudge();
+  const results = await runLocalCheck(git, REVISIONS, [requirement], planner, mapper, judge, () => true, DEFAULT_LOCAL_CHECK);
+  return { r: results[0]!, text: renderLocalCheck(results) };
+}
+
+test("a governed call that swallows its failure is reported, with everything needed to disagree", async () => {
+  const { mapper } = scriptedMapper();
+  const { r, text } = await findings(mapper);
+  const f = r.findings.find((x) => x.function === "read_baseline");
+  assert.ok(f, `the swallowing call should be worth checking: ${JSON.stringify(r.findings)}`);
+  assert.equal(f.quote, QUOTE);
+  assert.equal(f.observation, "returns_success");
+  assert.match(f.condition, /Execution reaches the call/);
+  assert.match(f.disagreement, /returning one/);
+  assert.match(text, /### Worth checking/);
+  assert.match(text, /\*\*The requirement says\*\*: "cannot be collected/);
+  assert.match(text, /neither checks the other/);
+});
+
+test("the same call, with the requirement read as not governing it, is not reported", async () => {
+  // The fixture for a requirement that allows carrying on: nothing about the code changed, and the
+  // observation is the same `returns_success`. Only the mapping differs.
+  const { mapper } = scriptedMapper((request) => ({ raw: { callId: request.callId, verdict: "does_not_apply", quote: "", reason: "the requirement allows this read to be skipped" } }));
+  const { r, text } = await findings(mapper);
+  assert.equal(r.findings.length, 0);
+  assert.ok(r.observed.some((o) => o.result.observation === "returns_success"), "the observation is unchanged; only the mapping is");
+  assert.match(text, /### Read, but not answered against the requirement/);
+  assert.match(text, /does not govern this call: the requirement allows this read to be skipped/);
+  assert.ok(!/### Worth checking/.test(text));
+});
+
+test("a requirement that does not settle the call, and a mapping that did not come back, are two different things", async () => {
+  const unsure = await findings(scriptedMapper((r) => ({ raw: { callId: r.callId, verdict: "unknown", quote: "", reason: "the requirement says nothing about this read" } })).mapper);
+  const broken = await findings(scriptedMapper(() => ({ failed: "the endpoint timed out" })).mapper);
+  assert.equal(unsure.r.findings.length, 0);
+  assert.equal(broken.r.findings.length, 0);
+  assert.match(unsure.text, /does not settle this call/);
+  assert.match(broken.text, /was not answered \(the endpoint timed out\)/);
+});
+
+test("a mapping is refused when it names a call this run never offered, or quotes what is not there", async () => {
+  const elsewhere = await findings(scriptedMapper(() => ({ raw: { callId: "src/nowhere.rs:call-9", verdict: "applies", quote: QUOTE, reason: "…" } })).mapper);
+  const invented = await findings(scriptedMapper((r) => ({ raw: { callId: r.callId, verdict: "applies", quote: "must never be swallowed under any circumstances", reason: "…" } })).mapper);
+  assert.equal(elsewhere.r.findings.length, 0);
+  assert.equal(invented.r.findings.length, 0);
+  assert.match(elsewhere.text, /is not a call this run offered/);
+  assert.match(invented.text, /the quote is not in the requirement's text/);
+});
+
+test("the mapping is asked before the judgment and is never told the answer", async () => {
+  const { mapper, seen } = scriptedMapper();
+  const { r } = await findings(mapper);
+  assert.ok(seen.length > 0);
+  assert.equal(r.counts.mapped, seen.length);
+  for (const request of seen) {
+    const fields = Object.keys(request);
+    assert.deepEqual(fields.sort(), ["body", "call", "callId", "function", "requirementId", "requirementText"], "no answer and no probability is among them");
+    assert.ok(!/returns_error|returns_success|probability/.test(JSON.stringify(request)), "nor anywhere inside them");
+  }
+});
+
+test("a call the requirement governs that does propagate is not reported", async () => {
+  // The shipped shape. Same mapping, same requirement; the code is what differs.
+  const { mapper } = scriptedMapper();
+  const { r } = await findings(mapper, fakeGit);
+  assert.equal(r.findings.length, 0, JSON.stringify(r.findings));
+  assert.ok(r.observed.every((o) => o.result.observation === "returns_error"));
 });
