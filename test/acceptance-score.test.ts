@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { render, type AcceptanceLog } from "../bench/acceptance/replay.ts";
+import { loadCases, render, type AcceptanceLog } from "../bench/acceptance/replay.ts";
 import { occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8")) as T;
@@ -168,4 +168,17 @@ test("one repository, no target outside the diff, fewer than three runs, zero ru
   const moved = good();
   moved.log.cases.two!.versions.shipped!.base = "c".repeat(40);
   assert.throws(() => render(moved.cases, moved.log, candidates), /case\.json says/);
+});
+
+// ---- 3b. The document says what the committed record says, byte for byte ------------------------
+
+test("the table in docs/local-check-cli.md is exactly what the committed log and cases produce", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- acceptance:begin -->\n";
+  const end = "\n<!-- acceptance:end -->";
+  assert.equal(doc.split(begin).length, 2, "exactly one acceptance:begin marker");
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = read<AcceptanceLog>("../bench/logs/acceptance-v1.json");
+  const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
+  assert.equal(block, render(loadCases(), log, candidates));
 });

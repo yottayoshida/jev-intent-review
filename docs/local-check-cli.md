@@ -78,6 +78,82 @@ the enumeration's own caps are counted in the notes.
 
 ## What has been measured
 
+### Cases that were not used to tune anything
+
+Forty merged pull requests from outside this project were examined in a fixed order
+(`bench/acceptance/candidates.json`; the rules are in `bench/acceptance/README.md`), looking for one
+that states how a failure must be handled, fixes it at a call v0.1 can put a question to, and lets
+the defect be observed by running it. The plan asked for three; two passed, and how the others
+failed is the first result. Twenty-eight of the forty do not fit v0.1's question at all. In many,
+the fix logs the failure, warns, blocks, or reports it in the result instead of returning it, and a
+question about whether a failure reaches the caller as a success cannot tell such a fix from the
+defect; the rest are about something other than a failed call. Of the twelve that fit, the fixed
+call could be asked about in three. The others go to the standard library or another crate, to a
+name defined more than once in the repository, or to a `Result` under another name (`CostResult`),
+and in two the tool found no changed function to ask about (one of the nine, iota#10136, is
+judged from its source without running the tool). Of the three, two could be built and
+run to observe the defect; the third needs a WebAssembly toolchain to build at all.
+
+The two cases are moltis-org/moltis#1064 and dashpay/grovedb#500. Each has four versions: the
+shipped code, a defect at the fixed call whose effect was observed by running it, a rewrite that
+does not change behaviour, and a version where the decision is moved into a helper whose body is
+not sent, so no confident reading is right. moltis also carries two defects outside the diff,
+placed at the merge base so the pull request did not fix them: one in an unchanged caller of a
+changed function — the README's example — and one in a function that neither changed nor calls one
+that did. Every branch whose target is inside the budget was run three times.
+
+<!-- acceptance:begin -->
+Candidates examined: 40 (cap 40). Passed condition (a): 12, (b): 3, (c): 2. Measured: 2 requirements from 2 repositories.
+
+| case | version | target | expected | reach | readings (mapping / behaviour) | result |
+|---|---|---|---|---|---|---|
+| grovedb-500 | shipped | A `finalize` | not listed | asked | applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 0.99; applies 1.00 / returns_error 0.99 | 3/3 agrees |
+| grovedb-500 | defect-A | A `finalize` | listed | asked | applies 0.99 / returns_success 0.89 · listed; applies 0.99 / returns_success 0.92 · listed; applies 0.99 / returns_success 0.94 · listed | 3/3 agrees |
+| grovedb-500 | rewrite-A | A `finalize` | not listed | asked | applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| grovedb-500 | hidden-A | A `finalize` | no confident reading | asked | applies 1.00 / returns_error 0.96; applies 1.00 / returns_error 0.94; applies 1.00 / returns_error 0.95 | 0/3 differs |
+| moltis-1064 | shipped | A `generate_title_for_session` | not listed | asked | applies 0.99 / returns_error 0.99; applies 0.99 / returns_error 1.00; applies 1.00 / returns_error 0.99 | 3/3 agrees |
+| moltis-1064 | shipped | B `dispatch_command` | not listed | held before any question (target_not_result) | — | not reached |
+| moltis-1064 | shipped | C `generate_title` | not listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+| moltis-1064 | defect-A | A `generate_title_for_session` | listed | asked | applies 0.98 / returns_success 0.99 · listed; applies 0.98 / returns_success 1.00 · listed; applies 0.99 / returns_success 1.00 · listed | 3/3 agrees |
+| moltis-1064 | rewrite-A | A `generate_title_for_session` | not listed | asked | applies 0.99 / returns_error 0.99; applies 1.00 / returns_error 1.00; applies 0.99 / returns_error 1.00 | 3/3 agrees |
+| moltis-1064 | hidden-A | A `generate_title_for_session` | no confident reading | asked | applies 0.98 / returns_error 0.92; applies 0.98 / returns_error 0.92; applies 0.99 / returns_error 0.94 | 0/3 differs |
+| moltis-1064 | defect-B | B `dispatch_command` | listed | held before any question (target_not_result) | — | not reached |
+| moltis-1064 | defect-C | C `generate_title` | listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+
+Calls other than the targets that were listed in these runs, not scored: 0. Requests sent to Jev: 205, over 24 runs.
+<!-- acceptance:end -->
+
+What it shows, and no more than that:
+
+- **Inside the diff, v0.1 read both unseen cases right.** Each defect was listed at its own call in
+  three runs of three, and neither the shipped code nor the rewrite listed it, or anything else.
+  That is two requirements from two repositories.
+- **Outside the diff, nothing was asked.** The unchanged caller was held before any question: its
+  return type is `ChannelResult<String>`, a `Result` alias the check does not recognise, and the
+  report says it does not return a `Result`. The other function is outside what v0.1 enumerates by
+  construction; the table says "cap or structure" because the rule fixed beforehand gives that
+  label whenever a cap fired in the run. Among the three candidates whose fixed call could be
+  asked, the unchanged caller reached no question in any: held for the alias here, held for a
+  callee signature wrapped past four lines in Kontor#385, and dropped by the forty-call cap of its
+  function in grovedb#500 (`bench/acceptance/precheck-shipped.json`).
+- **Jev reads through a helper it was not shown.** With the decision moved into a helper whose body
+  was not sent, Jev answered `returns_error` at 0.92–0.96 in every run of both cases. The helpers do
+  pass the failure through, so the reading happens to be right, but nothing Jev was sent
+  established it. The version was fixed beforehand as "no confident reading", and it is scored
+  against that.
+
+Reproducible from what is committed, without sending anything:
+
+```sh
+node bench/acceptance/replay.ts
+```
+
+A test compares the table above with that output byte for byte, and the script refuses to print a
+table for fewer than two repositories, no defect outside the diff, a branch sent to Jev fewer than
+three times, or commits other than the ones each case fixed.
+
+### The case v0.1 was tuned on
+
 One repository (omamori `#468` / PR `#476`), two requirements that state how a failure must be
 handled, five branches, one run each: the shipped code, two single-call mutations and two
 behaviour-preserving rewrites of the same calls. Each mutation was listed at its own call and
@@ -92,10 +168,11 @@ Reproducible from what is committed, without sending anything:
 node bench/replay-scoring.ts bench/logs/stated-requirements-v1.json
 ```
 
-That is the whole of it: **one repository, two requirements, one run per branch.** Nothing
-measures a second language, a second kind of requirement, or how stable a reading is across runs.
-The same targets asked under PR `#476`'s own sentence did **not** pass — Jev read the refusal
-itself as the governed call, not the functions that receive it (`bench/logs/jev-only-v1.json`).
+The wording of the questions was worked out on these same functions, so this case is a regression
+check and does not count as unseen. The same targets asked under PR `#476`'s own sentence did
+**not** pass — Jev read the refusal itself as the governed call, not the functions that receive it
+(`bench/logs/jev-only-v1.json`). Nothing yet measures a second language or a second kind of
+requirement.
 
 ## Only Jev
 
