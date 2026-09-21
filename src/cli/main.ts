@@ -53,9 +53,11 @@ Experimental:
                         requirement's words, the code, the assumed failure and both
                         answers. Requirements come from --intent-spec or an
                         acceptance-criteria list; no file, function or expected answer is
-                        named on the command line. Never a requirement verdict, and never
-                        a failing exit code: nothing listed is not a claim that the
-                        requirement holds.
+                        named on the command line. No requirement verdict is stated.
+                        Findings do not cause a nonzero exit code; configuration,
+                        repository and provider failures can. Nothing listed means no call
+                        met the conditions -- including calls left undetermined -- and
+                        exit 0 does not establish that the requirement holds.
   --experimental-candidates-only
                         with the above: build the set and stop. Prints which calls fit the
                         budget and which do not, with a reason each, and asks nothing --

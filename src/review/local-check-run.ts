@@ -28,8 +28,9 @@
 // **A local observation is not a requirement verdict.** A changed line says the work was done
 // there; resolving that a callee returns a `Result` makes a question askable. Neither makes the
 // requirement apply — the mapping is what says that, it is asked separately, and it is never told
-// what the code does. There is no requirement-level status here and no failing exit code: a
-// finding is two readings that disagree, printed with everything needed to disagree with them.
+// what the code does. No requirement-level status is stated, and a finding does not make the run
+// exit nonzero — a configuration, repository or provider failure still does. A finding is two
+// readings that disagree, printed with everything needed to disagree with them.
 
 import { analyzeChange } from "../change/seeds.ts";
 import { Discoverer } from "../discovery/discover.ts";

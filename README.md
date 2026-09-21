@@ -98,17 +98,20 @@ The other sections are all "not that", kept apart because they mean different th
 | section | what it holds |
 |---|---|
 | **Worth checking** | both answers cleared the bar and disagree |
-| **Read as required by the requirement** | Jev says the requirement requires it, and the code agreed |
+| **Read as required by the requirement** | Jev read the requirement as applying to this call. The behavior observation is reported separately — a call under *Worth checking* is in here too |
 | **Read, but not required of by the requirement** | `does_not_apply`, `unknown`, below the bar, or no answer — each says which |
 | **Not checked** | the callee has no definition here, the target returns no `Result`, the body did not fit, the call could not be located, **or the budget was spent** |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
 ## What it does not say
 
-**Exit 0 is not a verdict.** This path never returns a failing exit code and never states that a
-requirement holds. Nothing listed means the calls it reached and could ask about did not disagree
-with the requirement — the calls it did not reach are in *Not checked*, with reasons, and the
-enumeration itself has caps that the notes count.
+**Exit 0 is not a verdict.** Findings do not cause a nonzero exit code. Configuration, repository
+and provider failures can. Exit 0 does not establish that the requirement holds.
+
+**Nothing listed** means no call met the conditions for being listed — both answers over the bar
+and disagreeing. It covers calls whose mapping or whose behaviour came back undetermined, below
+the bar, or unanswered, as well as calls that agreed. What was not reached is in *Not checked*
+with a reason each, and the enumeration's own caps are counted in the notes.
 
 A listed call rests on **two model readings that do not check each other**. Everything either of
 them used is printed so you can throw it out.

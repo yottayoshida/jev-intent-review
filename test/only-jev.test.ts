@@ -93,6 +93,25 @@ test("over a whole run of the experimental path, every request that is sent asks
     assert.match(text, /\*\*Jev, on what the function returns\*\*: returns_success/);
     assert.equal(code, 0, "a listed call does not change the exit code");
     assert.ok(!/VERIFIED/.test(text), "and no requirement-level status is introduced");
+
+    // The other half of the sentence the README makes. A finding is not a failure, but a failure
+    // still is one — saying only the first reads as "this command never fails", which it does not.
+    // 401 rather than 500: a refused token is not retried, so this costs one request instead of
+    // four and a backoff. Either is a provider failure; the point is the exit code.
+    const broken = createServer((_request, response) => {
+      response.writeHead(401, { "content-type": "application/json" });
+      response.end(JSON.stringify({ errors: [{ message: "the token was refused" }] }));
+    });
+    await new Promise<void>((resolve) => broken.listen(0, "127.0.0.1", resolve));
+    try {
+      const errors: string[] = [];
+      const failing: Io = { stdout: () => {}, stderr: (t) => void errors.push(t), cwd: repo.dir, env: { JEV_API_URL: `http://127.0.0.1:${(broken.address() as AddressInfo).port}/run`, JEV_API_TOKEN: "local-token" } };
+      const failed = await main(["--experimental-local-check", "--base", base, "--head", head, "--intent-spec", spec], failing);
+      assert.notEqual(failed, 0, "a provider that cannot answer is a failure, and says so");
+      assert.match(errors.join(""), /401/);
+    } finally {
+      await new Promise<void>((resolve) => broken.close(() => resolve()));
+    }
   } finally {
     repo.remove();
     await new Promise<void>((resolve) => server.close(() => resolve()));
