@@ -61,6 +61,7 @@ The current pipeline is intentionally narrow:
 requirements
     ↓
 changed functions + nearby callers
++ other callers of what the changed code calls
     ↓
 candidate calls
     ↓
@@ -83,7 +84,8 @@ It currently supports:
 
 * Rust repositories
 * requirements describing how failures must propagate
-* functions touched by the change and callers one hop out
+* functions touched by the change and callers one hop out, and the other callers of the repository functions the changed code calls — the path a fix may have missed
+  (not yet measured on code the tool was not tuned on)
 * explicit requirements from an intent spec or acceptance-criteria list
 * Jev as the only judgment model
 

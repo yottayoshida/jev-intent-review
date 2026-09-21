@@ -26,7 +26,7 @@ export type Applicability =
   | { ok: false; kind: "target_not_result" | "callee_unresolved" | "callee_ambiguous" | "callee_not_result"; reason: string };
 
 /** The definitions of a bare name outside tests, at this commit. */
-async function definitionsOf(discoverer: Discoverer, name: string): Promise<{ path: string; line: number; text: string }[]> {
+export async function definitionsOf(discoverer: Discoverer, name: string): Promise<{ path: string; line: number; text: string }[]> {
   const { hits } = await discoverer.search(name);
   const found: { path: string; line: number; text: string }[] = [];
   for (const hit of hits) {
@@ -37,6 +37,28 @@ async function definitionsOf(discoverer: Discoverer, name: string): Promise<{ pa
     if (!inTest) found.push({ path: hit.path, line: hit.line, text: hit.text });
   }
   return found;
+}
+
+export type CalleeResolution =
+  | { ok: true; definedAt: string }
+  | { ok: false; kind: "callee_unresolved" | "callee_ambiguous" | "callee_not_result"; reason: string };
+
+/**
+ * The callee half: a bare name defined once in this repository, returning a `Result`.
+ *
+ * Also what makes a name a seed for the siblings of a change (`siblings.ts`): a call that ties a
+ * sibling to the change can then be asked about by construction, rather than found and held.
+ */
+export async function resolveCallee(discoverer: Discoverer, bare: string): Promise<CalleeResolution> {
+  const defs = await definitionsOf(discoverer, bare);
+  if (defs.length === 0) return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
+  if (defs.length > 1) return { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${defs.length} times here, so which one this call reaches is not resolved` };
+  const def = defs[0]!;
+  // The signature may wrap; a few lines past the definition line are enough to see the return.
+  const index = await discoverer.index(def.path);
+  const signature = (index?.lines ?? []).slice(def.line - 1, def.line + 3).join(" ");
+  if (!RETURNS_RESULT.test(signature)) return { ok: false, kind: "callee_not_result", reason: `${bare} does not return a Result (${def.path}:${def.line}), so it has no error to assume` };
+  return { ok: true, definedAt: `${def.path}:${def.line}` };
 }
 
 /**
@@ -52,14 +74,6 @@ export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandid
   if (!RETURNS_RESULT.test(fn.signature)) {
     return { ok: false, kind: "target_not_result", reason: `${fn.name} does not return a Result, so "a success" and "an error" do not sort what it returns` };
   }
-  const bare = call.callee.split("::").pop()!;
-  const defs = await definitionsOf(discoverer, bare);
-  if (defs.length === 0) return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
-  if (defs.length > 1) return { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${defs.length} times here, so which one this call reaches is not resolved` };
-  const def = defs[0]!;
-  // The signature may wrap; a few lines past the definition line are enough to see the return.
-  const index = await discoverer.index(def.path);
-  const signature = (index?.lines ?? []).slice(def.line - 1, def.line + 3).join(" ");
-  if (!RETURNS_RESULT.test(signature)) return { ok: false, kind: "callee_not_result", reason: `${bare} does not return a Result (${def.path}:${def.line}), so it has no error to assume` };
-  return { ok: true, calleeDefinedAt: `${def.path}:${def.line}` };
+  const callee = await resolveCallee(discoverer, call.callee.split("::").pop()!);
+  return callee.ok ? { ok: true, calleeDefinedAt: callee.definedAt } : callee;
 }

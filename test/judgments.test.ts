@@ -376,6 +376,22 @@ test("the client starts nothing past its deadline and does not wait past it for 
   assert.equal(busy.calls.length, 1, "the retry would wait at least 1 s; only 0.5 s were left");
 });
 
+test("a last attempt cut off by the run's deadline is the run's time limit, not a request that went unanswered", async () => {
+  // The clock passes the deadline while the request is out; the wait was capped by it.
+  let clock = 1000;
+  const timedOut = (async () => {
+    clock = 2000;
+    throw Object.assign(new Error("timed out"), { name: "TimeoutError" });
+  }) as typeof fetch;
+  const run = new JevClient(ENDPOINT, { fetch: timedOut, deadline: 1500, now: () => clock, maxRetries: 0 });
+  const error = await providerError(run.post(JEV));
+  assert.equal(error.kind, "budget");
+  assert.match(error.message, /time limit reached/);
+  // The control: the same timeout with the deadline still ahead is a timeout.
+  const slow = new JevClient(ENDPOINT, { fetch: fakeFetch([Object.assign(new Error("timed out"), { name: "TimeoutError" })]).fn, deadline: 1500, now: () => 1000, maxRetries: 0 });
+  assert.equal((await providerError(slow.post(JEV))).kind, "timeout");
+});
+
 test("the token does not show when the client is printed or serialised", () => {
   const { c } = client([]);
   assert.ok(!inspect(c, { depth: 5, showHidden: true }).includes(TOKEN));

@@ -20,14 +20,16 @@
 
 import type { Applicability } from "./applicability.ts";
 import type { CallCandidate, Candidates, FunctionCandidate } from "./candidates.ts";
+import type { Sibling } from "./siblings.ts";
 
 /**
- * Why this call is in the set: its function holds a changed line, or its function calls one that
- * does.
+ * Why this call is in the set: its function holds a changed line, its function calls one that
+ * does, or its function calls what the changed code calls and nothing the change touched
+ * (`siblings.ts`).
  */
-export type SiteOrigin = "changed" | "calls_changed";
+export type SiteOrigin = "changed" | "calls_changed" | "shares_call";
 
-/** How a *function* got into the set. A call inherits it. */
+/** How a *function* the change itself reached got into the set. A call inherits it. */
 export type FunctionOrigin = "changed" | "calls_changed";
 
 export interface Site {
@@ -35,7 +37,9 @@ export interface Site {
   fn: FunctionCandidate;
   origin: SiteOrigin;
   /** How the function got in. The packet's "changed by this pull request" is read off this. */
-  fnOrigin: FunctionOrigin;
+  fnOrigin: SiteOrigin;
+  /** For a sibling: the name the changed code calls that tied it. */
+  via?: string;
   applicability?: Applicability;
 }
 
@@ -134,14 +138,46 @@ export async function selectSites(
     for (const call of candidates.calls.filter((k) => k.functionId === fn.id)) widened.push({ call, fn, fnOrigin, origin: fnOrigin });
   }
 
+  return { widened, ...(await askable(widened, decide, budget)), functions };
+}
+
+/** Which of a set's calls a question can be put to, and which of those the budget reaches, in order. */
+async function askable(widened: readonly Site[], decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Applicability>, budget: number): Promise<Pick<Selection, "applicable" | "budgeted" | "overBudget" | "held">> {
   const applicable: Site[] = [];
   const held: Site[] = [];
   for (const site of widened) {
     const verdict = await decide(site.fn, site.call);
-    const withVerdict = { ...site, applicability: verdict };
-    (verdict.ok ? applicable : held).push(withVerdict);
+    (verdict.ok ? applicable : held).push({ ...site, applicability: verdict });
   }
-
   const { taken, left } = roundRobin(applicable, budget);
-  return { widened, applicable, budgeted: taken, overBudget: left, held, functions };
+  return { applicable, budgeted: taken, overBudget: left, held };
+}
+
+export interface SiblingSelection {
+  widened: Site[];
+  applicable: Site[];
+  budgeted: Site[];
+  overBudget: Site[];
+  held: Site[];
+  functions: number;
+}
+
+/**
+ * The siblings, under a budget of their own (ADR 0005).
+ *
+ * Kept apart from `selectSites` so that the calls asked about in the functions the change reached
+ * are the same set whether or not a sibling exists. Siblings take their turns in seed order, and
+ * inside each the call that tied it to the seed comes first: that is where a missed path's defect
+ * sits, and without it first a sibling's other calls would spend the budget.
+ */
+export async function selectSiblings(siblings: readonly Sibling[], decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Applicability>, budget: number): Promise<SiblingSelection> {
+  const widened: Site[] = [];
+  for (const sibling of siblings) {
+    const tying = new Set(sibling.tying.map((c) => c.id));
+    const calls = sibling.candidates.calls.filter((k) => k.functionId === sibling.fn.id);
+    for (const call of [...calls.filter((k) => tying.has(k.id)), ...calls.filter((k) => !tying.has(k.id))]) {
+      widened.push({ call, fn: sibling.fn, origin: "shares_call", fnOrigin: "shares_call", via: sibling.seed });
+    }
+  }
+  return { widened, ...(await askable(widened, decide, budget)), functions: siblings.length };
 }

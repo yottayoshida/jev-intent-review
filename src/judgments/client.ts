@@ -368,6 +368,10 @@ export class JevClient {
       } catch (error) {
         if (error instanceof ProviderError) throw error;
         const timedOut = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+        // The wait was capped by the run's deadline, and the deadline is what ran out: that is the
+        // run's own time limit, as it is at the top of the next attempt — not an answer that never
+        // came. Said the same way here, a caller that reports and stops at its own limit does so.
+        if (timedOut && this.#deadline - this.#now() <= 0) throw new ProviderError("budget", "time limit reached");
         if (attempt < maxRetries) {
           await this.#wait(backoff(attempt));
           continue;

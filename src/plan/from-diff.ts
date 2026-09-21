@@ -29,7 +29,7 @@ const MAX_CALLER_FUNCTIONS = 20;
  * protects, and its callers are not a lead. `Discoverer` draws the same line at 40 for the whole
  * review; here the hop is one of several finders, so it is drawn tighter.
  */
-const COMMON_FILES = 20;
+export const COMMON_FILES = 20;
 
 /** `enumerate` for a path at one commit, read once. Shared with whatever else opens the file. */
 export class CandidateFiles {
@@ -57,7 +57,7 @@ export interface ChangeSites {
   notes: string[];
 }
 
-const isRust = (path: string) => path.endsWith(".rs");
+export const isRust = (path: string) => path.endsWith(".rs");
 
 /**
  * The sources the change contributes, at the after commit.

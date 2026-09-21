@@ -1,0 +1,1967 @@
+{
+  "what": "the shipped branch of the development case (omamori #468 / PR #476), one run with the real Jev, to count findings raised in siblings. Not scored. Distilled by bench/beyond-diff-jev.ts: counts, seeds, stopped, every mapping, every observation and every finding as the CLI gave them; unchecked and notes left out (bench/beyond-diff.ts records them).",
+  "toolSrcDigest": "39ebce4e746c27aa5295ac86db0051fbeb765c11c75f0d6cc5556b1fba7cd193",
+  "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+  "head": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+  "spec": "bench/fixtures/omamori-468/stated-failure-handling.spec.json",
+  "seconds": 62,
+  "questions": 112,
+  "requirements": [
+    {
+      "requirementId": "R1",
+      "stopped": null,
+      "seeds": [
+        "resolve_config_path_checked",
+        "run_config_list",
+        "validate_rule_name",
+        "decode_hex_secret",
+        "merge_claude_settings",
+        "write_new_file",
+        "mutate_config",
+        "regenerate_hooks"
+      ],
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 20
+        },
+        "calls": 739,
+        "applicable": 37,
+        "asked": 19,
+        "mapped": 19,
+        "governed": 2,
+        "overBudget": 17,
+        "notApplicable": 702,
+        "beyond": {
+          "budget": 10,
+          "seeds": 8,
+          "functions": 3,
+          "calls": 50,
+          "applicable": 12,
+          "asked": 9,
+          "mapped": 9,
+          "governed": 0,
+          "overBudget": 2,
+          "notApplicable": 38
+        }
+      },
+      "findings": [],
+      "mappings": [
+        {
+          "requirementId": "R1",
+          "callId": "src/atomic_file.rs:call-38",
+          "file": "src/atomic_file.rs",
+          "function": "open_read_regular",
+          "call": "reject_non_regular(&file, path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.91,
+          "probabilities": {
+            "does_not_apply": 0.91,
+            "applies": 0.05,
+            "unknown": 0.04
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.91), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/atomic_file.rs:call-51",
+          "file": "src/atomic_file.rs",
+          "function": "read_to_string_capped",
+          "call": "open_read_regular(path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.46,
+          "probabilities": {
+            "applies": 0.45,
+            "does_not_apply": 0.46,
+            "unknown": 0.09
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.46), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "call": "open_read_nofollow(path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.86,
+          "probabilities": {
+            "applies": 0.08,
+            "does_not_apply": 0.86,
+            "unknown": 0.06
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.86), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/secret.rs:call-174",
+          "file": "src/audit/secret.rs",
+          "function": "open_read_nofollow",
+          "call": "crate::atomic_file::open_read_regular(path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.65,
+          "probabilities": {
+            "applies": 0.23,
+            "does_not_apply": 0.65,
+            "unknown": 0.12
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.65), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/secret.rs:call-185",
+          "file": "src/audit/secret.rs",
+          "function": "open_audit_rw",
+          "call": "crate::atomic_file::reject_non_regular(&file, path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_apply": 0.97,
+            "unknown": 0.02,
+            "applies": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.97), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "call": "guard_ai_config_modification(\"override disable\")",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "applies": 0.01,
+            "unknown": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.87,
+          "probabilities": {
+            "does_not_apply": 0.87,
+            "unknown": 0.03,
+            "applies": 0.1
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.87), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/config.rs:call-28",
+          "file": "src/config.rs",
+          "function": "raw_rule_names",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.58,
+          "probabilities": {
+            "does_not_apply": 0.58,
+            "unknown": 0.09,
+            "applies": 0.33
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.58), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/config.rs:call-41",
+          "file": "src/config.rs",
+          "function": "read_raw_rule_state",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 0.6,
+          "probabilities": {
+            "applies": 0.6,
+            "does_not_apply": 0.32,
+            "unknown": 0.08
+          },
+          "governs": true,
+          "why": "the requirement is read as requiring this of the call (0.60)"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/config.rs:call-60",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.75,
+          "probabilities": {
+            "applies": 0.2,
+            "unknown": 0.05,
+            "does_not_apply": 0.75
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.75), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.02,
+            "does_not_apply": 0.96
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/integrity.rs:call-44",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.01,
+            "unknown": 0.01,
+            "applies": 0.98
+          },
+          "governs": true,
+          "why": "the requirement is read as requiring this of the call (0.98)"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "call": "open_audit_rw(&self.path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.93,
+          "probabilities": {
+            "unknown": 0.03,
+            "does_not_apply": 0.93,
+            "applies": 0.04
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.93), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/secret.rs:call-193",
+          "file": "src/audit/secret.rs",
+          "function": "rotate_key_locked",
+          "call": "read_secret(&secret_path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.87,
+          "probabilities": {
+            "does_not_apply": 0.87,
+            "applies": 0.1,
+            "unknown": 0.03
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.87), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/break_glass.rs:call-94",
+          "file": "src/break_glass.rs",
+          "function": "activate",
+          "call": "write_state(&state)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/break_glass.rs:call-107",
+          "file": "src/break_glass.rs",
+          "function": "clear_rule",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/break_glass.rs:call-115",
+          "file": "src/break_glass.rs",
+          "function": "clear_all",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "unknown": 0.01,
+            "applies": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-37",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_command",
+          "call": "run_override_disable(rule_name)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "does_not_apply": 0.95,
+            "unknown": 0.02,
+            "applies": 0.03
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.95), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/audit/verify.rs:call-56",
+          "file": "src/audit/verify.rs",
+          "function": "show_entries",
+          "call": "open_read_nofollow(&path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.91,
+          "probabilities": {
+            "applies": 0.06,
+            "unknown": 0.03,
+            "does_not_apply": 0.91
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.91), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-277",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "resolve_config_path_checked()",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "applies": 0.02,
+            "does_not_apply": 0.97,
+            "unknown": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.97), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-6",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_list()",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.91,
+          "probabilities": {
+            "unknown": 0.03,
+            "applies": 0.06,
+            "does_not_apply": 0.91
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.91), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/integrity.rs:call-41",
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "write_new_file(&path, &content)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-272",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "guard_ai_config_modification(\"override enable\")",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "applies": 0.01,
+            "unknown": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-7",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.92,
+          "probabilities": {
+            "does_not_apply": 0.92,
+            "applies": 0.04,
+            "unknown": 0.04
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.92), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/integrity.rs:call-40",
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "crate::config::reject_symlink_public(&path, \"integrity baseline\")",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 1,
+          "probabilities": {
+            "unknown": 0,
+            "does_not_apply": 1,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (1.00), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-273",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "applies": 0,
+            "does_not_apply": 0.99,
+            "unknown": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-11",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_add(args)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "applies": 0.01,
+            "does_not_apply": 0.97,
+            "unknown": 0.02
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.97), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R1",
+          "callId": "src/cli/config_cmd.rs:call-18",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_disable(rule_name)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "does_not_apply": 0.95,
+            "unknown": 0.03,
+            "applies": 0.02
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.95), which is below the bar of 0.6 or not a requirement of this call"
+        }
+      ],
+      "observed": [
+        {
+          "file": "src/atomic_file.rs",
+          "function": "open_read_regular",
+          "call": "reject_non_regular(&file, path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/atomic_file.rs",
+          "function": "read_to_string_capped",
+          "call": "open_read_regular(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_success": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "call": "open_read_nofollow(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "returns_success": 0,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "open_read_nofollow",
+          "call": "crate::atomic_file::open_read_regular(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "open_audit_rw",
+          "call": "crate::atomic_file::reject_non_regular(&file, path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "cannot_determine": 0.01,
+              "returns_error": 0.99,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "call": "guard_ai_config_modification(\"override disable\")",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0.01,
+              "returns_error": 0.99
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "load_config",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 0.99,
+              "returns_success": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "raw_rule_names",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "cannot_determine": 0,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "read_raw_rule_state",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_error": 0.99,
+              "cannot_determine": 0,
+              "returns_success": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_error": 0.99,
+              "cannot_determine": 0,
+              "returns_success": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_success",
+            "probability": 0.96,
+            "probabilities": {
+              "returns_error": 0.01,
+              "cannot_determine": 0.03,
+              "returns_success": 0.96
+            },
+            "why": "the failed call is returned to the caller as a success"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_success": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "call": "open_audit_rw(&self.path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "returns_success": 0,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "rotate_key_locked",
+          "call": "read_secret(&secret_path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "activate",
+          "call": "write_state(&state)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "clear_rule",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "clear_all",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_command",
+          "call": "run_override_disable(rule_name)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.96,
+            "probabilities": {
+              "returns_success": 0.01,
+              "returns_error": 0.96,
+              "cannot_determine": 0.03
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/verify.rs",
+          "function": "show_entries",
+          "call": "open_read_nofollow(&path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.97,
+            "probabilities": {
+              "returns_error": 0.97,
+              "cannot_determine": 0.02,
+              "returns_success": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "resolve_config_path_checked()",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_list()",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "cannot_determine",
+            "probability": 0.51,
+            "probabilities": {
+              "cannot_determine": 0.51,
+              "returns_error": 0.43,
+              "returns_success": 0.06
+            },
+            "why": "the answer did not clear 0.6 (cannot_determine 0.51)"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "write_new_file(&path, &content)",
+          "origin": "shares_call",
+          "via": "write_new_file",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.93,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0.07,
+              "returns_error": 0.93
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "guard_ai_config_modification(\"override enable\")",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_error": 0.99,
+              "cannot_determine": 0.01,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "cannot_determine",
+            "probability": 0.58,
+            "probabilities": {
+              "returns_error": 0.58,
+              "returns_success": 0.04,
+              "cannot_determine": 0.38
+            },
+            "why": "the answer did not clear 0.6 (returns_error 0.58)"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "crate::config::reject_symlink_public(&path, \"integrity baseline\")",
+          "origin": "shares_call",
+          "via": "write_new_file",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_add(args)",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.7,
+            "probabilities": {
+              "returns_success": 0.05,
+              "returns_error": 0.7,
+              "cannot_determine": 0.25
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_disable(rule_name)",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.81,
+            "probabilities": {
+              "returns_success": 0.02,
+              "returns_error": 0.81,
+              "cannot_determine": 0.16
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        }
+      ]
+    },
+    {
+      "requirementId": "R2",
+      "stopped": null,
+      "seeds": [
+        "resolve_config_path_checked",
+        "run_config_list",
+        "validate_rule_name",
+        "decode_hex_secret",
+        "merge_claude_settings",
+        "write_new_file",
+        "mutate_config",
+        "regenerate_hooks"
+      ],
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 20
+        },
+        "calls": 739,
+        "applicable": 37,
+        "asked": 19,
+        "mapped": 19,
+        "governed": 3,
+        "overBudget": 17,
+        "notApplicable": 702,
+        "beyond": {
+          "budget": 10,
+          "seeds": 8,
+          "functions": 3,
+          "calls": 50,
+          "applicable": 12,
+          "asked": 9,
+          "mapped": 9,
+          "governed": 0,
+          "overBudget": 2,
+          "notApplicable": 38
+        }
+      },
+      "findings": [],
+      "mappings": [
+        {
+          "requirementId": "R2",
+          "callId": "src/atomic_file.rs:call-38",
+          "file": "src/atomic_file.rs",
+          "function": "open_read_regular",
+          "call": "reject_non_regular(&file, path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.84,
+          "probabilities": {
+            "unknown": 0.06,
+            "applies": 0.1,
+            "does_not_apply": 0.84
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.84), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/atomic_file.rs:call-51",
+          "file": "src/atomic_file.rs",
+          "function": "read_to_string_capped",
+          "call": "open_read_regular(path)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 0.51,
+          "probabilities": {
+            "does_not_apply": 0.43,
+            "unknown": 0.06,
+            "applies": 0.51
+          },
+          "governs": false,
+          "why": "read as `applies` (0.51), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "call": "open_read_nofollow(path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.9,
+          "probabilities": {
+            "applies": 0.05,
+            "unknown": 0.05,
+            "does_not_apply": 0.9
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.90), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/secret.rs:call-174",
+          "file": "src/audit/secret.rs",
+          "function": "open_read_nofollow",
+          "call": "crate::atomic_file::open_read_regular(path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.65,
+          "probabilities": {
+            "unknown": 0.06,
+            "applies": 0.29,
+            "does_not_apply": 0.65
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.65), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/secret.rs:call-185",
+          "file": "src/audit/secret.rs",
+          "function": "open_audit_rw",
+          "call": "crate::atomic_file::reject_non_regular(&file, path)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.02,
+            "does_not_apply": 0.96
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "call": "guard_ai_config_modification(\"override disable\")",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.02,
+            "does_not_apply": 0.96
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.53,
+          "probabilities": {
+            "does_not_apply": 0.53,
+            "applies": 0.32,
+            "unknown": 0.15
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.53), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/config.rs:call-28",
+          "file": "src/config.rs",
+          "function": "raw_rule_names",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 0.78,
+          "probabilities": {
+            "applies": 0.78,
+            "unknown": 0.04,
+            "does_not_apply": 0.18
+          },
+          "governs": true,
+          "why": "the requirement is read as requiring this of the call (0.78)"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/config.rs:call-41",
+          "file": "src/config.rs",
+          "function": "read_raw_rule_state",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 0.96,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.96,
+            "does_not_apply": 0.03
+          },
+          "governs": true,
+          "why": "the requirement is read as requiring this of the call (0.96)"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/config.rs:call-60",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "applies",
+          "probability": 1,
+          "probabilities": {
+            "does_not_apply": 0,
+            "applies": 1,
+            "unknown": 0
+          },
+          "governs": true,
+          "why": "the requirement is read as requiring this of the call (1.00)"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "applies": 0.02,
+            "does_not_apply": 0.95,
+            "unknown": 0.03
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.95), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/integrity.rs:call-44",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "verdict": "does_not_apply",
+          "probability": 0.47,
+          "probabilities": {
+            "applies": 0.42,
+            "unknown": 0.11,
+            "does_not_apply": 0.47
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.47), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "call": "open_audit_rw(&self.path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.03,
+            "does_not_apply": 0.95
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.95), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/secret.rs:call-193",
+          "file": "src/audit/secret.rs",
+          "function": "rotate_key_locked",
+          "call": "read_secret(&secret_path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.81,
+          "probabilities": {
+            "does_not_apply": 0.81,
+            "unknown": 0.03,
+            "applies": 0.16
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.81), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/break_glass.rs:call-94",
+          "file": "src/break_glass.rs",
+          "function": "activate",
+          "call": "write_state(&state)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/break_glass.rs:call-107",
+          "file": "src/break_glass.rs",
+          "function": "clear_rule",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.01,
+            "does_not_apply": 0.96,
+            "unknown": 0.03
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/break_glass.rs:call-115",
+          "file": "src/break_glass.rs",
+          "function": "clear_all",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-37",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_command",
+          "call": "run_override_disable(rule_name)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.51,
+          "probabilities": {
+            "applies": 0.36,
+            "unknown": 0.13,
+            "does_not_apply": 0.51
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.51), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/audit/verify.rs:call-56",
+          "file": "src/audit/verify.rs",
+          "function": "show_entries",
+          "call": "open_read_nofollow(&path)",
+          "origin": "calls_changed",
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "applies": 0.03,
+            "does_not_apply": 0.95,
+            "unknown": 0.02
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.95), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-277",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "resolve_config_path_checked()",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.72,
+          "probabilities": {
+            "unknown": 0.06,
+            "applies": 0.22,
+            "does_not_apply": 0.72
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.72), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-6",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_list()",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/integrity.rs:call-41",
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "write_new_file(&path, &content)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0,
+            "does_not_apply": 0.99
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-272",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "guard_ai_config_modification(\"override enable\")",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.02,
+            "does_not_apply": 0.96,
+            "unknown": 0.02
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.96), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-7",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.94,
+          "probabilities": {
+            "applies": 0.03,
+            "does_not_apply": 0.94,
+            "unknown": 0.03
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.94), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/integrity.rs:call-40",
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "crate::config::reject_symlink_public(&path, \"integrity baseline\")",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0,
+            "does_not_apply": 0.99
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.99), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-273",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "unknown": 0.01,
+            "applies": 0.01
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.98), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-11",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_add(args)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 1,
+          "probabilities": {
+            "applies": 0,
+            "unknown": 0,
+            "does_not_apply": 1
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (1.00), which is below the bar of 0.6 or not a requirement of this call"
+        },
+        {
+          "requirementId": "R2",
+          "callId": "src/cli/config_cmd.rs:call-18",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_disable(rule_name)",
+          "origin": "shares_call",
+          "verdict": "does_not_apply",
+          "probability": 0.75,
+          "probabilities": {
+            "applies": 0.14,
+            "does_not_apply": 0.75,
+            "unknown": 0.11
+          },
+          "governs": false,
+          "why": "read as `does_not_apply` (0.75), which is below the bar of 0.6 or not a requirement of this call"
+        }
+      ],
+      "observed": [
+        {
+          "file": "src/atomic_file.rs",
+          "function": "open_read_regular",
+          "call": "reject_non_regular(&file, path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/atomic_file.rs",
+          "function": "read_to_string_capped",
+          "call": "open_read_regular(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "returns_success": 0,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "call": "open_read_nofollow(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 0.99,
+              "cannot_determine": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "open_read_nofollow",
+          "call": "crate::atomic_file::open_read_regular(path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "open_audit_rw",
+          "call": "crate::atomic_file::reject_non_regular(&file, path)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.96,
+            "probabilities": {
+              "returns_error": 0.96,
+              "cannot_determine": 0.04,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "call": "guard_ai_config_modification(\"override disable\")",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "returns_success": 0,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "load_config",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.98,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 0.98,
+              "returns_success": 0.02
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "raw_rule_names",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "read_raw_rule_state",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "returns_success": 0,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_success",
+            "probability": 0.95,
+            "probabilities": {
+              "cannot_determine": 0.04,
+              "returns_error": 0.01,
+              "returns_success": 0.95
+            },
+            "why": "the failed call is returned to the caller as a success"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "origin": "changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "call": "open_audit_rw(&self.path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/secret.rs",
+          "function": "rotate_key_locked",
+          "call": "read_secret(&secret_path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "activate",
+          "call": "write_state(&state)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "clear_rule",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 0.99,
+              "returns_success": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/break_glass.rs",
+          "function": "clear_all",
+          "call": "remove_state_file()",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0,
+              "returns_error": 1
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_command",
+          "call": "run_override_disable(rule_name)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.94,
+            "probabilities": {
+              "returns_success": 0,
+              "cannot_determine": 0.06,
+              "returns_error": 0.94
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/audit/verify.rs",
+          "function": "show_entries",
+          "call": "open_read_nofollow(&path)",
+          "origin": "calls_changed",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_error": 1,
+              "cannot_determine": 0,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "resolve_config_path_checked()",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "cannot_determine": 0.01,
+              "returns_success": 0,
+              "returns_error": 0.99
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_list()",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "cannot_determine",
+            "probability": 0.47,
+            "probabilities": {
+              "cannot_determine": 0.47,
+              "returns_error": 0.36,
+              "returns_success": 0.17
+            },
+            "why": "the answer did not clear 0.6 (cannot_determine 0.47)"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "write_new_file(&path, &content)",
+          "origin": "shares_call",
+          "via": "write_new_file",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.84,
+            "probabilities": {
+              "returns_error": 0.84,
+              "cannot_determine": 0.16,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "guard_ai_config_modification(\"override enable\")",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.99,
+            "probabilities": {
+              "returns_error": 0.99,
+              "returns_success": 0,
+              "cannot_determine": 0.01
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.74,
+            "probabilities": {
+              "returns_error": 0.74,
+              "cannot_determine": 0.24,
+              "returns_success": 0.02
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/integrity.rs",
+          "function": "write_baseline",
+          "call": "crate::config::reject_symlink_public(&path, \"integrity baseline\")",
+          "origin": "shares_call",
+          "via": "write_new_file",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "cannot_determine": 0,
+              "returns_error": 1,
+              "returns_success": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_enable",
+          "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+          "origin": "shares_call",
+          "via": "resolve_config_path_checked",
+          "result": {
+            "observation": "returns_error",
+            "probability": 1,
+            "probabilities": {
+              "returns_success": 0,
+              "returns_error": 1,
+              "cannot_determine": 0
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_add(args)",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.84,
+            "probabilities": {
+              "returns_error": 0.84,
+              "returns_success": 0.02,
+              "cannot_determine": 0.14
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        },
+        {
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_config_command",
+          "call": "run_config_disable(rule_name)",
+          "origin": "shares_call",
+          "via": "run_config_list",
+          "result": {
+            "observation": "returns_error",
+            "probability": 0.9,
+            "probabilities": {
+              "returns_success": 0.01,
+              "returns_error": 0.9,
+              "cannot_determine": 0.09
+            },
+            "why": "the failed call is not returned as a success"
+          }
+        }
+      ]
+    }
+  ]
+}

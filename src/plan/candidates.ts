@@ -38,6 +38,11 @@ export interface FunctionCandidate {
    * a considered decision in a report.
    */
   signature: string;
+  /**
+   * Set when the per-function cap left some of its calls out. What such a function calls is not
+   * fully known, so nothing may be concluded from a call it does *not* seem to make.
+   */
+  callsCut?: true;
 }
 
 export interface CallCandidate {
@@ -177,6 +182,7 @@ export function enumerate(path: string, source: string): Candidates {
         if (NOT_A_CALL.has(bare) || NOT_A_CALL.has(callee)) continue;
         if (taken >= MAX_CALLS_PER_FUNCTION) {
           omittedCalls += 1;
+          fn.callsCut = true;
           continue;
         }
         // From this line to a few below, so a call split over lines still closes. `m.index` is an

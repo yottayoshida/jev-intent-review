@@ -41,6 +41,47 @@ Jev, in separate requests:
 Both are read at 0.6. `--experimental-candidates-only` stops before the first question and prints
 which calls are inside the budget and which are not, with a reason each; it needs no credentials.
 
+### Past the changed functions: siblings
+
+A path a fix missed usually uses the same helper as the path it fixed, and calls nothing the pull
+request touched — so neither list above reaches it. The run also reads those **siblings**, under a
+budget of their own (ADR 0005):
+
+- **Seeds** are the names the changed code calls outside tests — on its added and removed lines and
+  in the rest of each changed function — that are defined once in the repository, return a
+  `Result`, and are not themselves changed functions. A helper the pull request adds is a changed
+  function, and its callers are read one hop out. Up to 8 seeds: those on a changed line first, then
+  those called from more changed places, then those used in fewer files, then by name. A name used
+  in more than 20 files is not followed.
+- **A sibling** is a function whose own calls include one to a seed, that returns a `Result`, and
+  that calls no changed function by a name defined once in the repository (one that does is a
+  caller one hop out: it is read in that list, unless that search's own caps left it out, which its
+  notes count). A changed function whose name is defined more than once — one type's `open` among
+  several — does not rule a caller of that name out, since the call may reach another definition;
+  the notes name such functions. Changed tests and changed code in other languages play no part.
+  A mention in a comment or a string does not make one; a function whose call list the enumeration
+  cut is not one, because what it calls is not fully known. Up to 20.
+- **Budget**: 10 calls per requirement, one sibling at a time in seed order, and in each sibling the
+  call to its seed first. The budget of 20 above is separate and unchanged, and every requirement's
+  budget of 20 is asked before any sibling is looked for or asked about: the calls it asks about are
+  the same whether or not a sibling exists, even when the run's own request, byte or time limit
+  stops it.
+- Nothing is found from the requirement's words, and the report says so. Every name that could not
+  become a seed, and every function that could not become a sibling, is counted in the notes with
+  the reason.
+
+**Not reached**: a sibling that shares only a function with no definition in the repository (a
+standard-library call such as `fs::read_to_string`), since a question about that call cannot be put;
+callers two hops out; other definitions of a changed function's name. A function named `new` is
+not read as a function by this path at all — changed, one hop out or as a sibling.
+
+**Not yet measured on unseen code.** On the development case (omamori `#468` / PR `#476`, five
+branches) the siblings are three functions and the calls the first budget selects are the same set
+as before on every branch (`bench/logs/beyond-diff-v1.json`, no request sent). One run on the shipped
+branch with the real Jev read nine sibling calls under each of the two requirements, all
+`does_not_apply` (0.72–1.00), and listed none (`bench/logs/beyond-diff-jev-v1.json`, 112 questions,
+62 seconds). That case has no defect in a sibling, so nothing there says whether one is listed.
+
 ## Reading the output
 
 ```
@@ -59,7 +100,7 @@ which calls are inside the budget and which are not, with a reason each; it need
 | **Worth checking** | both answers cleared the bar and disagree |
 | **Read as required by the requirement** | Jev read the requirement as applying to this call. The behavior observation is reported separately — a call under *Worth checking* is in here too |
 | **Read, but not required of by the requirement** | `does_not_apply`, `unknown`, below the bar, or no answer — each says which |
-| **Not checked** | the callee has no definition here, the target returns no `Result`, the body did not fit, the call could not be located, or the budget was spent |
+| **Not checked** | the callee has no definition here, the target returns no `Result`, the body did not fit, the call could not be located, a budget was spent, or the run stopped at its own limit |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
 A listed call rests on two Jev readings that do not check each other. Everything either of them
@@ -70,6 +111,12 @@ option's probability.
 
 Findings do not cause a nonzero exit code. Configuration, intent, repository and provider failures
 can (10, 11, 13 and 12). **Exit 0 does not establish that the requirement holds.**
+
+A run that reaches its own request, byte or time limit (`limits` in the configuration) stops asking,
+reports what it read, says at the top of the report that it stopped and why, sets `stopped` in the
+JSON of every requirement it left something unasked in, lists what it did not ask under *Not checked*, and
+exits 0 — as the ordinary review does for a run that stops on its own budget. Before this it
+exited 12 with no report.
 
 "Nothing listed" means no call met the conditions for being listed — both answers over the bar and
 disagreeing. It covers calls whose mapping or whose behaviour came back undetermined, below the
@@ -83,7 +130,9 @@ handled, five branches, one run each: the shipped code, two single-call mutation
 behaviour-preserving rewrites of the same calls. Each mutation was listed at its own call and
 nowhere else; the shipped code and both rewrites listed nothing — ten cells of ten, against a table
 fixed before the first request. 76 requests per run, 380 in all, every one to `typesafe/jev` on
-Cloudflare Workers AI. TypeSafe's `jev-latest` and Vercel's `typesafe-ai/jev` were not measured, and
+Cloudflare Workers AI. Those runs predate siblings; the calls the budget of 20 selects on all five
+branches are the same with them (`bench/logs/beyond-diff-v1.json`), and a run now also asks about
+up to 10 sibling calls per requirement (112 questions on the shipped branch). TypeSafe's `jev-latest` and Vercel's `typesafe-ai/jev` were not measured, and
 may be a different version of Jev.
 
 Reproducible from what is committed, without sending anything:

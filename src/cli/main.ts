@@ -45,7 +45,9 @@ Change:
 Experimental:
   --experimental-local-check
                         the v0.1 path. For each requirement, take the Rust functions the
-                        change touched and their callers one hop out, and ask Jev two
+                        change touched and their callers one hop out (budget 20), and the
+                        other callers of the repository functions the changed code calls
+                        that call nothing it touched (budget 10), and ask Jev two
                         things about each call: whether the requirement requires that a
                         failure of it not reach the caller as a success, and what the
                         function returns when it does. Where both clear the bar and
@@ -55,9 +57,11 @@ Experimental:
                         acceptance-criteria list; no file, function or expected answer is
                         named on the command line. No requirement verdict is stated.
                         Findings do not cause a nonzero exit code; configuration, intent,
-                        repository and provider failures can. Nothing listed means no call
-                        met the conditions -- including calls left undetermined -- and
-                        exit 0 does not establish that the requirement holds.
+                        repository and provider failures can. A run that reaches its own
+                        request, byte or time limit reports what it read, says so at the
+                        top, and exits 0. Nothing listed means no call met the conditions
+                        -- including calls left undetermined -- and exit 0 does not
+                        establish that the requirement holds.
   --experimental-candidates-only
                         with the above: build the set and stop. Prints which calls fit the
                         budget and which do not, with a reason each, and asks nothing --
