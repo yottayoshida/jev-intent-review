@@ -1,7 +1,7 @@
 {
   "name": "jev-intent-review",
-  "version": "0.0.0",
-  "description": "Verify a pull request against the intent that caused it, across the whole repository, with small typed judgments from Jev",
+  "version": "0.1.0",
+  "description": "Check a pull request against requirements that state how a failure must be handled, by asking Jev about particular calls",
   "license": "MIT OR Apache-2.0",
   "private": true,
   "type": "module",
@@ -13,8 +13,10 @@
     "url": "git+https://github.com/yottayoshida/jev-intent-review.git"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p .",
     "test": "node --test \"test/*.test.ts\"",
+    "prepack": "npm run build",
     "probe:jev": "node bench/probe-jev.ts"
   },
   "dependencies": {
@@ -23,5 +25,22 @@
   "devDependencies": {
     "@types/node": "^22.19.0",
     "typescript": "^7.0.2"
-  }
+  },
+  "bin": {
+    "jev-intent-review": "dist/cli/main.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE"
+  ],
+  "keywords": [
+    "code-review",
+    "pull-request",
+    "workers-ai",
+    "jev",
+    "rust"
+  ]
 }

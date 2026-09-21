@@ -32,7 +32,7 @@ jev-intent-review --experimental-local-check --experimental-candidates-only ... 
 
 **局所の観測は要件の判定ではない。** **変更行はそこで作業したことを言うだけ**で、要件が
 当てはまるとは言わない。観測が要件にかかるかどうかは**対応付け**が決める（下の節）。
-**要件全体の判定（VERIFIED）も、違反による exit code も、この経路には無い。**
+**要件全体の判定（VERIFIED）は出さない。指摘が出ても終了コードは 0 のまま**——ただし設定・リポジトリ・エンドポイントの失敗は 0 以外で終わる。
 出るのは「**要確認の欠陥候補**」——根拠を全部添えて、読んだ人が否定できる形で。
 
 ## 実機の結果（omamori #468 / PR #476）
@@ -124,92 +124,104 @@ the planner did not answer about src/audit/mod.rs (… answered 429: … you hav
 daily free allocation of 10,000 neurons …), so no call there carries a clause
 ```
 
-## 観測を要件に対応付けて、根拠付きの欠陥候補を返す（2026-09-21 追記）
+## Jev 以外に何も送らない（2026-09-21）
 
-観測は**コードについての事実**で、それだけでは誰かが見るべきものにならない。足りない環が
-1 つある——**この要件はこの呼び出しに何かを要求しているのか。**
+**この道具は Jev に小さな型付きの問いを聞くもの**なのに、一般の instruct モデル（llama-3.3-70b）
+を 3 箇所で使っていた。要件のコンパイル（元から）、計画（#26 で私が）、対応付け（#28 で私が）。
+どれもその場では妥当に見え、**どれも宣言されていなかった**。
 
-そこで対応付け（`src/plan/mapping.ts`）を**別に**聞く。渡すのは要件原文・対象の呼び出し・
-関数本体だけで、**局所の回答も確率も渡さない**。コードの挙動を知っている答えは、それに
-合わせる自由を持ってしまう。
-
-**コードで検査できることと、正しさは別。** 検査するのは 3 つだけ:
-
-| 検査 | 不合格なら |
+| 直し | 中身 |
 |---|---|
-| `callId` が**今聞いた呼び出しそのもの**か | `wrong_call` |
-| 引用が**本当に原文にある**か（`applies` のとき必須、12 字以上） | `quote_not_in_requirement` |
-| `applies` / `does_not_apply` / `unknown` と必須欄の形 | `bad_shape` |
+| 送信境界で拒否 | `CloudflareClient.post` が `typesafe/jev` 以外を**組み立てる前に**拒む。CLI も bench も同じ経路を通る。件数にもバイト数にも数えない |
+| 要件のコンパイル | モデルに書かせない。`--intent-spec` か、**コードで読める受け入れ条件の箇条書き**。それ以外の散文は理由と使える 2 つの形を案内して止まる |
+| 計画 | **廃止**。候補は差分・参照探索・適用検査・予算配分だけで作る（要件の語でファイルを開く経路も消えた） |
+| 対応付け | **Jev の 3 択**（`applies` / `does_not_apply` / `unknown`）。確率分布を全部保存し、採用規則は実測前に固定（`applies` かつ 0.6 以上） |
+| 引用と説明 | **別モデルを残さない**。引用は入力原文そのもの、説明は原文・コード位置・仮定・2 つの答えから定型的に組み立てる。**モデルが書いたようには表示しない** |
+| CI | 実 API を使わず、**送信された全ボディのモデル名**を読む。実験経路を通しで走らせて全件 Jev を確認 |
 
-**1 つ目は最初「この run が出した候補集合にあるか」だった。** それだと `beta` について聞いて
-`alpha` の id が返ったとき——引用は本当に原文にあり、理由も本当に `alpha` についてのまま——
-**全部の検査を通って `beta` の欠陥候補になる**。実在する別候補の id だったほうが悪い:
-下流には区別する手がかりが何も無い。**別の問いへの答えは、この問いへの弱い答えではない。**
+**消えた欠陥が 1 つある。** Jev の回答に `callId` は無いので、「別の呼び出しへの回答が結合する」
+（#29）という形が**検査されるのではなく存在しなくなった**。Jev は送った state について、
+送った問いに答える。
 
-**通ったことは正しいことではない。** 実在の呼び出しを名指し、原文を正確に引用したまま、
-文が何を要求しているかについて間違っていられる。テストに、全部の検査を通る**明らかに
-おかしい理由**の例を 1 本置いてある。
+**引用を原文に照合する検査も要らなくなった。** モデルが断片を選ぶからこそ必要だった検査で、
+引用が要件そのものなら照合するものが無い。
 
-**欠陥候補は両輪が揃ったときだけ出る**——要件がその呼び出しを支配すると読めて、かつ
-その呼び出しの読みがそれに反すること。出力は 5 つ:
-
-```
-#### src/integrity.rs · read_baseline — `crate::atomic_file::read_to_string_capped(&path, MAX)`
-- **The requirement says**: "…"          ← 原文の該当箇所（原文にあることを検査済み）
-- **Read as governing this call because**: …
-- **Assumed**: Execution reaches the call … ← 置いた失敗条件
-- **Read as returning**: returns_success (0.97)
-- **Why that disagrees**: …
-```
-
-**要件全体の VERIFIED も、新しい失敗 exit code も入れていない。**
-
-**対応付けは、指摘が出たかどうかに関係なく全件記録する**（`mappings`）。聞いた呼び出し id・
-返ってきた id・採否・verdict・引用・理由・拒否の種別。指摘が 0 件の run で読む必要があるのは
-**対応付けそのもの**——どの語を引用し、なぜ支配すると言ったか——で、食い違ったときだけ残す形は
-成功側を読めなくしていた。レポートの 2 節（`Read as governed by the requirement` と
-`Read, but not answered against the requirement`）は**同じ 1 本のリスト**から出しているので、
-片方にあって片方に無い呼び出しは作れない。
-
-### 通信なしで確かめた出力
-
-模擬の対応付けと保存した観測で、CLI の出力まで（`test/cli.test.ts` と
-`test/local-check-run.test.ts`）:
-
-| 場合 | 出力 |
-|---|---|
-| 支配する × 飲み込む | **欠陥候補**（5 項目すべて） |
-| 支配する × 伝播する | 出ない |
-| **支配しない**（原文が続行を許す） | 出ない。理由付きで残る |
-| 不明 / 通信失敗 | 出ない。**互いに別の理由**で残る |
-| 実在しない呼び出し / 原文に無い引用 | 拒否。理由付きで残る |
-
-**「支配しない」の fixture はコードを一切変えていない**——観測は同じ `returns_success` のまま、
-対応付けだけが違う。指摘が出るかどうかを決めているのが対応付けだと分かる形にしてある。
-
-### 実機で確かめたところと、止まったところ
-
-正例 1 回を実行:
+## 対応付けを Jev に聞いた最初の実測（2026-09-21、正例、PR #476 の原文）
 
 ```
-counts: asked 19, mapped 19, governed 0, findings 0
-mappings: {"not_answered": 19}
-read_baseline          → not_answered: … answered 429: … used up your daily free allocation …
-raw_override_disables  → not_answered: …
+asked 19, mapped 19, governed 3, findings 0
 ```
 
-**両対象とも対応付けの入力に入っている**（19 件の判定対象すべてが対応付けにも渡った）。
-**対応付けのモデルだけが 429** で、判定側は 19 件すべて答えている。
-`mapped` は**要求した回数**、`governed` は**採用できて `applies` だった数**で、別の数として
-出す——0 件が「聞かなかった」なのか「聞いたが答えが無かった」なのか、この 2 つで決まる。
+**既知の 2 対象は、どちらも `does_not_apply`**（0.51 / 0.63）。Jev が `applies` と読んだのは
+`reject_non_regular`（0.90 / 0.77）——**拒否そのもの**を行う呼び出し。原文は
+「a path omamori reads **is now refused by name**」と書いていて、拒否を受け取った側が何を返すかは
+書いていない。**関門は NOT READY、残り 4 枝は送っていない。**
 
-したがって**枠が戻るまで残るのは最後の実測だけ**——正例で対応付けが取れるか、取れたら
-5 枝を 1 回ずつ。終了条件は、両変異でそれぞれの欠陥候補が出て、正例・挙動不変版では
-出ないこと。
+**この結果は変更しない。** 下は**別の評価入力**での測定で、原文の忠実な言い換えではないし、
+原文からの推論が成功したとも主張しない。
 
-**注意: `generate_baseline` を「意図的に読み飛ばすコードだから合法」と採点しない。**
-実装がそう動くことと、要件がそれを許すことは別。原文から確定できなければ `unknown` で、
-それは失敗ではなく正しい答え。
+## 失敗時の扱いを明示した要件での実測（2026-09-21）
+
+確かめたのは「**利用者が失敗時の扱いを明示した要件を、この CLI が検査できるか**」。
+
+入力（`bench/fixtures/omamori-468/stated-failure-handling.spec.json`、**関数名・ヘルパ名・
+call ID・期待回答は書いていない**）:
+
+> **R1** If reading an existing integrity baseline fails, the baseline-loading operation must
+> return an error to its caller. It must not return a successful result saying that no baseline
+> exists.
+>
+> **R2** If reading an existing configuration file fails while checking whether a rule override
+> disables a rule, that check must return an error to its caller. It must not return a successful
+> result saying that the rule is not disabled.
+
+**条件と期待結果は最初の 1 リクエストより前に保存した**（ツール commit `ee35665`、base は 5 枝
+とも `52a58fa`、予算 20、閾値 0.6、モデルは `typesafe/jev` のみ）。通信なしの候補確認で、
+**両対象が 5 枝 × 2 要件すべてで予算内**にあることも先に確認した。
+
+採点の単位は**要件 ID・ファイル・関数・呼び出し式**。関数名だけでは判定しない。
+
+### 結果: 10 マスすべて一致
+
+| 枝 | R1 `read_baseline` | R2 `raw_override_disables` |
+|---|---|---|
+| correct | 指摘なし（applies 0.97 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| m-read-baseline | **指摘あり**（applies 0.96 / **returns_success 1.00**） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| v-read-baseline | 指摘なし（applies 0.98 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| m-raw-override | 指摘なし（applies 0.98 / returns_error 1.00） | **指摘あり**（applies 1.00 / **returns_success 0.99**） |
+| v-raw-override | 指摘なし（applies 0.98 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
+
+**変異版はそれぞれ自分の対象にだけ指摘が出て、もう一方は静か。** 正例と挙動不変版は両方とも
+静か。**採点対象外の指摘は 0 件**（他の呼び出しには 1 件も立たなかった）。
+
+各 run は **76 要求**（2 要件 × 19 呼び出し × 2 問）、5 枝で **380**。
+記録は `bench/logs/stated-requirements-v1.json`——入力 spec、実行前に固定した条件、
+**5 枝 × 2 要件の全 38 呼び出しについて対応付けと観測（全選択肢の確率つき）**、全 finding、
+種類別の未確認件数、note。**採点はこのファイルだけで再現できる**:
+
+```sh
+node bench/replay-scoring.ts bench/logs/stated-requirements-v1.json
+```
+
+証拠パケット（送った関数本体）は保存していない——固定コミットの git オブジェクトから
+再構成できるため。秘匿処理は保存物にもそのまま効いている。
+
+### 関門で直したもの
+
+正例の関門が **`requirements[0]` だけを読んでいた**。要件が 2 つある spec では R2 の対象が
+R1 の答えで採点される。要件 ID ごとに照合する形に直した。
+
+もう 1 つ、**正例に対象の指摘があっても、対応付けが usable なら READY になっていた**。
+正例は他の 4 枝を比べる基準なので、そこで指摘が立っていれば表はもう壊れている。
+**両方（使える対応付け・指摘なし）**を要求する形にし、手書きのログで回帰テストにした。
+
+### 言えること
+
+**失敗時の扱いを明示した要件について、場所を利用者が指定せずに、既知の欠陥候補まで到達した。**
+
+これは既知の 2 対象についての採点で、1 リポジトリ・2 要件・各枝 1 回。
+`bench/logs/jev-only-v1.json` の原文による測定は NOT READY のまま残してある——
+**原文の言い換えが成功したのではなく、別の入力で成立した**ということ。
 
 ## 列挙そのものが取りこぼしている量
 

@@ -1,30 +1,26 @@
-// Whether a requirement requires anything of a particular call — and what can be checked about
-// that answer in code.
+// Whether a requirement requires anything of a particular call — asked of Jev, as a typed choice.
 //
-// The local check can now find the call a change was made at and read what the function returns
-// when it fails. That is a fact about code. Turning it into something a person should look at
-// needs one more link: does the requirement *require* that of this call? Nothing measured so far
-// answers it. The planner's clause is written while choosing where to look, about a file the
-// requirement's words opened; a call the diff found has no clause at all.
+// This was the most Jev-shaped question in the tool and it was the one sent elsewhere. The answer
+// is three options with fixed criteria; that is exactly what Jev returns, with a probability for
+// each. Routing it to a general instruct model bought a free-text quote and a free-text reason,
+// and cost the thing the rest of this path is built on: a number, and a bar fixed before the
+// measurement.
 //
-// So the mapping is asked separately, about the calls that are actually being checked, and it is
-// given the requirement, the call and the function — **never the local answer**. An answer that
-// knew what the code does would be free to agree with it.
+// What that model was giving is not lost, it is taken from somewhere better:
 //
-// Two things are kept apart here, and the distinction is the point of the file:
+//   - the **quote** is the requirement itself, copied from the input. A model choosing which
+//     fragment to quote was the only reason a quote had to be checked against the text at all.
+//   - the **reason** is assembled from what the run already knows — the requirement, the call, the
+//     condition assumed, the two answers — rather than written. Nothing in the report is model
+//     prose, so nothing in it has to be contained.
 //
-//   - **what code can check**: the call id is one this run offered, the quote is really in the
-//     requirement, the shape is the shape asked for. A mapping that fails these is refused.
-//   - **whether it is right**: nothing here establishes that. A mapping can name a real call and
-//     quote the requirement accurately and still be wrong about what the sentence requires.
-//
-// `unknown` is a first-class answer, and so is a request that did not come back. They are not the
-// same as `does_not_apply`, and a report that shows the three alike would be the silent-refusal
-// shape this path keeps running into.
+// And one class of defect stops existing rather than being checked: there is no call id in the
+// answer to come back wrong. Jev answers the question it was sent, about the state it was sent.
 
-import { COMPILER_MODEL, readModelJson } from "../intent/compiler.ts";
-import { redact } from "../evidence/redact.ts";
-import type { CloudflareClient } from "../judgments/cloudflare.ts";
+import type { ChoiceAnswer } from "../types.ts";
+import type { Questions } from "../judgments/provider.ts";
+import { BAR } from "./local-check.ts";
+import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
 
 /**
  * The only property this asks about, for now.
@@ -37,126 +33,68 @@ export const MAPPING_PROPERTY = "call_failure_not_returned_as_success" as const;
 
 export type MappingVerdict = "applies" | "does_not_apply" | "unknown";
 
-export interface Mapping {
-  callId: string;
-  requirementId: string;
-  verdict: MappingVerdict;
-  /** The words from the requirement that decide it, copied from the requirement. */
-  quote: string;
-  /** Why those words govern this call. */
-  reason: string;
-  property: typeof MAPPING_PROPERTY;
-}
-
-export type MappingCheck =
-  | { ok: true; mapping: Mapping }
-  | { ok: false; kind: "wrong_call" | "quote_not_in_requirement" | "bad_shape"; reason: string };
-
-/** Short enough and a quote is a word or two — long enough and it has to come from the sentence. */
-const MIN_QUOTE = 12;
-
-const flatten = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
-
 /**
- * What code can say about a mapping: it answers **the call it was asked about**, the quote is in
- * the requirement, the verdict is one of the three.
- *
- * The call check is identity with the question, not membership of the run's set. Checking
- * membership let an answer about one call be attached to another: ask about `beta`, get back
- * `alpha` with a quote that really is in the requirement and a reason really about `alpha`, and
- * every check passed while the finding was filed against `beta`. An answer to a different question
- * is not a weaker answer to this one.
- *
- * Passing is not being right. A mapping that answers the right call and quotes the sentence
- * exactly can still be wrong about what the sentence requires, and no check here would notice.
+ * The bar a mapping has to clear to be acted on: the same 0.6 the observation clears, fixed here
+ * before any measurement has been taken with it.
  */
-export function checkMapping(raw: unknown, context: { callId: string; offered?: ReadonlySet<string>; requirementId: string; requirementText: string }): MappingCheck {
-  if (typeof raw !== "object" || raw === null) return { ok: false, kind: "bad_shape", reason: "the answer was not an object" };
-  const { callId, verdict, quote, reason } = raw as Record<string, unknown>;
-  if (typeof callId !== "string" || typeof verdict !== "string" || typeof quote !== "string" || typeof reason !== "string") {
-    return { ok: false, kind: "bad_shape", reason: "the answer is missing callId, verdict, quote or reason" };
-  }
-  if (verdict !== "applies" && verdict !== "does_not_apply" && verdict !== "unknown") {
-    return { ok: false, kind: "bad_shape", reason: `${verdict} is not one of applies, does_not_apply, unknown` };
-  }
-  if (callId !== context.callId) {
-    // Being a real candidate makes this worse rather than better: the answer would land on a call
-    // this run is also asking about, where nothing downstream could tell it apart.
-    const elsewhere = context.offered?.has(callId) ? ", which is another call in this run's set" : "";
-    return { ok: false, kind: "wrong_call", reason: `the answer is about ${callId}${elsewhere}, not about ${context.callId}, which is what it was asked` };
-  }
-  // A verdict that does not apply needs no quote from the sentence: there may be nothing in it to
-  // point at. One that does is a claim about particular words, and those words have to be there.
-  if (verdict === "applies") {
-    const flat = flatten(quote);
-    if (flat.length < MIN_QUOTE) return { ok: false, kind: "quote_not_in_requirement", reason: `the quote is ${flat.length} characters, too short to have come from the requirement` };
-    if (!flatten(context.requirementText).includes(flat)) return { ok: false, kind: "quote_not_in_requirement", reason: "the quote is not in the requirement's text" };
-  }
-  return { ok: true, mapping: { callId, requirementId: context.requirementId, verdict, quote: redact(quote).text.replace(/\s+/g, " ").trim(), reason: redact(reason).text.replace(/\s+/g, " ").trim(), property: MAPPING_PROPERTY } };
-}
+export const MAPPING_BAR = BAR;
 
-export interface MappingRequest {
-  requirementId: string;
-  requirementText: string;
-  callId: string;
-  /** The call, as the condition names it. Already redacted. */
-  call: string;
-  function: string;
-  /** The function's body, as the packet carries it. Already redacted. */
-  body: string;
-}
-
-export interface Mapper {
-  /** `failed` separates a request that did not come back from an answer of `unknown`. */
-  map(request: MappingRequest): Promise<{ raw?: unknown; failed?: string }>;
-}
-
-const SCHEMA = {
-  type: "object",
-  properties: {
-    callId: { type: "string" },
-    verdict: { type: "string", enum: ["applies", "does_not_apply", "unknown"] },
-    quote: { type: "string", maxLength: 300 },
-    reason: { type: "string", maxLength: 400 },
-  },
-  required: ["callId", "verdict", "quote", "reason"],
+export const MAPPING_CRITERIA: Record<MappingVerdict, string> = {
+  applies: "The requirement requires it. Its text asks that a failure of that operation not reach the caller as a success.",
+  does_not_apply:
+    "The requirement does not require it of this call. It is about some other operation, or it explicitly allows this function to carry on when this one fails.",
+  unknown: "The requirement does not settle it: it neither requires that nor allows the opposite for this call.",
 };
 
-const INSTRUCTIONS = `You are given one requirement, one function, and one call inside that function.
-
-Decide one thing: does the requirement require that, when **that call** fails, **that function** does not return a success to its caller?
-
-- verdict: "applies" when the requirement requires that of this call. "does_not_apply" when it does not — including when the requirement explicitly allows the function to carry on, or when it is about something else entirely. "unknown" when the requirement does not settle it.
-- quote: the words of the requirement that decide it, copied exactly from the requirement. Required when the verdict is "applies".
-- reason: why those words govern this call.
-- callId: the id you were given, copied back.
-
-Decide what the requirement says. Do not decide what the code ought to do, and do not assume the code is right or wrong. If the requirement is about a different operation, or says nothing about what happens on a failure here, that is "does_not_apply" or "unknown" — those are proper answers, not failures.`;
-
-export function modelMapper(client: CloudflareClient): Mapper {
+/**
+ * The question, about the packet the observation is built from.
+ *
+ * Deliberately **not** in the same request as the observation: the observation is asked under an
+ * assumed failure, and this one must not assume it. What the requirement asks of a call is a fact
+ * about the sentence, and it is settled without knowing what the code does.
+ */
+export function mappingQuestionFor(fn: FunctionCandidate, call: CallCandidate, expression: string): Questions {
   return {
-    async map(request: MappingRequest): Promise<{ raw?: unknown; failed?: string }> {
-      const body = {
-        messages: [
-          { role: "system", content: INSTRUCTIONS },
-          {
-            role: "user",
-            content: JSON.stringify({
-              requirement: { id: request.requirementId, text: redact(request.requirementText).text },
-              call: { id: request.callId, expression: request.call, in: request.function },
-              function: { name: request.function, code: request.body },
-            }),
-          },
-        ],
-        response_format: { type: "json_schema", json_schema: SCHEMA },
-        max_tokens: 700,
-        temperature: 0,
-      };
-      try {
-        return { raw: readModelJson(await client.post({ model: COMPILER_MODEL, input: body }, { timeoutMs: 120_000, maxRetries: 1 })) };
-      } catch (error) {
-        return { failed: error instanceof Error ? error.message : String(error) };
-      }
+    requirement_governs: {
+      type: "choice",
+      instructions:
+        `\`code\` is the body of \`${fn.name}\`, and \`requirement.text\` is one requirement written for this change. ` +
+        `Assume nothing about what happens at run time. The question is about the requirement's words only: ` +
+        `does it require that, when the call \`${expression}\` inside \`${fn.name}\` fails, \`${fn.name}\` does not return a success to its caller? ` +
+        `Answer about that call. A requirement about a different operation, or one that allows this function to carry on here, does not require it.`,
+      criteria: MAPPING_CRITERIA,
     },
   };
+}
+
+export interface MappingAnswer {
+  verdict: MappingVerdict | "no_answer";
+  probability: number;
+  /** Every option's probability as Jev gave it, so a reading near the bar can be re-read later. */
+  probabilities: Record<string, number>;
+  /** Whether the run acts on it: `applies`, at or above the bar. */
+  governs: boolean;
+}
+
+/** The rule, in one place, fixed before the measurement it will be read with. */
+export function acceptMapping(answer: ChoiceAnswer | undefined): MappingAnswer {
+  if (!answer) return { verdict: "no_answer", probability: 0, probabilities: {}, governs: false };
+  const verdict = (Object.hasOwn(MAPPING_CRITERIA, answer.choice) ? answer.choice : "unknown") as MappingVerdict;
+  const probability = answer.probabilities[answer.choice] ?? answer.confidence;
+  return { verdict, probability, probabilities: { ...answer.probabilities }, governs: verdict === "applies" && probability >= MAPPING_BAR };
+}
+
+/**
+ * Why a call is listed, built from the parts rather than written.
+ *
+ * Every clause names where it came from — the requirement's words, the assumed condition, the two
+ * answers — so a reader can check each half separately. Nothing here is a model's sentence, and
+ * nothing here claims the requirement is violated.
+ */
+export function whyListed(target: string, mapping: MappingAnswer, observation: string, observed: number): string {
+  return (
+    `Jev answered \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}) when asked whether the requirement requires this call's failure not to reach the caller as a success, ` +
+    `and \`${observation}\` (${observed.toFixed(2)}) when asked what \`${target}\` returns under that failure. ` +
+    `Both are Jev's readings and neither checks the other.`
+  );
 }

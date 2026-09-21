@@ -30,21 +30,11 @@ function specFile(dir: string, name = "missed-path"): string {
   return path;
 }
 
-function fakeDeps(compiled?: IntentSpec, github?: Partial<GitHub>): Deps {
+/** No compiler: requirements come from a spec file or from an acceptance-criteria list. */
+function fakeDeps(github?: Partial<GitHub>): Deps {
   const provider = guardProvider("createSession", "disabledAt");
   return {
-    judges: () => ({
-      provider,
-      compiler: {
-        name: "fake",
-        compile: async () => {
-          if (!compiled) throw new Error("the compiler was not expected to run");
-          return compiled;
-        },
-      },
-      sent: () => ({ requests: provider.calls.length, bytes: 0 }),
-      origin: "https://api.cloudflare.com",
-    }),
+    judges: () => ({ provider, sent: () => ({ requests: provider.calls.length, bytes: 0 }), origin: "https://api.cloudflare.com" }),
     github: async () => github as GitHub,
   };
 }
@@ -125,22 +115,25 @@ test("with no intent the review is skipped (exit 0), or fails with exit 11 when 
   }
 });
 
-test("--intent goes through the compiler; the pull request comes from the Actions event when --pr is not given", async () => {
+test("--intent is read as written when it is a list, and prose is refused with the forms that work", async () => {
   const repo = fixtureRepo("missed-path");
   try {
-    const compiled: IntentSpec = JSON.parse(readFileSync(join(FIXTURES, "missed-path", "fixture.json"), "utf8")).spec;
-    compiled.nonGoals = [];
-    compiled.ambiguities = [];
-    compiled.requirements = compiled.requirements.map((r) => ({ ...r, kind: "security", priority: "required", sourceRefs: r.sourceRefs ?? [], searchHints: r.searchHints ?? [] }));
-    const viaText = io(repo.dir, CREDENTIALS);
-    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent", "Prevent disabled users from authenticating.", "--json"], viaText.value, fakeDeps(compiled)), EXIT.violation);
-    assert.deepEqual(JSON.parse(viaText.out()).sources.map((s: { id: string }) => s.id), ["cli"]);
+    const viaList = io(repo.dir, CREDENTIALS);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent", "Acceptance criteria:\n* Disabled users cannot authenticate by any path", "--json"], viaList.value, fakeDeps()), EXIT.violation);
+    assert.deepEqual(JSON.parse(viaList.out()).sources.map((s: { id: string }) => s.id), ["cli"]);
+
+    // No model writes requirements any more, so prose that is not a list stops the run and says
+    // which two forms do work. It used to be handed to a general instruct model.
+    const viaProse = io(repo.dir, CREDENTIALS);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent", "Prevent disabled users from authenticating."], viaProse.value, fakeDeps()), EXIT.intent);
+    assert.match(viaProse.err(), /--intent-spec/);
+    assert.match(viaProse.err(), /acceptance-criteria list/);
 
     const event = join(repo.dir, "event.json");
     writeFileSync(event, JSON.stringify({ pull_request: { number: 7 } }));
-    const pr = pullRequest(repo.head, repo.base, "Blocks disabled users at password login.");
+    const pr = pullRequest(repo.head, repo.base);
     const viaEvent = io(repo.dir, { ...CREDENTIALS, GITHUB_EVENT_NAME: "pull_request", GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--json"], viaEvent.value, fakeDeps(compiled, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--json"], viaEvent.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     const report = JSON.parse(viaEvent.out());
     assert.deepEqual(report.sources.map((s: { id: string; author: string }) => [s.id, s.author]), [["pr#7", "dev"]]);
     assert.match(report.metadata.notes.join(" "), /only from the pull request's own description, written by its author dev/);
@@ -155,17 +148,17 @@ test("--pr outside a pull_request workflow reviews the pull request's head, not 
     repo.git("checkout", "-q", repo.base);
     const pr = pullRequest(repo.head, repo.base);
     const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--pr", "7", "--base", repo.base, "--json"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--pr", "7", "--base", repo.base, "--json"], run.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     assert.equal(JSON.parse(run.out()).metadata.head, repo.head);
 
     // A workflow run by a comment or by hand has the default branch checked out, not the pull request.
     const comment = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r", GITHUB_ACTIONS: "true", GITHUB_EVENT_NAME: "issue_comment" });
-    assert.equal(await main(["--pr", "7", "--base", repo.base, "--json"], comment.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--pr", "7", "--base", repo.base, "--json"], comment.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     assert.equal(JSON.parse(comment.out()).metadata.head, repo.head);
 
     const missing = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
     const gone = { ...pr, headSha: "f".repeat(40) };
-    assert.equal(await main(["--pr", "7", "--base", repo.base], missing.value, fakeDeps(undefined, { pullRequest: async () => gone })), EXIT.repository);
+    assert.equal(await main(["--pr", "7", "--base", repo.base], missing.value, fakeDeps({ pullRequest: async () => gone })), EXIT.repository);
     assert.match(missing.err(), /git fetch origin pull\/7\/head/);
   } finally {
     repo.remove();
@@ -181,14 +174,14 @@ test("--pr takes the base commit the pull request started from, not the branch a
     repo.commit("main moved on");
     const pr = pullRequest(repo.head, repo.base);
     const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--pr", "7", "--json"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--pr", "7", "--json"], run.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     const report = JSON.parse(run.out());
     assert.deepEqual([report.metadata.base, report.metadata.head], [repo.base, repo.head]);
 
     // Without a base commit — an older GitHub response, or one this clone does not have — the run
     // stops instead of reporting on a commit compared with itself.
     const blind = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--pr", "7", "--json"], blind.value, fakeDeps(undefined, { pullRequest: async () => ({ ...pr, baseSha: "" }) })), EXIT.config);
+    assert.equal(await main(["--pr", "7", "--json"], blind.value, fakeDeps({ pullRequest: async () => ({ ...pr, baseSha: "" }) })), EXIT.config);
     assert.match(blind.err(), /nothing to compare: the merge base of main and [0-9a-f]+ is the head commit itself/);
     assert.equal(blind.out(), "");
   } finally {
@@ -215,7 +208,7 @@ test("--pr keeps measuring against the base branch when the head took the branch
 
     const pr = pullRequest(head, repo.base);
     const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     const report = JSON.parse(run.out());
     assert.deepEqual([report.metadata.base, report.metadata.head], [later, head]);
     // The upstream commit is not part of this pull request, so its file is not among the changed
@@ -246,7 +239,7 @@ test("--pr takes the latest commit the head still shares with a candidate, so a 
 
     const pr = pullRequest(head, startedFrom);
     const run = io(repo.dir, { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" });
-    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps(undefined, { pullRequest: async () => pr })), EXIT.violation);
+    assert.equal(await main(["--pr", "7", "--json", "--trace"], run.value, fakeDeps({ pullRequest: async () => pr })), EXIT.violation);
     assert.equal(JSON.parse(run.out()).metadata.base, startedFrom);
     assert.ok(!run.err().includes("docs/upstream.md"), run.err());
   } finally {
@@ -260,9 +253,10 @@ test("--intent-spec cannot be combined with other intent, and trace lines cannot
     const combined = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--intent-spec", specFile(repo.dir), "--intent", "x", "--base", repo.base], combined.value, fakeDeps()), EXIT.config);
 
-    const compiled = validateIntentSpec({ version: 1, requirements: [{ id: "R1", text: "Disabled users cannot sign in.\n::error::forged" }] }, "t");
+    const forged = join(repo.dir, "forged.json");
+    writeFileSync(forged, JSON.stringify(validateIntentSpec({ version: 1, requirements: [{ id: "R1", text: "Disabled users cannot sign in.\n::error::forged" }] }, "t")));
     const traced = io(repo.dir, CREDENTIALS);
-    await main(["--base", repo.base, "--head", repo.head, "--intent", "anything at all here", "--trace"], traced.value, fakeDeps(compiled));
+    await main(["--base", repo.base, "--head", repo.head, "--intent-spec", forged, "--trace"], traced.value, fakeDeps());
     assert.ok(traced.err().includes("forged"), "the text is still shown");
     assert.ok(!traced.err().split("\n").some((line) => line.startsWith("::")), "but never at the start of a line");
   } finally {
@@ -460,76 +454,6 @@ test("the CLI's exit codes for bad input: help 0, bad option 10, bad number 10, 
       assert.match(run.err(), message);
       assert.equal(run.out(), "");
     }
-  } finally {
-    repo.remove();
-  }
-});
-
-test("the experimental path returns a defect candidate from the command line, with no request made", async () => {
-  // The whole path from arguments to output: a repository, a diff, a requirement given as a spec,
-  // and scripted stand-ins for the three models. What is checked is the CLI's own output — the
-  // section, its five parts, and that a finding does not change the exit code.
-  const repo = tempRepo();
-  try {
-    repo.write({
-      "src/util.rs": "pub(crate) fn read_capped(path: &Path, max: u64) -> io::Result<String> {\n    Ok(String::new())\n}\n",
-      "src/integrity.rs": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let content = read_plain(base_dir)?;\n    Ok(Some(content))\n}\n",
-    });
-    const base = repo.commit("before");
-    repo.write({
-      "src/integrity.rs": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let Ok(content) = crate::util::read_capped(base_dir, MAX) else {\n        return Ok(None);\n    };\n    Ok(Some(content))\n}\n",
-    });
-    const head = repo.commit("a read that carries on");
-
-    const spec = join(repo.dir, "spec.json");
-    writeFileSync(
-      spec,
-      JSON.stringify({
-        version: 1,
-        title: "t",
-        summary: "",
-        requirements: [{ id: "R1", text: "A baseline that cannot be read is not reported as no baseline at all.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [] }],
-        nonGoals: [],
-        ambiguities: [],
-      }),
-    );
-
-    const deps: Deps = {
-      judges: () => ({
-        provider: {
-          model: "test",
-          async judge(_state: unknown, questions: Record<string, unknown>) {
-            const out: Record<string, unknown> = {};
-            for (const key of Object.keys(questions)) {
-              const choice = key === "on_error_result" ? "returns_success" : "keeps_going";
-              out[key] = { choice, confidence: 0.97, probabilities: { [choice]: 0.97 } };
-            }
-            return out;
-          },
-        } as never,
-        compiler: { name: "fake", compile: async () => { throw new Error("the compiler was not expected to run"); } } as never,
-        planner: { async pick() { return { picks: [] }; } },
-        mapper: {
-          async map(request: { callId: string }) {
-            return { raw: { callId: request.callId, verdict: "applies", quote: "cannot be read is not reported as no baseline at all", reason: "this is the read the sentence is about" } };
-          },
-        },
-        sent: () => ({ requests: 0, bytes: 0 }),
-        origin: "https://api.cloudflare.com",
-      }),
-    };
-
-    const run = io(repo.dir, CREDENTIALS);
-    const code = await main(["--experimental-local-check", "--base", base, "--head", head, "--intent-spec", spec], run.value, deps);
-    const text = run.out();
-    assert.equal(code, EXIT.ok, `a finding does not change the exit code. stderr: ${run.err()}`);
-    assert.match(text, /### Worth checking/);
-    assert.match(text, /src\/integrity\.rs · read_baseline/);
-    assert.match(text, /\*\*The requirement says\*\*: "cannot be read is not reported as no baseline at all"/);
-    assert.match(text, /\*\*Assumed\*\*: Execution reaches the call/);
-    assert.match(text, /\*\*Read as returning\*\*: returns_success \(0\.97\)/);
-    assert.match(text, /\*\*Why that disagrees\*\*:/);
-    assert.ok(!/VERIFIED/.test(text), "no requirement-level verdict is introduced here");
   } finally {
     repo.remove();
   }

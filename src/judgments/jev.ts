@@ -2,10 +2,11 @@
 // https://developers.cloudflare.com/ai/models/typesafe/jev/
 
 import type { ChoiceAnswer } from "../types.ts";
-import { ProviderError, type CloudflareClient } from "./cloudflare.ts";
+import { ONLY_MODEL, ProviderError, type CloudflareClient } from "./cloudflare.ts";
 import type { JudgmentProvider, Questions } from "./provider.ts";
 
-export const JEV_MODEL = "typesafe/jev";
+/** One constant, so the transport's guard and the model this asks for cannot drift apart. */
+export const JEV_MODEL = ONLY_MODEL;
 
 /**
  * The object holding `answers`. The docs show it at the top level; measured, it arrives as

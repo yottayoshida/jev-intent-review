@@ -5,7 +5,7 @@ import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadConfig, type Config } from "../config/config.ts";
-import { compileChecklist, WorkersAiCompiler, type IntentCompiler } from "../intent/compiler.ts";
+import { compileChecklist } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { resolveIntent } from "../intent/resolver.ts";
 import { CloudflareClient, endpointFromEnv, EndpointError, ProviderError, type Endpoint } from "../judgments/cloudflare.ts";
@@ -15,9 +15,6 @@ import { QUESTIONS_HASH } from "../judgments/questions.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
-import { modelPlanner } from "../plan/planner.ts";
-import { modelMapper, type Mapper } from "../plan/mapping.ts";
-import type { Planner } from "../review/local-check-run.ts";
 import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
 import { runReview } from "../review/run.ts";
@@ -47,18 +44,24 @@ Change:
 
 Experimental:
   --experimental-local-check
-                        instead of the usual report, ask about particular calls: start from
-                        the functions the change touched and the functions that call them,
-                        add the calls the requirement's own words lead the planner to, and
-                        observe what each function returns when one of its calls fails.
-                        Where a requirement is read as governing such a call and the
-                        reading contradicts it, the call is listed as worth checking, with
-                        the words, the code, the condition and the reading. Never a
-                        requirement verdict, and never a failing exit code.
-                        Nothing about a target is given on the command line.
+                        the v0.1 path. For each requirement, take the Rust functions the
+                        change touched and their callers one hop out, and ask Jev two
+                        things about each call: whether the requirement requires that a
+                        failure of it not reach the caller as a success, and what the
+                        function returns when it does. Where both clear the bar and
+                        disagree, the call is listed as worth checking, with the
+                        requirement's words, the code, the assumed failure and both
+                        answers. Requirements come from --intent-spec or an
+                        acceptance-criteria list; no file, function or expected answer is
+                        named on the command line. No requirement verdict is stated.
+                        Findings do not cause a nonzero exit code; configuration,
+                        repository and provider failures can. Nothing listed means no call
+                        met the conditions -- including calls left undetermined -- and
+                        exit 0 does not establish that the requirement holds.
   --experimental-candidates-only
-                        with the above: build the set and stop. Prints which calls are
-                        reachable and which fit the budget, and asks no model at all.
+                        with the above: build the set and stop. Prints which calls fit the
+                        budget and which do not, with a reason each, and asks nothing --
+                        no credentials needed.
 
 Output:
   --json                print the report as JSON instead of Markdown
@@ -66,10 +69,17 @@ Output:
   -h, --help            show this help
   --version             show the version
 
-Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for judgments on Cloudflare
-Workers AI, or JEV_API_URL and JEV_API_TOKEN for any other endpoint that runs this tool's
-models from a Workers AI run request; GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for
---pr and --issue.
+Model: typesafe/jev, and nothing else. A request for any other model is refused before it
+is built, so no other model can be reached from here.
+
+Intent: --intent-spec, or an acceptance-criteria list in the issue, the pull request or
+--intent (a heading such as "Acceptance criteria" and one item per line). Ordinary prose is
+not turned into requirements -- no model writes them -- and a run given only prose stops
+and says which two forms do work.
+
+Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for Cloudflare Workers AI, or
+JEV_API_URL and JEV_API_TOKEN for any other endpoint that serves a Workers AI run request;
+GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr and --issue.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
 10 configuration error, 11 intent could not be resolved, 12 judgment provider failed
@@ -94,7 +104,7 @@ function flat(text: string): string {
 
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string; planner?: Planner; mapper?: Mapper };
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; sent: () => { requests: number; bytes: number }; origin: string };
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -138,9 +148,6 @@ function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
   const client = new CloudflareClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes });
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
-    compiler: new WorkersAiCompiler(client),
-    planner: modelPlanner(client),
-    mapper: modelMapper(client),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
   };
@@ -310,8 +317,6 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         git,
         revisions,
         resolved.spec.requirements,
-        { pick: asksNothing } as unknown as Planner,
-        { map: asksNothing } as unknown as Mapper,
         { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
         pathFilter(config.repository.include, config.repository.ignore),
         { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
@@ -327,7 +332,17 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const deadline = Date.now() + config.limits.max_seconds * 1000;
     const judges = (deps.judges ?? defaultJudges)(endpoint, config, deadline);
 
-    const intent = resolved.spec ?? compileChecklist(resolved.sources) ?? (await judges.compiler.compile(resolved.sources));
+    // No model writes the requirements. Jev answers typed questions; it does not author a spec,
+    // and reaching for a general instruct model to do it is how a second model got in. Prose that
+    // is not an acceptance-criteria list is refused with the two forms that do work, rather than
+    // guessed at.
+    const intent = resolved.spec ?? compileChecklist(resolved.sources);
+    if (!intent) {
+      throw new ToolError(
+        "the intent could not be read without asking a model to write it: give the requirements with --intent-spec (a spec file), or state them in the issue or pull request as an acceptance-criteria list, one checkable statement per item",
+        EXIT.intent,
+      );
+    }
     if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
     for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
 
@@ -336,15 +351,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // about particular calls. It reports observations and what it did not check, never a
       // violation, and it does not go through `runReview`.
       const include = pathFilter(config.repository.include, config.repository.ignore);
-      // The planner and the mapper are the same model doing two different jobs, so they share one
-      // client and one budget: choosing where to look, and saying whether the requirement governs
-      // what was found. The judgment provider is separate and is never asked either question.
-      const client = judges.planner && judges.mapper ? null : new CloudflareClient(endpoint, { deadline });
-      const planner = judges.planner ?? modelPlanner(client!);
-      const mapper = judges.mapper ?? modelMapper(client!);
-      // `--experimental-candidates-only` returned above, before the credentials gate, so there is
-      // nothing to pass through here.
-      const results = await runLocalCheck(git, revisions, intent.requirements, planner, mapper, judges.provider, include, DEFAULT_LOCAL_CHECK);
+      // One provider, two questions. Both go to Jev; there is nothing else to send to.
+      // `--experimental-candidates-only` returned above, before the credentials gate.
+      const results = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, DEFAULT_LOCAL_CHECK);
       io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
       return EXIT.ok;
     }
