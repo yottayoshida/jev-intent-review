@@ -1,0 +1,13 @@
+diff --git a/crates/agents/src/title.rs b/crates/agents/src/title.rs
+index 99e0cb37..f49c343d 100644
+--- a/crates/agents/src/title.rs
++++ b/crates/agents/src/title.rs
+@@ -126,7 +126,7 @@ pub async fn generate_title(
+                 .record(duration);
+             }
+             warn!(error = %e, "title generation LLM call failed");
+-            Err(e)
++            Ok(String::new())
+         },
+     }
+ }

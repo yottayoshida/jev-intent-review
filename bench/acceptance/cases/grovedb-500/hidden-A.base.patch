@@ -1,0 +1,12 @@
+diff --git a/merk/src/merk/restore.rs b/merk/src/merk/restore.rs
+index 0f3b709d..fca5631f 100644
+--- a/merk/src/merk/restore.rs
++++ b/merk/src/merk/restore.rs
+@@ -1522,3 +1522,7 @@ mod tests {
+         assert_eq!(old_parent_keys, restorer.parent_keys);
+     }
+ }
++
++fn step_outcome(outcome: Result<(), Error>) -> Result<(), Error> {
++    outcome
++}

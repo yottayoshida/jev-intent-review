@@ -1,0 +1,350 @@
+{
+  "what": "Every candidate examined for the acceptance set of issue #36, in the order it was examined, with the verdict on condition (a) and the reason. Committed before the diff of any candidate's fix was opened.",
+  "examined": "A candidate counts as examined once its issue or pull request text was read. Titles screened out by the rules below are not counted.",
+  "gate": "Stop and return to the plan if 20 examined candidates do not yield 3 that pass every condition, from at least two repositories with at least one outside yottayoshida/omamori.",
+  "conditions": {
+    "a": "The requirement can be written as: a failure must reach the caller as an error, not as a success, an empty value or an absence. Judged from the issue and pull request text only.",
+    "b": "On the pull request's base..head, --experimental-candidates-only puts the fixed call on the side a question can be put to.",
+    "c": "The behaviour difference of a defect can be observed in a throwaway clone, with no network and no credentials, through one crate's test or example.",
+    "d": "The repository has a function outside the diff that the same requirement governs."
+  },
+  "sources": {
+    "yottayoshida/omamori": {
+      "pool": "Closed issues, state reason completed, newest first.",
+      "titleScreen": "Titles matching (?i)fail|error|silent|swallow|ignore|treated as|as if|empty|missing|unreadable|refus|fail-open|fail open|fail-closed|propagat|Err|Ok\\(|default|fallback|corrupt|partial|truncat, read in order; titles naming a refactor, documentation, test harness, packaging or labels were screened out without reading.",
+      "excluded": {
+        "465": "closed by PR 557, in bench/corpus",
+        "468": "the measurement v0.1 was tuned on (bench/fixtures/omamori-468)",
+        "470": "closed by PR 558, whose read loop bench/local-check-propagation.ts was tuned on",
+        "474": "closed by PR 559, named in bench/",
+        "477": "the ReadDir truncation family the development case omamori-553-r2 comes from",
+        "482": "same family as 477",
+        "485": "closed by PR 553, the development case",
+        "494": "closed by PR 554, in bench/corpus",
+        "526": "closed by PR 551, in bench/corpus"
+      }
+    },
+    "external": {
+      "pool": "The two GitHub pull request searches run while the plan was written (2026-09-21): `gh search prs --language rust --merged -- \"propagate error instead of silently\"` and `gh search prs --language rust --merged -- \"error treated as success\"`. Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success. Newest merge first.",
+      "excludedByLicense": [
+        "limn-works/scp#736 (NOASSERTION)"
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "order": 1,
+      "ref": "yottayoshida/omamori#556",
+      "a": "fail",
+      "why": "The call that fails is a typed peek, and it fails legitimately on a genuinely torn line. The requirement is to classify a line that declares an unrecognised chain version, not to return a failed call as an error."
+    },
+    {
+      "order": 2,
+      "ref": "yottayoshida/omamori#461",
+      "a": "fail",
+      "why": "A design concern about pruning past unverifiable entries; no failed call is turned into a success."
+    },
+    {
+      "order": 3,
+      "ref": "yottayoshida/omamori#514",
+      "a": "fail",
+      "why": "A predicate that asks readability where writability is meant; not a failed call reaching the caller."
+    },
+    {
+      "order": 4,
+      "ref": "yottayoshida/omamori#490",
+      "a": "fail",
+      "why": "The suggested fix carries the failed write in the result and keeps returning success, so the two options of the v0.1 question cannot tell the fixed code from the defect."
+    },
+    {
+      "order": 5,
+      "ref": "yottayoshida/omamori#483",
+      "a": "fail",
+      "why": "A recording-policy decision; the issue rejects returning an error on these paths."
+    },
+    {
+      "order": 6,
+      "ref": "yottayoshida/omamori#506",
+      "a": "fail",
+      "why": "The opposite direction: the fix turns an error into a partial result that reports truncation."
+    },
+    {
+      "order": 7,
+      "ref": "yottayoshida/omamori#487",
+      "a": "fail",
+      "why": "How a state is reported on three surfaces, not a failed call returned as a success."
+    },
+    {
+      "order": 8,
+      "ref": "yottayoshida/omamori#391",
+      "a": "fail",
+      "why": "The proposed fix resolves the nearest existing ancestor instead of returning an error, and the check returns a boolean."
+    },
+    {
+      "order": 9,
+      "ref": "yottayoshida/omamori#114",
+      "a": "fail",
+      "why": "Read with PR #127: an audit write failure becomes a warning and the command continues, returning success, unless strict mode is on. In the default mode the fixed code and the defect both return success."
+    },
+    {
+      "order": 10,
+      "ref": "yottayoshida/omamori#111",
+      "a": "fail",
+      "why": "Read with PR #125: malformed input is classified into a variant that blocks (exit 2). The fix is a classification that blocks, not an error returned to the caller."
+    },
+    {
+      "order": 11,
+      "ref": "yottayoshida/omamori#99",
+      "a": "fail",
+      "why": "One error mapped to another error; nothing becomes a success."
+    },
+    {
+      "order": 12,
+      "ref": "yottayoshida/omamori#75",
+      "a": "fail",
+      "why": "Same shape as #111: the fix answers deny, which is a result, not an error returned to the caller."
+    },
+    {
+      "order": 13,
+      "ref": "yottayoshida/omamori#60",
+      "a": "fail",
+      "why": "The fix adds a warning; the skip stays a success."
+    },
+    {
+      "order": 14,
+      "ref": "yottayoshida/omamori#323",
+      "a": "fail",
+      "why": "The failure is an absent environment variable (an Option), not a failed call returning a Result."
+    },
+    {
+      "order": 15,
+      "ref": "yottayoshida/omamori#182",
+      "a": "fail",
+      "why": "An unrecognised tool name routed to allow; no call fails."
+    },
+    {
+      "order": 16,
+      "ref": "yottayoshida/omamori#271",
+      "a": "fail",
+      "why": "Environment findings in a sandbox; no code path turns a failure into a success."
+    },
+    {
+      "order": 17,
+      "ref": "yottayoshida/omamori#387",
+      "a": "fail",
+      "why": "A missing backstop rule; no failed call."
+    },
+    {
+      "order": 18,
+      "ref": "oxidezap/whatsapp-rust#759",
+      "a": "pass",
+      "requirement": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+      "source": "PR text: \"logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations\"; \"propagate download/decode failures\"; \"an empty patch is never applied\".",
+      "b": "fail",
+      "bWhy": "The enumeration listed no call at all: one changed function was found, the fixed file hit the listing cap (17 calls left out), and six references to changed functions sit where this path does not read (impl methods among them). The fixed call cannot be asked."
+    },
+    {
+      "order": 19,
+      "ref": "moltis-org/moltis#1064",
+      "a": "pass",
+      "requirement": "If generating a session's automatic title fails, the failure must reach the caller as an error. It must not return a successful result with no label.",
+      "source": "PR text: \"Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.\"",
+      "b": "pass",
+      "bWhy": "The fixed call moltis_agents::title::generate_title(provider, &chat_msgs) is inside the budget. The B target (dispatch_command) is enumerated but held: its return type ChannelResult<String> is an alias the Result check does not recognise.",
+      "c": "pass",
+      "d": "pass",
+      "cWhy": "Built moltis-gateway with --no-default-features --features voice (the default features build llama.cpp with cmake, which title generation does not use). The pull request's own test generate_title_for_session_returns_provider_errors passes on the shipped, rewrite and hidden versions and fails on the defect. The C defect was observed with a probe test: the shipped generate_title returns Err for a failing provider, the defect returns Ok(\"\").",
+      "bNote": "The B defect (dispatch_command) was not run: reaching it needs a gateway state, a channel binding and a session with two messages, which no existing test builds. Its effect is read from the code. Its measured result does not depend on it: the target is held before any question."
+    },
+    {
+      "order": 20,
+      "ref": "KontorProtocol/Kontor#385",
+      "a": "pass",
+      "requirement": "If parsing a transaction, querying the database, or encoding a value or a certificate fails, the failure must reach the caller as an error. It must not skip the item that failed and return a successful result.",
+      "source": "PR text: \"failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped\"; \"failing fast on invalid staking data rather than skipping validators\".",
+      "b": "pass",
+      "bWhy": "The fixed call batch_to_decided(b) is inside the budget. The B target (initiate_rollback) is enumerated but held: the callee get_decided_from_anchor has a signature wrapped over several lines and is read as not returning a Result.",
+      "c": "fail",
+      "d": "not checked",
+      "cWhy": "The test crate's build script compiles test-contracts to WASM unconditionally and needs the wasm32-unknown-unknown target, wasm-opt and brotli, none of them on this machine. Installing three toolchains is outside a one-crate probe."
+    },
+    {
+      "order": 21,
+      "ref": "Naoray/instruckt-tauri#9",
+      "a": "pass",
+      "requirement": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content.",
+      "source": "PR text: \"Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content\".",
+      "b": "fail",
+      "bWhy": "All five fixed calls are held before the budget: to_string_pretty has no definition in the repository (it is serde_json's)."
+    },
+    {
+      "order": 22,
+      "ref": "dashpay/grovedb#501",
+      "a": "pass",
+      "requirement": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded.",
+      "source": "PR text: \"returned a `CostResult<(), Error>` that was silently discarded via `let _ =`. If `set_base_root_key` fails (e.g., due to a storage error), the restorer would continue operating on corrupt state\".",
+      "b": "fail",
+      "bWhy": "The fixed call is held: set_base_root_key returns CostResult<(), Error>, which the Result check does not accept. The B target is held too, its callee process_chunk read as not returning a Result because the signature wraps."
+    },
+    {
+      "order": 23,
+      "ref": "dashpay/grovedb#500",
+      "a": "pass",
+      "requirement": "If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished.",
+      "source": "PR text: \"This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed\".",
+      "b": "pass",
+      "bWhy": "The fixed call rewrite_heights(grove_version) is inside the budget. The B target finalize(grove_version) in apply_chunk does not appear in the enumeration: apply_chunk lists exactly 40 calls, the per-function cap.",
+      "c": "pass",
+      "d": "pass",
+      "cWhy": "Built grovedb-merk after narrowing the workspace to merk and its path dependencies in the throwaway clone (the repository has no Cargo.lock and another member needs a crate whose 0.3 releases are all yanked). With failures injected into the height check and the height rewrite through ACCEPTANCE_PROBE, restore_single_chunk_20 panics at finalize on the shipped, rewrite and hidden versions; on the defect finalize returns Ok and the test then finds the restored child heights differ from the source. Without the injection all four pass."
+    },
+    {
+      "order": 24,
+      "ref": "TyRoXx/NonlocalityOS#433",
+      "a": "fail",
+      "why": "On a failed move the fix compares content hashes and cleans up; it is not a failure returned to the caller as an error."
+    },
+    {
+      "order": 25,
+      "ref": "iotaledger/iota#10136",
+      "a": "pass",
+      "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
+      "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\".",
+      "b": "not checked with the tool",
+      "note": "Dropped at (c) without running the tool; its (b) has no verdict.",
+      "c": "fail",
+      "cWhy": "The fixed calls are trait methods and common names (get_latest_checkpoint_sequence_number, BcsData::serialize, get_epoch_info) in a 470 MB monorepo, and the fixed crates build on iota-types with the Move VM. Cloning it to run the pre-check and building it for a probe are both far outside a one-crate probe."
+    },
+    {
+      "order": 26,
+      "ref": "armaxri/termiHub#2751",
+      "a": "fail",
+      "why": "The fixed sites are TypeScript .catch(() => {}) calls in the frontend, and the fix logs them; no Rust call returns its failure to the caller."
+    },
+    {
+      "order": 27,
+      "ref": "armaxri/termiHub#2732",
+      "a": "fail",
+      "why": "TypeScript frontend; failures are now logged and shown as a toast, not returned to a caller as an error."
+    },
+    {
+      "order": 28,
+      "ref": "ratazzi/quebec#136",
+      "a": "pass",
+      "requirement": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success.",
+      "source": "PR text: \"Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes\".",
+      "b": "fail",
+      "bWhy": "The pre-check reports \"the change touched no Rust function at this commit\": the fixed calls in enqueue_job are not in the enumeration at all."
+    },
+    {
+      "order": 29,
+      "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "a": "pass",
+      "requirement": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result.",
+      "source": "PR text: \"entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \\\"neither dir nor file\\\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read\".",
+      "b": "fail",
+      "bWhy": "The fixed call is held: file_type has no definition in the repository (it is the standard library's). The B target is held too, its callee read as not returning a Result because the signature wraps."
+    },
+    {
+      "order": 30,
+      "ref": "beboite/boite-legacy#187",
+      "a": "fail",
+      "why": "The swallowed results are now printed to stderr, not returned; the rest of the pull request is not failure handling."
+    },
+    {
+      "order": 31,
+      "ref": "Diogo-Esteves/polyVocal#60",
+      "a": "fail",
+      "why": "The swallowed audio-callback errors now log through tracing; nothing is returned to a caller."
+    },
+    {
+      "order": 32,
+      "ref": "cavi-ai/bobby-browser#163",
+      "a": "fail",
+      "why": "The swallowed page-runtime errors are now logged; the other findings are ordering, bounds and escaping, not a failure returned as an error."
+    },
+    {
+      "order": 33,
+      "ref": "dolang-org/dolang#337",
+      "a": "fail",
+      "why": "The pull request has no text, and the title is about error output being shown, not a failure turned into a success."
+    },
+    {
+      "order": 34,
+      "ref": "TumbleOwlee/ferrowl#127",
+      "a": "fail",
+      "why": "Discarded start and stop failures are now reported in a message log, not returned to the caller."
+    },
+    {
+      "order": 35,
+      "ref": "MarshalX/python-libipld#117",
+      "a": "fail",
+      "why": "The pull request has no text; the title names swallowed errors without saying what they became, so no requirement can be written from the text."
+    },
+    {
+      "order": 36,
+      "ref": "getappz/agentflare#229",
+      "a": "pass",
+      "requirement": "If flushing, syncing or setting the permissions of a credential file fails during an atomic write, the failure must reach the caller as an error. It must not return a successful result.",
+      "source": "PR text: \"A dropped `sync_all` means the \\\"durable\\\" write may never reach disk; a dropped `set_permissions` means a credential file ... can silently be left world-readable. These now propagate via `?`\".",
+      "b": "fail",
+      "bWhy": "Every fixed call goes to the standard library (flush, sync_all, set_permissions, read_to_string: no definition in the repository, grep). applicabilityOf holds a call whose callee has no definition, so this is settled without running the pre-check."
+    },
+    {
+      "order": 37,
+      "ref": "dsx-ai-factory/infra-controller#3469",
+      "a": "fail",
+      "why": "The swallowed failures now warn and are counted; none is returned to a caller."
+    },
+    {
+      "order": 38,
+      "ref": "Davidslv/cce-rust#168",
+      "a": "pass",
+      "requirement": "If the sync marker exists but cannot be read, the failure must reach the caller as an error. It must not be treated as a missing marker and the pull allowed to overwrite the index.",
+      "source": "PR text: \"`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \\\"never pulled\\\", disarming the ... overwrite guard ... `Err` (naming `--force`) for a corrupt one\".",
+      "b": "fail",
+      "bWhy": "The fixed call SyncState::load_strict goes to a name defined twice (src/sync/commands.rs and src/sync/knowledge_commands.rs, grep). applicabilityOf holds a call whose callee is defined more than once; settled without running the pre-check."
+    },
+    {
+      "order": 39,
+      "ref": "liveask/liveask#127",
+      "a": "fail",
+      "why": "The pull request has no text; the title does not say what the swallowed fetch error became."
+    },
+    {
+      "order": 40,
+      "ref": "AndreaBozzo/dataprof#370",
+      "a": "pass",
+      "requirement": "If decoding a value fails, the failure must reach the caller as an error. It must not be folded into a default value that is reported as the profile.",
+      "source": "PR text: \"removes silent fallback behavior that could turn malformed input into plausible profile values\"; \"decode paths surface errors instead of folding them into default values\".",
+      "b": "fail",
+      "bWhy": "The only fixed call to a function defined in the repository, count_table_rows, goes to a name defined four times (a trait and three connectors, grep); the rest go to serde_json and the standard library. Settled without running the pre-check. The shipped fix also still returns 0 for that call, with a warning."
+    }
+  ],
+  "gateResult": {
+    "examined": 40,
+    "cap": 40,
+    "passedA": 12,
+    "passedB": 3,
+    "passedC": 2,
+    "passingAll": [
+      19,
+      23
+    ],
+    "status": "not met at the cap of 40: two cases pass every condition; measured on the owner's ruling (gateExtension.rulingAtCap)"
+  },
+  "gateExtension": {
+    "when": "2026-09-21, after the gate was not met at 20",
+    "ruling": "The owner chose to keep looking for a third case rather than measure two or stop: the cap goes from 20 to 40, the four conditions and the order stay as they were. The rest of the fixed external pool is examined newest merge first; if it runs out, one search term is added and recorded here before its results are read.",
+    "addedSearch": {
+      "term": "gh search prs --language rust --merged --limit 60 -- \"swallowed error\"",
+      "recordedBefore": "its results were read",
+      "rule": "Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success. Newest merge first. Candidates already examined are skipped."
+    },
+    "rulingAtCap": {
+      "when": "2026-09-21, after the cap of 40 was reached with two cases passing",
+      "ruling": "The owner chose to measure the two cases that passed every condition (moltis#1064, grovedb#500) rather than stop or raise the cap again. The target of three is not met, and the documents say so.",
+      "recorded": "after the measurement, in the commit that corrected the first review; the ruling itself was given before the first request"
+    }
+  }
+}

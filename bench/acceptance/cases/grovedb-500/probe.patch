@@ -1,0 +1,24 @@
+diff --git a/merk/src/merk/restore.rs b/merk/src/merk/restore.rs
+index 25676f4f..33d59556 100644
+--- a/merk/src/merk/restore.rs
++++ b/merk/src/merk/restore.rs
+@@ -414,6 +414,9 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+     /// about the height values after replication we need to verify the
+     /// heights and if invalid recompute the correct values
+     fn rewrite_heights(&mut self, grove_version: &GroveVersion) -> Result<(), Error> {
++        if std::env::var_os("ACCEPTANCE_PROBE").is_some() {
++            return Err(Error::ChunkRestoringError(ChunkError::InternalError("probe: injected rewrite failure")));
++        }
+         fn rewrite_child_heights<'s, 'db, S: StorageContext<'db>>(
+             mut walker: RefWalker<MerkSource<'s, S>>,
+             batch: &mut <S as StorageContext<'db>>::Batch,
+@@ -553,6 +556,9 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+     /// Verify that the child heights of the merk tree links correctly represent
+     /// the tree
+     fn verify_height(&self, grove_version: &GroveVersion) -> Result<(), Error> {
++        if std::env::var_os("ACCEPTANCE_PROBE").is_some() {
++            return Err(Error::ChunkRestoringError(ChunkError::InternalError("probe: injected height mismatch")));
++        }
+         let tree = self.merk.tree.take();
+         let height_verification_result = if let Some(tree) = &tree {
+             self.verify_tree_height(tree, tree.height(), grove_version)
