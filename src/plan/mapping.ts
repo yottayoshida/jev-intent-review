@@ -50,7 +50,7 @@ export interface Mapping {
 
 export type MappingCheck =
   | { ok: true; mapping: Mapping }
-  | { ok: false; kind: "unknown_call" | "quote_not_in_requirement" | "bad_shape"; reason: string };
+  | { ok: false; kind: "wrong_call" | "quote_not_in_requirement" | "bad_shape"; reason: string };
 
 /** Short enough and a quote is a word or two — long enough and it has to come from the sentence. */
 const MIN_QUOTE = 12;
@@ -58,13 +58,19 @@ const MIN_QUOTE = 12;
 const flatten = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
 
 /**
- * What code can say about a mapping: the call is one that was offered, the quote is in the
- * requirement, the verdict is one of the three.
+ * What code can say about a mapping: it answers **the call it was asked about**, the quote is in
+ * the requirement, the verdict is one of the three.
  *
- * Passing is not being right. A mapping that names a real call and quotes the sentence exactly can
- * still be wrong about what the sentence requires, and no check here would notice.
+ * The call check is identity with the question, not membership of the run's set. Checking
+ * membership let an answer about one call be attached to another: ask about `beta`, get back
+ * `alpha` with a quote that really is in the requirement and a reason really about `alpha`, and
+ * every check passed while the finding was filed against `beta`. An answer to a different question
+ * is not a weaker answer to this one.
+ *
+ * Passing is not being right. A mapping that answers the right call and quotes the sentence
+ * exactly can still be wrong about what the sentence requires, and no check here would notice.
  */
-export function checkMapping(raw: unknown, context: { callIds: ReadonlySet<string>; requirementId: string; requirementText: string }): MappingCheck {
+export function checkMapping(raw: unknown, context: { callId: string; offered?: ReadonlySet<string>; requirementId: string; requirementText: string }): MappingCheck {
   if (typeof raw !== "object" || raw === null) return { ok: false, kind: "bad_shape", reason: "the answer was not an object" };
   const { callId, verdict, quote, reason } = raw as Record<string, unknown>;
   if (typeof callId !== "string" || typeof verdict !== "string" || typeof quote !== "string" || typeof reason !== "string") {
@@ -73,7 +79,12 @@ export function checkMapping(raw: unknown, context: { callIds: ReadonlySet<strin
   if (verdict !== "applies" && verdict !== "does_not_apply" && verdict !== "unknown") {
     return { ok: false, kind: "bad_shape", reason: `${verdict} is not one of applies, does_not_apply, unknown` };
   }
-  if (!context.callIds.has(callId)) return { ok: false, kind: "unknown_call", reason: `${callId} is not a call this run offered` };
+  if (callId !== context.callId) {
+    // Being a real candidate makes this worse rather than better: the answer would land on a call
+    // this run is also asking about, where nothing downstream could tell it apart.
+    const elsewhere = context.offered?.has(callId) ? ", which is another call in this run's set" : "";
+    return { ok: false, kind: "wrong_call", reason: `the answer is about ${callId}${elsewhere}, not about ${context.callId}, which is what it was asked` };
+  }
   // A verdict that does not apply needs no quote from the sentence: there may be nothing in it to
   // point at. One that does is a claim about particular words, and those words have to be there.
   if (verdict === "applies") {
