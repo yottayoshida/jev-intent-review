@@ -151,8 +151,10 @@
       "source": "PR text: \"Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.\"",
       "b": "pass",
       "bWhy": "The fixed call moltis_agents::title::generate_title(provider, &chat_msgs) is inside the budget. The B target (dispatch_command) is enumerated but held: its return type ChannelResult<String> is an alias the Result check does not recognise.",
-      "c": "not checked",
-      "d": "not checked"
+      "c": "pass",
+      "d": "pass",
+      "cWhy": "Built moltis-gateway with --no-default-features --features voice (the default features build llama.cpp with cmake, which title generation does not use). The pull request's own test generate_title_for_session_returns_provider_errors passes on the shipped, rewrite and hidden versions and fails on the defect. The C defect was observed with a probe test: the shipped generate_title returns Err for a failing provider, the defect returns Ok(\"\").",
+      "bNote": "The B defect (dispatch_command) was not run: reaching it needs a gateway state, a channel binding and a session with two messages, which no existing test builds. Its effect is read from the code. Its measured result does not depend on it: the target is held before any question."
     },
     {
       "order": 20,
@@ -162,8 +164,9 @@
       "source": "PR text: \"failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped\"; \"failing fast on invalid staking data rather than skipping validators\".",
       "b": "pass",
       "bWhy": "The fixed call batch_to_decided(b) is inside the budget. The B target (initiate_rollback) is enumerated but held: the callee get_decided_from_anchor has a signature wrapped over several lines and is read as not returning a Result.",
-      "c": "not checked",
-      "d": "not checked"
+      "c": "fail",
+      "d": "not checked",
+      "cWhy": "The test crate's build script compiles test-contracts to WASM unconditionally and needs the wasm32-unknown-unknown target, wasm-opt and brotli, none of them on this machine. Installing three toolchains is outside a one-crate probe."
     },
     {
       "order": 21,
@@ -191,8 +194,9 @@
       "source": "PR text: \"This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed\".",
       "b": "pass",
       "bWhy": "The fixed call rewrite_heights(grove_version) is inside the budget. The B target finalize(grove_version) in apply_chunk does not appear in the enumeration: apply_chunk lists exactly 40 calls, the per-function cap.",
-      "c": "not checked",
-      "d": "B and C fixed"
+      "c": "pass",
+      "d": "pass",
+      "cWhy": "Built grovedb-merk after narrowing the workspace to merk and its path dependencies in the throwaway clone (the repository has no Cargo.lock and another member needs a crate whose 0.3 releases are all yanked). With failures injected into the height check and the height rewrite through ACCEPTANCE_PROBE, restore_single_chunk_20 panics at finalize on the shipped, rewrite and hidden versions; on the defect finalize returns Ok and the test then finds the restored child heights differ from the source. Without the injection all four pass."
     },
     {
       "order": 24,
@@ -206,8 +210,10 @@
       "a": "pass",
       "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
       "source": "PR text: \"Properly propagates errors instead of silently swallowing them with `.ok()`\".",
-      "b": "not checked",
-      "note": "Held in reserve: examined only if one of 19, 20 or 23 fails condition (c)."
+      "b": "not checked with the tool",
+      "note": "Held in reserve: examined only if one of 19, 20 or 23 fails condition (c).",
+      "c": "fail",
+      "cWhy": "The fixed calls are trait methods and common names (get_latest_checkpoint_sequence_number, BcsData::serialize, get_epoch_info) in a 470 MB monorepo, and the fixed crates build on iota-types with the Move VM. Cloning it to run the pre-check and building it for a probe are both far outside a one-crate probe."
     }
   ],
   "gateResult": {
@@ -215,16 +221,20 @@
     "cap": 40,
     "passedA": 7,
     "passedB": 3,
-    "passingB": [
+    "passedC": 2,
+    "passingAll": [
       19,
-      20,
       23
     ],
-    "status": "three pass (b); condition (c) not yet checked",
-    "precheck": "bench/acceptance/precheck-shipped.json"
+    "status": "two pass every condition; the fixed pool is exhausted"
   },
   "gateExtension": {
     "when": "2026-09-21, after the gate was not met at 20",
-    "ruling": "The owner chose to keep looking for a third case rather than measure two or stop: the cap goes from 20 to 40, the four conditions and the order stay as they were. The rest of the fixed external pool is examined newest merge first; if it runs out, one search term is added and recorded here before its results are read."
+    "ruling": "The owner chose to keep looking for a third case rather than measure two or stop: the cap goes from 20 to 40, the four conditions and the order stay as they were. The rest of the fixed external pool is examined newest merge first; if it runs out, one search term is added and recorded here before its results are read.",
+    "addedSearch": {
+      "term": "gh search prs --language rust --merged --limit 60 -- \"swallowed error\"",
+      "recordedBefore": "its results were read",
+      "rule": "Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success. Newest merge first. Candidates already examined are skipped."
+    }
   }
 }

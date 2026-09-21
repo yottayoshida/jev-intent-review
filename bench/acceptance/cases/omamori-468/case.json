@@ -1,0 +1,122 @@
+{
+  "id": "omamori-468",
+  "repo": "https://github.com/yottayoshida/omamori",
+  "role": "regression",
+  "note": "The measurement v0.1 was tuned on (bench/logs/stated-requirements-v1.json), converted to the case format to calibrate the scoring. It never counts as unseen.",
+  "versions": {
+    "correct": {
+      "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+      "head": "e58c04f",
+      "targets": {
+        "R1": {
+          "requirementId": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        "R2": {
+          "requirementId": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)"
+        }
+      },
+      "expected": {
+        "R1": "not_listed",
+        "R2": "not_listed"
+      }
+    },
+    "m-read-baseline": {
+      "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+      "head": "0a3b5a0",
+      "place": "A",
+      "targets": {
+        "R1": {
+          "requirementId": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        "R2": {
+          "requirementId": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)"
+        }
+      },
+      "expected": {
+        "R1": "listed",
+        "R2": "not_listed"
+      }
+    },
+    "v-read-baseline": {
+      "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+      "head": "8eeae67",
+      "place": "A",
+      "targets": {
+        "R1": {
+          "requirementId": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        "R2": {
+          "requirementId": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)"
+        }
+      },
+      "expected": {
+        "R1": "not_listed",
+        "R2": "not_listed"
+      }
+    },
+    "m-raw-override": {
+      "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+      "head": "659f6b5",
+      "place": "A",
+      "targets": {
+        "R1": {
+          "requirementId": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        "R2": {
+          "requirementId": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)"
+        }
+      },
+      "expected": {
+        "R1": "not_listed",
+        "R2": "listed"
+      }
+    },
+    "v-raw-override": {
+      "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+      "head": "16ecbdf",
+      "place": "A",
+      "targets": {
+        "R1": {
+          "requirementId": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        "R2": {
+          "requirementId": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)"
+        }
+      },
+      "expected": {
+        "R1": "not_listed",
+        "R2": "not_listed"
+      }
+    }
+  }
+}
