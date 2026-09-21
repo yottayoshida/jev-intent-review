@@ -15,6 +15,10 @@ import { QUESTIONS_HASH } from "../judgments/questions.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
+import { modelPlanner } from "../plan/planner.ts";
+import type { Planner } from "../review/local-check-run.ts";
+import { renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
+import { pathFilter } from "../config/glob.ts";
 import { runReview } from "../review/run.ts";
 import { EXIT, ToolError, type IntentSource, type ReviewReport } from "../types.ts";
 import { VERSION } from "../version.ts";
@@ -39,6 +43,14 @@ Change:
                         the merge commit's first parent)
   --head <rev>          the commit after the change (default: HEAD; with --pr outside a
                         pull_request workflow, the pull request's head commit)
+
+Experimental:
+  --experimental-local-check
+                        instead of the usual report, ask about particular calls: for each
+                        requirement, pick the calls it governs, add the others in the same
+                        functions, and observe what each function returns when that call
+                        fails. Reports observations and what it did not check, never a
+                        violation. Nothing about a target is given on the command line.
 
 Output:
   --json                print the report as JSON instead of Markdown
@@ -74,7 +86,7 @@ function flat(text: string): string {
 
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string };
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; compiler: IntentCompiler; sent: () => { requests: number; bytes: number }; origin: string; planner?: Planner };
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
 }
 
@@ -94,6 +106,7 @@ function parse(argv: string[]) {
         repo: { type: "string" },
         base: { type: "string" },
         head: { type: "string" },
+        "experimental-local-check": { type: "boolean", default: false },
         json: { type: "boolean", default: false },
         trace: { type: "boolean", default: false },
         help: { type: "boolean", short: "h", default: false },
@@ -117,6 +130,7 @@ function defaultJudges(endpoint: Endpoint, config: Config, deadline: number) {
   return {
     provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
     compiler: new WorkersAiCompiler(client),
+    planner: modelPlanner(client),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
   };
@@ -283,6 +297,17 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const intent = resolved.spec ?? compileChecklist(resolved.sources) ?? (await judges.compiler.compile(resolved.sources));
     if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
     for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
+
+    if (args["experimental-local-check"]) {
+      // The experimental path (docs/local-check-cli.md): from each requirement to observations
+      // about particular calls. It reports observations and what it did not check, never a
+      // violation, and it does not go through `runReview`.
+      const include = pathFilter(config.repository.include, config.repository.ignore);
+      const planner = judges.planner ?? modelPlanner(new CloudflareClient(endpoint, { deadline }));
+      const results = await runLocalCheck(git, revisions.after, intent.requirements, planner, judges.provider, include);
+      io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
+      return EXIT.ok;
+    }
 
     const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes, endpoint: judges.origin });
     return output(report);
