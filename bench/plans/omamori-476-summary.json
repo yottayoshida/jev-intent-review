@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/yottayoshida/omamori/pull/476",
+  "rule": "the first paragraph after the \"## Summary\" heading, lines joined with a single space; nothing added and nothing chosen by hand",
+  "retrievedAt": "2026-09-21",
+  "text": "Move the \"is this actually a regular file\" check off individual callers and onto the open itself, in one shared helper. A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+  "namesTheHelper": false
+}

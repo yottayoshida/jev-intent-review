@@ -1,0 +1,1413 @@
+{
+  "question": "Does adding the pull request's summary paragraph get the selection to the call the patch changes?",
+  "judging": "none — this run sends nothing to Jev",
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "pickingModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+  },
+  "materials": {
+    "A": "the property sentence",
+    "B": "the property sentence plus the summary paragraph",
+    "paragraph": {
+      "source": "https://github.com/yottayoshida/omamori/pull/476",
+      "rule": "the first paragraph after the \"## Summary\" heading, lines joined with a single space; nothing added and nothing chosen by hand",
+      "retrievedAt": "2026-09-21",
+      "text": "Move the \"is this actually a regular file\" check off individual callers and onto the open itself, in one shared helper. A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+      "namesTheHelper": false
+    }
+  },
+  "maxPicks": 4,
+  "maxSet": 5,
+  "runs": 3,
+  "sent": {
+    "requests": 12,
+    "bytes": 474258,
+    "hardLimit": 20
+  },
+  "log": [
+    {
+      "case": "omamori-read-baseline",
+      "material": "A",
+      "run": 1,
+      "requirementChars": 193,
+      "sentHash": "3f73bdd37d5d",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-54",
+            "clause": "is now refused by name instead of reading through to a link target"
+          },
+          {
+            "callId": "call-113",
+            "clause": "is now refused by name instead of being silently treated as an empty file"
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-54",
+          "call-113"
+        ],
+        "widened": [
+          "call-16",
+          "call-54",
+          "call-113",
+          "call-218"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-54",
+          "call-113",
+          "call-218"
+        ],
+        "leftOver": 0
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": false,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-54",
+          "function": "canary",
+          "expression": "fs::read_link(&shim_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-113",
+          "function": "check_cursor_snippet",
+          "expression": "cursor_snippet_exe_path(&actual)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "check_cursor_snippet does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-218",
+          "function": "full_check_with_exe",
+          "expression": "fs::read_link(&link_path)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "full_check_with_exe does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        }
+      ]
+    },
+    {
+      "case": "omamori-read-baseline",
+      "material": "A",
+      "run": 2,
+      "requirementChars": 193,
+      "sentHash": "3f73bdd37d5d",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-54",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-61",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-113",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113"
+        ],
+        "widened": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113",
+          "call-43",
+          "call-102",
+          "call-115",
+          "call-129",
+          "call-191",
+          "call-218",
+          "call-224",
+          "call-240",
+          "call-272"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113",
+          "call-43"
+        ],
+        "leftOver": 8
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": false,
+          "functionOnly": true
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": true
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-54",
+          "function": "canary",
+          "expression": "fs::read_link(&shim_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-61",
+          "function": "canary",
+          "expression": "exists()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-113",
+          "function": "check_cursor_snippet",
+          "expression": "cursor_snippet_exe_path(&actual)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "check_cursor_snippet does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-43",
+          "function": "read_baseline",
+          "expression": "exists()",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "`exists()` is not handled as a Result where it is called, so it may not have an error to assume"
+        }
+      ]
+    },
+    {
+      "case": "omamori-read-baseline",
+      "material": "A",
+      "run": 3,
+      "requirementChars": 193,
+      "sentHash": "3f73bdd37d5d",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-54",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-61",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-113",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113"
+        ],
+        "widened": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113",
+          "call-43",
+          "call-102",
+          "call-115",
+          "call-129",
+          "call-191",
+          "call-218",
+          "call-224",
+          "call-240",
+          "call-272"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-54",
+          "call-61",
+          "call-113",
+          "call-43"
+        ],
+        "leftOver": 8
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": false,
+          "functionOnly": true
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": true
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-54",
+          "function": "canary",
+          "expression": "fs::read_link(&shim_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-61",
+          "function": "canary",
+          "expression": "exists()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-113",
+          "function": "check_cursor_snippet",
+          "expression": "cursor_snippet_exe_path(&actual)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "check_cursor_snippet does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-43",
+          "function": "read_baseline",
+          "expression": "exists()",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "`exists()` is not handled as a Result where it is called, so it may not have an error to assume"
+        }
+      ]
+    },
+    {
+      "case": "omamori-read-baseline",
+      "material": "B",
+      "run": 1,
+      "requirementChars": 508,
+      "sentHash": "05fed60fac82",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-38",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-43",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-50",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50"
+        ],
+        "widened": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50",
+          "call-54",
+          "call-61",
+          "call-102",
+          "call-115",
+          "call-129",
+          "call-191",
+          "call-218",
+          "call-224",
+          "call-240",
+          "call-272"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50",
+          "call-54"
+        ],
+        "leftOver": 9
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": true
+        },
+        "widened": {
+          "call": false,
+          "functionOnly": true
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": true
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-38",
+          "function": "write_baseline",
+          "expression": "symlink_metadata()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-43",
+          "function": "read_baseline",
+          "expression": "exists()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`exists()` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-50",
+          "function": "canary",
+          "expression": "fs::symlink_metadata(&bp)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-54",
+          "function": "canary",
+          "expression": "fs::read_link(&shim_path)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        }
+      ]
+    },
+    {
+      "case": "omamori-read-baseline",
+      "material": "B",
+      "run": 2,
+      "requirementChars": 508,
+      "sentHash": "05fed60fac82",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-38",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-43",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-50",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50"
+        ],
+        "widened": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50",
+          "call-54",
+          "call-61",
+          "call-102",
+          "call-115",
+          "call-129",
+          "call-191",
+          "call-218",
+          "call-224",
+          "call-240",
+          "call-272"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-38",
+          "call-43",
+          "call-50",
+          "call-54"
+        ],
+        "leftOver": 9
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": true
+        },
+        "widened": {
+          "call": false,
+          "functionOnly": true
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": true
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-38",
+          "function": "write_baseline",
+          "expression": "symlink_metadata()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-43",
+          "function": "read_baseline",
+          "expression": "exists()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`exists()` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-50",
+          "function": "canary",
+          "expression": "fs::symlink_metadata(&bp)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-54",
+          "function": "canary",
+          "expression": "fs::read_link(&shim_path)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        }
+      ]
+    },
+    {
+      "case": "omamori-read-baseline",
+      "material": "B",
+      "run": 3,
+      "requirementChars": 508,
+      "sentHash": "05fed60fac82",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-16",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-38",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-44",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-50",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-16",
+          "call-38",
+          "call-44",
+          "call-50"
+        ],
+        "widened": [
+          "call-16",
+          "call-38",
+          "call-44",
+          "call-50",
+          "call-25",
+          "call-54",
+          "call-104",
+          "call-131",
+          "call-193",
+          "call-218",
+          "call-273"
+        ],
+        "withinBudget": [
+          "call-16",
+          "call-38",
+          "call-44",
+          "call-50",
+          "call-25"
+        ],
+        "leftOver": 6
+      },
+      "reach": {
+        "picked": {
+          "call": true,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": true,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-16",
+          "function": "generate_baseline",
+          "expression": "fs::read_link(&link_path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`fs::read_link(&link_path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-38",
+          "function": "write_baseline",
+          "expression": "symlink_metadata()",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-44",
+          "function": "read_baseline",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-50",
+          "function": "canary",
+          "expression": "fs::symlink_metadata(&bp)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "canary does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "callId": "call-25",
+          "function": "generate_baseline",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": false,
+          "reason": "`crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)` is not handled as a Result where it is called, so it may not have an error to assume"
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "A",
+      "run": 1,
+      "requirementChars": 193,
+      "sentHash": "85d009ac5d81",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-15",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-20",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-257",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-261",
+            "clause": "is now refused by name instead of hanging the process"
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261"
+        ],
+        "widened": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28",
+          "call-41",
+          "call-60",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28"
+        ],
+        "leftOver": 3
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-15",
+          "function": "load_config",
+          "expression": "permissions_are_safe(&path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`permissions_are_safe(&path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-261",
+          "function": "write_default_config",
+          "expression": "reject_symlink(path, \"config path\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "A",
+      "run": 2,
+      "requirementChars": 193,
+      "sentHash": "85d009ac5d81",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-15",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-20",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-257",
+            "clause": "is now refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-261",
+            "clause": "is now refused by name instead of hanging the process"
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261"
+        ],
+        "widened": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28",
+          "call-41",
+          "call-60",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28"
+        ],
+        "leftOver": 3
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-15",
+          "function": "load_config",
+          "expression": "permissions_are_safe(&path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`permissions_are_safe(&path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-261",
+          "function": "write_default_config",
+          "expression": "reject_symlink(path, \"config path\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "A",
+      "run": 3,
+      "requirementChars": 193,
+      "sentHash": "85d009ac5d81",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-15",
+            "clause": "refused by name instead of hanging the process"
+          },
+          {
+            "callId": "call-20",
+            "clause": "refused by name instead of reading through to a link target"
+          },
+          {
+            "callId": "call-257",
+            "clause": "refused by name instead of being silently treated as an empty file"
+          },
+          {
+            "callId": "call-261",
+            "clause": "refused by name instead of being silently treated as an empty file"
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261"
+        ],
+        "widened": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28",
+          "call-41",
+          "call-60",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-15",
+          "call-20",
+          "call-257",
+          "call-261",
+          "call-28"
+        ],
+        "leftOver": 3
+      },
+      "reach": {
+        "picked": {
+          "call": false,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": false,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-15",
+          "function": "load_config",
+          "expression": "permissions_are_safe(&path)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": false,
+          "reason": "`permissions_are_safe(&path)` is not handled as a Result where it is called, so it may not have an error to assume"
+        },
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-261",
+          "function": "write_default_config",
+          "expression": "reject_symlink(path, \"config path\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "B",
+      "run": 1,
+      "requirementChars": 508,
+      "sentHash": "47e98095f869",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-20",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-41",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-60",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-257",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257"
+        ],
+        "widened": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28",
+          "call-261",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28"
+        ],
+        "leftOver": 2
+      },
+      "reach": {
+        "picked": {
+          "call": true,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": true,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-41",
+          "function": "read_raw_rule_state",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-60",
+          "function": "raw_override_disables",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "B",
+      "run": 2,
+      "requirementChars": 508,
+      "sentHash": "47e98095f869",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-20",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-41",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-60",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-257",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257"
+        ],
+        "widened": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28",
+          "call-261",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28"
+        ],
+        "leftOver": 2
+      },
+      "reach": {
+        "picked": {
+          "call": true,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": true,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-41",
+          "function": "read_raw_rule_state",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-60",
+          "function": "raw_override_disables",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "material": "B",
+      "run": 3,
+      "requirementChars": 508,
+      "sentHash": "47e98095f869",
+      "answer": {
+        "picks": [
+          {
+            "callId": "call-20",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-41",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-60",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          },
+          {
+            "callId": "call-257",
+            "clause": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+          }
+        ]
+      },
+      "rejectedPicks": [],
+      "stages": {
+        "picked": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257"
+        ],
+        "widened": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28",
+          "call-261",
+          "call-271"
+        ],
+        "withinBudget": [
+          "call-20",
+          "call-41",
+          "call-60",
+          "call-257",
+          "call-28"
+        ],
+        "leftOver": 2
+      },
+      "reach": {
+        "picked": {
+          "call": true,
+          "functionOnly": false
+        },
+        "widened": {
+          "call": true,
+          "functionOnly": false
+        },
+        "withinBudget": {
+          "call": true,
+          "functionOnly": false
+        }
+      },
+      "applicable": [
+        {
+          "callId": "call-20",
+          "function": "load_config",
+          "expression": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-41",
+          "function": "read_raw_rule_state",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-60",
+          "function": "raw_override_disables",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-257",
+          "function": "write_default_config",
+          "expression": "reject_symlink(dir, \"config directory\")",
+          "related": "stated",
+          "hasClause": true,
+          "applicable": true,
+          "reason": null
+        },
+        {
+          "callId": "call-28",
+          "function": "raw_rule_names",
+          "expression": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "related": "same_callee",
+          "hasClause": false,
+          "applicable": true,
+          "reason": null
+        }
+      ]
+    }
+  ]
+}
