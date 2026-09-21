@@ -166,23 +166,23 @@ test("a definition inside a test region is not one a path outside it reaches", (
   assert.deepEqual(new BlockIndex(rust).testRegions, [{ start: 5, end: 10 }], "the index carries them");
 });
 
-test("a test module behind a platform-qualified cfg is still a test module", () => {
-  // `#[cfg(all(test, unix))]` is the same module as `#[cfg(test)]`. Matching only the literal
-  // first form read one of omamori's modules as production code: its helpers became candidates to
-  // ask about, and its `fn`s became definitions the applicability check resolved names against.
-  for (const attribute of ["#[cfg(all(test, unix))]", "#[cfg(any(test, feature = \"probe\"))]", "#[cfg(test)]"]) {
+test("a cfg is a test region only when it cannot hold outside the tests", () => {
+  // Matching only the literal `#[cfg(test)]` read one of omamori's modules as production code:
+  // its helpers became candidates to ask about, and its `fn`s became definitions the applicability
+  // check resolved names against. Looking for the word anywhere on the line went too far the other
+  // way and deleted real code, which is the worse mistake — nothing reports what is not there.
+  for (const attribute of ["#[cfg(test)]", "#[cfg(all(test, unix))]", "#[cfg(all(unix, any(test, all(test, windows))))]", "#[cfg(test)] // uses &[(u8)]"]) {
     const lines = [attribute, "mod tests {", "    fn helper() {}", "}", "pub fn production() {}"];
     assert.deepEqual(testRegions(lines), [{ start: 1, end: 4 }], attribute);
   }
-  // Things that look alike and are not. The word has to be inside the parentheses: reading it off
-  // the whole line makes a trailing comment decide what is production code.
   for (const line of [
-    '#[cfg(feature = "test-utils")]',
-    "#[cfg(not(test))]",
-    "#[cfg(unix)] // see the test in tests/foo.rs",
-    '#[cfg(feature = "serde")] // only used in test builds',
+    '#[cfg(any(test, feature = "production"))]', // with that feature on, this is an ordinary build
+    '#[cfg(feature = "test-utils")]', // a feature named after tests is not the tests
+    "#[cfg(not(test))]", // the code compiled when the tests are not
+    "#[cfg(unix)] // see the test in tests/foo.rs", // the word, but not in the predicate
+    "#[cfg(target_os = \"linux\")]",
   ]) {
-    assert.deepEqual(testRegions([line, "pub fn production() {}"]), [], line);
+    assert.deepEqual(testRegions([line, "mod m {", "    pub fn real() {}", "}"]), [], line);
   }
 });
 

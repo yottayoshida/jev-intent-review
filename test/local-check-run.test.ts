@@ -221,6 +221,44 @@ test("the budget is spent once for the requirement, not once per file", async ()
   assert.equal(result.unchecked.filter((u) => /budget of 2 was already spent/.test(u.why)).length, 1);
 });
 
+test("nothing secret-shaped leaves in a request, packet or question, nor in the report", async () => {
+  // A request is the packet *and* the questions. Only the packet was being cleaned, and the
+  // question text carries the call expression — so a call with a secret-shaped argument went out
+  // in the one field nothing touched. The hold that used to cover this was `locateCall` failing
+  // to find the raw expression in a redacted body, which was itself a defect and is now fixed.
+  const secretish = "0123456789abcdef0123456789abcdef0123456789abcdef";
+  const withSecret = INTEGRITY.replace("read_capped(&path, MAX)", `read_capped(&path, "${secretish}")`);
+  const files: Record<string, string> = { ...FILES, "src/integrity.rs": withSecret };
+  const git = { ...fakeGit, async readText(rev: string, path: string) {
+      if (rev === "BEFORE" && path === "src/integrity.rs") return INTEGRITY_BEFORE;
+      return files[path] ?? null;
+    },
+    async grep(_rev: string, pattern: string) {
+      const hits = Object.entries(files).flatMap(([path, text]) =>
+        text.split("\n").flatMap((line, i) => (new RegExp(`(?<![\\w$])${pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w$])`, "i").test(line) ? [{ path, line: i + 1, text: line }] : [])),
+      );
+      return { hits, more: false };
+    } } as unknown as Git;
+
+  const sent: string[] = [];
+  const recording: JudgmentProvider = {
+    model: "test",
+    async judge(state: unknown, questions: Questions) {
+      sent.push(JSON.stringify({ state, questions }));
+      const out: Record<string, ChoiceAnswer> = {};
+      for (const key of Object.keys(questions)) out[key] = { choice: key === "on_error_result" ? "returns_error" : "stops_there", confidence: 0.9, probabilities: {} };
+      return out;
+    },
+  };
+  const { planner } = scriptedPlanner();
+  const results = await runLocalCheck(git, REVISIONS, [requirement], planner, recording, () => true, DEFAULT_LOCAL_CHECK);
+  assert.ok(sent.length > 0, "something was judged");
+  const asked = sent.find((s) => s.includes("read_capped"));
+  assert.ok(asked, "including the call that carries it");
+  for (const request of sent) assert.ok(!request.includes(secretish), "no request carries it, in either half");
+  assert.ok(!renderLocalCheck(results).includes(secretish), "and the report does not print it either");
+});
+
 test("what goes to the planner is redacted, the requirement's text and the listing alike", async () => {
   const secretish = "0123456789abcdef0123456789abcdef0123456789abcdef";
   const { planner, asked } = scriptedPlanner();

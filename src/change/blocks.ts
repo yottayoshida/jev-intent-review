@@ -51,6 +51,79 @@ const CONTINUATION = /^\s*([)\]]|\{\s*$)/;
 
 const NOT_NAMES = new Set(["if", "for", "while", "switch", "catch", "return", "function", "new", "await", "async", "else", "do", "with", "yield"]);
 
+/** Pieces of a `cfg` predicate, split on the commas that are not inside nested parentheses. */
+function splitPredicate(text: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let quote = false;
+  let start = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i] as string;
+    if (quote) {
+      if (ch === "\\") i += 1;
+      else if (ch === '"') quote = false;
+      continue;
+    }
+    if (ch === '"') quote = true;
+    else if (ch === "(") depth += 1;
+    else if (ch === ")") depth -= 1;
+    else if (ch === "," && depth === 0) {
+      parts.push(text.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(text.slice(start));
+  return parts.map((p) => p.trim()).filter((p) => p.length > 0);
+}
+
+/**
+ * Whether a `cfg` predicate can hold **only** when the tests are being compiled.
+ *
+ * `all(test, unix)` can, because every part has to hold. `any(test, feature = "production")`
+ * cannot: with that feature on, the code is in an ordinary build. Excluding it would delete real
+ * code from the candidates and from the definitions names resolve against, and say nothing.
+ *
+ * Anything this does not recognise — a `not`, an unknown form — is **not** test-only. Being unsure
+ * leaves the code in, where it is visible, rather than dropping it where nothing reports it.
+ */
+export function testOnlyCfg(predicate: string): boolean {
+  const text = predicate.trim();
+  if (text === "test") return true;
+  const call = /^(all|any|not)\s*\(([\s\S]*)\)$/.exec(text);
+  if (!call) return false;
+  const parts = splitPredicate(call[2] as string);
+  if (parts.length === 0) return false;
+  if (call[1] === "all") return parts.some(testOnlyCfg);
+  if (call[1] === "any") return parts.every(testOnlyCfg);
+  return false;
+}
+
+/**
+ * What is inside `#[cfg(…)]` on this line, by matching the parenthesis rather than the last `)]`
+ * on the line — `#[cfg(test)] // uses &[(u8)]` ends its attribute long before the line does.
+ */
+function cfgPredicate(line: string): string | null {
+  const open = /^\s*#\[cfg\(/.exec(line);
+  if (!open) return null;
+  let depth = 1;
+  let quote = false;
+  for (let i = open[0].length; i < line.length; i++) {
+    const ch = line[i] as string;
+    if (quote) {
+      if (ch === "\\") i += 1;
+      else if (ch === '"') quote = false;
+      continue;
+    }
+    if (ch === '"') quote = true;
+    else if (ch === "(") depth += 1;
+    else if (ch === ")") {
+      depth -= 1;
+      if (depth === 0) return line.slice(open[0].length, i);
+    }
+  }
+  return null;
+}
+
 /**
  * Lines inside a test region of a source file: Rust's `#[cfg(test)] mod tests`, Zig's
  * `test "..." {`. A definition in one is not the definition a path outside it reaches, and both
@@ -60,17 +133,13 @@ export function testRegions(lines: readonly string[]): { start: number; end: num
   const regions: { start: number; end: number }[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] as string;
-    // `#[cfg(test)]` and every predicate that reduces to it: `#[cfg(all(test, unix))]`,
-    // `#[cfg(any(test, feature = "…"))]`. Only the first form was matched, and a module behind a
-    // platform-qualified one was read as production code — its helpers became candidates and its
-    // `fn`s became definitions the applicability check resolved names against.
-    //
-    // Only what is **inside the parentheses** is read, and string literals in it are emptied
-    // first. The word alone, anywhere on the line, calls `#[cfg(unix)] // see the test in …` a
-    // test region, and `#[cfg(feature = "test-utils")]` too. `not(test)` is removed, because that
-    // attribute marks the code compiled when the tests are not.
-    const predicate = /^\s*#\[cfg\((.*)\)\]/.exec(line)?.[1] ?? "";
-    const cfgTest = /\btest\b/.test(predicate.replace(/"[^"]*"/g, '""').replace(/\bnot\s*\(\s*test\s*\)/g, ""));
+    // `#[cfg(test)]` and every predicate that can only hold under test: `#[cfg(all(test, unix))]`
+    // among them. Matching the literal first form alone read a platform-qualified test module as
+    // production code — its helpers became candidates and its `fn`s became definitions names
+    // resolved against. Looking for the word anywhere instead excluded real code:
+    // `#[cfg(any(test, feature = "production"))]` is compiled with that feature on.
+    const predicate = cfgPredicate(line);
+    const cfgTest = predicate !== null && testOnlyCfg(predicate);
     const zigTest = /^\s*test\s+("[^"]*"|[\w.]+)?\s*\{/.test(line);
     if (!cfgTest && !zigTest) continue;
     // The region is the block that opens on this line or the next one.

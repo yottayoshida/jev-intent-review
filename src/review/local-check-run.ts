@@ -143,6 +143,15 @@ export function statedClause(text: string | undefined): string | undefined {
   return flat.length > MAX_CLAUSE ? `${flat.slice(0, MAX_CLAUSE - 1)}…` : flat;
 }
 
+/**
+ * A call as the report prints it.
+ *
+ * The report is a deliverable — stdout, a file, a comment on a pull request — so an expression
+ * with a secret-shaped argument does not belong in it any more than it belongs in a request.
+ * The condition sent to the model is built from the same redacted text.
+ */
+const shown = (call: CallCandidate) => redact(call.expression).text;
+
 /** Files the requirement's own words find, most hits first. The tool's existing lexical search. */
 async function filesFor(discoverer: Discoverer, requirement: Requirement, max: number): Promise<string[]> {
   const counts = new Map<string, number>();
@@ -239,9 +248,9 @@ export async function runLocalCheck(
     }
 
     const selection = await selectSites([...sources.values()], decide, options.budget);
-    for (const p of selection.picked) picks.push({ call: p.call.expression, function: p.fn.name, ...(p.clause ? { clause: p.clause } : {}) });
-    for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: h.call.expression, origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
-    for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: o.call.expression, origin: o.origin, why: `the budget of ${options.budget} was already spent` });
+    for (const p of selection.picked) picks.push({ call: shown(p.call), function: p.fn.name, ...(p.clause ? { clause: p.clause } : {}) });
+    for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
+    for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: `the budget of ${options.budget} was already spent` });
 
     let asked = 0;
     for (const site of options.candidatesOnly ? [] : selection.budgeted) {
@@ -259,13 +268,13 @@ export async function runLocalCheck(
       // The body itself cut is not the same as its surroundings cut: an answer about a body that
       // arrived in two halves is an answer about neither of them.
       if (evidence.cut.own) {
-        unchecked.push({ file: site.fn.path, function: site.fn.name, call: site.call.expression, origin: site.origin, why: `the body of ${site.fn.name} did not fit the evidence limit, so an answer would be about part of it` });
+        unchecked.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, why: `the body of ${site.fn.name} did not fit the evidence limit, so an answer would be about part of it` });
         continue;
       }
       const body = evidence.packet.evidence.code;
       const located = locateCall(body, site.call);
       if (!located.ok) {
-        unchecked.push({ file: site.fn.path, function: site.fn.name, call: site.call.expression, origin: site.origin, why: located.reason ?? "the call could not be located in the body read here" });
+        unchecked.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, why: located.reason ?? "the call could not be located in the body read here" });
         continue;
       }
       const condition = conditionFor(site.fn, site.call);
@@ -273,7 +282,7 @@ export async function runLocalCheck(
       const answer = answers.on_error_result;
       const p = answer ? probabilityOf(answer, answer.choice) : 0;
       asked += 1;
-      observed.push({ file: site.fn.path, function: site.fn.name, call: site.call.expression, origin: site.origin, result: describe(answer, p, site.clause) });
+      observed.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, result: describe(answer, p, site.clause) });
     }
 
     out.push({
@@ -282,7 +291,7 @@ export async function runLocalCheck(
       filesOpened: opened,
       picks,
       rejectedPicks: selection.rejected,
-      wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: s.call.expression, origin: s.origin })),
+      wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
       counts: {
