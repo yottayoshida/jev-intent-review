@@ -1,0 +1,533 @@
+{
+  "question": "Is the declared referent load-bearing when the condition already stipulates what it returns?",
+  "notAFirstMeasurementOfTheComparison": "Run after #20, to settle one of the four things that run said the generated plan was missing.",
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "model": "typesafe/jev"
+  },
+  "questionVersion": "v5, the same conditions as bench/plans/three-way-A-plans.json",
+  "bar": 0.6,
+  "runs": 3,
+  "sent": {
+    "requests": 12,
+    "bytes": 34128,
+    "hardLimit": 20
+  },
+  "packets": {
+    "bac93f6ed17d": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-220",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let content = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)?;\n    let baseline: IntegrityBaseline =\n        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;\n    Ok(Some(baseline))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "bbcfcba2cda6": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-223",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let Ok(content) = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)\n    else {\n        return Ok(None);\n    };\n    let baseline: IntegrityBaseline =\n        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;\n    Ok(Some(baseline))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "0ea776ca1a13": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-331",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let content = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)?;\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        == Some(false))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "6436e0fc1888": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-333",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let Ok(content) = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES) else {\n        return Ok(false);\n    };\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        == Some(false))\n}",
+        "related": [],
+        "truncated": true
+      }
+    }
+  },
+  "log": [
+    {
+      "case": "omamori-read-baseline",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 1,
+      "truth": "returns_error",
+      "sentStateHash": "bac93f6ed17d",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "cannot_determine": 0.02,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-read-baseline",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 2,
+      "truth": "returns_error",
+      "sentStateHash": "bac93f6ed17d",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.99,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-read-baseline",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 3,
+      "truth": "returns_error",
+      "sentStateHash": "bac93f6ed17d",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 0.99,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-read-baseline",
+      "which": "mutant",
+      "branch": "m-read-baseline",
+      "commit": "bd368be1df050364b6b080c30d59d1d8fa97d6d6",
+      "run": 1,
+      "truth": "returns_success",
+      "sentStateHash": "bbcfcba2cda6",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 0,
+            "returns_success": 1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "omamori-read-baseline",
+      "which": "mutant",
+      "branch": "m-read-baseline",
+      "commit": "bd368be1df050364b6b080c30d59d1d8fa97d6d6",
+      "run": 2,
+      "truth": "returns_success",
+      "sentStateHash": "bbcfcba2cda6",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.98,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.01,
+            "returns_success": 0.98
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.98,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "omamori-read-baseline",
+      "which": "mutant",
+      "branch": "m-read-baseline",
+      "commit": "bd368be1df050364b6b080c30d59d1d8fa97d6d6",
+      "run": 3,
+      "truth": "returns_success",
+      "sentStateHash": "bbcfcba2cda6",
+      "questionsHash": "0f3e062d0231",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.01,
+            "cannot_determine": 0,
+            "returns_success": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 1,
+      "truth": "returns_error",
+      "sentStateHash": "0ea776ca1a13",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.98,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 2,
+      "truth": "returns_error",
+      "sentStateHash": "0ea776ca1a13",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.98,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "correct",
+      "branch": "correct",
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "run": 3,
+      "truth": "returns_error",
+      "sentStateHash": "0ea776ca1a13",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_success": 0.01,
+            "returns_error": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.98,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "mutant",
+      "branch": "m-raw-override",
+      "commit": "7c8ddbb68fa03569b16af04b40c8bca8e14fda57",
+      "run": 1,
+      "truth": "returns_success",
+      "sentStateHash": "6436e0fc1888",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_error": 0,
+            "cannot_determine": 0,
+            "returns_success": 1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "mutant",
+      "branch": "m-raw-override",
+      "commit": "7c8ddbb68fa03569b16af04b40c8bca8e14fda57",
+      "run": 2,
+      "truth": "returns_success",
+      "sentStateHash": "6436e0fc1888",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_error": 0,
+            "returns_success": 1,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "stops_there": 1,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "case": "omamori-raw-override-disables",
+      "which": "mutant",
+      "branch": "m-raw-override",
+      "commit": "7c8ddbb68fa03569b16af04b40c8bca8e14fda57",
+      "run": 3,
+      "truth": "returns_success",
+      "sentStateHash": "6436e0fc1888",
+      "questionsHash": "c43b9d6664cd",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 1,
+            "returns_error": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0,
+            "stops_there": 0.99
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    }
+  ]
+}
