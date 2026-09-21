@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "title": "omamori#468 / PR#476 — failure handling stated by the requirement",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    },
+    {
+      "id": "R2",
+      "text": "If reading an existing configuration file fails while checking whether a rule override disables a rule, that check must return an error to its caller. It must not return a successful result saying that the rule is not disabled.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

@@ -146,41 +146,73 @@ daily free allocation of 10,000 neurons …), so no call there carries a clause
 **引用を原文に照合する検査も要らなくなった。** モデルが断片を選ぶからこそ必要だった検査で、
 引用が要件そのものなら照合するものが無い。
 
-## 対応付けを Jev に聞いた最初の実測（2026-09-21、正例）
+## 対応付けを Jev に聞いた最初の実測（2026-09-21、正例、PR #476 の原文）
 
 ```
 asked 19, mapped 19, governed 3, findings 0
-verdicts: applies 6（うち 0.6 以上が 3）, does_not_apply 13
 ```
 
-**既知の 2 対象は、どちらも `does_not_apply`。**
+**既知の 2 対象は、どちらも `does_not_apply`**（0.51 / 0.63）。Jev が `applies` と読んだのは
+`reject_non_regular`（0.90 / 0.77）——**拒否そのもの**を行う呼び出し。原文は
+「a path omamori reads **is now refused by name**」と書いていて、拒否を受け取った側が何を返すかは
+書いていない。**関門は NOT READY、残り 4 枝は送っていない。**
 
-| 対象 | 読み | 全選択肢 |
+**この結果は変更しない。** 下は**別の評価入力**での測定で、原文の忠実な言い換えではないし、
+原文からの推論が成功したとも主張しない。
+
+## 失敗時の扱いを明示した要件での実測（2026-09-21）
+
+確かめたのは「**利用者が失敗時の扱いを明示した要件を、この CLI が検査できるか**」。
+
+入力（`bench/fixtures/omamori-468/stated-failure-handling.spec.json`、**関数名・ヘルパ名・
+call ID・期待回答は書いていない**）:
+
+> **R1** If reading an existing integrity baseline fails, the baseline-loading operation must
+> return an error to its caller. It must not return a successful result saying that no baseline
+> exists.
+>
+> **R2** If reading an existing configuration file fails while checking whether a rule override
+> disables a rule, that check must return an error to its caller. It must not return a successful
+> result saying that the rule is not disabled.
+
+**条件と期待結果は最初の 1 リクエストより前に保存した**（ツール commit `ee35665`、base は 5 枝
+とも `52a58fa`、予算 20、閾値 0.6、モデルは `typesafe/jev` のみ）。通信なしの候補確認で、
+**両対象が 5 枝 × 2 要件すべてで予算内**にあることも先に確認した。
+
+採点の単位は**要件 ID・ファイル・関数・呼び出し式**。関数名だけでは判定しない。
+
+### 結果: 10 マスすべて一致
+
+| 枝 | R1 `read_baseline` | R2 `raw_override_disables` |
 |---|---|---|
-| `read_baseline` の `read_to_string_capped` | `does_not_apply` 0.51 | applies 0.26 / unknown 0.23 |
-| `raw_override_disables` の同じ呼び出し | `does_not_apply` 0.63 | applies 0.13 / unknown 0.24 |
+| correct | 指摘なし（applies 0.97 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| m-read-baseline | **指摘あり**（applies 0.96 / **returns_success 1.00**） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| v-read-baseline | 指摘なし（applies 0.98 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
+| m-raw-override | 指摘なし（applies 0.98 / returns_error 1.00） | **指摘あり**（applies 1.00 / **returns_success 0.99**） |
+| v-raw-override | 指摘なし（applies 0.98 / returns_error 1.00） | 指摘なし（applies 1.00 / returns_error 1.00） |
 
-**関門は NOT READY。記録して止めた**——残り 4 枝は送っていない。
+**変異版はそれぞれ自分の対象にだけ指摘が出て、もう一方は静か。** 正例と挙動不変版は両方とも
+静か。**採点対象外の指摘は 0 件**（他の呼び出しには 1 件も立たなかった）。
 
-**Jev が `applies` と読んだのは、拒否そのものを行う呼び出しだった:**
+各 run は **38 要求**（19 呼び出し × 2 問）、5 枝で 190。記録は
+`bench/logs/stated-requirements-v1.json`（入力 spec・条件・全確率・全 finding・note）。
 
-| 関数 | 呼び出し | 確率 |
-|---|---|---|
-| `open_read_regular` | `reject_non_regular(&file, path)` | 0.90 |
-| `open_audit_rw` | `crate::atomic_file::reject_non_regular(&file, path)` | 0.77 |
-| `show_entries` | `open_read_nofollow(&path)` | 0.65 |
+### 関門で直したもの
 
-原文は「a path omamori reads **is now refused by name**」と書いてある。`reject_non_regular` は
-**その拒否**で、`read_baseline` は拒否を受け取る側。Jev の読みは**もっともらしい**——
-そして**この評価が置いていた前提**（2 対象が要件に支配される）と食い違う。
+正例の関門が **`requirements[0]` だけを読んでいた**。要件が 2 つある spec では R2 の対象が
+R1 の答えで採点される。要件 ID ごとに照合する形に直した。
 
-`read_baseline` は 0.51 対 0.26 で、**定まっていない**。0.05 で切れているのとは違う状態なので、
-関門は確率を全部印字する。
+もう 1 つ、**正例に対象の指摘があっても、対応付けが usable なら READY になっていた**。
+正例は他の 4 枝を比べる基準なので、そこで指摘が立っていれば表はもう壊れている。
+**両方（使える対応付け・指摘なし）**を要求する形にし、手書きのログで回帰テストにした。
 
-**この結果を「対応付けの失敗」とも「要件の正しい読み」とも採点しない。** どちらかを決めるには
-原文の読み方そのものを固定する必要があり、それはまだしていない。分かったのは、
-**原文が症状（FIFO・ディレクトリ・symlink が拒否される）を書いていて、その拒否を受け取った側が
-何を返すかは書いていない**ということ。#27 で測った 2 対象は後者にある。
+### 言えること
+
+**失敗時の扱いを明示した要件について、場所を利用者が指定せずに、既知の欠陥候補まで到達した。**
+
+これは既知の 2 対象についての採点で、1 リポジトリ・2 要件・各枝 1 回。
+`bench/logs/jev-only-v1.json` の原文による測定は NOT READY のまま残してある——
+**原文の言い換えが成功したのではなく、別の入力で成立した**ということ。
 
 ## 列挙そのものが取りこぼしている量
 
