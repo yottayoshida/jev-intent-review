@@ -464,3 +464,73 @@ test("the CLI's exit codes for bad input: help 0, bad option 10, bad number 10, 
     repo.remove();
   }
 });
+
+test("the experimental path returns a defect candidate from the command line, with no request made", async () => {
+  // The whole path from arguments to output: a repository, a diff, a requirement given as a spec,
+  // and scripted stand-ins for the three models. What is checked is the CLI's own output — the
+  // section, its five parts, and that a finding does not change the exit code.
+  const repo = tempRepo();
+  try {
+    repo.write({
+      "src/util.rs": "pub(crate) fn read_capped(path: &Path, max: u64) -> io::Result<String> {\n    Ok(String::new())\n}\n",
+      "src/integrity.rs": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let content = read_plain(base_dir)?;\n    Ok(Some(content))\n}\n",
+    });
+    const base = repo.commit("before");
+    repo.write({
+      "src/integrity.rs": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let Ok(content) = crate::util::read_capped(base_dir, MAX) else {\n        return Ok(None);\n    };\n    Ok(Some(content))\n}\n",
+    });
+    const head = repo.commit("a read that carries on");
+
+    const spec = join(repo.dir, "spec.json");
+    writeFileSync(
+      spec,
+      JSON.stringify({
+        version: 1,
+        title: "t",
+        summary: "",
+        requirements: [{ id: "R1", text: "A baseline that cannot be read is not reported as no baseline at all.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [] }],
+        nonGoals: [],
+        ambiguities: [],
+      }),
+    );
+
+    const deps: Deps = {
+      judges: () => ({
+        provider: {
+          model: "test",
+          async judge(_state: unknown, questions: Record<string, unknown>) {
+            const out: Record<string, unknown> = {};
+            for (const key of Object.keys(questions)) {
+              const choice = key === "on_error_result" ? "returns_success" : "keeps_going";
+              out[key] = { choice, confidence: 0.97, probabilities: { [choice]: 0.97 } };
+            }
+            return out;
+          },
+        } as never,
+        compiler: { name: "fake", compile: async () => { throw new Error("the compiler was not expected to run"); } } as never,
+        planner: { async pick() { return { picks: [] }; } },
+        mapper: {
+          async map(request: { callId: string }) {
+            return { raw: { callId: request.callId, verdict: "applies", quote: "cannot be read is not reported as no baseline at all", reason: "this is the read the sentence is about" } };
+          },
+        },
+        sent: () => ({ requests: 0, bytes: 0 }),
+        origin: "https://api.cloudflare.com",
+      }),
+    };
+
+    const run = io(repo.dir, CREDENTIALS);
+    const code = await main(["--experimental-local-check", "--base", base, "--head", head, "--intent-spec", spec], run.value, deps);
+    const text = run.out();
+    assert.equal(code, EXIT.ok, `a finding does not change the exit code. stderr: ${run.err()}`);
+    assert.match(text, /### Worth checking/);
+    assert.match(text, /src\/integrity\.rs · read_baseline/);
+    assert.match(text, /\*\*The requirement says\*\*: "cannot be read is not reported as no baseline at all"/);
+    assert.match(text, /\*\*Assumed\*\*: Execution reaches the call/);
+    assert.match(text, /\*\*Read as returning\*\*: returns_success \(0\.97\)/);
+    assert.match(text, /\*\*Why that disagrees\*\*:/);
+    assert.ok(!/VERIFIED/.test(text), "no requirement-level verdict is introduced here");
+  } finally {
+    repo.remove();
+  }
+});

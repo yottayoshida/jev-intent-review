@@ -17,14 +17,17 @@
 //      held, with the reason, in the report
 //   5. **one** judgment budget for the requirement, spent round-robin over functions, so neither a
 //      busy body nor a busy file can take the run
+//   6. each of those calls is put to the mapping — does the requirement require anything of it? —
+//      and where the answer is yes and the reading of the call contradicts it, the call is listed
+//      as worth checking
 //
 // Nothing in this file knows a function name, a helper name or an expected answer.
 //
-// **A local observation is not a requirement verdict.** An observation only bears on the
-// requirement when the planner said which clause governs that call; a changed line says the work
-// was done there, and resolving that a callee returns a `Result` makes a question askable. Neither
-// makes the requirement apply. The report keeps the two apart, and nothing here reports a
-// violation.
+// **A local observation is not a requirement verdict.** A changed line says the work was done
+// there; resolving that a callee returns a `Result` makes a question askable. Neither makes the
+// requirement apply — the mapping is what says that, it is asked separately, and it is never told
+// what the code does. There is no requirement-level status here and no failing exit code: a
+// finding is two readings that disagree, printed with everything needed to disagree with them.
 
 import { analyzeChange } from "../change/seeds.ts";
 import { Discoverer, requirementWords } from "../discovery/discover.ts";
@@ -37,6 +40,7 @@ import { applicabilityOf, type Applicability } from "../plan/applicability.ts";
 import { listingFor, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, conditionFor, describe, locateCall, questionsFor, type LocalResult } from "../plan/local-check.ts";
+import { checkMapping, type Mapper, type Mapping } from "../plan/mapping.ts";
 import { selectSites, type FunctionOrigin, type Pick, type Site, type SiteSource } from "../plan/select.ts";
 import { probabilityOf } from "./requirement.ts";
 
@@ -81,6 +85,30 @@ export interface Unchecked {
   why: string;
 }
 
+/**
+ * Something for a person to look at: a requirement read as governing this call, and an observation
+ * that contradicts it.
+ *
+ * It is a candidate, not a verdict. Two model answers stand behind it — one about what the
+ * sentence requires, one about what the function returns — and neither is checked by the other.
+ * Everything a reader needs to disagree with it is in the record: which words, which code, what
+ * was assumed, what was read, and why those two are taken to disagree.
+ */
+export interface Finding {
+  requirementId: string;
+  file: string;
+  function: string;
+  call: string;
+  /** From the requirement's own text, checked to be in it. */
+  quote: string;
+  reason: string;
+  /** The condition that was assumed when the function was read. */
+  condition: string;
+  observation: LocalResult["observation"];
+  probability: number;
+  disagreement: string;
+}
+
 export interface LocalCheckResult {
   requirementId: string;
   requirementText: string;
@@ -99,6 +127,9 @@ export interface LocalCheckResult {
   wouldAsk: { file: string; function: string; call: string; origin: Site["origin"] }[];
   observed: Observed[];
   unchecked: Unchecked[];
+  /** Calls that were observed but carry no usable mapping: not applicable, not settled, not answered. */
+  unmapped: Unchecked[];
+  findings: Finding[];
   /** The set and the budget, so a report never leaves the size of either to be guessed. */
   counts: {
     budget: number;
@@ -106,6 +137,7 @@ export interface LocalCheckResult {
     calls: number;
     applicable: number;
     asked: number;
+    mapped: number;
     overBudget: number;
     notApplicable: number;
   };
@@ -177,6 +209,7 @@ export async function runLocalCheck(
   revisions: LocalCheckRevisions,
   requirements: readonly Requirement[],
   planner: Planner,
+  mapper: Mapper,
   judge: JudgmentProvider,
   include: (path: string) => boolean,
   options: LocalCheckOptions = DEFAULT_LOCAL_CHECK,
@@ -213,6 +246,8 @@ export async function runLocalCheck(
     const picks: LocalCheckResult["picks"] = [];
     const observed: Observed[] = [];
     const unchecked: Unchecked[] = [];
+    const unmapped: Unchecked[] = [];
+    const findings: Finding[] = [];
 
     // The change's sources are shared between requirements, so each requirement gets its own
     // shallow copy to hang its picks on.
@@ -252,7 +287,10 @@ export async function runLocalCheck(
     for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
     for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: `the budget of ${options.budget} was already spent` });
 
+    // Every call this run offers the mapping. A mapping naming anything else is refused.
+    const offered = new Set(selection.budgeted.map((s) => s.call.id));
     let asked = 0;
+    let mapped = 0;
     for (const site of options.candidatesOnly ? [] : selection.budgeted) {
       const candidate: Candidate = {
         path: site.fn.path,
@@ -278,11 +316,51 @@ export async function runLocalCheck(
         continue;
       }
       const condition = conditionFor(site.fn, site.call);
+
+      // The mapping is asked **before** the judgment and is given no part of it. An answer that
+      // knew what the code does would be free to agree with it, and the whole value of the link is
+      // that it is about the sentence rather than about the code's behaviour.
+      const answered = await mapper.map({
+        requirementId: requirement.id,
+        requirementText: requirement.text,
+        callId: site.call.id,
+        call: condition.operation.replace(/`/g, ""),
+        function: site.fn.name,
+        body,
+      });
+      mapped += 1;
+      const place = { file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin };
+      let mapping: Mapping | undefined;
+      if (answered.failed) unmapped.push({ ...place, why: `the mapping was not answered (${answered.failed})` });
+      else {
+        const checked = checkMapping(answered.raw, { callIds: offered, requirementId: requirement.id, requirementText: requirement.text });
+        if (!checked.ok) unmapped.push({ ...place, why: `the mapping was refused: ${checked.reason}` });
+        else if (checked.mapping.verdict !== "applies") unmapped.push({ ...place, why: `the mapping says the requirement ${checked.mapping.verdict === "does_not_apply" ? "does not govern this call" : "does not settle this call"}: ${checked.mapping.reason}` });
+        else mapping = checked.mapping;
+      }
+
       const answers = await judge.judge(evidence.packet, questionsFor(condition));
       const answer = answers.on_error_result;
       const p = answer ? probabilityOf(answer, answer.choice) : 0;
       asked += 1;
-      observed.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, result: describe(answer, p, site.clause) });
+      const result = describe(answer, p, site.clause);
+      observed.push({ ...place, result });
+
+      // A finding needs both halves: a requirement that governs this call, and an observation that
+      // contradicts what it requires. Either alone is not one, and neither is a reading below the
+      // bar — that is an unread answer, not a disagreement.
+      if (mapping && result.observation === "returns_success") {
+        findings.push({
+          requirementId: requirement.id,
+          ...place,
+          quote: mapping.quote,
+          reason: mapping.reason,
+          condition: `${condition.setup} ${condition.occurrence}, ${condition.operation} returns ${condition.yields}. ${condition.others}`,
+          observation: result.observation,
+          probability: result.probability,
+          disagreement: `the requirement is read as requiring that this failure not come back as a success, and \`${site.fn.name}\` was read as returning one`,
+        });
+      }
     }
 
     out.push({
@@ -294,12 +372,15 @@ export async function runLocalCheck(
       wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
+      unmapped,
+      findings,
       counts: {
         budget: options.budget,
         functions: selection.functions,
         calls: selection.widened.length,
         applicable: selection.applicable.length,
         asked,
+        mapped,
         overBudget: selection.overBudget.length,
         notApplicable: selection.held.length,
       },
@@ -317,7 +398,13 @@ const ORIGIN_WORDS: Record<Site["origin"], string> = {
   calls_changed: "in a function that calls one the change touched",
 };
 
-/** The report. Observations first, then what was not checked and why; never a violation verdict. */
+/**
+ * The report: what is worth checking, then what was observed, then what was not checked and why.
+ *
+ * No requirement-level verdict appears anywhere in it. A finding is about one call, and it is
+ * printed as two model readings that disagree, with everything needed to disagree with them —
+ * not as this tool concluding that a requirement is violated.
+ */
 export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
   const lines: string[] = ["# Local check (experimental)", "", `Each line is one call, under the condition that the call fails. The bar is ${BAR}.`, "", "**A local observation is not a statement about the requirement.** It bears on the requirement only where the plan said which clause governs that call; everything else is an observation about code.", ""];
   for (const r of results) {
@@ -326,6 +413,19 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
     lines.push(`Files the requirement's words opened: ${r.filesOpened.join(", ") || "none"}`);
     lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those, ${c.functions.picked} only the plan named.`);
     lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} asked, ${c.overBudget} left over, ${c.notApplicable} not applicable.`, "");
+
+    if (r.findings.length > 0) {
+      lines.push("### Worth checking", "", "Each of these is a requirement read as governing a call, and a reading of that call that contradicts it. **Two model answers stand behind each one, and neither checks the other** — what follows is everything needed to disagree with it.", "");
+      for (const f of r.findings) {
+        lines.push(`#### ${f.file} · ${f.function} — \`${f.call}\``);
+        lines.push(`- **The requirement says**: "${f.quote}"`);
+        lines.push(`- **Read as governing this call because**: ${f.reason}`);
+        lines.push(`- **Assumed**: ${f.condition}`);
+        lines.push(`- **Read as returning**: ${f.observation} (${f.probability.toFixed(2)})`);
+        lines.push(`- **Why that disagrees**: ${f.disagreement}`, "");
+      }
+    }
+
     if (r.observed.length === 0) {
       lines.push("_Nothing was asked._", "");
       // Only the ones that are not already below with a reason of their own. A budgeted call every
@@ -346,6 +446,10 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
       lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
       lines.push(`  - when that call fails: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
       lines.push(`  - ${bears}`);
+    }
+    if (r.unmapped.length > 0) {
+      lines.push("", "### Read, but not answered against the requirement", "");
+      for (const u of r.unmapped) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\`: ${u.why}`);
     }
     if (r.unchecked.length > 0) {
       lines.push("", "### Not checked", "");
