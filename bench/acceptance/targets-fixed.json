@@ -167,6 +167,31 @@
         "source": "bound.call0()?",
         "why": "the Python call the constraint comes from; not changed and calls nothing the pull request changed"
       }
+    },
+    "pybun-428": {
+      "repo": "https://github.com/VOID-TECHNOLOGY-INC/PyBun",
+      "pr": 428,
+      "license": "MIT",
+      "base": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "A": {
+        "file": "src/build.rs",
+        "function": "collect_inputs_recursive",
+        "source": "entry.file_type().map_err(...)?",
+        "why": "the call the pull request made propagate; its callee is the standard library's, with no definition in the repository (grep)"
+      },
+      "B": {
+        "file": "src/build.rs",
+        "function": "collect_build_inputs",
+        "source": "collect_inputs_recursive(project_root, &ignore, &mut inputs)?",
+        "why": "an unchanged caller of the changed collect_inputs_recursive"
+      },
+      "C": {
+        "file": "src/build.rs",
+        "function": "collect_inputs_recursive",
+        "source": "(none: every read in this walk is in the changed function)",
+        "why": "no function outside the diff reads directory entries for the build inputs; C is not placed in this case"
+      }
     }
   }
 }

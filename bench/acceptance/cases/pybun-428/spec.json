@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "VOID-TECHNOLOGY-INC/PyBun#428 — failure handling stated by the pull request",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}
