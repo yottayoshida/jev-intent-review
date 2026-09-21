@@ -9,8 +9,15 @@ questions and their criteria as sent, the meaning table and the bar, and for eve
 code, its hash, what was written down beforehand, every answer unrounded, the verdict and the
 reason. Nothing is summarised. A claim in the prose can be recomputed rather than trusted.
 
+`diff-reach-v1.json` is the exception and says so in its row: a run of the whole CLI holds every
+call it enumerated, which is 235 KB per branch, and five of those would be more than this
+directory is for. It keeps every answer unrounded and every count, and drops the text of the calls
+it never asked about. The table below is also not a full index — several logs written after it are
+not in it.
+
 | file | experiment | runs | what it establishes |
 |---|---|---|---|
+| `diff-reach-v1.json` | `--experimental-local-check`, five branches of omamori `#468` | 5 | The diff reaches both target calls inside a budget of 20 on every branch, and the answers match what the program does in ten cells of ten. **Distilled**: counts, notes, the budgeted set and every observation with its probability — not the 700-odd calls that were held. |
 | `local-check.json` | `bench/local-check.ts` | 18 | The first plan on `collect_listing`: 18/18 as written down beforehand. |
 | `local-check-propagation.json` | `bench/local-check-propagation.ts` | 18 | The same plan on the `show_entries` read loop: 12/18, and the six that miss are the shipped behaviour. |
 | `stated-condition.json` | `bench/local-check-stated-condition.ts` | 24 | The 2×2. The wording decides, not the code form. |

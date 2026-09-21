@@ -1,0 +1,1853 @@
+{
+ "what": "From a pull requests diff to observations about particular calls, on omamori#468 / PR#476 and four one-file branches built on its shipped head.",
+ "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+ "baseIs": "the commit PR#476 was squashed onto; the same base for every branch, so no diff points at a mutation on its own",
+ "requirement": {
+  "id": "R1",
+  "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+  "kind": "behavior",
+  "priority": "required",
+  "sourceRefs": [],
+  "searchHints": []
+ },
+ "settings": {
+  "budget": 20,
+  "maxFiles": 2,
+  "maxPrimaryChars": 8000,
+  "maxRelatedChars": 0,
+  "bar": 0.6
+ },
+ "targets": [
+  "read_baseline",
+  "raw_override_disables"
+ ],
+ "plannerNote": "Every run recorded picks: [] with no reason; the run that exposed why came after the accounts daily free allocation was spent, and reports 429. Whether the planner declined or failed during the five measured runs is not recorded — which is what the note added here exists to stop.",
+ "branches": {
+  "correct": {
+   "head": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "probe": {
+    "read_baseline": "Err",
+    "raw_override_disables": "Err"
+   },
+   "candidatesOnly": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 0,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "notes": [
+     "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+     "src/config.rs: 61 calls were left out of the listing by its cap",
+     "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+     "src/integrity.rs: 80 calls were left out of the listing by its cap",
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+     "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+     "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+     "the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent"
+    ],
+    "inBudget": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "verify_chain",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed"
+     }
+    ]
+   },
+   "run": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 19,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "filesOpened": [
+     "src/audit/mod.rs",
+     "src/actions.rs"
+    ],
+    "picks": [],
+    "notes": [
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "src/actions.rs: 1 calls were left out of the listing the planner chose from"
+    ],
+    "uncheckedByKind": {
+     "callee_unresolved": 283,
+     "callee_not_result": 84,
+     "target_not_result": 328,
+     "callee_ambiguous": 7,
+     "over_budget": 17,
+     "body_did_not_fit": 1
+    },
+    "observed": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.98,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.88,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.96,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.62,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.86,
+      "bearsOnRequirement": false
+     }
+    ]
+   }
+  },
+  "m-read-baseline": {
+   "head": "0a3b5a003d85a7a7878278e2d5ea39f7dd3ed22e",
+   "probe": {
+    "read_baseline": "Ok(None)",
+    "raw_override_disables": "Err"
+   },
+   "candidatesOnly": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 0,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "notes": [
+     "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+     "src/config.rs: 61 calls were left out of the listing by its cap",
+     "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+     "src/integrity.rs: 80 calls were left out of the listing by its cap",
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+     "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+     "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+     "the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent"
+    ],
+    "inBudget": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "verify_chain",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed"
+     }
+    ]
+   },
+   "run": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 19,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "filesOpened": [
+     "src/audit/mod.rs",
+     "src/actions.rs"
+    ],
+    "picks": [],
+    "notes": [
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "src/actions.rs: 1 calls were left out of the listing the planner chose from"
+    ],
+    "uncheckedByKind": {
+     "callee_unresolved": 283,
+     "callee_not_result": 84,
+     "target_not_result": 328,
+     "callee_ambiguous": 7,
+     "over_budget": 17,
+     "body_did_not_fit": 1
+    },
+    "observed": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.98,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.73,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.94,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.83,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.94,
+      "bearsOnRequirement": false
+     }
+    ]
+   }
+  },
+  "v-read-baseline": {
+   "head": "8eeae676f97312fd9fcbc8c5f9542f8de706eb20",
+   "probe": {
+    "read_baseline": "Err",
+    "raw_override_disables": "Err"
+   },
+   "candidatesOnly": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 738,
+     "applicable": 37,
+     "asked": 0,
+     "overBudget": 17,
+     "notApplicable": 701
+    },
+    "notes": [
+     "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+     "src/config.rs: 61 calls were left out of the listing by its cap",
+     "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+     "src/integrity.rs: 80 calls were left out of the listing by its cap",
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+     "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+     "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+     "the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent"
+    ],
+    "inBudget": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "verify_chain",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed"
+     }
+    ]
+   },
+   "run": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 738,
+     "applicable": 37,
+     "asked": 19,
+     "overBudget": 17,
+     "notApplicable": 701
+    },
+    "filesOpened": [
+     "src/audit/mod.rs",
+     "src/actions.rs"
+    ],
+    "picks": [],
+    "notes": [
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "src/actions.rs: 1 calls were left out of the listing the planner chose from"
+    ],
+    "uncheckedByKind": {
+     "callee_unresolved": 282,
+     "callee_not_result": 84,
+     "target_not_result": 328,
+     "callee_ambiguous": 7,
+     "over_budget": 17,
+     "body_did_not_fit": 1
+    },
+    "observed": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.94,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.97,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.98,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.89,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.9,
+      "bearsOnRequirement": false
+     }
+    ]
+   }
+  },
+  "m-raw-override": {
+   "head": "659f6b598346cf8bfce731bff3ceb9702eb650a0",
+   "probe": {
+    "read_baseline": "Err",
+    "raw_override_disables": "Ok(false)"
+   },
+   "candidatesOnly": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 0,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "notes": [
+     "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+     "src/config.rs: 61 calls were left out of the listing by its cap",
+     "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+     "src/integrity.rs: 80 calls were left out of the listing by its cap",
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+     "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+     "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+     "the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent"
+    ],
+    "inBudget": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "verify_chain",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed"
+     }
+    ]
+   },
+   "run": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 739,
+     "applicable": 37,
+     "asked": 19,
+     "overBudget": 17,
+     "notApplicable": 702
+    },
+    "filesOpened": [
+     "src/audit/mod.rs",
+     "src/actions.rs"
+    ],
+    "picks": [],
+    "notes": [
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "src/actions.rs: 1 calls were left out of the listing the planner chose from"
+    ],
+    "uncheckedByKind": {
+     "callee_unresolved": 283,
+     "callee_not_result": 84,
+     "target_not_result": 328,
+     "callee_ambiguous": 7,
+     "over_budget": 17,
+     "body_did_not_fit": 1
+    },
+    "observed": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.98,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.83,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.95,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.7,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.89,
+      "bearsOnRequirement": false
+     }
+    ]
+   }
+  },
+  "v-raw-override": {
+   "head": "16ecbdf6825ff3b1eb126a47d3ba644762f4dc4d",
+   "probe": {
+    "read_baseline": "Err",
+    "raw_override_disables": "Err"
+   },
+   "candidatesOnly": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 740,
+     "applicable": 37,
+     "asked": 0,
+     "overBudget": 17,
+     "notApplicable": 703
+    },
+    "notes": [
+     "src/cli/config_cmd.rs: 29 calls were left out of the listing by its cap",
+     "src/config.rs: 61 calls were left out of the listing by its cap",
+     "src/engine/shim.rs: 46 calls were left out of the listing by its cap",
+     "src/integrity.rs: 80 calls were left out of the listing by its cap",
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "src/audit/verify.rs: 33 calls were left out of the listing by its cap",
+     "src/cli/install.rs: 7 calls were left out of the listing by its cap",
+     "src/cli/status.rs: 5 calls were left out of the listing by its cap",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "84 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+     "the planner was not consulted (candidates only), so no call carries a clause and the picks that would share this budget are absent"
+    ],
+    "inBudget": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed"
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "verify_chain",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed"
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed"
+     }
+    ]
+   },
+   "run": {
+    "counts": {
+     "budget": 20,
+     "functions": {
+      "picked": 0,
+      "changed": 23,
+      "calls_changed": 20
+     },
+     "calls": 740,
+     "applicable": 37,
+     "asked": 19,
+     "overBudget": 17,
+     "notApplicable": 703
+    },
+    "filesOpened": [
+     "src/audit/mod.rs",
+     "src/actions.rs"
+    ],
+    "picks": [],
+    "notes": [
+     "2 changed files are not Rust and were not read for candidates (this path reads Rust)",
+     "only the first 12 of 23 changed functions had their callers looked up",
+     "29 more callers were found than the cap of 20 functions allows",
+     "src/actions.rs: 1 calls were left out of the listing the planner chose from"
+    ],
+    "uncheckedByKind": {
+     "callee_unresolved": 284,
+     "callee_not_result": 84,
+     "target_not_result": 328,
+     "callee_ambiguous": 7,
+     "over_budget": 17,
+     "body_did_not_fit": 1
+    },
+    "observed": [
+     {
+      "file": "src/atomic_file.rs",
+      "function": "open_read_regular",
+      "call": "reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/atomic_file.rs",
+      "function": "read_to_string_capped",
+      "call": "open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "read_secret",
+      "call": "open_read_nofollow(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_read_nofollow",
+      "call": "crate::atomic_file::open_read_regular(path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "open_audit_rw",
+      "call": "crate::atomic_file::reject_non_regular(&file, path)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.98,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_disable",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "load_config",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.86,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_rule_names",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "read_raw_rule_state",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/config.rs",
+      "function": "raw_override_disables",
+      "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "generate_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_success",
+      "probability": 0.95,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/integrity.rs",
+      "function": "read_baseline",
+      "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+      "origin": "changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/mod.rs",
+      "function": "append",
+      "call": "open_audit_rw(&self.path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/secret.rs",
+      "function": "rotate_key_locked",
+      "call": "read_secret(&secret_path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "activate",
+      "call": "write_state(&state)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 1,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_rule",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/break_glass.rs",
+      "function": "clear_all",
+      "call": "remove_state_file()",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.99,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/cli/config_cmd.rs",
+      "function": "run_override_command",
+      "call": "run_override_disable(rule_name)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.73,
+      "bearsOnRequirement": false
+     },
+     {
+      "file": "src/audit/verify.rs",
+      "function": "show_entries",
+      "call": "open_read_nofollow(&path)",
+      "origin": "calls_changed",
+      "observation": "returns_error",
+      "probability": 0.89,
+      "bearsOnRequirement": false
+     }
+    ]
+   }
+  }
+ },
+ "note": "The judged runs and the candidates-only pass were taken from two builds: the review fixes landed between them. The set and every count are identical across both passes, checked branch by branch; what the later build adds is the notes (the per-function cap had been dropping 261 calls in silence)."
+}

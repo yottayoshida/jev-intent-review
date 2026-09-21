@@ -13,6 +13,7 @@
 // observation about one call is not a statement about the requirement. `describe` below keeps the
 // two apart.
 
+import { redact } from "../evidence/redact.ts";
 import type { ChoiceAnswer } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
 
@@ -47,13 +48,20 @@ export interface Condition {
  *
  * `setup` names the call and quotes no line: a line number and a source line are the two things a
  * change moves, and a condition has to hold across the versions being compared (`#22`).
+ *
+ * The expression is redacted. A request carries the packet and the questions, and only the packet
+ * was being cleaned — so a call with a secret-shaped argument went out in the one field nothing
+ * touched. `locateCall` searches with the same redacted text, so the two still agree, and when
+ * redaction makes two calls in a body identical its uniqueness check withholds rather than
+ * guessing which was meant.
  */
 export function conditionFor(fn: FunctionCandidate, call: CallCandidate): Condition {
+  const expression = redact(call.expression).text;
   return {
     target: fn.name,
-    setup: `Execution reaches the call \`${call.expression}\` inside \`${fn.name}\`.`,
+    setup: `Execution reaches the call \`${expression}\` inside \`${fn.name}\`.`,
     occurrence: "There",
-    operation: `\`${call.expression}\``,
+    operation: `\`${expression}\``,
     yields: "an error",
     others: "Every other operation the function reaches succeeds.",
     extra: "",
@@ -85,7 +93,10 @@ export const questionsFor = (c: Condition) =>
 export function locateCall(body: string, call: CallCandidate): { ok: boolean; found: number; reason?: string } {
   if (!call.expressionComplete) return { ok: false, found: 0, reason: `the call does not close its parentheses within the scan, so it cannot be pointed at` };
   const flat = body.replace(/\s+/g, " ");
-  const needle = call.expression.replace(/\s+/g, " ");
+  // The body is the packet's, which is redacted; the expression is as the file has it. A call with
+  // a long opaque argument matched nothing, and the reason given for withholding was "this version
+  // moved it" — a true-sounding sentence about the wrong thing.
+  const needle = redact(call.expression).text.replace(/\s+/g, " ");
   let found = 0;
   for (let i = flat.indexOf(needle); i >= 0; i = flat.indexOf(needle, i + 1)) found += 1;
   if (found === 0) return { ok: false, found, reason: `\`${needle}\` is not in this version of ${call.functionId}` };

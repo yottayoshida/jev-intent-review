@@ -55,6 +55,17 @@ test("each call knows which function it is in", () => {
   assert.ok(call.line >= target.startLine && call.line <= target.endLine);
 });
 
+test("an id carries its file, so two files' candidates never collide", () => {
+  // A selection used to come from one file at a time, and `function-1` was enough. Once the diff
+  // contributes candidates from every changed file, a bare id makes one file's pick resolve
+  // against another file's listing, and dedup by id merges two different calls into one.
+  const a = enumerate("src/a.rs", SOURCE);
+  const b = enumerate("src/b.rs", SOURCE);
+  assert.match(a.functions[0]!.id, /^src\/a\.rs:/);
+  assert.equal(new Set([...a.calls, ...b.calls].map((k) => k.id)).size, a.calls.length + b.calls.length);
+  assert.equal(new Set([...a.functions, ...b.functions].map((f) => f.id)).size, a.functions.length + b.functions.length);
+});
+
 test("the listing carries ids and nothing invented", () => {
   const l = listingFor(c);
   assert.deepEqual(new Set(l.functions.map((f) => f.id)), new Set(c.functions.map((f) => f.id)));

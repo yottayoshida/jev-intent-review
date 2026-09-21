@@ -42,7 +42,7 @@ Pick the calls the requirement is about, not every call in the file, and not onl
 
 export function modelPlanner(client: CloudflareClient) {
   return {
-    async pick(input: { requirement: string; file: string; listing: ReturnType<typeof listingFor> }): Promise<{ picks: Pick[]; notCovered?: string[] }> {
+    async pick(input: { requirement: string; file: string; listing: ReturnType<typeof listingFor> }): Promise<{ picks: Pick[]; notCovered?: string[]; failed?: string }> {
       const body = {
         messages: [
           { role: "system", content: INSTRUCTIONS },
@@ -55,10 +55,12 @@ export function modelPlanner(client: CloudflareClient) {
       try {
         const answer = readModelJson(await client.post({ model: COMPILER_MODEL, input: body }, { timeoutMs: 120_000, maxRetries: 1 })) as { picks?: Pick[]; notCovered?: string[] };
         return { picks: (answer.picks ?? []).slice(0, MAX_PICKS), ...(answer.notCovered ? { notCovered: answer.notCovered } : {}) };
-      } catch {
-        // A planner that cannot answer selects nothing; the run says so rather than failing the
-        // whole review, and the requirement is reported with no observation.
-        return { picks: [] };
+      } catch (error) {
+        // A planner that cannot answer selects nothing, and the run goes on with whatever else
+        // found candidates rather than failing the whole review. But an empty list of picks and a
+        // failed request are different things, and a report that shows both as "no call carries a
+        // clause" is a silent refusal wearing the clothes of a decision. So say which it was.
+        return { picks: [], failed: error instanceof Error ? error.message : String(error) };
       }
     },
   };

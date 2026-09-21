@@ -166,6 +166,26 @@ test("a definition inside a test region is not one a path outside it reaches", (
   assert.deepEqual(new BlockIndex(rust).testRegions, [{ start: 5, end: 10 }], "the index carries them");
 });
 
+test("a cfg is a test region only when it cannot hold outside the tests", () => {
+  // Matching only the literal `#[cfg(test)]` read one of omamori's modules as production code:
+  // its helpers became candidates to ask about, and its `fn`s became definitions the applicability
+  // check resolved names against. Looking for the word anywhere on the line went too far the other
+  // way and deleted real code, which is the worse mistake — nothing reports what is not there.
+  for (const attribute of ["#[cfg(test)]", "#[cfg(all(test, unix))]", "#[cfg(all(unix, any(test, all(test, windows))))]", "#[cfg(test)] // uses &[(u8)]"]) {
+    const lines = [attribute, "mod tests {", "    fn helper() {}", "}", "pub fn production() {}"];
+    assert.deepEqual(testRegions(lines), [{ start: 1, end: 4 }], attribute);
+  }
+  for (const line of [
+    '#[cfg(any(test, feature = "production"))]', // with that feature on, this is an ordinary build
+    '#[cfg(feature = "test-utils")]', // a feature named after tests is not the tests
+    "#[cfg(not(test))]", // the code compiled when the tests are not
+    "#[cfg(unix)] // see the test in tests/foo.rs", // the word, but not in the predicate
+    "#[cfg(target_os = \"linux\")]",
+  ]) {
+    assert.deepEqual(testRegions([line, "mod m {", "    pub fn real() {}", "}"]), [], line);
+  }
+});
+
 test("a line that only closes brackets belongs to the block it closes", () => {
   const rust = ["mod tests {", "    #[test]", "    fn works() {", "        check(1);", "    }", "}"];
   const block = enclosingBlock(rust, 5);

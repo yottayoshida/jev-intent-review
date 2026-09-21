@@ -165,7 +165,14 @@ for (const c of CASES) {
   const aCall = aTarget ? candidates.calls.find((k) => k.functionId === aTarget.id && k.callee.endsWith(c.humanCallee)) : undefined;
   const aPlan: TypedPlan | null = aTarget && aCall ? { property: "call_failure_not_returned_as_success", targetId: aTarget.id, failure: { kind: "call_result", callId: aCall.id, result: "err" }, notCovered: ["every other call site of the same helper", "what the callers do with either answer"] } : null;
 
-  const bPlan = dry ? { property: "call_failure_not_returned_as_success", targetId: "function-1", failure: { kind: "call_result", callId: "call-1", result: "err" } } : await generate(c.id, c.file, candidates);
+  // The dry run stands in for the model with the first ids of this listing. They are read from the
+  // listing rather than written out: ids carry their file now, so a spelled-out `function-1` would
+  // stop resolving and the dry run would quietly report a plan that failed its check.
+  const first = candidates.calls[0];
+  if (dry && !first) throw new Error(`${c.file} at ${shipped} has no call to stand in for the model's pick`);
+  const bPlan = dry
+    ? { property: "call_failure_not_returned_as_success", targetId: first!.functionId, failure: { kind: "call_result", callId: first!.id, result: "err" } }
+    : await generate(c.id, c.file, candidates);
   console.log(`   B picked: ${JSON.stringify(bPlan).slice(0, 200)}`);
 
   for (const [method, plan] of [["A", aPlan] as const, ["B", bPlan] as const]) {

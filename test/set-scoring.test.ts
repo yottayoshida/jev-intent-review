@@ -6,6 +6,8 @@ import { test } from "node:test";
 import { BlockIndex } from "../src/change/blocks.ts";
 import { enumerate } from "../src/plan/candidates.ts";
 import { applicabilityOf } from "../src/plan/applicability.ts";
+import { locateCall } from "../src/plan/local-check.ts";
+import { redact } from "../src/evidence/redact.ts";
 import type { Discoverer } from "../src/discovery/discover.ts";
 import { reachesTheDefect, scoreSet, type SiteOutcome } from "../bench/set-scoring.ts";
 
@@ -128,6 +130,22 @@ test("dropping hard candidates cannot improve a score, because nothing is droppe
   const reach = { call: true, functionOnly: false };
   assert.notEqual(scoreSet(withHard, reach).sites, scoreSet(trimmed, reach).sites);
   assert.equal(scoreSet(withHard, reach).right, scoreSet(trimmed, reach).right);
+});
+
+test("a call with an opaque argument is found in the redacted body it is judged in", () => {
+  // The body handed to the model has been through redaction; the call expression has not. A long
+  // hex argument made the two disagree, and the site was withheld with "this version moved it" —
+  // a reason that is about the wrong thing, and says nothing about redaction.
+  const opaque = `pub fn load(path: &Path) -> Result<String, AppError> {
+    let content = read_capped(path, "0123456789abcdef0123456789abcdef0123456789abcdef")?;
+    Ok(content)
+}
+`;
+  const call = enumerate("src/opaque.rs", opaque).calls.find((k) => k.callee === "read_capped")!;
+  assert.match(call.expression, /0123456789abcdef/, "the expression is as the file has it");
+  const body = redact(opaque).text;
+  assert.match(body, /REDACTED LONG STRING/, "the body the model sees is not the file");
+  assert.equal(locateCall(body, call).ok, true);
 });
 
 test("a signature that wraps is still read as returning a Result", async () => {

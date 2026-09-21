@@ -7,6 +7,12 @@ The requirement, quoted from [PR #476](https://github.com/yottayoshida/omamori/p
 
 Base commit `44f534ca0ae5088f7038561ad33363b48f7a3390`. Every patch applies cleanly to it, checked.
 
+They apply cleanly to **`e58c04f6df082146969320b91f09aa7a0123ac1f`** too — the commit PR #476 was
+squashed onto main as — and that is the base the CLI measurement uses, because a run that starts
+from the diff needs the same base for every branch. Starting a mutant's diff at the shipped code
+would hand the search the mutated line and nothing else. The table below was **taken again** at
+that commit with the same two probes, and every cell holds (`bench/logs/diff-reach-v1.json`).
+
 | patch | target | what it does |
 |---|---|---|
 | `m-read-baseline.patch` | `integrity::read_baseline` | the read failure becomes `Ok(None)` — a baseline that cannot be read comes back as "there is no baseline" |

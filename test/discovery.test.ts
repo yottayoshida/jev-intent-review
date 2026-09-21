@@ -255,6 +255,24 @@ test("a name defined twice makes its callers' context unreliable, and the eviden
   }
 });
 
+test("a file excluded by name is not read, whichever way its path arrived", async () => {
+  // `redact.ts` states it: files are excluded by name before they are read. That held because
+  // every path reaching `index` had come through `search`, which filters. A path can now arrive
+  // from the diff instead, filtered by the configuration's include list alone.
+  const repo = tempRepo();
+  try {
+    repo.write({ "src/a.rs": "pub fn run() {\n    go();\n}\n", "secrets.rs": "pub fn key() -> &'static str {\n    \"x\"\n}\n" });
+    const sha = repo.commit("one ordinary file and one named like a secret");
+    const git = await Git.open(repo.dir);
+    const d = new Discoverer(git, sha, { include: () => true, maxCandidates: 30, lexicalSearch: true, referenceSearch: true });
+    assert.notEqual(await d.index("src/a.rs"), null, "an ordinary file is read");
+    assert.equal(await d.index("secrets.rs"), null, "a file excluded by name is not, even asked for directly");
+    assert.equal((await git.readText(sha, "secrets.rs")) !== null, true, "and it is there to be read — the refusal is the name rule, not a missing file");
+  } finally {
+    repo.remove();
+  }
+});
+
 test("a second definition inside a test region does not make the evidence ambiguous", async () => {
   // Rust and Zig keep their tests in the files they test. Counting a `deinit` written in one as
   // another definition of the production name voided the answers about the production path; on

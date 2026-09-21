@@ -14,8 +14,16 @@
 // test code is out for the same reason it is out of `realDefinitions`.
 
 import { blockEnd, definedName, testRegions } from "../change/blocks.ts";
+import { redact } from "../evidence/redact.ts";
 
 export interface FunctionCandidate {
+  /**
+   * Unique across the repository, not just within the file: `src/config.rs:function-3`.
+   *
+   * A bare `function-1` was enough while a selection came from one file at a time. It is not once
+   * the diff contributes candidates from every changed file — two files' `call-1` would dedup
+   * against each other, and one file's pick would silently resolve against another's listing.
+   */
   id: string;
   path: string;
   name: string;
@@ -150,7 +158,7 @@ export function enumerate(path: string, source: string): Candidates {
     // `blockEnd` indexes `lines` from 0 and answers from 0; `BlockIndex.enclosing` counts lines
     // from 1. Passing one to the other returns the line after the signature as the whole function.
     const endLine = blockEnd(lines, startLine - 1) + 1;
-    functions.push({ id: `function-${functions.length + 1}`, path, name, startLine, endLine, signature: signatureAt(lines, startLine, endLine) });
+    functions.push({ id: `${path}:function-${functions.length + 1}`, path, name, startLine, endLine, signature: signatureAt(lines, startLine, endLine) });
   }
 
   const calls: CallCandidate[] = [];
@@ -175,7 +183,7 @@ export function enumerate(path: string, source: string): Candidates {
         // offset into this line, which is where the window starts.
         const window = lines.slice(l - 1, Math.min(fn.endLine, l + 5)).join("\n");
         const expression = callExpression(window, m.index);
-        calls.push({ id: `call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee, expression: expression.text, expressionComplete: expression.complete });
+        calls.push({ id: `${path}:call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee, expression: expression.text, expressionComplete: expression.complete });
         taken += 1;
       }
     }
@@ -184,11 +192,18 @@ export function enumerate(path: string, source: string): Candidates {
   return { path, functions, calls, omitted: { functions: omittedFunctions, calls: omittedCalls } };
 }
 
-/** The listing a model chooses from: ids and nothing it could not have seen in the file. */
+/**
+ * The listing a model chooses from: ids and nothing it could not have seen in the file.
+ *
+ * Source text goes out over the network here, so it is redacted on the way, the same as the
+ * evidence packets are. A listing is a few hundred trimmed lines of a file, which is exactly where
+ * a key assigned to a constant would sit — and the planner has no use for the value either way.
+ */
 export function listingFor(c: Candidates): { functions: { id: string; name: string; lines: string; signature: string }[]; calls: { id: string; in: string; line: number; text: string }[]; omitted: Candidates["omitted"] } {
+  const clean = (text: string) => redact(text).text;
   return {
-    functions: c.functions.map((f) => ({ id: f.id, name: f.name, lines: `${f.startLine}-${f.endLine}`, signature: f.signature })),
-    calls: c.calls.map((k) => ({ id: k.id, in: k.functionId, line: k.line, text: k.text })),
+    functions: c.functions.map((f) => ({ id: f.id, name: f.name, lines: `${f.startLine}-${f.endLine}`, signature: clean(f.signature) })),
+    calls: c.calls.map((k) => ({ id: k.id, in: k.functionId, line: k.line, text: clean(k.text) })),
     omitted: c.omitted,
   };
 }
