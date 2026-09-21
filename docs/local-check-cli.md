@@ -82,6 +82,14 @@ branch with the real Jev read nine sibling calls under each of the two requireme
 `does_not_apply` (0.72–1.00), and listed none (`bench/logs/beyond-diff-jev-v1.json`, 112 questions,
 62 seconds). That case has no defect in a sibling, so nothing there says whether one is listed.
 
+**On the cases it was not tuned on**, the siblings were frozen before the acceptance set below was
+opened (`a76c152`). The set's one defect in a function the change did not touch and that calls
+nothing it touched (moltis#1064, place C) is in `generate_title` — the function the changed code
+calls, not another caller of it. The siblings do not read a seed's own body, so it was not
+enumerated (`bench/logs/acceptance-37-v1.json`, no request sent); had it been, its call names a
+trait method defined 34 times in that repository, which is held before any question. The set has
+no defect in a sibling, so the siblings are still unmeasured on unseen code.
+
 ## Reading the output
 
 ```

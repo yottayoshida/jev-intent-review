@@ -1,0 +1,68 @@
+{
+  "what": "issue #37 on the acceptance set of #36: the one defect there in a function the change did not touch and that calls nothing it touched (moltis-1064, place C). No request sent: a target that is not enumerated is settled before any question, as bench/acceptance/README.md scores it. Distilled from the command's JSON: the seeds, the counts, the notes, and every listed or held call in the target's function (none).",
+  "tool": {
+    "commit": "a76c152",
+    "note": "the siblings frozen before the acceptance cases were opened; src/ at this commit hashes to tool.newSrcDigest in bench/logs/beyond-diff-v1.json"
+  },
+  "command": "jev-intent-review --experimental-local-check --experimental-candidates-only --base <defect-C base> --head <defect-C head> --intent-spec bench/acceptance/cases/moltis-1064/spec.json --json, in a clone built by bench/acceptance/build-branches.sh",
+  "case": "moltis-1064",
+  "version": "defect-C",
+  "base": "d07c04faef9832e01f17967fc9903c4a0a9915e2",
+  "head": "3e35d5175e2f0fe27db7259f2741a97f0d424527",
+  "target": {
+    "requirementId": "R1",
+    "file": "crates/agents/src/title.rs",
+    "function": "generate_title",
+    "call": "complete(&messages, &[])"
+  },
+  "stage": "not_enumerated",
+  "why": "the target is in generate_title, the function the changed code calls (the seed), not in another caller of it; a sibling is another caller, and the seed's own body is not read. No cap note names the target's file.",
+  "nextWall": "were generate_title read, its call complete(...) names a trait method defined 34 times outside tests at this head (git grep 'fn complete' at the head), so applicability would hold it as callee_ambiguous before any question",
+  "seeds": [
+    "generate_title"
+  ],
+  "counts": {
+    "budget": 20,
+    "functions": {
+      "changed": 6,
+      "calls_changed": 3
+    },
+    "calls": 170,
+    "applicable": 2,
+    "asked": 0,
+    "mapped": 0,
+    "governed": 0,
+    "overBudget": 0,
+    "notApplicable": 168,
+    "beyond": {
+      "budget": 10,
+      "seeds": 1,
+      "functions": 0,
+      "calls": 0,
+      "applicable": 0,
+      "asked": 0,
+      "mapped": 0,
+      "governed": 0,
+      "overBudget": 0,
+      "notApplicable": 0
+    }
+  },
+  "targetFunctionInWouldAsk": [],
+  "targetFunctionInUnchecked": [],
+  "siblings": [],
+  "notes": [
+    "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+    "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+    "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+    "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+    "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+    "the callers of register were not followed (more references than the search returns)",
+    "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+    "siblings: 17 names the changed code calls have no definition here, so a call to them cannot be asked about: and_then, as_deref, as_ref, context, first, and 12 more",
+    "siblings: 8 names the changed code calls are defined more than once here: as_str, broadcast, context_window, set_model, supports_tools, and 3 more",
+    "siblings: 6 names the changed code calls do not return a Result: compute_auto_compact_threshold, estimate_text_tokens, get, list_models, saturating_add, and 1 more",
+    "siblings: 3 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, handle_title, try_generate_title_if_needed",
+    "siblings: 18 names are called only in the change's tests: allow, cfg, connect, contains, empty, and 13 more",
+    "siblings: 1 changed functions have a name defined more than once here, so calling that name does not keep a function from being a sibling: register"
+  ]
+}
