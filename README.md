@@ -15,7 +15,8 @@ A run that lists nothing is not a claim that the requirement holds — see
 
 ## Install
 
-Not on npm yet. From a clone:
+Not on npm yet. Take `jev-intent-review-0.1.0.tgz` from
+[Releases](https://github.com/yottayoshida/jev-intent-review/releases), or build it from a clone:
 
 ```
 $ npm install && npm run build && npm pack
