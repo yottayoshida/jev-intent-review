@@ -17,7 +17,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import type * as Main from "../../src/cli/main.ts";
 import type * as Client from "../../src/judgments/client.ts";
@@ -169,8 +169,11 @@ function distil(r: LocalCheck.LocalCheckResult) {
 async function measure(id: string, clone: string, limit: number) {
   const d = await dist();
   const self = await d.git.Git.open(join(HERE, "..", ".."));
-  // The log names the commit it was taken at; a working tree with changes would make that a lie.
-  if ((await self.text(["status", "--porcelain"])).trim() !== "") throw new Error("the working tree has uncommitted changes; commit them first so the log's tool commit is the code that ran");
+  // The log names the commit its source was built from; changes beside the log itself would make that
+  // untrue. The log is left out: measuring a second case, or resuming, writes to it before any commit.
+  // What runs is the build in dist/, which this does not check — build from the committed source.
+  const dirty = (await self.text(["status", "--porcelain", "--", ".", `:(exclude)${relative(join(HERE, "..", ".."), LOG)}`])).trim();
+  if (dirty !== "") throw new Error(`the working tree has uncommitted changes besides the log; commit them first:\n${dirty}`);
   const c = readCase(id);
   const log: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
   const toolCommit = (await self.text(["rev-parse", "HEAD"])).trim();

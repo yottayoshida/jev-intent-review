@@ -343,7 +343,8 @@
     },
     "rulingAtCap": {
       "when": "2026-09-21, after the cap of 40 was reached with two cases passing",
-      "ruling": "The owner chose to measure the two cases that passed every condition (moltis#1064, grovedb#500) rather than stop or raise the cap again. The target of three is not met, and the documents say so."
+      "ruling": "The owner chose to measure the two cases that passed every condition (moltis#1064, grovedb#500) rather than stop or raise the cap again. The target of three is not met, and the documents say so.",
+      "recorded": "after the measurement, in the commit that corrected the first review; the ruling itself was given before the first request"
     }
   }
 }

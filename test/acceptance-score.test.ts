@@ -193,6 +193,11 @@ test("one repository, no target outside the diff, fewer than three runs, zero ru
   extra.cases[1]!.versions.other = version({ A: "not_listed" });
   assert.throws(() => render(extra.cases, extra.log, candidates), /in the log and not in case\.json/);
 
+  // A case the log measured whose case.json is missing, or not marked unseen, would leave the table unseen.
+  const orphan = good();
+  orphan.cases[1] = { ...orphan.cases[1]!, role: "regression" };
+  assert.throws(() => render(orphan.cases, orphan.log, candidates), /has no case\.json marked unseen/);
+
   const moved = good();
   moved.log.cases.two!.versions.shipped!.base = "c".repeat(40);
   assert.throws(() => render(moved.cases, moved.log, candidates), /case\.json says/);

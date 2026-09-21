@@ -26,7 +26,9 @@ A case is kept only if all four hold:
 The set is the first three that pass, from at least two repositories. If twenty examined
 candidates do not yield three, the work stops there and says so, and goes on only on the owner's
 ruling, recorded in `candidates.json` (`gateExtension`). This set went on twice: the cap was raised to
-forty, and at forty, with two cases passing, the owner chose to measure those two. Candidates that fail are counted:
+forty, and at forty, with two cases passing, the owner chose to measure those two. (The clause
+about the owner's ruling and the sentence after it were added after the measurement; the rulings
+they describe were given before the first request.) Candidates that fail are counted:
 how often a real repository's failure handling fits v0.1's question is itself a result.
 
 The same requirement on another function does not count as a second requirement. A case that is

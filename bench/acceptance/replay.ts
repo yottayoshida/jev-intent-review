@@ -73,6 +73,9 @@ function result(row: Row): string {
 export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidates: Candidates): string {
   const measured = cases.filter((c) => c.role === "unseen");
   for (const c of measured) if (!log.cases[c.id]) throw new ScoringError(`${c.id} is an unseen case with no measurement in the log`);
+  for (const id of Object.keys(log.cases)) {
+    if (!measured.some((c) => c.id === id)) throw new ScoringError(`${id} is measured in the log but has no case.json marked unseen, so it would drop out of the table unseen`);
+  }
   const repos = new Set(measured.map((c) => c.repo));
   if (repos.size < 2) throw new ScoringError(`the log covers ${repos.size} repository, and the claim needs two or more`);
 

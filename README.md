@@ -49,7 +49,7 @@ Suppose the PR correctly fixes one path, but an unchanged caller still converts 
 
 `jev-intent-review` is meant to surface that call even though the call itself is outside the diff.
 
-In v0.1 that is a goal, not yet a result. v0.1 lists the callers one hop out of the functions a change touched, so such a caller can be asked about — but on the real repositories measured so far that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question: a `Result` alias, a callee signature wrapped past what v0.1 reads, and a per-function cap each stopped it first. See [what has been measured](docs/local-check-cli.md#what-has-been-measured).
+In v0.1 that is a goal, not yet a result. v0.1 lists the callers one hop out of the functions a change touched, so such a caller can be asked about — but among the real pull requests examined so far that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question: a `Result` alias, a callee signature wrapped past what v0.1 reads, and a per-function cap each stopped it first. See [what has been measured](docs/local-check-cli.md#what-has-been-measured).
 
 A finding contains the requirement, the relevant code, the assumed failure, and the typed judgments that caused it to be listed.
 

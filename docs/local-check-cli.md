@@ -94,7 +94,8 @@ name (`CostResult`), or it never entered the tool's listing at all — a cap on 
 methods the listing does not read in one case, a change the tool reports as touching no Rust
 function in another. Three of the eight were settled from the definitions of the callee, the count
 `applicabilityOf` uses, without running the tool. The twelfth, iota#10136, was not run through the
-tool: building it for a probe is far outside a one-crate test. Of the three, two could be built and
+tool: cloning its 470 MB monorepo to run the pre-check, and building it for a probe, are both far
+outside a one-crate test. Of the three, two could be built and
 run to observe the defect; the third needs a WebAssembly toolchain to build at all. At forty
 candidates, the cap, the owner chose to measure the two rather than stop
 (`bench/acceptance/candidates.json`, `gateExtension`).
@@ -141,9 +142,9 @@ What it shows, and no more than that:
   fixed call could be asked, the call from the unchanged caller to the changed function reached no
   question in any: held for the alias here, held for a callee signature wrapped past four lines in
   Kontor#385, and dropped by the forty-call cap of its function in grovedb#500
-  (`bench/acceptance/precheck-shipped.json`). The unchanged caller itself is reached: in grovedb#500
-  three other calls in it were asked about in every run, and read as not governed by the
-  requirement.
+  (`bench/acceptance/precheck-shipped.json`). In grovedb#500 the unchanged caller itself was
+  reached: three other calls in it were asked about in every run, and read as not governed by the
+  requirement. In moltis#1064 and Kontor#385 every call in it was held before a question.
 - **Jev reads through a helper it was not shown.** With the decision moved into a helper whose body
   was not sent, Jev answered `returns_error` at 0.92–0.96 in every run of both cases. The helpers do
   pass the failure through, so the reading happens to be right, but nothing Jev was sent
