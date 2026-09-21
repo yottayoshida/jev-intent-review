@@ -1,0 +1,1928 @@
+{
+  "tool": {
+    "name": "jev-intent-review",
+    "version": "0.0.0",
+    "commit": "556c134615c63704c75d04fd5da3a7769b48a234",
+    "jevModel": "typesafe/jev",
+    "planningAndReviewModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+  },
+  "plans": {
+    "comparison": {
+      "planVersion": "1",
+      "writtenAt": "2026-09-20",
+      "note": "Written and committed before any request of this comparison. The frozen experiment spec is docs/frozen-spec-v1.md; nothing in it is changed here.",
+      "purpose": "Whether the verification plan a person has been writing can be generated instead, and whether the arrangement earns its keep against an ordinary LLM review.",
+      "methods": {
+        "A": {
+          "what": "the hand-written plan + Jev",
+          "measures": "whether a fit plan lets a new target be observed and judged at all"
+        },
+        "B": {
+          "what": "a generated plan + Jev",
+          "measures": "whether choosing the target, the condition and the dependency from the requirement can be automated"
+        },
+        "C": {
+          "what": "an ordinary LLM review",
+          "measures": "whether separating the plan from the local judgment buys anything in quality or cost"
+        }
+      },
+      "sameModelForBandC": "@cf/meta/llama-3.3-70b-instruct-fp8-fast — the model the tool already uses to write requirements (`COMPILER_MODEL`), on the same endpoint, so requests and bytes are counted by `CloudflareClient.sent` for every method.",
+      "whatBandCMayNotSee": "The hand-written plan, the mutation labels, which branch a packet came from, and the expected answers. B receives the requirement text, the repository at the commit, and the target file; C receives the same plus the code.",
+      "cases": [
+        {
+          "id": "omamori-read-baseline",
+          "repository": "yottayoshida/omamori",
+          "base": "the commit at the time of writing, recorded by the runner",
+          "file": "src/integrity.rs",
+          "symbol": "read_baseline",
+          "neededReferents": [
+            "read_to_string_capped"
+          ],
+          "requirement": {
+            "id": "omamori#468 / PR#476",
+            "primarySource": "https://github.com/yottayoshida/omamori/pull/476",
+            "quote": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+            "issue": "https://github.com/yottayoshida/omamori/issues/468",
+            "correspondence": "`read_baseline` distinguishes `Ok(None)` — there is no baseline — from an `Err` — the baseline is there and could not be read. It reaches that through `crate::atomic_file::read_to_string_capped(&path, …)?`, which is the shared helper PR #476 introduced; `git log -S` puts the `?` in the commit that closed #468."
+          },
+          "usageHistory": "Neither the requirement nor the function has been used in any bench.",
+          "mutations": {
+            "target": "`let Ok(content) = read_to_string_capped(&path, …) else { return Ok(None) };` — a baseline that cannot be read comes back as 'there is no baseline'.",
+            "behaviourPreserving": "the parsed value returned inline instead of through a binding",
+            "dependency": null
+          }
+        },
+        {
+          "id": "omamori-raw-override-disables",
+          "repository": "yottayoshida/omamori",
+          "file": "src/config.rs",
+          "symbol": "raw_override_disables",
+          "neededReferents": [
+            "read_to_string_capped"
+          ],
+          "requirement": {
+            "id": "omamori#468 / PR#476",
+            "primarySource": "https://github.com/yottayoshida/omamori/pull/476",
+            "quote": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file.",
+            "correspondence": "The same helper, at the config path. A config that cannot be read must not read as 'this rule is not disabled'. #468 lists `.config/omamori/config.toml` among the paths that hang, and `config` among the callers that had their own check."
+          },
+          "usageHistory": "Neither the requirement nor the function has been used in any bench.",
+          "disclosure": "Same requirement and same callee as the case above, different function. Two of the three cases therefore share a source; this is disclosed rather than presented as three independent requirements.",
+          "secondFailureKind": "The function also swallows a TOML parse failure on purpose (`let Ok(value) = toml::from_str… else { return Ok(false) }`). The condition names the read, as in the earlier work, so the parse path is excluded by 'every other operation the function reaches succeeds'.",
+          "mutations": {
+            "target": "`let Ok(content) = read_to_string_capped(path, …) else { return Ok(false) };` — a config that cannot be read comes back as 'not disabled'.",
+            "behaviourPreserving": "`== Some(false)` written as `.is_some_and(|b| !b)`",
+            "dependency": null
+          }
+        },
+        {
+          "id": "lkr-custom-keychain-open",
+          "repository": "yottayoshida/llm-key-ring",
+          "file": "crates/lkr-core/src/custom_keychain.rs",
+          "symbol": "open",
+          "neededReferents": [
+            "keychain_path"
+          ],
+          "requirement": {
+            "id": "llm-key-ring PR#3 item 1-2",
+            "primarySource": "https://github.com/yottayoshida/llm-key-ring/pull/3",
+            "quote": "`keychain_path()` returns `Error::Keychain` when `$HOME` unset (was silent `\".\"` fallback)",
+            "correspondence": "`open()` reaches the caller through `let path = keychain_path()?;`. The requirement is about the callee, and `open` keeping it means not substituting a path of its own. `git log -S` puts that `?` in the commit of PR #3."
+          },
+          "usageHistory": "A different repository, and neither the requirement nor the function has been used in any bench.",
+          "mutations": {
+            "target": "`let path = keychain_path().unwrap_or_else(|_| PathBuf::from(\".\"));` — the silent `.` fallback the pull request removed, put back.",
+            "behaviourPreserving": "the `map_err` message built with a positional argument instead of an inline one",
+            "dependency": null
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "id": "correct",
+          "what": "as shipped",
+          "property": "holds"
+        },
+        {
+          "id": "target-mutant",
+          "what": "the mutation above",
+          "property": "breaks"
+        },
+        {
+          "id": "variant",
+          "what": "the behaviour-preserving change",
+          "property": "holds"
+        },
+        {
+          "id": "evidence-missing",
+          "what": "the needed referent taken out of the packet",
+          "property": "withheld locally, no request"
+        }
+      ],
+      "localVerificationBeforeAnyRequest": "Each mutation is a one-commit change on an isolated clone, and `cargo test` is run on every branch. A mutation that does not change what a test observes is not a mutation, and the case is dropped rather than measured. The counts go in the log.",
+      "localVerificationResult": {
+        "note": "Recorded after building the branches and before any request of this comparison. The case list above is left as written; this is the clause above being applied, not the plan being changed.",
+        "lkr-custom-keychain-open": {
+          "adopted": false,
+          "why": "The mutated branch cannot be reached on this machine, so the difference cannot be shown by running anything. `cargo test --workspace` is 100 passed / 0 failed on all three branches — the silent `.` fallback is caught by none of them. A probe run with `env -u HOME` then showed why: `home::home_dir()` falls back to the password database on macOS, so `keychain_path()` returns `Ok(/Users/…/Library/Keychains/lkr.keychain-db)` with `$HOME` unset, and `open()` returns `Ok` on the shipped branch, the mutant and the variant alike.",
+          "whatThatAlsoSays": "The requirement's own sentence — \"`keychain_path()` returns `Error::Keychain` when `$HOME` unset\" — does not reproduce here. That is a finding about the requirement text, recorded rather than worked around, and it is why no mutation of this function could be demonstrated.",
+          "notDone": "No attempt was made to force `home::home_dir()` to fail. Faking the failure would measure a case the repository cannot reach, which is what dropping it avoids.",
+          "cost": "The comparison loses its second repository. Two of the three cases remain, and they share a requirement source, which is already disclosed above."
+        }
+      },
+      "scoring": {
+        "perCase": [
+          "violation found: the property-breaking condition judged `property_breaks` at or over the bar",
+          "false violation: a holding condition judged `property_breaks`",
+          "missed: a breaking condition judged `property_holds`",
+          "undecided: anything else, including withheld",
+          "coverage: which clause of the requirement the plan claims, and what it leaves unchecked",
+          "human repair: for B, whether the generated plan needed a person to touch it before it could run at all — and a plan that picked the wrong target or dropped a needed condition counts as B failing, not as a case removed from B's score"
+        ],
+        "notCounted": "The number of VERIFIED. A method that withholds is not thereby worse than one that guesses."
+      },
+      "requestBudget": {
+        "runsPerCell": 3,
+        "A": "3 cases × 3 sending conditions × 3 runs = 27",
+        "B": "3 plan generations + at most 27 judgments = 30",
+        "C": "3 cases × 4 conditions × 3 runs = 36",
+        "total": 93,
+        "hardLimit": 130,
+        "maxRetries": 0,
+        "cost": "Workers AI bills by neuron and the REST answer does not carry a price. Requests and bytes are recorded for every method, plan generation included, and no yen figure is claimed."
+      },
+      "decisionsFixedBeforeTheRun": [
+        "A fails on the new targets → look again at what can be observed at all; that is not a failure of plan generation.",
+        "A passes and B does not → name which judgment the generated plan was missing.",
+        "B passes with no human repair → connect a limited requirement kind to the CLI.",
+        "C wins on quality and cost → reconsider the arrangement that puts Jev under a plan."
+      ],
+      "outOfScope": [
+        "Changing runReview, the report format or the thresholds.",
+        "The default `as-is` packet under v4.",
+        "Any requirement kind outside Rust failure propagation."
+      ]
+    },
+    "comparisonHash": "3449be327273",
+    "aPlans": {
+      "planVersion": "1",
+      "writtenAt": "2026-09-21",
+      "note": "Method A's plans: what a person decided, written and committed before any request of the comparison. Method B never sees this file — it is the thing B is being compared against.",
+      "questionVersion": "v5 (bench/check-questions-v5.ts). The frozen v4 hard-codes an iterator's shape ('at one iteration', a `finite` field) and neither new target iterates, so the template had to give up one field. Recorded in the spec's own terms: the frozen question did not travel to the first new kind it met, and v4's numbers are not v5's.",
+      "whoDecidedWhat": {
+        "requirement and its quote": "person (from the primary source, before the cases were built)",
+        "target file and symbol": "person",
+        "the failing operation": "person",
+        "the condition": "person",
+        "needed referents": "person",
+        "what is out of scope": "person",
+        "the mutations and their expected behaviour": "person, verified by running the code",
+        "the answer for any packet": "the model, never the person"
+      },
+      "regression": {
+        "why": "v5 is a different wording, so the case v4 met its exit condition on is measured again rather than carried over.",
+        "case": "omamori#553 R2 × `staging_info_from`, from bench/fixtures/omamori-553-r2/",
+        "conditions": [
+          "correct",
+          "target-mutant"
+        ],
+        "condition": {
+          "target": "staging_info_from",
+          "setup": "`dir` is a path and the function has just been entered.",
+          "occurrence": "At one iteration",
+          "operation": "the iterator `entries`",
+          "yields": "`Err(io_error)`",
+          "others": "Every other operation the function reaches succeeds.",
+          "extra": "The iterator is finite."
+        },
+        "neededReferents": [
+          "collect_listing"
+        ],
+        "expected": {
+          "correct": "returns_error",
+          "target-mutant": "returns_success"
+        }
+      },
+      "cases": [
+        {
+          "id": "omamori-read-baseline",
+          "file": "src/integrity.rs",
+          "symbol": "read_baseline",
+          "neededReferents": [
+            "read_to_string_capped"
+          ],
+          "condition": {
+            "target": "read_baseline",
+            "setup": "`base_dir` is a directory, and the baseline file under it exists.",
+            "occurrence": "When it is called",
+            "operation": "`crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)`",
+            "yields": "`Err(io_error)`",
+            "others": "Every other operation the function reaches succeeds.",
+            "extra": ""
+          },
+          "whyThatOperation": "It is the only call in the function that can fail with an io error, and it is the one PR #476 routed through the shared helper. The `path.exists()` check above it is why the condition says the file exists — without that, the function returns `Ok(None)` before reaching the read, for a reason that is not the one under test.",
+          "notCovered": [
+            "Every other caller of `read_to_string_capped`, and the other paths #468 lists (`audit.jsonl.hwm`, `break-glass.json`, `config.toml`).",
+            "Whether `write_baseline` refuses the same way.",
+            "What the callers of `read_baseline` do with either answer.",
+            "The JSON parse failure below the read, which the condition excludes."
+          ]
+        },
+        {
+          "id": "omamori-raw-override-disables",
+          "file": "src/config.rs",
+          "symbol": "raw_override_disables",
+          "neededReferents": [
+            "read_to_string_capped"
+          ],
+          "condition": {
+            "target": "raw_override_disables",
+            "setup": "`path` names a file that exists.",
+            "occurrence": "When it is called",
+            "operation": "`crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)`",
+            "yields": "`Err(io_error)`",
+            "others": "Every other operation the function reaches succeeds.",
+            "extra": ""
+          },
+          "whyThatOperation": "Same helper, at the config path, which #468 lists among the ones that hang. The function also swallows a TOML parse failure on purpose; 'every other operation the function reaches succeeds' keeps that path out, as the condition did for the parse failure in the earlier work.",
+          "notCovered": [
+            "The deliberate swallow of a TOML parse failure, which is not a defect and is excluded by the condition.",
+            "`config enable`'s redirect, which is what the function's doc comment says the answer is for.",
+            "The two sibling functions in the same file with the same shape — grep found three call sites of this helper with `?` in `config.rs`.",
+            "Every other path #468 lists."
+          ]
+        }
+      ],
+      "sharedSource": "Both cases come from omamori#468 / PR#476. The third case, in another repository, was dropped in #19 because its mutated branch is unreachable on this machine. Two cases from one requirement is thinner than intended and is disclosed rather than presented as two independent requirements."
+    },
+    "aPlansHash": "2f61b2a58f35"
+  },
+  "questionVersion": "v5",
+  "bar": 0.6,
+  "generatedPlans": {
+    "omamori-read-baseline": {
+      "needed_referents": [],
+      "not_covered": [],
+      "occurrence": "When it is called",
+      "operation": "crate::atomic_file::read_to_string_capped",
+      "others": "Every other operation the function reaches succeeds.",
+      "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+      "symbol": "read_to_string_capped",
+      "yields": "an error instead of hanging the process, reading through to a link target, or a默",
+      "sourceChars": 21308,
+      "wholeFileChars": 155991,
+      "truncated": false
+    },
+    "omamori-raw-override-disables": {
+      "needed_referents": [],
+      "not_covered": [],
+      "occurrence": "When it is called",
+      "operation": "fs::read_to_string",
+      "others": "Every other operation the function reaches succeeds.",
+      "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+      "symbol": "load_config",
+      "yields": "a refusal by name instead of hanging the process, reading through to a link, or ",
+      "sourceChars": 44265,
+      "wholeFileChars": 99547,
+      "truncated": false
+    }
+  },
+  "runs": 3,
+  "sent": {
+    "requests": 50,
+    "bytes": 208659,
+    "hardLimit": 130
+  },
+  "packets": {
+    "47a9303fe3b6": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-761",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = crate::util::collect_listing(entries).map_err(|stop| {\n        StagingUnreadable::new(\n            \"listing_stopped\",\n            format!(\n                \"the listing of {} stopped after {} entries: {}\",\n                dir.display(),\n                stop.seen.len(),\n                stop.err\n            ),\n        )\n    })?;\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "b6bbff9c710a": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/cli/doctor.rs",
+        "lines": "699-754",
+        "symbol": "staging_info_from",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "fn staging_info_from(\n    dir: &Path,\n    entries: impl Iterator<Item = std::io::Result<std::ffi::OsString>>,\n) -> Result<StagingInfo, StagingUnreadable> {\n    let names = match crate::util::collect_listing(entries) {\n        Ok(names) => names,\n        Err(stop) => stop.seen,\n    };\n\n    let now = std::time::SystemTime::now();\n    let mut count = 0u64;\n    let mut bytes = 0u64;\n    let mut oldest_mtime: Option<std::time::SystemTime> = None;\n\n    for name in names {\n        // Named first, stat second: a file that is not a staging file says\n        // nothing about staging, whatever state it is in.\n        if !crate::engine::hook::is_staging_filename(&name.to_string_lossy()) {\n            continue;\n        }\n        let path = dir.join(&name);\n        let m = match std::fs::symlink_metadata(&path) {\n            Ok(m) => m,\n            // Pruned between the listing and this stat.\n            Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,\n            Err(e) => {\n                return Err(StagingUnreadable::new(\n                    \"entry_unreadable\",\n                    format!(\"{}: {e}\", path.display()),\n                ));\n            }\n        };\n        if !m.is_file() {\n            continue;\n        }\n        count += 1;\n        bytes += m.len();\n        let mtime = m.modified().unwrap_or(now);\n        oldest_mtime = Some(match oldest_mtime {\n            Some(prev) if prev < mtime => prev,\n            _ => mtime,\n        });\n    }\n\n    let oldest_days_ago = oldest_mtime.and_then(|mt| {\n        let mt_jd = crate::util::system_time_utc_julian_day(mt)?;\n        let today_jd = OffsetDateTime::now_utc().date().to_julian_day();\n        Some(i64::from(today_jd - mt_jd))\n    });\n\n    Ok(StagingInfo {\n        file_count: count,\n        total_bytes: bytes,\n        oldest_days_ago,\n    })\n}",
+        "related": [
+          {
+            "path": "src/util.rs",
+            "lines": "317-328",
+            "code": "pub(crate) fn collect_listing(\n    entries: impl Iterator<Item = std::io::Result<OsString>>,\n) -> Result<Vec<OsString>, ListingStopped> {\n    let mut seen = Vec::new();\n    for entry in entries {\n        match entry {\n            Ok(name) => seen.push(name),\n            Err(err) => return Err(ListingStopped { seen, err }),\n        }\n    }\n    Ok(seen)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "f6bd3b2b899b": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-220",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let content = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)?;\n    let baseline: IntegrityBaseline =\n        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;\n    Ok(Some(baseline))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "4bbb46084b24": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-223",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let Ok(content) = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)\n    else {\n        return Ok(None);\n    };\n    let baseline: IntegrityBaseline =\n        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;\n    Ok(Some(baseline))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "778f1cee5595": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-221",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let content = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)?;\n    Ok(Some(\n        serde_json::from_str::<IntegrityBaseline>(&content)\n            .map_err(|e| AppError::Config(e.to_string()))?,\n    ))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "bac93f6ed17d": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "211-220",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<IntegrityBaseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let content = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)?;\n    let baseline: IntegrityBaseline =\n        serde_json::from_str(&content).map_err(|e| AppError::Config(e.to_string()))?;\n    Ok(Some(baseline))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "567898e813f2": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-331",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let content = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)?;\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        == Some(false))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "ca32f82e9bef": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-333",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let Ok(content) = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES) else {\n        return Ok(false);\n    };\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        == Some(false))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "5bf230c4641d": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-331",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let content = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)?;\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        .is_some_and(|enabled| !enabled))\n}",
+        "related": [
+          {
+            "path": "src/atomic_file.rs",
+            "lines": "220-234",
+            "code": "pub(crate) fn read_to_string_capped(path: &Path, max_bytes: u64) -> io::Result<String> {\n    use std::io::Read;\n    let file = open_read_regular(path)?;\n    let mut buf = String::new();\n    io::BufReader::new(file)\n        .take(max_bytes.saturating_add(1))\n        .read_to_string(&mut buf)?;\n    if buf.len() as u64 > max_bytes {\n        return Err(io::Error::new(\n            io::ErrorKind::InvalidData,\n            format!(\"{} exceeds {max_bytes} bytes\", path.display()),\n        ));\n    }\n    Ok(buf)\n}"
+          }
+        ],
+        "truncated": true
+      }
+    },
+    "0ea776ca1a13": {
+      "requirement": {
+        "id": "omamori#468 / PR#476",
+        "text": "A FIFO, directory or symlink planted at a path omamori reads is now refused by name instead of hanging the process, reading through to a link target, or being silently treated as an empty file."
+      },
+      "candidate": {
+        "path": "src/config.rs",
+        "lines": "318-331",
+        "symbol": "raw_override_disables",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub(crate) fn raw_override_disables(path: &Path, name: &str) -> Result<bool, AppError> {\n    if !path.exists() {\n        return Ok(false);\n    }\n    let content = crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)?;\n    let Ok(value) = toml::from_str::<toml::Value>(&content) else {\n        return Ok(false);\n    };\n    Ok(value\n        .get(\"overrides\")\n        .and_then(|o| o.get(name))\n        .and_then(|v| v.as_bool())\n        == Some(false))\n}",
+        "related": [],
+        "truncated": true
+      }
+    }
+  },
+  "log": [
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-correct",
+      "run": 1,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_error",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "47a9303fe3b6",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "keeps_going": 0,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-correct",
+      "run": 2,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_error",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "47a9303fe3b6",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0.01,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-correct",
+      "run": 3,
+      "commit": "916d954607f1f22a4326feb59c76c2197f540bc9",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_error",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "47a9303fe3b6",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.99,
+            "cannot_determine": 0.01,
+            "returns_success": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 1,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-mutant",
+      "run": 1,
+      "commit": "5db81ec5ee79e5206d18403cbf9b45f49233f401",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_success",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "b6bbff9c710a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.77,
+          "probabilities": {
+            "returns_error": 0.08,
+            "cannot_determine": 0.08,
+            "returns_success": 0.84
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.82,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "keeps_going": 0.11,
+            "stops_there": 0.88
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.84,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-mutant",
+      "run": 2,
+      "commit": "5db81ec5ee79e5206d18403cbf9b45f49233f401",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_success",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "b6bbff9c710a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.83,
+          "probabilities": {
+            "returns_error": 0.05,
+            "returns_success": 0.88,
+            "cannot_determine": 0.07
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.81,
+          "probabilities": {
+            "keeps_going": 0.12,
+            "stops_there": 0.87,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.88,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "regression",
+      "case": "staging_info_from",
+      "branch": "r-mutant",
+      "run": 3,
+      "commit": "5db81ec5ee79e5206d18403cbf9b45f49233f401",
+      "note": "v5 on the case v4 was measured on",
+      "truth": "returns_success",
+      "questionsHash": "0ee243d2939f",
+      "sentStateHash": "b6bbff9c710a",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.8,
+          "probabilities": {
+            "returns_error": 0.06,
+            "cannot_determine": 0.07,
+            "returns_success": 0.87
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.86,
+          "probabilities": {
+            "stops_there": 0.91,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.08
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.87,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 1,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "f6bd3b2b899b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.95,
+          "probabilities": {
+            "returns_success": 0.01,
+            "returns_error": 0.96,
+            "cannot_determine": 0.03
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0.02,
+            "stops_there": 0.97
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.96,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 2,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "f6bd3b2b899b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "stops_there": 0.97,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.02
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 3,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "f6bd3b2b899b",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.95,
+          "probabilities": {
+            "returns_error": 0.97,
+            "cannot_determine": 0.02,
+            "returns_success": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0.01,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 1,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "f6bd3b2b899b",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the file without checking if the path is a FIFO, directory, or symlink, which could cause the process to hang or read through to a link target, violating the requirement."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 2,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "f6bd3b2b899b",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` calls `open_read_regular` which does not check if the path is a FIFO, directory, or symlink, and may hang or read through to a link target, instead of refusing by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 3,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "f6bd3b2b899b",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` calls `open_read_regular` which does not check if the path is a FIFO, directory, or symlink, and thus may hang the process or read through to a link target instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 1,
+      "commit": "c77cf04840642afa80f21721a83abf6cc46ff260",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "4bbb46084b24",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.01,
+            "returns_success": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 2,
+      "commit": "c77cf04840642afa80f21721a83abf6cc46ff260",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "4bbb46084b24",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.01,
+            "returns_success": 0.99,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 3,
+      "commit": "c77cf04840642afa80f21721a83abf6cc46ff260",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "4bbb46084b24",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.98,
+          "probabilities": {
+            "returns_error": 0.01,
+            "cannot_determine": 0,
+            "returns_success": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "keeps_going": 0.01,
+            "stops_there": 0.98
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 1,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "4bbb46084b24",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` calls `open_read_regular` which does not check if the path is a FIFO, directory, or symlink, and may hang or read through to a link target, instead of refusing by name."
+      },
+      "right": true
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 2,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "4bbb46084b24",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` calls `open_read_regular`, which is not shown, but the name suggests it may not check the file type. If it doesn't, and the file is a FIFO, directory, or symlink, this code may hang or read through to the link target, violating the requirement."
+      },
+      "right": true
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "run": 3,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "4bbb46084b24",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` calls `open_read_regular` which is not shown, but the name suggests it may not check the file type. If it doesn't, and the function proceeds to read from a FIFO, directory, or symlink, it may hang the process or read through to a link target, violating the requirement."
+      },
+      "right": true
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 1,
+      "commit": "885e523db1519f07b706e59ada673b40c373e615",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "778f1cee5595",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_error": 0.97,
+            "cannot_determine": 0.02,
+            "returns_success": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.96,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "stops_there": 0.98,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.97,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 2,
+      "commit": "885e523db1519f07b706e59ada673b40c373e615",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "778f1cee5595",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_error": 0.98,
+            "returns_success": 0.01,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0.02,
+            "stops_there": 0.98
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 3,
+      "commit": "885e523db1519f07b706e59ada673b40c373e615",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "0f3e062d0231",
+      "sentStateHash": "778f1cee5595",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.98,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0.02,
+            "stops_there": 0.98
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.99,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 1,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "778f1cee5595",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` attempts to read the file at the given path without checking if it's a FIFO, directory, or symlink, which could cause the process to hang or read through to a link target, violating the requirement."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 2,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "778f1cee5595",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` attempts to read the file at the given path without checking if it's a FIFO, directory, or symlink, which could cause the process to hang or read through to a link target, violating the requirement."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "run": 3,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "778f1cee5595",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function in `atomic_file.rs` attempts to read the file at the given path without checking if it's a FIFO, directory, or symlink, which could cause the process to hang or read through to a link target, violating the requirement."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 1,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "bac93f6ed17d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code reads the content of the file at the given path without checking if it's a FIFO, directory, or symlink, which could lead to hanging the process or being silently treated as an empty file."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 2,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "bac93f6ed17d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code reads the content of the file at the given path without checking if it's a FIFO, directory, or symlink, which could lead to hanging the process or being silently treated as an empty file."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "run": 3,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "bac93f6ed17d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code reads the content of the file at the given path without checking if it's a FIFO, directory, or symlink, which could lead to hanging the process or being silently treated as an empty file."
+      },
+      "right": false
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 1,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "567898e813f2",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.94,
+            "returns_success": 0.05
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.98,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.94,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 2,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "567898e813f2",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.94,
+          "probabilities": {
+            "returns_error": 0.96,
+            "returns_success": 0.03,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.98,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.96,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 3,
+      "commit": "44f534ca0ae5088f7038561ad33363b48f7a3390",
+      "which": "correct",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "567898e813f2",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.91,
+          "probabilities": {
+            "returns_success": 0.05,
+            "returns_error": 0.94,
+            "cannot_determine": 0.01
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.94,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 1,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "567898e813f2",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to a non-regular file, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 2,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "567898e813f2",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to a non-regular file, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 3,
+      "which": "correct",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "567898e813f2",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to a non-regular file, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 1,
+      "commit": "7caaa853fddb1d8788d9fe31a581a0860de13bee",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "ca32f82e9bef",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 1,
+            "returns_error": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.99,
+            "cannot_determine": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 2,
+      "commit": "7caaa853fddb1d8788d9fe31a581a0860de13bee",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "ca32f82e9bef",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "returns_error": 0,
+            "cannot_determine": 0,
+            "returns_success": 1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 3,
+      "commit": "7caaa853fddb1d8788d9fe31a581a0860de13bee",
+      "which": "mutant",
+      "truth": "returns_success",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "ca32f82e9bef",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 0,
+            "returns_success": 1
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0.99,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_success",
+        "probability": 1,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_breaks"
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 1,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "ca32f82e9bef",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code attempts to read the contents of the file at the given path using `read_to_string_capped`, which will hang if the path is a FIFO or block on reading a symlink, instead of refusing it by name."
+      },
+      "right": true
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 2,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "ca32f82e9bef",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code attempts to read the contents of the file at the given path using `read_to_string_capped`, which will hang if the path is a FIFO or block on reading if it's a symlink to a non-regular file, instead of refusing it by name."
+      },
+      "right": true
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "run": 3,
+      "which": "mutant",
+      "dependencyInPacket": true,
+      "truth": "returns_success",
+      "wanted": "violates",
+      "sentStateHash": "ca32f82e9bef",
+      "answer": {
+        "verdict": "violates",
+        "why": "The code attempts to read the contents of the file at the given path using `read_to_string_capped`, which will hang if the path is a FIFO or block on reading a symlink, instead of refusing it by name."
+      },
+      "right": true
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 1,
+      "commit": "462135621638df87fa02f7e559dfd939bc8d6f9c",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "5bf230c4641d",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.94,
+          "probabilities": {
+            "returns_error": 0.96,
+            "cannot_determine": 0.01,
+            "returns_success": 0.03
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.98,
+          "probabilities": {
+            "stops_there": 0.98,
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.96,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 2,
+      "commit": "462135621638df87fa02f7e559dfd939bc8d6f9c",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "5bf230c4641d",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.92,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.95,
+            "returns_success": 0.04
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "stops_there": 0.98,
+            "keeps_going": 0.01
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.95,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 3,
+      "commit": "462135621638df87fa02f7e559dfd939bc8d6f9c",
+      "which": "variant",
+      "truth": "returns_error",
+      "questionsHash": "c43b9d6664cd",
+      "sentStateHash": "5bf230c4641d",
+      "answers": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "confidence": 0.97,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.98,
+            "cannot_determine": 0
+          }
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "confidence": 0.97,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0.01,
+            "stops_there": 0.98
+          }
+        }
+      },
+      "result": {
+        "choice": "returns_error",
+        "probability": 0.98,
+        "choiceMatch": true,
+        "counted": true
+      },
+      "verdict": "property_holds"
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 1,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "5bf230c4641d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to one, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 2,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "5bf230c4641d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to one, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "run": 3,
+      "which": "variant",
+      "dependencyInPacket": true,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "5bf230c4641d",
+      "answer": {
+        "verdict": "violates",
+        "why": "The `read_to_string_capped` function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or a symlink to one, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 1,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "0ea776ca1a13",
+      "answer": {
+        "verdict": "violates",
+        "why": "The function attempts to read the content of the path using `read_to_string_capped`, which may hang or read through to a link target if the path is a FIFO, directory, or symlink, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 2,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "0ea776ca1a13",
+      "answer": {
+        "verdict": "violates",
+        "why": "The function attempts to read the content of the path using `read_to_string_capped`, which may hang or read through to a link target if the path is a FIFO, directory, or symlink, instead of refusing it by name."
+      },
+      "right": false
+    },
+    {
+      "method": "C",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "run": 3,
+      "which": "no-dependency",
+      "dependencyInPacket": false,
+      "truth": "returns_error",
+      "wanted": "holds",
+      "sentStateHash": "0ea776ca1a13",
+      "answer": {
+        "verdict": "violates",
+        "why": "The function attempts to read the contents of the file at the given path, which could hang the process if the path is a FIFO or directory, or read through to a link target if the path is a symlink."
+      },
+      "right": false
+    }
+  ],
+  "notes": [
+    {
+      "method": "B",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "crate::atomic_file::read_to_string_capped",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "read_to_string_capped",
+        "yields": "an error instead of hanging the process, reading through to a link target, or a默"
+      }
+    },
+    {
+      "method": "B",
+      "case": "omamori-read-baseline",
+      "branch": "m-read-baseline",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "crate::atomic_file::read_to_string_capped",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "read_to_string_capped",
+        "yields": "an error instead of hanging the process, reading through to a link target, or a默"
+      }
+    },
+    {
+      "method": "B",
+      "case": "omamori-read-baseline",
+      "branch": "v-read-baseline",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "crate::atomic_file::read_to_string_capped",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "read_to_string_capped",
+        "yields": "an error instead of hanging the process, reading through to a link target, or a默"
+      }
+    },
+    {
+      "method": "A",
+      "case": "omamori-read-baseline",
+      "branch": "correct",
+      "condition": "no-dependency",
+      "withheld": "the packet does not carry read_to_string_capped, which the question needs to be answerable",
+      "requestsSpent": 0
+    },
+    {
+      "method": "B",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "fs::read_to_string",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "load_config",
+        "yields": "a refusal by name instead of hanging the process, reading through to a link, or "
+      }
+    },
+    {
+      "method": "B",
+      "case": "omamori-raw-override-disables",
+      "branch": "m-raw-override",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "fs::read_to_string",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "load_config",
+        "yields": "a refusal by name instead of hanging the process, reading through to a link, or "
+      }
+    },
+    {
+      "method": "B",
+      "case": "omamori-raw-override-disables",
+      "branch": "v-raw-override",
+      "withheld": "the generated plan declares no needed referent, so nothing makes it answerable",
+      "plan": {
+        "needed_referents": [],
+        "not_covered": [],
+        "occurrence": "When it is called",
+        "operation": "fs::read_to_string",
+        "others": "Every other operation the function reaches succeeds.",
+        "setup": "A FIFO, directory or symlink is planted at a path omamori reads",
+        "symbol": "load_config",
+        "yields": "a refusal by name instead of hanging the process, reading through to a link, or "
+      }
+    },
+    {
+      "method": "A",
+      "case": "omamori-raw-override-disables",
+      "branch": "correct",
+      "condition": "no-dependency",
+      "withheld": "the packet does not carry read_to_string_capped, which the question needs to be answerable",
+      "requestsSpent": 0
+    }
+  ]
+}
