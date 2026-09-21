@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "ratazzi/quebec#136 — failure handling stated by the pull request",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

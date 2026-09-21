@@ -142,6 +142,31 @@
         "source": "serde_json::to_string_pretty(&result)",
         "why": "the five calls the pull request made propagate; the callee is serde_json's and has no definition in the repository (grep), so condition (b) was settled before any B or C was needed"
       }
+    },
+    "quebec-136": {
+      "repo": "https://github.com/ratazzi/quebec",
+      "pr": 136,
+      "license": "MIT",
+      "base": "aa6c8094345db28af71d42a3b7a4cd80252dfe2a",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "A": {
+        "file": "src/scheduler.rs",
+        "function": "enqueue_job",
+        "source": "runnable.get_concurrency_constraint(args_ref, None::<&serde_yaml::Value>).map_err(...)?",
+        "why": "the constraint lookup the pull request made propagate"
+      },
+      "B": {
+        "file": "src/control_plane/handlers/recurring_jobs.rs",
+        "function": "(the function holding line 215)",
+        "source": "enqueue_job(&ctx, db, entry, now).await?",
+        "why": "an unchanged caller of the changed enqueue_job; the file is not in the diff"
+      },
+      "C": {
+        "file": "src/worker.rs",
+        "function": "get_concurrency_constraint",
+        "source": "bound.call0()?",
+        "why": "the Python call the constraint comes from; not changed and calls nothing the pull request changed"
+      }
     }
   }
 }
