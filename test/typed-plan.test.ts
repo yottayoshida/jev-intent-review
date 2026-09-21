@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { enumerate, listingFor } from "../bench/code-candidates.ts";
-import { checkPlan, conditionFrom, referentsFor, type TypedPlan } from "../bench/typed-plan.ts";
+import { checkPlan, conditionFrom, locateCall, referentsFor, type TypedPlan } from "../bench/typed-plan.ts";
 
 const SOURCE = `use std::path::Path;
 
@@ -119,6 +119,66 @@ test("the condition holds across the versions being compared", () => {
     assert.ok(!field.includes(call.text), "the condition must not quote a line a mutation can rewrite");
     assert.ok(!field.includes("let "), "quoting a binding is quoting the thing under test");
   }
+});
+
+const TWO_READS = `fn two_reads(a: &Path, b: &Path) -> Result<String, E> {
+    let first = read_to_string_capped(a, 100)?;
+    let second = read_to_string_capped(b, 100).unwrap_or_default();
+    Ok(first)
+}
+`;
+
+test("two calls to the same function in one body get different conditions", () => {
+  // One propagates and one swallows. A condition built from the callee alone is the same sentence
+  // for both, which is what this file used to produce.
+  const t = enumerate("x.rs", TWO_READS);
+  const fn = t.functions[0]!;
+  const both = t.calls.filter((k) => k.functionId === fn.id && k.callee === "read_to_string_capped");
+  assert.equal(both.length, 2);
+  const [a, b] = both.map((k) => JSON.stringify(conditionFrom(fn, k)));
+  assert.notEqual(a, b, "the two calls must not produce the same condition");
+  assert.match(both[0]!.expression, /read_to_string_capped\(a, 100\)/);
+  assert.match(both[1]!.expression, /read_to_string_capped\(b, 100\)/);
+});
+
+test("a call is located in the body it is about to be judged in, or withheld", () => {
+  const t = enumerate("x.rs", TWO_READS);
+  const fn = t.functions[0]!;
+  const first = t.calls.find((k) => k.expression.includes("(a, 100)"))!;
+  const body = TWO_READS;
+
+  assert.equal(locateCall(body, first).ok, true);
+
+  // The handling changes; the call does not. That is the point of using the expression.
+  const handledDifferently = body.replace("let first = read_to_string_capped(a, 100)?;", "let Ok(first) = read_to_string_capped(a, 100) else { return Ok(String::new()) };");
+  assert.equal(locateCall(handledDifferently, first).ok, true, "a call must still be found when its result is handled another way");
+
+  // The call itself changes: it is a different call now, and the question is not about it.
+  const gone = body.replace("read_to_string_capped(a, 100)", "read_to_string_capped(a, 200)");
+  const missing = locateCall(gone, first);
+  assert.equal(missing.ok, false);
+  assert.match(missing.reason!, /is not in this version/);
+
+  // Two of it: the condition does not say which.
+  const twice = body.replace("let second = read_to_string_capped(b, 100).unwrap_or_default();", "let second = read_to_string_capped(a, 100).unwrap_or_default();");
+  const ambiguous = locateCall(twice, first);
+  assert.equal(ambiguous.ok, false);
+  assert.equal(ambiguous.found, 2);
+});
+
+test("a call whose parentheses never close cannot be pointed at", () => {
+  const unclosed = { ...enumerate("x.rs", TWO_READS).calls[0]!, expressionComplete: false };
+  const r = locateCall(TWO_READS, unclosed);
+  assert.equal(r.ok, false);
+  assert.match(r.reason!, /does not close its parentheses/);
+});
+
+test("wrapping a call over lines does not change where it is found", () => {
+  const wrapped = TWO_READS.replace("read_to_string_capped(a, 100)", "read_to_string_capped(\n        a,\n        100,\n    )");
+  const t = enumerate("x.rs", wrapped);
+  const call = t.calls.find((k) => k.callee === "read_to_string_capped" && k.expression.includes("a,"))!;
+  assert.equal(call.expressionComplete, true);
+  assert.equal(locateCall(wrapped, call).ok, true);
 });
 
 test("a stipulated call result needs no referent", () => {
