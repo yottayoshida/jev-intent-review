@@ -246,19 +246,75 @@
       "ref": "beboite/boite-legacy#187",
       "a": "fail",
       "why": "The swallowed results are now printed to stderr, not returned; the rest of the pull request is not failure handling."
+    },
+    {
+      "order": 31,
+      "ref": "Diogo-Esteves/polyVocal#60",
+      "a": "fail",
+      "why": "The swallowed audio-callback errors now log through tracing; nothing is returned to a caller."
+    },
+    {
+      "order": 32,
+      "ref": "cavi-ai/bobby-browser#163",
+      "a": "fail",
+      "why": "The swallowed page-runtime errors are now logged; the other findings are ordering, bounds and escaping, not a failure returned as an error."
+    },
+    {
+      "order": 33,
+      "ref": "dolang-org/dolang#337",
+      "a": "fail",
+      "why": "The pull request has no text, and the title is about error output being shown, not a failure turned into a success."
+    },
+    {
+      "order": 34,
+      "ref": "TumbleOwlee/ferrowl#127",
+      "a": "fail",
+      "why": "Discarded start and stop failures are now reported in a message log, not returned to the caller."
+    },
+    {
+      "order": 35,
+      "ref": "MarshalX/python-libipld#117",
+      "a": "fail",
+      "why": "The pull request has no text; the title names swallowed errors without saying what they became, so no requirement can be written from the text."
+    },
+    {
+      "order": 36,
+      "ref": "getappz/agentflare#229",
+      "a": "pass",
+      "requirement": "If flushing, syncing or setting the permissions of a credential file fails during an atomic write, the failure must reach the caller as an error. It must not return a successful result.",
+      "source": "PR text: \"A dropped `sync_all` means the \\\"durable\\\" write may never reach disk; a dropped `set_permissions` means a credential file ... can silently be left world-readable. These now propagate via `?`\"."
+    },
+    {
+      "order": 37,
+      "ref": "dsx-ai-factory/infra-controller#3469",
+      "a": "fail",
+      "why": "The swallowed failures now warn and are counted; none is returned to a caller."
+    },
+    {
+      "order": 38,
+      "ref": "Davidslv/cce-rust#168",
+      "a": "pass",
+      "requirement": "If the sync marker exists but cannot be read, the failure must reach the caller as an error. It must not be treated as a missing marker and the pull allowed to overwrite the index.",
+      "source": "PR text: \"`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \\\"never pulled\\\", disarming the ... overwrite guard ... `Err` (naming `--force`) for a corrupt one\"."
+    },
+    {
+      "order": 39,
+      "ref": "liveask/liveask#127",
+      "a": "fail",
+      "why": "The pull request has no text; the title does not say what the swallowed fetch error became."
+    },
+    {
+      "order": 40,
+      "ref": "AndreaBozzo/dataprof#370",
+      "a": "pass",
+      "requirement": "If decoding a value fails, the failure must reach the caller as an error. It must not be folded into a default value that is reported as the profile.",
+      "source": "PR text: \"removes silent fallback behavior that could turn malformed input into plausible profile values\"; \"decode paths surface errors instead of folding them into default values\"."
     }
   ],
   "gateResult": {
-    "examined": 25,
+    "examined": 40,
     "cap": 40,
-    "passedA": 7,
-    "passedB": 3,
-    "passedC": 2,
-    "passingAll": [
-      19,
-      23
-    ],
-    "status": "two pass every condition; the fixed pool is exhausted"
+    "status": "the cap is reached; candidates 36, 38 and 40 are still to be checked against (b)-(d)"
   },
   "gateExtension": {
     "when": "2026-09-21, after the gate was not met at 20",
