@@ -1,0 +1,29 @@
+{
+  "what": "The target calls of the three cases that passed condition (a), fixed from the diff and from call relations found with grep, before --experimental-candidates-only was run on any of them. Expressions are as written in the source; the form the enumeration reports is resolved when existence is checked, and a target is not moved after that.",
+  "whichCaseCarriesBAndC": "The live B defect and the C defect go in the first case, in examination order, that passes every condition and whose probe for that kind of place can run offline. The targets of the other cases stay recorded here and are not used.",
+  "cases": {
+    "whatsapp-rust-759": {
+      "repo": "https://github.com/oxidezap/whatsapp-rust", "pr": 759, "license": "MIT",
+      "base": "0df74ff98e7b1933376c403b745f8a3240a024fe", "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "A": { "file": "wacore/src/appstate_sync.rs", "function": "process_parsed_patch_list", "source": "download_external_blobs(&mut pl, &download)?", "why": "the call the pull request made propagate on the single-collection path" },
+      "B": { "file": "src/client/app_state.rs", "function": "process_app_state_sync_task", "source": "proc.process_parsed_patch_list(pl, &download, true).await?", "why": "an unchanged function that calls one the pull request changed; the file is not in the diff" },
+      "C": { "file": "src/download.rs", "function": "download", "source": "download_media_with_retry(...).await (returned as the function's value)", "why": "the downloader external blobs are fetched with; not changed and calls nothing the pull request changed" },
+      "notTargeted": "The batched path (process_patch_lists) marks a failed collection for retry and returns success by design; the requirement read literally does not hold there, so it is not a target and anything listed there is not scored."
+    },
+    "moltis-1064": {
+      "repo": "https://github.com/moltis-org/moltis", "pr": 1064, "license": "MIT",
+      "base": "be4431a57851b001ba1af13a3f7354ba6aa9aefb", "head": "4106d46dad04481a932597141739e42a5452cc86",
+      "A": { "file": "crates/gateway/src/session/title.rs", "function": "generate_title_for_session", "source": "moltis_agents::title::generate_title(provider, &chat_msgs).await?", "why": "the title generation the pull request made propagate" },
+      "B": { "file": "crates/gateway/src/channel_events/commands/dispatch.rs", "function": "dispatch_command", "source": "session_handlers::handle_title(state, &session_key).await", "why": "an unchanged dispatcher that calls a handler the pull request changed; the file is not in the diff" },
+      "C": { "file": "crates/agents/src/title.rs", "function": "generate_title", "source": "provider.complete(&messages, &[]).await (matched, Err arm returns the error)", "why": "the model call the title comes from; not changed and calls nothing the pull request changed" },
+      "notTargeted": "The background trigger (generate_title_if_needed) logs a failure and returns (); the requirement read literally does not hold there, so it is not a target and anything listed there is not scored."
+    },
+    "kontor-385": {
+      "repo": "https://github.com/KontorProtocol/Kontor", "pr": 385, "license": "MIT",
+      "base": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f", "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "A": { "file": "core/indexer/src/reactor/consensus_state.rs", "function": "get_decided_range", "source": "self.batch_to_decided(b)?", "why": "the per-batch decode the pull request stopped skipping" },
+      "B": { "file": "core/indexer/src/reactor/batches.rs", "function": "initiate_rollback", "source": "self.consensus.get_decided_from_anchor(&conn, from_anchor).await.context(...)?", "why": "an unchanged function (base lines 374-413, no hunk inside) that calls one whose body the pull request changed" },
+      "C": { "file": "core/indexer/src/database/queries.rs", "function": "query_batches", "source": "conn.query(&sql, ()).await?", "why": "the database query the batches are read with; not changed and calls nothing the pull request changed" }
+    }
+  }
+}
