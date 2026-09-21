@@ -5,6 +5,14 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **An installable command.** `npm run build` emits JavaScript to `dist/`, `npm pack` makes a
+  tarball that carries only that and the licences, and `jev-intent-review` runs from it without
+  the source tree. `--experimental-local-check` is the v0.1 path: Rust, requirements that state
+  how a failure must be handled, the functions a change touched and their callers one hop out. The
+  README and `--help` are the implementation's, not the older design's.
+
 ### Changed
 
 - **Only Jev is asked anything.** `CloudflareClient` refuses every other model before a request is

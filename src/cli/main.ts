@@ -44,18 +44,22 @@ Change:
 
 Experimental:
   --experimental-local-check
-                        instead of the usual report, ask about particular calls: start from
-                        the functions the change touched and the functions that call them,
-                        add the calls the requirement's own words lead the planner to, and
-                        observe what each function returns when one of its calls fails.
-                        Where a requirement is read as governing such a call and the
-                        reading contradicts it, the call is listed as worth checking, with
-                        the words, the code, the condition and the reading. Never a
-                        requirement verdict, and never a failing exit code.
-                        Nothing about a target is given on the command line.
+                        the v0.1 path. For each requirement, take the Rust functions the
+                        change touched and their callers one hop out, and ask Jev two
+                        things about each call: whether the requirement requires that a
+                        failure of it not reach the caller as a success, and what the
+                        function returns when it does. Where both clear the bar and
+                        disagree, the call is listed as worth checking, with the
+                        requirement's words, the code, the assumed failure and both
+                        answers. Requirements come from --intent-spec or an
+                        acceptance-criteria list; no file, function or expected answer is
+                        named on the command line. Never a requirement verdict, and never
+                        a failing exit code: nothing listed is not a claim that the
+                        requirement holds.
   --experimental-candidates-only
-                        with the above: build the set and stop. Prints which calls are
-                        reachable and which fit the budget, and asks no model at all.
+                        with the above: build the set and stop. Prints which calls fit the
+                        budget and which do not, with a reason each, and asks nothing --
+                        no credentials needed.
 
 Output:
   --json                print the report as JSON instead of Markdown
@@ -63,10 +67,17 @@ Output:
   -h, --help            show this help
   --version             show the version
 
-Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for judgments on Cloudflare
-Workers AI, or JEV_API_URL and JEV_API_TOKEN for any other endpoint that runs this tool's
-models from a Workers AI run request; GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for
---pr and --issue.
+Model: typesafe/jev, and nothing else. A request for any other model is refused before it
+is built, so no other model can be reached from here.
+
+Intent: --intent-spec, or an acceptance-criteria list in the issue, the pull request or
+--intent (a heading such as "Acceptance criteria" and one item per line). Ordinary prose is
+not turned into requirements -- no model writes them -- and a run given only prose stops
+and says which two forms do work.
+
+Environment: CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for Cloudflare Workers AI, or
+JEV_API_URL and JEV_API_TOKEN for any other endpoint that serves a Workers AI run request;
+GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr and --issue.
 
 Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
 10 configuration error, 11 intent could not be resolved, 12 judgment provider failed
