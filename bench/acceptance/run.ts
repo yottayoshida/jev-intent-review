@@ -31,7 +31,7 @@ import type * as Config from "../../src/config/config.ts";
 import type * as Glob from "../../src/config/glob.ts";
 import type * as Redact from "../../src/evidence/redact.ts";
 import type * as LocalCheck from "../../src/review/local-check-run.ts";
-import { isLive, occurrences, type CaseFile, type Enumeration, type RunRecord, type Target, type VersionLog } from "./score.ts";
+import { isLive, keepForTargets, occurrences, type CaseFile, type Enumeration, type RunRecord, type Target, type VersionLog } from "./score.ts";
 import type { AcceptanceLog } from "./replay.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
@@ -188,7 +188,7 @@ async function measure(id: string, clone: string, limit: number) {
       const f = await targetFacts(d, clone, version.head, target);
       if ("applicability" in f && f.applicability) targetApplicability[key] = f.applicability;
     }
-    const v: VersionLog = (entry.versions[versionId] ??= { base: version.base, head: version.head, enumeration: { ...enumeration, targetApplicability }, runs: [] });
+    const v: VersionLog = (entry.versions[versionId] ??= { base: version.base, head: version.head, enumeration: keepForTargets({ ...enumeration, targetApplicability }, Object.values(version.targets)), runs: [] });
     if (!isLive(version, enumeration)) {
       console.log(`${id} ${versionId}: no target inside the budget; settled by the enumeration, nothing sent`);
       writeJson(LOG, log);

@@ -245,3 +245,16 @@ export function occurrences(source: string, fn: string, call: string): number {
   const needle = collapse(call);
   return functionTexts(source, fn).reduce((n, text) => n + collapse(text).split(needle).length - 1, 0);
 }
+
+/**
+ * What the log keeps of a branch's enumeration: every call inside the budget, the notes and counts,
+ * and the held rows of the functions that hold a target.
+ *
+ * The rest is not lost: the enumeration depends on the commits alone and `run.ts precheck` takes it
+ * again, with no request. The held rows of a target's own function stay so that a target written
+ * wrong can be matched again inside the function it names, which is the mistake the scoring guards.
+ */
+export function keepForTargets<E extends Enumeration>(enumeration: E, targets: readonly Target[]): E {
+  const fns = new Set(targets.map((t) => `${t.file}\u0000${t.function}`));
+  return { ...enumeration, unchecked: enumeration.unchecked.filter((u) => fns.has(`${u.file}\u0000${u.function}`)) };
+}

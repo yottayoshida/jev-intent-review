@@ -75,12 +75,19 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
   const table: string[] = ["| case | version | target | expected | reach | readings (mapping / behaviour) | result |", "|---|---|---|---|---|---|---|"];
   let outside = 0;
   let listedElsewhere = 0;
+  let requests = 0;
+  let runs = 0;
   for (const c of measured) {
     const versions = log.cases[c.id]!.versions;
     for (const [versionId, version] of Object.entries(c.versions)) {
       const v = versions[versionId];
       if (!v) throw new ScoringError(`${c.id} ${versionId} is in case.json and not in the log`);
       const finished = v.runs.filter((r) => r.finished).length;
+      // Every run sent counts, finished or not: what was spent is what was sent.
+      for (const run of v.runs as (typeof v.runs[number] & { requests?: number })[]) {
+        requests += run.requests ?? 0;
+        runs += 1;
+      }
       if (isLive(version, v.enumeration) && finished < RUNS) {
         throw new ScoringError(`${c.id} ${versionId} was sent to Jev ${finished} times to completion, not ${RUNS}`);
       }
@@ -110,7 +117,7 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
     "",
     ...table,
     "",
-    `Calls other than the targets that were listed in these runs, not scored: ${listedElsewhere}.`,
+    `Calls other than the targets that were listed in these runs, not scored: ${listedElsewhere}. Requests sent to Jev: ${requests}, over ${runs} runs.`,
   );
   return lines.join("\n");
 }
