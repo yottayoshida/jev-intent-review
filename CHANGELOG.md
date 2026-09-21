@@ -5,6 +5,19 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Jev through TypeSafe or Vercel AI Gateway, not only Cloudflare.** Set `JEV_PROVIDER` to `cloudflare`, `typesafe` or `vercel` and that host's key (`CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`, `TYPESAFE_API_KEY`, or `AI_GATEWAY_API_KEY`), and every judgment goes in that host's documented request form to that host's fixed URL, and to no other. Before this, `JEV_API_URL` could only reach an endpoint that speaks Workers AI's run request, which TypeSafe and Vercel do not, so their users could not use the tool. Only Cloudflare has been called for real; the TypeSafe and Vercel requests follow their documentation and are tested against a stand-in. See ADR 0003.
+
+### Changed
+
+- Without `JEV_PROVIDER`, selection is as before: `JEV_API_URL` with `JEV_API_TOKEN`, else the Cloudflare pair. `TYPESAFE_API_KEY` or `AI_GATEWAY_API_KEY` alone selects nothing, so a key kept in the environment for something else does not start sending code. `JEV_PROVIDER` with a value that names no host, or together with `JEV_API_URL`, is a configuration error (exit 10); with the named host's key missing, the run has no credentials whatever other hosts' keys are set, and the skip says which variable that host needs.
+- Every failure that comes back from a host names the host and its origin — `TypeSafe (https://api.typesafe.ai) answered 422: …` — including an answer of the wrong shape, which before this did not say where it came from. In the experimental local check, a mapping question that failed is recorded as `not answered (<kind> from <host>)` instead of a bare "not answered", and a failure that ends the run (a refused key, an empty balance, a wrong endpoint) or a fault in this tool now ends it at that question instead of being counted as unanswered.
+- An answer's probability for its choice is checked to be a finite number from 0 to 1 — `probabilities[choice]` when given, else `confidence` — and so is every kept probability. Before this only `confidence` was checked, while decisions read `probabilities[choice]` first, so `{"yes": 60}` passed and was read as 60. `confidence` is now optional, and `null` counts as absent; the JSON report carries the checked value as `probability` on each answer and may leave `confidence` out. All 840 choice answers kept in the saved bench logs — as the previous check stored them, not as Cloudflare sent them — pass the new check.
+- The report's endpoint line names the host, and the warning at the top appears for an endpoint set by `JEV_API_URL` (decided by how it was chosen, not by its origin) instead of for anything other than Cloudflare. `sent.host` is added to the JSON report.
+- TypeSafe's 529 ("overloaded") is retried like 429 and 5xx.
+- `JevClient` (was `CloudflareClient`, in `src/judgments/client.ts`, was `cloudflare.ts`).
+
 ## [0.1.1] - 2026-09-21
 
 ### Changed

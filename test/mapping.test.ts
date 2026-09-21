@@ -20,7 +20,7 @@ const c = enumerate("src/integrity.rs", SOURCE);
 const fn = c.functions[0]!;
 const call = c.calls.find((k) => k.callee === "read_capped")!;
 
-const answer = (choice: string, p: number): ChoiceAnswer => ({ choice, confidence: p, probabilities: { [choice]: p } });
+const answer = (choice: string, p: number): ChoiceAnswer => ({ choice, probability: p, confidence: p, probabilities: { [choice]: p } });
 
 test("the question is three options with fixed criteria — which is what Jev answers", () => {
   const q = mappingQuestionFor(fn, call, "read_capped(base_dir, MAX)");
@@ -50,7 +50,7 @@ test("the rule is applies, at or above the same bar the code's reading clears", 
 });
 
 test("every option's probability is kept, so a reading near the bar can be re-read later", () => {
-  const rich: ChoiceAnswer = { choice: "applies", confidence: 0.62, probabilities: { applies: 0.62, does_not_apply: 0.3, unknown: 0.08 } };
+  const rich: ChoiceAnswer = { choice: "applies", probability: 0.62, confidence: 0.62, probabilities: { applies: 0.62, does_not_apply: 0.3, unknown: 0.08 } };
   const m = acceptMapping(rich);
   assert.equal(m.probability, 0.62);
   assert.deepEqual(m.probabilities, { applies: 0.62, does_not_apply: 0.3, unknown: 0.08 });

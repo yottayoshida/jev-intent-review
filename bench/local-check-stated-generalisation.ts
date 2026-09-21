@@ -294,7 +294,7 @@ const CASES: Case[] = [
 const runs = Number(process.argv[2] ?? 3);
 const out = process.argv[3] ?? "local-check-stated-generalisation.json";
 const endpoint = endpointFromEnv();
-if (!endpoint) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
+if (!endpoint) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
 const provider = new JevProvider(new JevClient(endpoint));
 const hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex").slice(0, 12);
 

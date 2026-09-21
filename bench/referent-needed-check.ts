@@ -60,7 +60,7 @@ const out = process.argv[4] ?? "referent-needed.json";
 const HARD_LIMIT = 20;
 
 const endpoint = endpointFromEnv();
-if (!endpoint) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
+if (!endpoint) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
 const client = new JevClient(endpoint, { maxRetries: 0, maxRequests: HARD_LIMIT });
 const provider = new JevProvider(client);
 const git = new Git(repoDir);

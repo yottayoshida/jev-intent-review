@@ -1,6 +1,7 @@
 # 0001. One replaceable endpoint for every model call
 
-Status: Accepted
+Status: Accepted, amended by [0003](0003-jev-on-three-hosts.md) (one request shape for every
+endpoint no longer holds: TypeSafe and Vercel AI Gateway are named hosts with their own)
 
 ## Context
 

@@ -132,5 +132,5 @@ function fakeClient(responses: unknown[]) {
     if (next instanceof Error) throw next;
     return new Response(JSON.stringify(next), { status: 200 });
   }) as typeof globalThis.fetch;
-  return { client: new JevClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", source: "CLOUDFLARE_ACCOUNT_ID" }, { fetch, sleep: async () => {} }), bodies };
+  return { client: new JevClient({ url: "https://api.cloudflare.com/client/v4/accounts/00000000000000000000000000000000/ai/run", token: "t", host: "cloudflare" }, { fetch, sleep: async () => {} }), bodies };
 }

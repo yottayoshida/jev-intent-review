@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { inspect } from "node:util";
-import { JevClient, EndpointError, endpointFromEnv, fromEndpoint, ProviderError, type Endpoint } from "../src/judgments/client.ts";
+import { JevClient, EndpointError, endpointFromEnv, fromEndpoint, JUDGMENT_ENV, PROVIDERS, ProviderError, type Endpoint, type Host, type Provider } from "../src/judgments/client.ts";
 import { JevProvider, readChoice, unwrapAnswers } from "../src/judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider, type Questions } from "../src/judgments/provider.ts";
 import { CANDIDATE_QUESTIONS, QUESTIONS_HASH } from "../src/judgments/questions.ts";
@@ -12,7 +12,7 @@ const JEV = { model: "typesafe/jev" };
 const ACCOUNT = "0123456789abcdef0123456789abcdef";
 const TOKEN = "test-token-value-that-must-never-leak";
 const CLOUDFLARE_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/ai/run`;
-const ENDPOINT: Endpoint = { url: CLOUDFLARE_URL, token: TOKEN, source: "CLOUDFLARE_ACCOUNT_ID" };
+const ENDPOINT: Endpoint = { url: CLOUDFLARE_URL, token: TOKEN, host: "cloudflare" };
 
 function fakeFetch(responses: (Response | Error)[]) {
   const calls: { url: string; init: RequestInit }[] = [];
@@ -51,7 +51,7 @@ test("endpointFromEnv: every combination of the four variables, and each token o
   const cf = { CLOUDFLARE_ACCOUNT_ID: ACCOUNT, CLOUDFLARE_API_TOKEN: TOKEN };
   // A URL of one's own, with its token: any Cloudflare variable is beside the point.
   for (const extra of [{}, { CLOUDFLARE_ACCOUNT_ID: ACCOUNT }, cf]) {
-    assert.deepEqual(endpointFromEnv({ JEV_API_URL: OTHER, JEV_API_TOKEN: "t", ...extra }), { url: OTHER, token: "t", source: "JEV_API_URL" });
+    assert.deepEqual(endpointFromEnv({ JEV_API_URL: OTHER, JEV_API_TOKEN: "t", ...extra }), { url: OTHER, token: "t", host: "custom" });
   }
   // A URL without its token is a fork's pull request: no credentials, not an error.
   assert.equal(endpointFromEnv({ JEV_API_URL: OTHER }), null);
@@ -71,6 +71,122 @@ test("endpointFromEnv: every combination of the four variables, and each token o
   // An input a workflow did not fill arrives as "".
   assert.deepEqual(endpointFromEnv({ JEV_API_URL: "  ", JEV_API_TOKEN: "", ...cf }), ENDPOINT);
   assert.throws(() => endpointFromEnv({ JEV_API_URL: OTHER, JEV_API_TOKEN: "two words" }), EndpointError, "a value with whitespace inside it is not a token");
+});
+
+// Over every combination of the variables, each unset, empty or set, and JEV_PROVIDER with valid,
+// blank, padded, mis-cased and misspelt values: properties of the outcome, not a copy of the rules.
+test("endpointFromEnv: over every combination, a key goes only to its own host and the host the user named is the one used", () => {
+  const SET = {
+    JEV_API_URL: "https://judge.example.com/ai/run",
+    JEV_API_TOKEN: "sentinel-jev-token",
+    CLOUDFLARE_ACCOUNT_ID: ACCOUNT,
+    CLOUDFLARE_API_TOKEN: "sentinel-cloudflare-token",
+    TYPESAFE_API_KEY: "sentinel-typesafe-key",
+    AI_GATEWAY_API_KEY: "sentinel-vercel-key",
+  } as const;
+  type Name = keyof typeof SET;
+  const NAMES = Object.keys(SET) as Name[];
+  const KEY_OF: Record<Host, Name> = { cloudflare: "CLOUDFLARE_API_TOKEN", typesafe: "TYPESAFE_API_KEY", vercel: "AI_GATEWAY_API_KEY", custom: "JEV_API_TOKEN" };
+  const URL_OF: Record<Host, string> = {
+    cloudflare: CLOUDFLARE_URL,
+    typesafe: "https://api.typesafe.ai/v1/systemone",
+    vercel: "https://ai-gateway.vercel.sh/typesafe/v1/systemone",
+    custom: SET.JEV_API_URL,
+  };
+  // What must be set for a host to be usable once it is the one chosen.
+  const NEEDS: Record<Provider, Name[]> = { cloudflare: ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN"], typesafe: ["TYPESAFE_API_KEY"], vercel: ["AI_GATEWAY_API_KEY"] };
+  // The last one is a key pasted into the wrong variable: it must not be repeated back either.
+  const PROVIDER_VALUES = [undefined, "", "  ", "cloudflare", "typesafe", "vercel", " vercel ", "Cloudflare", "cloudfare", "custom", "sentinel-pasted-key"];
+
+  type Outcome = { kind: "error"; message: string } | { kind: "none" } | { kind: "host"; host: Host; url: string; token: string };
+  const outcome = (env: NodeJS.ProcessEnv): Outcome => {
+    try {
+      const e = endpointFromEnv(env);
+      return e ? { kind: "host", host: e.host, url: e.url, token: e.token } : { kind: "none" };
+    } catch (error) {
+      assert.ok(error instanceof EndpointError, String(error));
+      return { kind: "error", message: error.message };
+    }
+  };
+  const without = (env: NodeJS.ProcessEnv, names: readonly string[]) => Object.fromEntries(Object.entries(env).filter(([k]) => !names.includes(k)));
+
+  let combinations = 0;
+  for (const provider of PROVIDER_VALUES) {
+    for (let code = 0; code < 3 ** NAMES.length; code++) {
+      const env: NodeJS.ProcessEnv = provider === undefined ? {} : { JEV_PROVIDER: provider };
+      let rest = code;
+      for (const name of NAMES) {
+        const state = rest % 3;
+        rest = Math.floor(rest / 3);
+        if (state === 1) env[name] = "";
+        if (state === 2) env[name] = SET[name];
+      }
+      combinations += 1;
+      const has = (name: Name) => (env[name] ?? "").trim() !== "";
+      const named = provider?.trim() ?? "";
+      const valid = (PROVIDERS as readonly string[]).includes(named) ? (named as Provider) : undefined;
+      const o = outcome(env);
+      const label = JSON.stringify(env);
+
+      // (i) No key's value in anything said about the setting.
+      if (o.kind === "error") for (const value of [...Object.values(SET), provider ?? ""]) if (value.startsWith("sentinel")) assert.ok(!o.message.includes(value), `${label}: ${o.message}`);
+      // (a) (b) The key of the host chosen, at that host's address — nobody else's key, nowhere else.
+      if (o.kind === "host") {
+        assert.equal(o.token, env[KEY_OF[o.host]], label);
+        assert.equal(o.url, URL_OF[o.host], label);
+      }
+      // (e) A URL of one's own is never replaced by a named host.
+      if (has("JEV_API_URL") && o.kind === "host") assert.equal(o.host, "custom", label);
+      // (f) A value that names no host is a setting to fix, never "unset".
+      if (named !== "" && valid === undefined) assert.equal(o.kind, "error", label);
+      if (valid !== undefined && !has("JEV_API_URL")) {
+        // (d) The named host or nothing, and no other host's key changes that.
+        if (o.kind === "host") assert.equal(o.host, valid, label);
+        const otherKeys = PROVIDERS.filter((p) => p !== valid).flatMap((p) => NEEDS[p]).filter((n) => !NEEDS[valid].includes(n));
+        assert.deepEqual(outcome(without(env, otherKeys)), o, `${label}: other hosts' keys decided it`);
+        // (m) Named, with its key, and nothing else asking to be used: that host.
+        if (!has("JEV_API_TOKEN") && NEEDS[valid].every(has)) assert.deepEqual(o.kind === "host" && o.host, valid, label);
+      }
+      if (named === "") {
+        // (o) A URL with its token: that URL.
+        if (has("JEV_API_URL") && has("JEV_API_TOKEN")) assert.equal(o.kind === "host" && o.host, "custom", label);
+        if (!has("JEV_API_URL") && !has("JEV_API_TOKEN")) {
+          // (n) The Cloudflare pair, as before this change.
+          if (has("CLOUDFLARE_ACCOUNT_ID") && has("CLOUDFLARE_API_TOKEN")) assert.equal(o.kind === "host" && o.host, "cloudflare", label);
+          // (l) TypeSafe's or Vercel's key alone never selects anything.
+          else assert.equal(o.kind, "none", label);
+        }
+      }
+      // (g) Empty is unset.
+      const emptied = NAMES.filter((n) => env[n] === "");
+      if (emptied.length > 0) assert.deepEqual(outcome(without(env, emptied)), o, `${label}: an empty value decided it`);
+      // (h) Taking a key away never moves the judgments to another host, and never starts them.
+      for (const name of NAMES.filter(has)) {
+        const after = outcome(without(env, [name]));
+        if (after.kind === "host") {
+          if (o.kind === "host") assert.equal(after.host, o.host, `${label} without ${name}`);
+          assert.notEqual(o.kind, "none", `${label} without ${name}: removing a key started sending`);
+        }
+      }
+    }
+  }
+  assert.equal(combinations, PROVIDER_VALUES.length * 3 ** NAMES.length);
+});
+
+test("endpointFromEnv reads the variables in JUDGMENT_ENV and no others", () => {
+  const read = new Set<string>();
+  const env = new Proxy({ JEV_PROVIDER: "typesafe", TYPESAFE_API_KEY: "k", CLOUDFLARE_ACCOUNT_ID: ACCOUNT, CLOUDFLARE_API_TOKEN: "t" } as NodeJS.ProcessEnv, {
+    get(target, name) {
+      if (typeof name === "string") read.add(name);
+      return Reflect.get(target, name);
+    },
+  });
+  for (const provider of [...PROVIDERS, undefined]) {
+    env.JEV_PROVIDER = provider;
+    endpointFromEnv(env);
+  }
+  assert.ok(read.size > 0);
+  for (const name of read) assert.ok((JUDGMENT_ENV as readonly string[]).includes(name), `${name} is read but not in JUDGMENT_ENV`);
 });
 
 test("endpointFromEnv: https only, http for this machine only, and no URL in what it says", () => {
@@ -107,7 +223,7 @@ test("fromEndpoint flattens what the endpoint returns and never repeats the toke
 });
 
 test("a key kept in the URL's query does not come back in what the endpoint says", async () => {
-  const endpoint: Endpoint = { url: "https://judge.example.com/ai/run?key=secret-in-the-query", token: TOKEN, source: "JEV_API_URL" };
+  const endpoint: Endpoint = { url: "https://judge.example.com/ai/run?key=secret-in-the-query", token: TOKEN, host: "custom" };
   const fake = fakeFetch([new Response("Cannot POST /ai/run?key=secret-in-the-query", { status: 404 })]);
   const c = new JevClient(endpoint, { fetch: fake.fn, maxRetries: 0 });
   const error = await providerError(c.post(JEV));
@@ -122,6 +238,11 @@ test("the client posts to the account's endpoint with the token, and retries 429
   assert.equal(calls[0]?.url, `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}/ai/run`);
   assert.equal((calls[0]?.init.headers as Record<string, string>).Authorization, `Bearer ${TOKEN}`);
   assert.equal(sleeps[0], 2000, "Retry-After is honoured");
+
+  // TypeSafe's "overloaded", which its documentation says to retry.
+  const overloaded = client([json({ message: "overloaded" }, 529), json({ result: { ok: 2 } })]);
+  assert.deepEqual(await overloaded.c.post({ ...JEV, a: 2 }), { result: { ok: 2 } });
+  assert.equal(overloaded.calls.length, 2);
 });
 
 test("the client does not retry auth, payment or bad requests, and names what went wrong", async () => {
@@ -177,7 +298,8 @@ test("a second answer it cannot use, with none read yet, is the endpoint and not
       await providerError(c.post({ ...JEV, a: 1 }));
       const error = await providerError(c.post({ ...JEV, b: 2 }));
       assert.equal(error.kind, "endpoint", `${i}`);
-      assert.match(error.message, /not a Workers AI run endpoint/);
+      assert.match(error.message, /not a Jev endpoint/);
+      assert.equal(error.where, "Cloudflare Workers AI (https://api.cloudflare.com)");
       await c.post({ ...JEV, c: 3 }).catch(() => {});
       assert.equal(calls.length, 2, "the rest of the run is not sent");
     }
@@ -203,7 +325,7 @@ test("nothing the endpoint returns can forge a log line or hand the token back",
   const error = await providerError(c.post(JEV));
   assert.ok(!error.message.includes(TOKEN), error.message);
   assert.ok(!/[\r\n]/.test(error.message), error.message);
-  assert.match(error.message, /https:\/\/api\.cloudflare\.com answered 500/);
+  assert.match(error.message, /Cloudflare Workers AI \(https:\/\/api\.cloudflare\.com\) answered 500/);
 
   // A failure the endpoint reports in its own JSON goes through the same treatment.
   const reported = client([json({ success: false, errors: [{ message: `no\n::add-mask::${TOKEN}` }] })], 0);
@@ -268,13 +390,21 @@ test("unwrapAnswers finds the answers however deep the gateway nests them", () =
   assert.equal(unwrapAnswers("text"), null);
 });
 
-test("readChoice accepts only an offered choice with a confidence between 0 and 1", () => {
+test("readChoice accepts only an offered choice, with the probability every decision reads between 0 and 1", () => {
   const criteria = { yes: "y", no: "n" };
-  assert.deepEqual(readChoice("q", { choice: "yes", confidence: 0.8, probabilities: { yes: 0.8, no: 0.2, other: 1 } }, criteria), {
+  assert.deepEqual(readChoice("q", { choice: "yes", confidence: 0.8, probabilities: { yes: 0.7, no: 0.2, other: 1 } }, criteria), {
     choice: "yes",
+    probability: 0.7, // the chosen option's probability when there is one, not the confidence
     confidence: 0.8,
-    probabilities: { yes: 0.8, no: 0.2 },
+    probabilities: { yes: 0.7, no: 0.2 },
   });
+  // Without `confidence`, as a gateway's copy of TypeSafe's shape may send it: the probabilities decide.
+  assert.deepEqual(readChoice("q", { choice: "no", probabilities: { yes: 0.1, no: 0.9 } }, criteria), { choice: "no", probability: 0.9, probabilities: { yes: 0.1, no: 0.9 } });
+  // Without probabilities: the confidence is the chosen option's probability, as before.
+  assert.deepEqual(readChoice("q", { choice: "yes", confidence: 0.6 }, criteria), { choice: "yes", probability: 0.6, confidence: 0.6, probabilities: {} });
+  // `null` is absent, for `confidence` as for `probabilities`.
+  assert.deepEqual(readChoice("q", { choice: "no", confidence: null, probabilities: { no: 0.9 } }, criteria), { choice: "no", probability: 0.9, probabilities: { no: 0.9 } });
+  assert.deepEqual(readChoice("q", { choice: "yes", confidence: 0.6, probabilities: null }, criteria), { choice: "yes", probability: 0.6, confidence: 0.6, probabilities: {} });
   for (const bad of [
     undefined,
     { choice: "maybe", confidence: 0.5 },
@@ -283,6 +413,16 @@ test("readChoice accepts only an offered choice with a confidence between 0 and 
     { choice: "yes", confidence: 1.5 },
     { choice: "yes", confidence: Number.NaN },
     { choice: "yes" },
+    // The number every decision reads, out of range: a percentage, an overflow, a negative.
+    { choice: "yes", confidence: 0.8, probabilities: { yes: 60 } },
+    JSON.parse('{"choice":"yes","confidence":0.8,"probabilities":{"yes":1e999}}'),
+    { choice: "yes", confidence: 0.8, probabilities: { yes: -0.1 } },
+    // A kept probability of another option, out of range: it is read when that option is asked about.
+    { choice: "yes", confidence: 0.8, probabilities: { yes: 0.8, no: 2 } },
+    // Probabilities for other options only, and no confidence: nothing says how likely the choice is.
+    { choice: "yes", probabilities: { no: 0.9 } },
+    { choice: "yes", confidence: null, probabilities: { no: 0.9 } },
+    { choice: "yes", confidence: 0.8, probabilities: [0.8, 0.2] },
   ]) {
     assert.throws(() => readChoice("q", bad, criteria), (e: unknown) => e instanceof ProviderError && e.kind === "bad_response", JSON.stringify(bad));
   }
@@ -317,7 +457,7 @@ class SlowFake implements JudgmentProvider {
     this.maxInFlight = Math.max(this.maxInFlight, this.inFlight);
     await new Promise((resolve) => setTimeout(resolve, 5));
     this.inFlight -= 1;
-    return Object.fromEntries(Object.keys(questions).map((k) => [k, { choice: "x", confidence: 1, probabilities: {} }]));
+    return Object.fromEntries(Object.keys(questions).map((k) => [k, { choice: "x", probability: 1, confidence: 1, probabilities: {} }]));
   }
 }
 
@@ -354,7 +494,7 @@ test("LimitedProvider checks the deadline again after waiting for a slot", async
       sent.push(clock);
       await new Promise((resolve) => setTimeout(resolve, 1));
       clock += 100; // each call takes 100 of the fake clock
-      return Object.fromEntries(Object.keys(questions).map((k) => [k, { choice: "x", confidence: 1, probabilities: {} }]));
+      return Object.fromEntries(Object.keys(questions).map((k) => [k, { choice: "x", probability: 1, confidence: 1, probabilities: {} }]));
     },
   };
   const limited = new LimitedProvider(stepping, { concurrency: 1, deadline: 150 }, () => clock);

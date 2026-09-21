@@ -353,7 +353,7 @@ test("an endpoint that answers nothing usable fails the run instead of reporting
   try {
     const run = io(refusing.dir, { JEV_API_URL: wrongShape.url, JEV_API_TOKEN: "local-token" });
     assert.equal(await main(["--base", refusing.base, "--head", refusing.head, "--intent-spec", specFile(refusing.dir)], run.value), EXIT.provider);
-    assert.match(run.err(), /not a Workers AI run endpoint/);
+    assert.match(run.err(), /the endpoint set by JEV_API_URL \(http:\/\/127\.0\.0\.1:\d+\) answered 400.*not a Jev endpoint/);
     assert.ok(wrongShape.seen.length <= 8, `${wrongShape.seen.length} requests`);
   } finally {
     wrongShape.close();

@@ -125,8 +125,8 @@ const dry = process.env.DRY_RUN === "1";
 const hardLimit = comparison.requestBudget.hardLimit;
 
 const endpoint = endpointFromEnv();
-if (!endpoint && !dry) throw new Error("no credentials: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN");
-const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", source: "JEV_API_URL" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
+if (!endpoint && !dry) throw new Error("no credentials: set JEV_PROVIDER (cloudflare, typesafe or vercel) with its key, the Cloudflare pair, or JEV_API_URL and JEV_API_TOKEN");
+const client = new JevClient(endpoint ?? { url: "https://example.invalid/dry", token: "unused", host: "custom" }, { maxRetries: 0, maxRequests: dry ? 0 : hardLimit });
 const provider = new JevProvider(client);
 const git = new Git(repoDir);
 

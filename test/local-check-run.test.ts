@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { DEFAULT_LOCAL_CHECK, runLocalCheck, renderLocalCheck, type LocalCheckOptions } from "../src/review/local-check-run.ts";
 import type { Git } from "../src/repository/git.ts";
+import { ProviderError } from "../src/judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { ChoiceAnswer, Requirement } from "../src/types.ts";
 
@@ -102,7 +103,7 @@ interface Asked {
  * The mapping answer is scripted per call; the reading of the code comes from the body, so the
  * two never agree by construction.
  */
-function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choice: "applies", confidence: 0.9, probabilities: { applies: 0.9 } })): { judge: JudgmentProvider; asked: Asked[] } {
+function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choice: "applies", probability: 0.9, confidence: 0.9, probabilities: { applies: 0.9 } })): { judge: JudgmentProvider; asked: Asked[] } {
   const asked: Asked[] = [];
   const judge: JudgmentProvider = {
     model: "typesafe/jev",
@@ -121,7 +122,7 @@ function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choi
       const out: Record<string, ChoiceAnswer> = {};
       for (const key of keys) {
         const choice = key === "on_error_result" ? (flat.includes(`${expression}?`) ? "returns_error" : "returns_success") : "stops_there";
-        out[key] = { choice, confidence: 0.95, probabilities: { [choice]: 0.95 } };
+        out[key] = { choice, probability: 0.95, confidence: 0.95, probabilities: { [choice]: 0.95 } };
       }
       return out;
     },
@@ -181,7 +182,7 @@ test("a governed call that swallows its failure is listed, with everything neede
 
 test("the same call, read as not required by the requirement, is not listed", async () => {
   // The code does not change: same call, same `returns_success`. Only the mapping differs.
-  const { r, text } = await run(undefined, SWALLOWING, () => ({ choice: "does_not_apply", confidence: 0.95, probabilities: { does_not_apply: 0.95 } }));
+  const { r, text } = await run(undefined, SWALLOWING, () => ({ choice: "does_not_apply", probability: 0.95, confidence: 0.95, probabilities: { does_not_apply: 0.95 } }));
   assert.equal(r.findings.length, 0);
   assert.ok(r.observed.some((o) => o.result.observation === "returns_success"));
   assert.match(text, /### Read, but not required of by the requirement/);
@@ -189,7 +190,7 @@ test("the same call, read as not required by the requirement, is not listed", as
 });
 
 test("a mapping below the bar is not acted on, and says its number", async () => {
-  const { r, text } = await run(undefined, SWALLOWING, () => ({ choice: "applies", confidence: 0.5, probabilities: { applies: 0.5 } }));
+  const { r, text } = await run(undefined, SWALLOWING, () => ({ choice: "applies", probability: 0.5, confidence: 0.5, probabilities: { applies: 0.5 } }));
   assert.equal(r.findings.length, 0);
   assert.equal(r.counts.governed, 0);
   assert.match(text, /read as `applies` \(0\.50\)/);
@@ -200,6 +201,25 @@ test("a mapping that was not answered is its own state, not a quiet no", async (
   assert.equal(r.findings.length, 0);
   assert.ok(r.mappings.every((m) => m.verdict === "no_answer"));
   assert.match(text, /the mapping question was not answered/);
+});
+
+test("a mapping question that failed says what kind of failure and which host; one that ends the run ends it", async () => {
+  const failing = (error: unknown) => (): ChoiceAnswer | undefined => {
+    throw error;
+  };
+  const where = "TypeSafe (https://api.typesafe.ai)";
+  const { r, text } = await run(undefined, SWALLOWING, failing(new ProviderError("bad_response", `${where}: [the host's own words](https://evil.example)`, undefined, where)));
+  assert.ok(r.mappings.length > 0);
+  for (const m of r.mappings) {
+    assert.equal(m.verdict, "no_answer");
+    assert.equal(m.why, `the mapping question was not answered (bad_response from ${where})`);
+  }
+  assert.ok(text.includes(`bad_response from ${where}`), text);
+  assert.ok(!text.includes("the host's own words"), "what the host said is not printed as Markdown");
+  // Before this, every one of these was swallowed into "not answered" too.
+  for (const error of [new ProviderError("auth", "refused", 401, where), new ProviderError("endpoint", "not a Jev endpoint", 404, where), new TypeError("a bug in this tool")]) {
+    await assert.rejects(run(undefined, SWALLOWING, failing(error)), (e: unknown) => e === error);
+  }
 });
 
 test("the mapping is recorded whether or not anything came of it", async () => {

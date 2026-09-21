@@ -6,7 +6,7 @@ import type { JudgmentProvider, Questions } from "../../src/judgments/provider.t
 import type { ChoiceAnswer } from "../../src/types.ts";
 
 export function answer(choice: string, p = 0.9): ChoiceAnswer {
-  return { choice, confidence: p, probabilities: { [choice]: p } };
+  return { choice, probability: p, confidence: p, probabilities: { [choice]: p } };
 }
 
 export interface PacketLike {
