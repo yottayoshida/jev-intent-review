@@ -212,41 +212,46 @@ export function scoreListed(caseFile: CaseFile, versionId: string, run: RunRecor
 const collapse = (s: string) => s.replace(/\s+/g, "");
 
 /**
- * The text of every function named `name` in a Rust file, found by the `fn` line and the braces
- * after it.
+ * `[start, end, name]` of every function with a body in a Rust source, 1-based and inclusive, found
+ * by the `fn` line and the braces after it. Used both to count a target in its own function and to
+ * name the functions a diff changed (`changed-functions.ts`).
  *
  * ponytail: brace counting, not a parser — braces inside string and char literals are counted too.
- * It only has to find a target's own function well enough to count one expression in it, and it
+ * It only has to find a function well enough to count one expression in it or to name it, and it
  * is kept apart from `enumerate` on purpose: `enumerate` stops at 60 functions a file and 40 calls a
  * function, and existence must not depend on those caps.
  */
-export function functionTexts(source: string, name: string): string[] {
+export function functionSpans(source: string): [number, number, string][] {
   const lines = source.split("\n");
-  const head = new RegExp(`\\bfn\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(<]`);
-  const out: string[] = [];
+  const spans: [number, number, string][] = [];
+  const head = /\bfn\s+([A-Za-z_][A-Za-z0-9_]*)\s*[(<]/;
   for (let i = 0; i < lines.length; i++) {
-    if (!head.test(lines[i]!)) continue;
+    const m = head.exec(lines[i]!);
+    if (!m) continue;
     let depth = 0;
     let opened = false;
-    const body: string[] = [];
     for (let j = i; j < lines.length; j++) {
-      body.push(lines[j]!);
       for (const ch of lines[j]!) {
         if (ch === "{") (depth += 1), (opened = true);
         else if (ch === "}") depth -= 1;
       }
-      if (opened && depth <= 0) break;
+      if (opened && depth <= 0) {
+        spans.push([i + 1, j + 1, m[1]!]);
+        break;
+      }
       if (!opened && lines[j]!.trimEnd().endsWith(";")) break; // a declaration with no body
     }
-    out.push(body.join("\n"));
   }
-  return out;
+  return spans;
 }
 
 /** How often `call` occurs in the functions named `fn`, whitespace ignored. */
 export function occurrences(source: string, fn: string, call: string): number {
   const needle = collapse(call);
-  return functionTexts(source, fn).reduce((n, text) => n + collapse(text).split(needle).length - 1, 0);
+  const lines = source.split("\n");
+  return functionSpans(source)
+    .filter(([, , name]) => name === fn)
+    .reduce((n, [start, end]) => n + collapse(lines.slice(start - 1, end).join("\n")).split(needle).length - 1, 0);
 }
 
 /**

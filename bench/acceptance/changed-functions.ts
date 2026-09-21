@@ -11,33 +11,9 @@
 import { execFileSync } from "node:child_process";
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { functionSpans } from "./score.ts";
 
 const git = (clone: string, args: string[]) => execFileSync("git", ["-C", clone, ...args], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
-
-/** `[start, end, name]` of every function in a Rust source, 1-based and inclusive. */
-export function functionSpans(source: string): [number, number, string][] {
-  const lines = source.split("\n");
-  const spans: [number, number, string][] = [];
-  const head = /\bfn\s+([A-Za-z_][A-Za-z0-9_]*)\s*[(<]/;
-  for (let i = 0; i < lines.length; i++) {
-    const m = head.exec(lines[i]!);
-    if (!m) continue;
-    let depth = 0;
-    let opened = false;
-    for (let j = i; j < lines.length; j++) {
-      for (const ch of lines[j]!) {
-        if (ch === "{") (depth += 1), (opened = true);
-        else if (ch === "}") depth -= 1;
-      }
-      if (opened && depth <= 0) {
-        spans.push([i + 1, j + 1, m[1]!]);
-        break;
-      }
-      if (!opened && lines[j]!.trimEnd().endsWith(";")) break;
-    }
-  }
-  return spans;
-}
 
 /** The innermost function around each line. */
 function namesAt(spans: [number, number, string][], lines: number[]): Set<string> {
