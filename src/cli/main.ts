@@ -54,7 +54,7 @@ Experimental:
                         answers. Requirements come from --intent-spec or an
                         acceptance-criteria list; no file, function or expected answer is
                         named on the command line. No requirement verdict is stated.
-                        Findings do not cause a nonzero exit code; configuration,
+                        Findings do not cause a nonzero exit code; configuration, intent,
                         repository and provider failures can. Nothing listed means no call
                         met the conditions -- including calls left undetermined -- and
                         exit 0 does not establish that the requirement holds.
