@@ -1,0 +1,1776 @@
+{
+  "what": "--experimental-candidates-only on each case at the pull request base..head, before any branch was built. Counts, notes, and every enumerated call in the functions that hold a fixed target.",
+  "cases": {
+    "whatsapp-rust-759": {
+      "revisions": {
+        "before": "0cb4ca5cd99efa87183b07519748621a43adce20",
+        "after": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+        "how": "merge base of 0df74ff98e7b1933376c403b745f8a3240a024fe and f46e703543e434c91fe3031184a48eebb7b63d1b"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 0
+        },
+        "calls": 0,
+        "applicable": 0,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 0
+      },
+      "notes": [
+        "wacore/src/appstate_sync.rs: 17 calls were left out of the listing by its cap",
+        "6 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": []
+    },
+    "moltis-1064": {
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "4106d46dad04481a932597141739e42a5452cc86",
+        "how": "merge base of be4431a57851b001ba1af13a3f7354ba6aa9aefb and 4106d46dad04481a932597141739e42a5452cc86"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "origin": "changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read(session_key)",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "len()",
+          "origin": "changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "context(\"failed to read session history\")",
+          "origin": "changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(session_key)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|e| e.model)",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read()",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "read()",
+          "origin": "changed",
+          "why": "read has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_deref()",
+          "origin": "changed",
+          "why": "as_deref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|id| reg.get(id))",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(id)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "is_some()",
+          "origin": "changed",
+          "why": "is_some has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "is_none()",
+          "origin": "changed",
+          "why": "is_none has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "list_models()",
+          "origin": "changed",
+          "why": "list_models does not return a Result (crates/providers/src/registry/registration.rs:1281), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "iter()",
+          "origin": "changed",
+          "why": "iter has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "map(|m| m.id.as_str())",
+          "origin": "changed",
+          "why": "map has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_str()",
+          "origin": "changed",
+          "why": "as_str is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "collect()",
+          "origin": "changed",
+          "why": "collect has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "unwrap_or_default()",
+          "origin": "changed",
+          "why": "unwrap_or_default has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "as_deref()",
+          "origin": "changed",
+          "why": "as_deref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "and_then(|id| reg.get(id))",
+          "origin": "changed",
+          "why": "and_then has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "get(id)",
+          "origin": "changed",
+          "why": "get does not return a Result (crates/agents/src/tool_registry.rs:157), so it has no error to assume"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "or(from_session)",
+          "origin": "changed",
+          "why": "or has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "or_else(|| reg.first())",
+          "origin": "changed",
+          "why": "or_else has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "first()",
+          "origin": "changed",
+          "why": "first has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::model::values_to_chat_messages(&history)",
+          "origin": "changed",
+          "why": "values_to_chat_messages is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "upsert(session_key, Some(title.clone()))",
+          "origin": "changed",
+          "why": "upsert is defined 13 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "clone()",
+          "origin": "changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "with_context(|| format!(\"failed to persist title for session {session_key}\"))",
+          "origin": "changed",
+          "why": "with_context is defined 6 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "broadcast( state, \"session\", serde_json::json!({ \"kind\": \"patched\", \"sessionKey\": session_key,",
+          "origin": "changed",
+          "why": "broadcast is defined 5 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "BroadcastOpts::default()",
+          "origin": "changed",
+          "why": "default has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "get()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ok_or_else(|| ChannelError::unavailable(\"gateway not ready\"))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::unavailable(\"gateway not ready\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "as_ref()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ok_or_else(|| ChannelError::unavailable(\"session metadata not available\"))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::unavailable(\"session metadata not available\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "resolve_channel_session(&reply_to, session_metadata)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "strip_prefix('/')",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "unwrap_or(command)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "split_whitespace()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "next()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "unwrap_or(\"\")",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "trim()",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_new( state, session_metadata, &session_key, &reply_to, sender_id,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_fork(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_clear(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_compact(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_context(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_sessions( state, session_metadata, &session_key, &reply_to, args,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_attach(state, session_metadata, &session_key, &reply_to, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_approvals(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_approve_deny( state, &session_key, &reply_to, sender_id, cmd,",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_agent(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_mode(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_model(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_sandbox(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_sh(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_stop(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_peek(state, &session_key)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_tts(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "control_handlers::handle_update(state, &reply_to, sender_id, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_rollback(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_btw(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_fast(state, session_metadata, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_insights(state, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_steer(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "quick_actions::handle_queue(state, &session_key, args)",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        },
+        {
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "ChannelError::invalid_input(format!( \"unknown command: /{cmd}\" ))",
+          "origin": "calls_changed",
+          "why": "dispatch_command does not return a Result, so \"a success\" and \"an error\" do not sort what it returns"
+        }
+      ]
+    },
+    "kontor-385": {
+      "revisions": {
+        "before": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f",
+        "after": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+        "how": "merge base of 99cfbdfd4b0bccc60c2bc6476c3636e82995af2f and 5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 11
+        },
+        "calls": 633,
+        "applicable": 47,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 27,
+        "notApplicable": 586
+      },
+      "notes": [
+        "core/indexer/src/reactor/batches.rs: 6 calls were left out of the listing by its cap",
+        "core/indexer/src/reactor/mod.rs: 36 calls were left out of the listing by its cap",
+        "core/indexer/src/reactor/reactor_cluster_tests.rs: 25 calls were left out of the listing by its cap",
+        "core/indexer/src/runtime/call.rs: 41 calls were left out of the listing by its cap",
+        "only the first 12 of 23 changed functions had their callers looked up",
+        "16 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "origin": "changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+          "origin": "changed",
+          "why": "select_batches_in_range does not return a Result (core/indexer/src/database/queries.rs:575), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "as_u64()",
+          "origin": "changed",
+          "why": "as_u64 is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "as_u64()",
+          "origin": "changed",
+          "why": "as_u64 is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "context(\"Failed to query batches for sync range\")",
+          "origin": "changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "Vec::new()",
+          "origin": "changed",
+          "why": "new has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "let (mut value, cert)",
+          "origin": "changed",
+          "why": "let does not return a Result (core/indexer/src/api/error.rs:39), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "load_raw_txs_if_unfinalized(conn, b.anchor_height, b.consensus_height)",
+          "origin": "changed",
+          "why": "load_raw_txs_if_unfinalized does not return a Result (core/indexer/src/reactor/consensus_state.rs:416), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "set_raw_txs(raw_txs)",
+          "origin": "changed",
+          "why": "set_raw_txs does not return a Result (core/indexer/src/consensus/value.rs:197), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "push((value, cert))",
+          "origin": "changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "db_conn()",
+          "origin": "calls_changed",
+          "why": "db_conn does not return a Result (core/indexer/src/reactor/mod.rs:113), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "origin": "calls_changed",
+          "why": "get_decided_from_anchor does not return a Result (core/indexer/src/reactor/consensus_state.rs:370), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "context(\"Failed to load replay batches for rollback\")",
+          "origin": "calls_changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len does not return a Result (core/indexer/src/consensus/validator_set.rs:67), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len does not return a Result (core/indexer/src/consensus/validator_set.rs:67), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "into()",
+          "origin": "calls_changed",
+          "why": "into has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "retain(|tx| !excluded_txids.contains(&tx.txid()))",
+          "origin": "calls_changed",
+          "why": "retain has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "contains(&tx.txid())",
+          "origin": "calls_changed",
+          "why": "contains does not return a Result (kontor-ts/src/component/kontor-ts.js:699), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "txid()",
+          "origin": "calls_changed",
+          "why": "txid does not return a Result (core/indexer/src/consensus/value.rs:20), so it has no error to assume"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "retain(|b| b.anchor_height < from_anchor)",
+          "origin": "calls_changed",
+          "why": "retain has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "origin": "calls_changed",
+          "why": "replay_blocks_from is defined 4 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "context(\"Failed to send replay request\")",
+          "origin": "calls_changed",
+          "why": "context has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    },
+    "instruckt-tauri-9": {
+      "revisions": {
+        "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
+        "after": "a808734a5b264a433e74f96126b9a8159c19e641",
+        "how": "merge base of 78617c77e44238d05f19300b4b31a4d5cb0db64c and a808734a5b264a433e74f96126b9a8159c19e641"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 9,
+          "calls_changed": 2
+        },
+        "calls": 170,
+        "applicable": 7,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 163
+      },
+      "notes": [
+        "29 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": [
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_all_pending",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "resolve",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_source_location",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_component_stack",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "CallToolResult::success(vec![Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )])",
+          "origin": "changed",
+          "why": "success has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "Content::text( serde_json::to_string_pretty(&result) .map_err(|e| McpError::internal_error(e.to_string(), None))?, )",
+          "origin": "changed",
+          "why": "text has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/mcp/server.rs",
+          "function": "get_project_structure",
+          "call": "serde_json::to_string_pretty(&result)",
+          "origin": "changed",
+          "why": "to_string_pretty has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    },
+    "grovedb-501": {
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e",
+        "how": "merge base of 43f4253c33ccb2f74fcc212c9d6e532f78ec95f5 and e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 3
+        },
+        "calls": 68,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 66
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "10 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "vec_bytes_as_traversal_instruction(chunk_id)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "decode_vec_ops(chunk_data)",
+          "origin": "calls_changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "get(chunk_id)",
+          "origin": "changed",
+          "why": "get is defined 35 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "ok_or(Error::ChunkRestoringError(ChunkError::UnexpectedChunk))",
+          "origin": "changed",
+          "why": "ok_or has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "Error::ChunkRestoringError(ChunkError::UnexpectedChunk)",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "Self::verify_chunk(chunk, expected_root_hash, &parent_key_value_hash)",
+          "origin": "changed",
+          "why": "verify_chunk does not return a Result (merk/src/merk/restore.rs:170), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))",
+          "origin": "changed",
+          "why": "set_base_root_key does not return a Result (merk/src/merk/mod.rs:560), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "key()",
+          "origin": "changed",
+          "why": "key has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "map(|k| k.to_vec())",
+          "origin": "changed",
+          "why": "map does not return a Result (costs/src/context.rs:65), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "to_vec()",
+          "origin": "changed",
+          "why": "to_vec has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "rewrite_parent_link( chunk_id, &root_traversal_instruction, &chunk_tree, grove_version, )",
+          "origin": "changed",
+          "why": "rewrite_parent_link does not return a Result (merk/src/merk/restore.rs:352), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "write_chunk(chunk_tree, &mut root_traversal_instruction)",
+          "origin": "changed",
+          "why": "write_chunk does not return a Result (merk/src/merk/restore.rs:229), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "is_ok()",
+          "origin": "changed",
+          "why": "is_ok has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "remove(chunk_id)",
+          "origin": "changed",
+          "why": "remove is defined 18 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "contains(chunk_id)",
+          "origin": "calls_changed",
+          "why": "contains does not return a Result (grovedb-query/src/query_item/mod.rs:514), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::InternalError( \"Incoming global_chunk_id not expected\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "remove(chunk_id)",
+          "origin": "calls_changed",
+          "why": "remove is defined 18 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "process_chunk(chunk_id, ops, grove_version)",
+          "origin": "calls_changed",
+          "why": "process_chunk does not return a Result (merk/src/merk/restore.rs:88), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "insert(next_chunk_id.clone())",
+          "origin": "calls_changed",
+          "why": "insert does not return a Result (docs/crates/grovedb.md:110), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "clone()",
+          "origin": "calls_changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "push(next_chunk_id)",
+          "origin": "calls_changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::InternalError( \"Unable to process incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "Error::CorruptedData( \"Unable to decode incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    },
+    "grovedb-500": {
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+        "how": "merge base of 43f4253c33ccb2f74fcc212c9d6e532f78ec95f5 and c0e02819ac99a545e70a858208f2095c5fb461c7"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 215,
+        "applicable": 8,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "verify_height(grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunks)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "verify(self.merk.tree_type != TreeType::NormalTree, grove_version)",
+          "origin": "changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(packed_global_chunks)",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+          "origin": "calls_changed"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+          "origin": "calls_changed"
+        }
+      ],
+      "unchecked": [
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError( ChunkError::RestorationNotComplete, )",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+          "origin": "changed",
+          "why": "load_base_root does not return a Result (merk/src/merk/mod.rs:577), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+          "origin": "changed",
+          "why": "map_err does not return a Result (costs/src/context.rs:98), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"failed to load base root during finalize\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_err()",
+          "origin": "changed",
+          "why": "is_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+          "origin": "changed",
+          "why": "load_base_root does not return a Result (merk/src/merk/mod.rs:577), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+          "origin": "changed",
+          "why": "map_err does not return a Result (costs/src/context.rs:98), so it has no error to assume"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"failed to reload base root after height rewrite\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "is_empty()",
+          "origin": "changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "Error::ChunkRestoringError(ChunkError::InternalError( \"restored tree invalid\", ))",
+          "origin": "changed",
+          "why": "ChunkRestoringError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "ChunkError::InternalError( \"restored tree invalid\", )",
+          "origin": "changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::CorruptedData( \"Unsupported state sync protocol version\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::CorruptedData( \"Unsupported state sync protocol version\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "CorruptedData has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_vec()",
+          "origin": "calls_changed",
+          "why": "to_vec has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(unpack_nested_bytes(packed_global_chunk_ids)?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(unpack_nested_bytes(packed_global_chunks)?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Packed num of global chunkIDs and chunks are not matching\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"GroveDB is not in syncing mode\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "zip(nested_global_chunks.iter())",
+          "origin": "calls_changed",
+          "why": "zip has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "let (chunk_prefix, _, _, nested_local_chunk_ids)",
+          "origin": "calls_changed",
+          "why": "let has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_slice()",
+          "origin": "calls_changed",
+          "why": "as_slice does not return a Result (grovedb/src/batch/key_info.rs:122), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "is_empty()",
+          "origin": "calls_changed",
+          "why": "is_empty is defined 7 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_slice()",
+          "origin": "calls_changed",
+          "why": "as_slice does not return a Result (grovedb/src/batch/key_info.rs:122), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "len()",
+          "origin": "calls_changed",
+          "why": "len has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Packed num of chunkIDs and chunks are not matching #2\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "as_mut()",
+          "origin": "calls_changed",
+          "why": "as_mut has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "current_prefixes()",
+          "origin": "calls_changed",
+          "why": "current_prefixes does not return a Result (grovedb/src/replication/state_sync_session.rs:317), so it has no error to assume"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "get_mut(&chunk_prefix)",
+          "origin": "calls_changed",
+          "why": "get_mut has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "Error::InternalError( \"Unable to process incoming chunk\".to_string(), )",
+          "origin": "calls_changed",
+          "why": "InternalError has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "to_string()",
+          "origin": "calls_changed",
+          "why": "to_string has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "zip(current_nested_chunk_data.iter())",
+          "origin": "calls_changed",
+          "why": "zip has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "iter()",
+          "origin": "calls_changed",
+          "why": "iter is defined 2 times here, so which one this call reaches is not resolved"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "extend(subtree_state_sync.apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )?)",
+          "origin": "calls_changed",
+          "why": "extend has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_chunk",
+          "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+          "origin": "calls_changed",
+          "why": "apply_inner_chunk does not return a Result (grovedb/src/replication/state_sync_session.rs:94), so it has no error to assume"
+        }
+      ]
+    },
+    "quebec-136": {
+      "revisions": {
+        "before": "aa6c8094345db28af71d42a3b7a4cd80252dfe2a",
+        "after": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+        "how": "merge base of aa6c8094345db28af71d42a3b7a4cd80252dfe2a and 33cd86eea40565d08b2cd662d8c9c31e7a3de147"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 0,
+          "calls_changed": 0
+        },
+        "calls": 0,
+        "applicable": 0,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 0
+      },
+      "notes": [
+        "1 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "the change touched no Rust function at this commit"
+      ],
+      "wouldAsk": [],
+      "unchecked": []
+    },
+    "pybun-428": {
+      "revisions": {
+        "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
+        "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+        "how": "merge base of 7190a54f41ca1d0672b8f719767fca26a20c3aa9 and cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      },
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 5,
+          "calls_changed": 13
+        },
+        "calls": 396,
+        "applicable": 11,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 385
+      },
+      "notes": [
+        "src/drift.rs: 77 calls were left out of the listing by its cap",
+        "1 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "src/commands/project.rs: 28 calls were left out of the listing by its cap",
+        "src/mcp/schema.rs: 17 calls were left out of the listing by its cap",
+        "src/mcp/tools/maintenance.rs: 296 calls were left out of the listing by its cap",
+        "src/commands/mod.rs: 336 calls were left out of the listing by its cap",
+        "src/commands/run.rs: 441 calls were left out of the listing by its cap",
+        "src/installer.rs: 7 calls were left out of the listing by its cap",
+        "src/resolver.rs: 21 functions were left out of the listing by its cap",
+        "src/resolver.rs: 104 calls were left out of the listing by its cap",
+        "21 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "wouldAsk": [],
+      "unchecked": [
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "fs::read_dir(current)",
+          "origin": "changed",
+          "why": "read_dir has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: current.to_path_buf(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_path_buf()",
+          "origin": "changed",
+          "why": "to_path_buf has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: current.to_path_buf(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_path_buf()",
+          "origin": "changed",
+          "why": "to_path_buf has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "path()",
+          "origin": "changed",
+          "why": "path has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "file_name()",
+          "origin": "changed",
+          "why": "file_name has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "to_string_lossy()",
+          "origin": "changed",
+          "why": "to_string_lossy has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "file_type()",
+          "origin": "changed",
+          "why": "file_type has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "map_err(|source| BuildCacheError::Read { path: path.clone(), source, })",
+          "origin": "changed",
+          "why": "map_err has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "clone()",
+          "origin": "changed",
+          "why": "clone has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "is_dir()",
+          "origin": "changed",
+          "why": "is_dir has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "contains(name.as_ref())",
+          "origin": "changed",
+          "why": "contains does not return a Result (src/snapshot.rs:123), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "as_ref()",
+          "origin": "changed",
+          "why": "as_ref has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "collect_inputs_recursive(&path, ignore, inputs)",
+          "origin": "changed",
+          "why": "collect_inputs_recursive does not return a Result (src/build.rs:202), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "is_file()",
+          "origin": "changed",
+          "why": "is_file has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_inputs_recursive",
+          "call": "push(path)",
+          "origin": "changed",
+          "why": "push has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "Vec::new()",
+          "origin": "calls_changed",
+          "why": "new has no definition in this repository, so what it returns is not established here"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "ignored_dirs()",
+          "origin": "calls_changed",
+          "why": "ignored_dirs does not return a Result (src/build.rs:240), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "collect_inputs_recursive(project_root, &ignore, &mut inputs)",
+          "origin": "calls_changed",
+          "why": "collect_inputs_recursive does not return a Result (src/build.rs:202), so it has no error to assume"
+        },
+        {
+          "file": "src/build.rs",
+          "function": "collect_build_inputs",
+          "call": "sort()",
+          "origin": "calls_changed",
+          "why": "sort has no definition in this repository, so what it returns is not established here"
+        }
+      ]
+    }
+  }
+}

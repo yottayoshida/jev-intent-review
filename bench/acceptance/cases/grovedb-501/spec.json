@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "dashpay/grovedb#501 — failure handling stated by the pull request",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

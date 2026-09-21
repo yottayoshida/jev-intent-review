@@ -1,0 +1,57 @@
+diff --git a/crates/gateway/src/session/title.rs b/crates/gateway/src/session/title.rs
+index 4a6347b7..7aa8d45c 100644
+--- a/crates/gateway/src/session/title.rs
++++ b/crates/gateway/src/session/title.rs
+@@ -312,3 +312,52 @@ mod tests {
+         assert_eq!(label.as_deref(), Some("Existing Label"));
+     }
+ }
++
++#[cfg(test)]
++mod acceptance_probe {
++    use std::{pin::Pin, sync::Arc};
++
++    use {
++        async_trait::async_trait,
++        moltis_agents::model::{ChatMessage, CompletionResponse, LlmProvider, StreamEvent},
++        tokio_stream::Stream,
++    };
++
++    struct Failing;
++
++    #[async_trait]
++    impl LlmProvider for Failing {
++        fn name(&self) -> &str {
++            "probe"
++        }
++
++        fn id(&self) -> &str {
++            "probe"
++        }
++
++        async fn complete(
++            &self,
++            _messages: &[ChatMessage],
++            _tools: &[serde_json::Value],
++        ) -> anyhow::Result<CompletionResponse> {
++            anyhow::bail!("probe: provider failure")
++        }
++
++        fn stream(
++            &self,
++            _messages: Vec<ChatMessage>,
++        ) -> Pin<Box<dyn Stream<Item = StreamEvent> + Send + '_>> {
++            Box::pin(tokio_stream::empty())
++        }
++    }
++
++    #[tokio::test]
++    async fn generate_title_failure_reaches_the_caller() {
++        let conversation = vec![
++            ChatMessage::user("How do I rotate the key?"),
++            ChatMessage::user("And what happens to the audit log?"),
++        ];
++        let result = moltis_agents::title::generate_title(Arc::new(Failing), &conversation).await;
++        assert!(result.is_err(), "generate_title returned {result:?}");
++    }
++}

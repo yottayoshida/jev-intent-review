@@ -1,0 +1,12 @@
+diff --git a/crates/gateway/src/session/title.rs b/crates/gateway/src/session/title.rs
+index b37ba512..80782327 100644
+--- a/crates/gateway/src/session/title.rs
++++ b/crates/gateway/src/session/title.rs
+@@ -128,3 +128,7 @@ pub(crate) async fn generate_title_for_session(state: &Arc<GatewayState>, sessio
+         },
+     }
+ }
++
++fn settle_step<T, E>(outcome: Result<T, E>) -> Result<T, E> {
++    outcome
++}

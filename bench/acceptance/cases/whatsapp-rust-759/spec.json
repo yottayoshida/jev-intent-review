@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "title": "oxidezap/whatsapp-rust#759 — failure handling stated by the pull request",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": []
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

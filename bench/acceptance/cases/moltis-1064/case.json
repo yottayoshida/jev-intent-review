@@ -1,0 +1,382 @@
+{
+  "id": "moltis-1064",
+  "repo": "https://github.com/moltis-org/moltis",
+  "pr": 1064,
+  "license": "MIT",
+  "role": "unseen",
+  "source": "bench/acceptance/candidates.json order 19; targets fixed in bench/acceptance/targets-fixed.json",
+  "build": "bench/acceptance/build-branches.sh <clone> <merge-base> <pr-head> <this dir> <base-patch|-> <head-patch|-> moltis-1064-<version>",
+  "prHead": "4106d46dad04481a932597141739e42a5452cc86",
+  "versions": {
+    "shipped": {
+      "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+      "head": "4106d46dad04481a932597141739e42a5452cc86",
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)"
+        },
+        "B": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)"
+        },
+        "C": {
+          "requirementId": "R1",
+          "file": "crates/agents/src/title.rs",
+          "function": "generate_title",
+          "call": "complete(&messages, &[])"
+        }
+      },
+      "expected": {
+        "A": "not_listed",
+        "B": "not_listed",
+        "C": "not_listed"
+      }
+    },
+    "defect-A": {
+      "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+      "head": "fa45a528825734c277a84107af93b4ea9ff105d0",
+      "place": "A",
+      "patches": {
+        "head": "defect-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)"
+        }
+      },
+      "expected": {
+        "A": "listed"
+      }
+    },
+    "rewrite-A": {
+      "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+      "head": "e14b5b7d1268fc583d428735086583335943e684",
+      "place": "A",
+      "patches": {
+        "head": "rewrite-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)"
+        }
+      },
+      "expected": {
+        "A": "not_listed"
+      }
+    },
+    "hidden-A": {
+      "base": "d2697974d470b2adde91472e85ed5c14e78174b4",
+      "head": "e5f20ac177a50c402b266ba5516d9559b8938686",
+      "place": "A",
+      "patches": {
+        "base": "hidden-A.base.patch",
+        "head": "hidden-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)"
+        }
+      },
+      "expected": {
+        "A": "undetermined"
+      }
+    },
+    "defect-B": {
+      "base": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+      "head": "4697c3977399b015efd2ac38fd9aec6797783117",
+      "place": "B",
+      "patches": {
+        "base": "defect-B.base.patch"
+      },
+      "targets": {
+        "B": {
+          "requirementId": "R1",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)"
+        }
+      },
+      "expected": {
+        "B": "listed"
+      }
+    },
+    "defect-C": {
+      "base": "d07c04faef9832e01f17967fc9903c4a0a9915e2",
+      "head": "3e35d5175e2f0fe27db7259f2741a97f0d424527",
+      "place": "C",
+      "patches": {
+        "base": "defect-C.base.patch"
+      },
+      "targets": {
+        "C": {
+          "requirementId": "R1",
+          "file": "crates/agents/src/title.rs",
+          "function": "generate_title",
+          "call": "complete(&messages, &[])"
+        }
+      },
+      "expected": {
+        "C": "listed"
+      }
+    }
+  },
+  "existence": {
+    "shipped": {
+      "A": 1,
+      "B": 1,
+      "C": 1
+    },
+    "defect-A": {
+      "A": 1
+    },
+    "rewrite-A": {
+      "A": 1
+    },
+    "hidden-A": {
+      "A": 1
+    },
+    "defect-B": {
+      "B": 1
+    },
+    "defect-C": {
+      "C": 1
+    }
+  },
+  "precheck": {
+    "shipped": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        },
+        "B": {
+          "existence": 1,
+          "applicability": {
+            "ok": false,
+            "kind": "target_not_result"
+          }
+        },
+        "C": {
+          "existence": 1,
+          "applicability": {
+            "ok": false,
+            "kind": "callee_ambiguous"
+          }
+        }
+      }
+    },
+    "defect-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "rewrite-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "hidden-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 171,
+        "applicable": 3,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "defect-B": {
+      "live": false,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/dispatch.rs: 2 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "B": {
+          "existence": 1,
+          "applicability": {
+            "ok": false,
+            "kind": "target_not_result"
+          }
+        }
+      }
+    },
+    "defect-C": {
+      "live": false,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 6,
+          "calls_changed": 3
+        },
+        "calls": 170,
+        "applicable": 2,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 168
+      },
+      "notes": [
+        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+        "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+        "the callers of register were not followed (more references than the search returns)",
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "C": {
+          "existence": 1,
+          "applicability": {
+            "ok": false,
+            "kind": "callee_ambiguous"
+          }
+        }
+      }
+    }
+  }
+}

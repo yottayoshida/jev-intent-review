@@ -1,0 +1,241 @@
+{
+  "id": "grovedb-500",
+  "repo": "https://github.com/dashpay/grovedb",
+  "pr": 500,
+  "license": "MIT",
+  "role": "unseen",
+  "source": "bench/acceptance/candidates.json order 23; targets fixed in bench/acceptance/targets-fixed.json",
+  "build": "bench/acceptance/build-branches.sh <clone> <merge-base> <pr-head> <this dir> <base-patch|-> <head-patch|-> grovedb-500-<version>",
+  "prHead": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+  "versions": {
+    "shipped": {
+      "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+      "head": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)"
+        }
+      },
+      "expected": {
+        "A": "not_listed"
+      }
+    },
+    "defect-A": {
+      "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+      "head": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+      "place": "A",
+      "patches": {
+        "head": "defect-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)"
+        }
+      },
+      "expected": {
+        "A": "listed"
+      }
+    },
+    "rewrite-A": {
+      "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+      "head": "87e06509bc8da68b9c815ad5799f507d81183c69",
+      "place": "A",
+      "patches": {
+        "head": "rewrite-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)"
+        }
+      },
+      "expected": {
+        "A": "not_listed"
+      }
+    },
+    "hidden-A": {
+      "base": "ad3f80263ed21321bee9f450a854d0ee92356b8a",
+      "head": "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd",
+      "place": "A",
+      "patches": {
+        "base": "hidden-A.base.patch",
+        "head": "hidden-A.head.patch"
+      },
+      "targets": {
+        "A": {
+          "requirementId": "R1",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)"
+        }
+      },
+      "expected": {
+        "A": "undetermined"
+      }
+    }
+  },
+  "existence": {
+    "shipped": {
+      "A": 1
+    },
+    "defect-A": {
+      "A": 1
+    },
+    "rewrite-A": {
+      "A": 1
+    },
+    "hidden-A": {
+      "A": 1
+    }
+  },
+  "precheck": {
+    "shipped": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 215,
+        "applicable": 8,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "defect-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 215,
+        "applicable": 8,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "rewrite-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 215,
+        "applicable": 8,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    },
+    "hidden-A": {
+      "live": true,
+      "counts": {
+        "budget": 20,
+        "functions": {
+          "changed": 1,
+          "calls_changed": 13
+        },
+        "calls": 216,
+        "applicable": 9,
+        "asked": 0,
+        "mapped": 0,
+        "governed": 0,
+        "overBudget": 0,
+        "notApplicable": 207
+      },
+      "notes": [
+        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+      ],
+      "targets": {
+        "A": {
+          "existence": 1,
+          "applicability": {
+            "ok": true
+          }
+        }
+      }
+    }
+  }
+}
