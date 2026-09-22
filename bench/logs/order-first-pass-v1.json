@@ -1,8 +1,8 @@
 {
   "what": "Which calls the budget of 20 reaches, with the order inside a function (calls into a function the change touched first) and without it, under today's applicability check and a wider stand-in for #45. No request sent.",
   "tool": {
-    "commit": "18ac68c7c6424989fde91ac3801a191da3ac63b6",
-    "src": "89e09e4b8ca541a5e0c5d7ce5d6b213bc7c168ac51fc3224bea18a59f5b31aa1"
+    "commit": "b8a17ec11c0802f6ca37a88e18ce0ee0aa761554",
+    "src": "acdb065f569f6370219f96dbe61a27ddf0b8610bc71d0663380eb76325d3012d"
   },
   "budget": 20,
   "rows": [
@@ -47,7 +47,7 @@
           ]
         }
       ],
-      "ms": 9668
+      "ms": 9189
     },
     {
       "case": "moltis-1064",
@@ -88,7 +88,7 @@
           "held": []
         }
       ],
-      "ms": 5633
+      "ms": 5138
     },
     {
       "case": "moltis-1064",
@@ -131,7 +131,7 @@
           ]
         }
       ],
-      "ms": 9869
+      "ms": 10108
     },
     {
       "case": "moltis-1064",
@@ -172,7 +172,7 @@
           "held": []
         }
       ],
-      "ms": 5572
+      "ms": 5163
     },
     {
       "case": "moltis-1064",
@@ -215,7 +215,7 @@
           ]
         }
       ],
-      "ms": 9893
+      "ms": 14819
     },
     {
       "case": "moltis-1064",
@@ -256,7 +256,7 @@
           "held": []
         }
       ],
-      "ms": 5472
+      "ms": 10420
     },
     {
       "case": "moltis-1064",
@@ -299,7 +299,7 @@
           ]
         }
       ],
-      "ms": 9726
+      "ms": 11075
     },
     {
       "case": "moltis-1064",
@@ -340,7 +340,7 @@
           "held": []
         }
       ],
-      "ms": 5295
+      "ms": 5483
     },
     {
       "case": "moltis-1064",
@@ -383,7 +383,7 @@
           ]
         }
       ],
-      "ms": 9108
+      "ms": 10520
     },
     {
       "case": "moltis-1064",
@@ -424,7 +424,7 @@
           "held": []
         }
       ],
-      "ms": 6199
+      "ms": 5616
     },
     {
       "case": "grovedb-500",
@@ -454,7 +454,7 @@
           "held": []
         }
       ],
-      "ms": 7108
+      "ms": 7272
     },
     {
       "case": "grovedb-500",
@@ -484,7 +484,7 @@
           "held": []
         }
       ],
-      "ms": 1416
+      "ms": 1354
     },
     {
       "case": "grovedb-500",
@@ -514,7 +514,7 @@
           "held": []
         }
       ],
-      "ms": 7046
+      "ms": 8198
     },
     {
       "case": "grovedb-500",
@@ -544,7 +544,7 @@
           "held": []
         }
       ],
-      "ms": 1429
+      "ms": 1490
     },
     {
       "case": "grovedb-500",
@@ -574,7 +574,7 @@
           "held": []
         }
       ],
-      "ms": 7288
+      "ms": 7429
     },
     {
       "case": "grovedb-500",
@@ -604,7 +604,7 @@
           "held": []
         }
       ],
-      "ms": 1464
+      "ms": 1398
     },
     {
       "case": "grovedb-500",
@@ -634,7 +634,7 @@
           "held": []
         }
       ],
-      "ms": 7951
+      "ms": 7401
     },
     {
       "case": "grovedb-500",
@@ -664,7 +664,7 @@
           "held": []
         }
       ],
-      "ms": 1679
+      "ms": 1412
     },
     {
       "case": "grovedb-501",
@@ -709,7 +709,7 @@
           ]
         }
       ],
-      "ms": 8063
+      "ms": 8161
     },
     {
       "case": "grovedb-501",
@@ -750,7 +750,7 @@
           "held": []
         }
       ],
-      "ms": 1755
+      "ms": 1658
     },
     {
       "case": "kontor-385",
@@ -837,7 +837,7 @@
           ]
         }
       ],
-      "ms": 10783
+      "ms": 11616
     },
     {
       "case": "kontor-385",
@@ -992,7 +992,7 @@
           "held": []
         }
       ],
-      "ms": 7212
+      "ms": 7237
     },
     {
       "case": "instruckt-tauri-9",
@@ -1010,7 +1010,7 @@
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 2394
+      "ms": 2117
     },
     {
       "case": "instruckt-tauri-9",
@@ -1028,7 +1028,7 @@
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 2241
+      "ms": 2146
     },
     {
       "case": "pybun-428",
@@ -1046,7 +1046,7 @@
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 8278
+      "ms": 8045
     },
     {
       "case": "pybun-428",
@@ -1064,7 +1064,7 @@
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 5066
+      "ms": 5842
     },
     {
       "case": "quebec-136",
@@ -1193,7 +1193,7 @@
           "held": []
         }
       ],
-      "ms": 7346
+      "ms": 8402
     },
     {
       "case": "omamori-468",
@@ -1250,7 +1250,7 @@
           "held": []
         }
       ],
-      "ms": 6836
+      "ms": 6240
     },
     {
       "case": "omamori-468",
@@ -1307,7 +1307,7 @@
           "held": []
         }
       ],
-      "ms": 7721
+      "ms": 14413
     },
     {
       "case": "omamori-468",
@@ -1364,7 +1364,7 @@
           "held": []
         }
       ],
-      "ms": 6736
+      "ms": 10446
     },
     {
       "case": "omamori-468",
@@ -1421,7 +1421,7 @@
           "held": []
         }
       ],
-      "ms": 7976
+      "ms": 8051
     },
     {
       "case": "omamori-468",
@@ -1478,7 +1478,7 @@
           "held": []
         }
       ],
-      "ms": 6887
+      "ms": 6429
     },
     {
       "case": "omamori-468",
@@ -1535,7 +1535,7 @@
           "held": []
         }
       ],
-      "ms": 7726
+      "ms": 7740
     },
     {
       "case": "omamori-468",
@@ -1592,7 +1592,7 @@
           "held": []
         }
       ],
-      "ms": 6704
+      "ms": 6679
     },
     {
       "case": "omamori-468",
@@ -1649,7 +1649,7 @@
           "held": []
         }
       ],
-      "ms": 7282
+      "ms": 7837
     },
     {
       "case": "omamori-468",
@@ -1706,7 +1706,7 @@
           "held": []
         }
       ],
-      "ms": 6449
+      "ms": 7130
     }
   ]
 }
