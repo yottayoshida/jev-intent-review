@@ -91,7 +91,7 @@ function signatureAt(lines: readonly string[], startLine: number, endLine: numbe
   return parts.join(" ").replace(/\s+/g, " ").slice(0, 300);
 }
 
-const isRustFunction = (line: string, name: string) => new RegExp(`\\bfn\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(<]`).test(line);
+export const isRustFunction = (line: string, name: string) => new RegExp(`\\bfn\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(<]`).test(line);
 
 /** `foo(` / `a::b::foo(` / `x.foo(` — the name immediately before an open parenthesis. */
 const CALL = /(?<![\w$])((?:[A-Za-z_][\w$]*::)*[A-Za-z_][\w$]*)\s*\(/g;

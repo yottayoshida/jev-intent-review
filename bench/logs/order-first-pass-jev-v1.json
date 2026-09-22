@@ -1,0 +1,1939 @@
+{
+  "what": "The two calls of run_override_disable that the order inside a function swaps on omamori #468, asked of Jev; every other question answered with nothing and not sent.",
+  "tool": {
+    "commit": "18ac68c7c6424989fde91ac3801a191da3ac63b6",
+    "src": "08f17f49744c1ab9fd0550f00f3b45c9c07fb13e0e2c88e993f98cf8f450be38"
+  },
+  "model": "typesafe/jev",
+  "runs": 3,
+  "questions": {
+    "sent": 120,
+    "answeredWithNothing": 1740
+  },
+  "requests": {
+    "requests": 120,
+    "bytes": 399000
+  },
+  "rows": [
+    {
+      "branch": "correct",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.75,
+          "probabilities": {
+            "does_not_apply": 0.75,
+            "unknown": 0.05,
+            "applies": 0.2
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "applies": 0.01,
+            "unknown": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.02,
+            "unknown": 0,
+            "applies": 0.98
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "does_not_apply": 0.96,
+            "applies": 0.03,
+            "unknown": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.84,
+          "probabilities": {
+            "unknown": 0.04,
+            "applies": 0.12,
+            "does_not_apply": 0.84
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "applies": 0.01,
+            "unknown": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.96,
+          "probabilities": {
+            "does_not_apply": 0.03,
+            "unknown": 0.01,
+            "applies": 0.96
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_apply": 0.97,
+            "unknown": 0.01,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.8,
+          "probabilities": {
+            "unknown": 0.04,
+            "does_not_apply": 0.8,
+            "applies": 0.16
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.96,
+            "unknown": 0.01,
+            "does_not_apply": 0.03
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "correct",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.97,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.81,
+          "probabilities": {
+            "does_not_apply": 0.81,
+            "unknown": 0.04,
+            "applies": 0.15
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_apply": 0.99,
+            "unknown": 0.01,
+            "applies": 0
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "applies": 0.98,
+            "unknown": 0,
+            "does_not_apply": 0.02
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "unknown": 0.02,
+            "applies": 0.03,
+            "does_not_apply": 0.95
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.82,
+          "probabilities": {
+            "does_not_apply": 0.82,
+            "unknown": 0.04,
+            "applies": 0.14
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.95,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.04,
+            "applies": 0.95
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.94,
+          "probabilities": {
+            "unknown": 0.02,
+            "applies": 0.04,
+            "does_not_apply": 0.94
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.86,
+          "probabilities": {
+            "unknown": 0.03,
+            "applies": 0.11,
+            "does_not_apply": 0.86
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.99,
+          "probabilities": {
+            "applies": 0,
+            "does_not_apply": 0.99,
+            "unknown": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.02,
+            "unknown": 0,
+            "applies": 0.98
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-read-baseline",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.97,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "cannot_determine": 0.01,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.86,
+          "probabilities": {
+            "does_not_apply": 0.86,
+            "applies": 0.11,
+            "unknown": 0.03
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.98,
+            "applies": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.94,
+          "probabilities": {
+            "applies": 0.94,
+            "does_not_apply": 0.05,
+            "unknown": 0.01
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.01,
+            "does_not_apply": 0.97
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.78,
+          "probabilities": {
+            "unknown": 0.04,
+            "does_not_apply": 0.78,
+            "applies": 0.18
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.98,
+            "applies": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.94,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.05,
+            "applies": 0.94
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.96,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.02,
+            "does_not_apply": 0.96
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.78,
+          "probabilities": {
+            "applies": 0.18,
+            "unknown": 0.04,
+            "does_not_apply": 0.78
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.97,
+          "probabilities": {
+            "applies": 0.97,
+            "does_not_apply": 0.02,
+            "unknown": 0.01
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-read-baseline",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.84,
+          "probabilities": {
+            "does_not_apply": 0.84,
+            "unknown": 0.03,
+            "applies": 0.13
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.95,
+          "probabilities": {
+            "applies": 0.95,
+            "does_not_apply": 0.04,
+            "unknown": 0.01
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "cannot_determine": 0,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "applies": 0.02,
+            "unknown": 0.01,
+            "does_not_apply": 0.97
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.86,
+          "probabilities": {
+            "unknown": 0.03,
+            "applies": 0.11,
+            "does_not_apply": 0.86
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.98,
+            "unknown": 0.01,
+            "applies": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "applies": 0.98,
+            "unknown": 0,
+            "does_not_apply": 0.02
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.83,
+          "probabilities": {
+            "does_not_apply": 0.83,
+            "unknown": 0.03,
+            "applies": 0.14
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 1,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "applies": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.94,
+          "probabilities": {
+            "does_not_apply": 0.05,
+            "applies": 0.94,
+            "unknown": 0.01
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "m-raw-override",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.95,
+          "probabilities": {
+            "unknown": 0.02,
+            "applies": 0.03,
+            "does_not_apply": 0.95
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.78,
+          "probabilities": {
+            "unknown": 0.04,
+            "does_not_apply": 0.78,
+            "applies": 0.18
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 1,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "applies": 0.01,
+            "unknown": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_apply": 0.03,
+            "unknown": 0,
+            "applies": 0.97
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 1,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.97,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.87,
+          "probabilities": {
+            "does_not_apply": 0.87,
+            "applies": 0.1,
+            "unknown": 0.03
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 2,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0.01,
+            "does_not_apply": 0.98,
+            "applies": 0.01
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_apply": 0.02,
+            "unknown": 0,
+            "applies": 0.98
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 2,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_apply": 0.97,
+            "unknown": 0.01,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.81,
+          "probabilities": {
+            "does_not_apply": 0.81,
+            "applies": 0.16,
+            "unknown": 0.03
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 3,
+      "requirementId": "R1",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.98,
+          "probabilities": {
+            "applies": 0.01,
+            "unknown": 0.01,
+            "does_not_apply": 0.98
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "entered",
+      "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)",
+      "mapping": [
+        {
+          "verdict": "applies",
+          "probability": 0.98,
+          "probabilities": {
+            "unknown": 0,
+            "does_not_apply": 0.02,
+            "applies": 0.98
+          },
+          "governs": true
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    },
+    {
+      "branch": "v-raw-override",
+      "run": 3,
+      "requirementId": "R2",
+      "target": "left",
+      "call": "guard_ai_config_modification(\"override disable\")",
+      "mapping": [
+        {
+          "verdict": "does_not_apply",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_apply": 0.97,
+            "unknown": 0.01,
+            "applies": 0.02
+          },
+          "governs": false
+        }
+      ],
+      "observed": [
+        {
+          "observation": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "why": "the failed call is not returned as a success"
+        }
+      ],
+      "findings": 0
+    }
+  ]
+}
