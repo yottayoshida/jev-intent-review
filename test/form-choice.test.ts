@@ -3,10 +3,29 @@
 // written by hand, so that a table cannot be right for a wrong reason.
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { chooseForm, FORM_QUESTION, keywordForm } from "../bench/forms/choice/question.ts";
-import { barLines, duplicates, isFragment, renderTables, rows, summarise, type Log, type SentenceSet } from "../bench/forms/choice/score.ts";
+import { barLines, duplicates, isFragment, normalise, readAtBar, renderTables, requirementSentencesIn, rows, summarise, type Log, type SentenceSet } from "../bench/forms/choice/score.ts";
 import { answer } from "./helpers/fakes.ts";
+
+const ROOT = new URL("../", import.meta.url).pathname;
+const committedSet = (): SentenceSet => JSON.parse(readFileSync(`${ROOT}bench/forms/choice/sentences.json`, "utf8")) as SentenceSet;
+
+test("every requirement sentence in the repository's spec, fixture and golden files is in the labelled set", () => {
+  const have = new Set(committedSet().sentences.map((s) => normalise(s.text)));
+  const found = requirementSentencesIn(ROOT);
+  assert.ok(found.length >= 60, `only ${found.length} sentences found in the repository`);
+  const left = found.filter((f) => !have.has(normalise(f.text)));
+  assert.deepEqual(left, []);
+});
+
+test("an answer whose choice the question did not offer reads as none, not as a label", () => {
+  assert.equal(readAtBar(answer("constructor", 0.99)), "none");
+  assert.equal(readAtBar(answer("neither", 0.99)), "neither");
+  assert.equal(readAtBar(answer("neither", 0.59)), "under");
+  assert.equal(readAtBar(undefined), "none");
+});
 
 test("the form question offers the two forms and neither, and its text names no sentence", () => {
   assert.deepEqual(Object.keys(FORM_QUESTION), ["requirement_form"]);

@@ -25,7 +25,7 @@ import { endpointFromEnv, FATAL_KINDS, JevClient, ProviderError } from "../../..
 import { JevProvider } from "../../../src/judgments/jev.ts";
 import { BAR } from "../../../src/plan/local-check.ts";
 import { FORM_QUESTION, QUESTION_HASH } from "./question.ts";
-import { duplicates, isFragment, KINDS, LABELS, renderTables, type Log, type Sentence, type SentenceSet } from "./score.ts";
+import { duplicates, isFragment, KINDS, LABELS, normalise, renderTables, requirementSentencesIn, requirementsIn, type Log, type Sentence, type SentenceSet } from "./score.ts";
 
 const HERE = new URL("./", import.meta.url).pathname;
 const ROOT = new URL("../../../", import.meta.url).pathname;
@@ -41,7 +41,7 @@ function textAt(s: Sentence): { text: string } | { byHand: true } | { missing: s
   if (o.file === undefined) return o.url !== undefined ? { byHand: true } : { missing: "no file and no url" };
   const doc = JSON.parse(readFileSync(join(ROOT, o.file), "utf8")) as Record<string, unknown>;
   if (o.id !== undefined) {
-    const r = (doc.requirements as { id: string; text: string }[] | undefined)?.find((x) => x.id === o.id);
+    const r = requirementsIn(doc).find((x) => x.id === o.id);
     return r ? { text: r.text } : { missing: `${o.file} has no requirement ${o.id}` };
   }
   if (o.case !== undefined && o.index !== undefined) {
@@ -78,6 +78,15 @@ function verify(): number {
   for (const ids of duplicates(set.sentences)) {
     console.log(`the same sentence twice: ${ids.join(", ")}`);
     bad += 1;
+  }
+  // The other direction: nothing the repository holds is left out. A set that only checks what it
+  // lists would pass with half the sentences missing.
+  const have = new Set(set.sentences.map((s) => normalise(s.text)));
+  for (const { file, text } of requirementSentencesIn(ROOT)) {
+    if (!have.has(normalise(text))) {
+      console.log(`not in the set: ${file}: ${text.slice(0, 120)}`);
+      bad += 1;
+    }
   }
   const count = (f: (s: Sentence) => boolean) => set.sentences.filter(f).length;
   console.log(`${set.sentences.length} sentences: ${LABELS.map((l) => `${l} ${count((s) => s.label === l)}`).join(", ")}`);
@@ -124,7 +133,13 @@ async function measure(runs: number): Promise<number> {
         }
       }
       sent += 1;
-      const a = answers!.requirement_form!;
+      const a = answers!.requirement_form;
+      // The provider checks every answer against its question, so this is unreachable through it;
+      // a provider that returned without the key would otherwise leave a half entry in the log.
+      if (!a) {
+        console.log(`${s.id}: the answer has no requirement_form; stopping`);
+        return 12;
+      }
       entry.push({ answer: a, ms: Date.now() - started });
       writeFileSync(LOG, `${JSON.stringify(log, null, 2)}\n`);
       console.log(`${s.id} [${s.label}] run ${entry.length}: ${a.choice} ${a.probability.toFixed(2)} ${JSON.stringify(a.probabilities)}`);

@@ -192,6 +192,36 @@
       "text": "A baseline file must not be read unless it exists."
     },
     {
+      "id": "fixture-missed-path-R1",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "tool",
+        "file": "test/fixtures/missed-path/fixture.json",
+        "id": "R1"
+      },
+      "text": "Disabled users cannot authenticate."
+    },
+    {
+      "id": "fixture-scope-creep-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "tool",
+        "file": "test/fixtures/scope-creep/fixture.json",
+        "id": "R1"
+      },
+      "text": "A failed OAuth token exchange is retried once before the login fails."
+    },
+    {
+      "id": "fixture-unknown-plugin-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "tool",
+        "file": "test/fixtures/unknown-plugin/fixture.json",
+        "id": "R1"
+      },
+      "text": "Every deletion of a record writes an entry to the audit log."
+    },
+    {
       "id": "corpus-omamori-551-R1",
       "label": "neither",
       "origin": {

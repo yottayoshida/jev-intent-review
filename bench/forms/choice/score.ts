@@ -1,6 +1,8 @@
 // The table `docs/local-check-cli.md` quotes, computed from the log and from nothing else, and the
 // checks on the labelled set. Nothing here sends a request.
 
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { BAR } from "../../../src/plan/local-check.ts";
 import type { ChoiceAnswer } from "../../../src/types.ts";
 import { keywordForm, type Label } from "./question.ts";
@@ -45,6 +47,50 @@ export function isFragment(text: string): boolean {
   return !/[.;。][)”’"'*_]*$/.test(text.trim());
 }
 
+/** The requirements a spec or fixture file holds, at its top or under `spec`. */
+export function requirementsIn(doc: Record<string, unknown>): { id: string; text: string }[] {
+  const list = Array.isArray(doc.requirements) ? doc.requirements : Array.isArray((doc.spec as Record<string, unknown> | undefined)?.requirements) ? (doc.spec as { requirements: unknown[] }).requirements : [];
+  return list.filter((r): r is { id: string; text: string } => !!r && typeof (r as { text?: unknown }).text === "string");
+}
+
+/**
+ * Every requirement sentence the repository holds in a file: `requirements[]` at the top or under
+ * `spec` of any JSON file, the golden's `cases`, and the candidates' `requirement` — under `bench/`
+ * and `test/fixtures/`, leaving out `bench/logs/`, whose files are records of runs and copy the
+ * specs those runs were given. What is left out is said here so that the set's claim to hold
+ * "every sentence" can be read against it.
+ */
+export function requirementSentencesIn(root: string): { file: string; text: string }[] {
+  const out: { file: string; text: string }[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      const rel = relative(root, path);
+      if (entry.isDirectory()) {
+        if (entry.name === "node_modules" || rel === "bench/logs") continue;
+        walk(path);
+        continue;
+      }
+      if (!entry.name.endsWith(".json")) continue;
+      let doc: unknown;
+      try {
+        doc = JSON.parse(readFileSync(path, "utf8"));
+      } catch {
+        continue;
+      }
+      if (!doc || typeof doc !== "object" || Array.isArray(doc)) continue;
+      const d = doc as Record<string, unknown>;
+      for (const r of requirementsIn(d)) out.push({ file: rel, text: r.text });
+      if (d.cases && typeof d.cases === "object" && !Array.isArray(d.cases)) {
+        for (const items of Object.values(d.cases as Record<string, unknown>)) if (Array.isArray(items)) for (const it of items) if (it && typeof (it as { text?: unknown }).text === "string") out.push({ file: rel, text: (it as { text: string }).text });
+      }
+      if (Array.isArray(d.candidates)) for (const c of d.candidates) if (c && typeof (c as { requirement?: unknown }).requirement === "string") out.push({ file: rel, text: (c as { requirement: string }).requirement });
+    }
+  };
+  for (const top of ["bench", "test/fixtures"]) walk(join(root, top));
+  return out;
+}
+
 export function duplicates(sentences: readonly Sentence[]): string[][] {
   const byText = new Map<string, string[]>();
   for (const s of sentences) {
@@ -57,9 +103,13 @@ export function duplicates(sentences: readonly Sentence[]): string[][] {
 export const LABELS: readonly Label[] = ["failure_propagation", "check_before_action", "neither"];
 export const KINDS: readonly Kind[] = ["tool", "model", "text", "written"];
 
-/** Jev's reading of one answer at the bar: the option chosen, when its probability clears the bar, else `under`. */
+/**
+ * Jev's reading of one answer at the bar: the option chosen, when its probability clears the bar,
+ * else `under`; no answer, or an option the question did not offer, is `none`. The same line as
+ * `chooseForm`, kept as a label so that `neither` counts as a reading here.
+ */
 export function readAtBar(answer: ChoiceAnswer | undefined, bar = BAR): Label | "under" | "none" {
-  if (!answer) return "none";
+  if (!answer || !LABELS.includes(answer.choice as Label)) return "none";
   if (answer.probability < bar) return "under";
   return answer.choice as Label;
 }
@@ -106,7 +156,6 @@ export interface ClassSummary {
   /** Read as `neither` or under the bar in any run. */
   defaultInAnyRun: number;
   keywordRight: number;
-  missing: number;
 }
 
 export function summarise(all: Row[], label: Label, kinds: Kind[] | "all"): ClassSummary {
@@ -120,7 +169,6 @@ export function summarise(all: Row[], label: Label, kinds: Kind[] | "all"): Clas
     checkInAnyRun: picked.filter((r) => r.checkInAnyRun).length,
     defaultInAnyRun: picked.filter((r) => r.readings.some((x) => x === "neither" || x === "under" || x === "none")).length,
     keywordRight: picked.filter((r) => r.keyword === r.label).length,
-    missing: picked.filter((r) => r.readings.length === 0).length,
   };
 }
 
