@@ -52,8 +52,8 @@ exactly as in text mode, and stderr stays a single JSON object.
 
 This is the form for a pull request that says, in one place, what becomes true when it merges.
 A requirement read only from a pull request's own description is its author's claim about their
-own change: the report says so, it is not used to justify the change's other lines, and in the
-review an issue that could not be read withholds VERIFIED.
+own change: the report says so, it is not used to justify the change's other lines, and an issue
+that could not be read is named in the report's notes.
 
 ## What is read, exactly
 
@@ -72,9 +72,10 @@ review an issue that could not be read withholds VERIFIED.
 - An issue the pull request closes and the tool does not read — in another repository, missing, or
   past the ten GitHub lists — is named.
 
-In the review, intent that exists and was not checked withholds VERIFIED: a source as high as any
-that was read and itself unread, requirements past the first twenty, and issues past the ten GitHub
-lists. The local check shows the same in its Intent section and does not change its exit code for it.
+Intent that exists and was not checked is said in the report's notes: a source as high as any that
+was read and itself unread, requirements past the first twenty, and issues past the ten GitHub
+lists. The run states no requirement verdict for it to withhold (ADR 0007), and its exit code does
+not change for it.
 
 ## An issue template
 
