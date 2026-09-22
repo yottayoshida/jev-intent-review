@@ -4541,5 +4541,212 @@
       "from": "judged for the first time once targets are read in full (the stand-in's guess)"
     }
   ],
-  "conflicts": []
+  "conflicts": [],
+  "adjudicated": [
+    {
+      "repo": "Kontor",
+      "about": "callee",
+      "names": [
+        "mine_and_send",
+        "mine_empty_and_send",
+        "mock_bitcoin",
+        "send_mempool_event",
+        "wait_for_batch",
+        "wait_for_block",
+        "wait_for_finality_event_matching",
+        "wait_for_ready",
+        "wait_for_state_event_matching"
+      ],
+      "got": [
+        "callee_not_result",
+        "callee_return_unknown",
+        "askable"
+      ],
+      "callerFiles": [
+        "core/indexer/src/reactor/reactor_cluster_tests.rs"
+      ],
+      "decided": "after the first measurement",
+      "reason": "The labeller counted core/indexer/src/reactor/reactor_cluster_tests.rs as test code, since core/indexer/src/reactor/mod.rs declares it with `#[cfg(test)] mod reactor_cluster_tests;`. The tool reads test regions file by file and does not follow a `mod x;` declaration, so it reads that file as code: its test functions are candidates, and these helpers, defined in the same file, are the callees those calls reach. The reason printed names that definition. The disagreement is about which files are test code, not about what a function returns; it is not changed here.",
+      "labels": [
+        "no_def"
+      ],
+      "reasonMatches": "reactor_cluster_tests\\.rs|^$"
+    },
+    {
+      "repo": "moltis",
+      "about": "callee",
+      "names": [
+        "len"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first measurement",
+      "reason": "The only `fn len` outside a test path, crates/nostr/src/seen.rs:87, carries `#[cfg(test)]` itself. The labelling rule named `#[cfg(test)]` modules only; the tool's test regions cover any item under it, as before this change, so that definition is not counted and a call to `len` from code outside tests reads as having no definition here.",
+      "labels": [
+        "not"
+      ],
+      "reasonMatches": "^len has no definition in this repository"
+    },
+    {
+      "repo": "Kontor",
+      "about": "callee",
+      "names": [
+        "build",
+        "filter_map",
+        "txid"
+      ],
+      "labels": [
+        "not",
+        "unknown"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first diff review",
+      "reason": "The labelling rules find a callee by its name alone. After the first diff review, the tool also rules out the one definition of a name when the call cannot reach it: a method call (`x.name(…)`) to a function that takes no `self`, or a number of arguments the function does not take. Each of these was checked in the source: `.build()` and `.filter_map(…)` are method calls, and core/indexer/build.rs:4 and core/indexer/src/block.rs:54 take no `self`; `.txid(t.txid.to_string())` passes one argument, and core/indexer/src/consensus/value.rs:20 `fn txid(&self) -> Txid` takes none.",
+      "reasonMatches": "so this call does not reach it"
+    },
+    {
+      "repo": "omamori",
+      "about": "callee",
+      "names": [
+        "collect",
+        "is_symlink"
+      ],
+      "labels": [
+        "unknown",
+        "not"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first diff review",
+      "reason": "The labelling rules find a callee by its name alone. After the first diff review, the tool also rules out the one definition of a name when the call cannot reach it: a method call (`x.name(…)`) to a function that takes no `self`, or a number of arguments the function does not take. Each of these was checked in the source: `.collect()` and `.is_symlink()` are method calls, and src/audit/provenance.rs:70 and src/atomic_file.rs:117 take no `self`.",
+      "reasonMatches": "so this call does not reach it"
+    }
+  ],
+  "labelledAfter": [
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "verify",
+      "label": "ambiguous",
+      "definitions": 7,
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Asked about before this change and held after it, so not among the items labelled beforehand. `git grep -w -F \"fn verify\"` finds seven definitions outside test paths; the tool before this change found one because its search for the bare name stopped at 200 hits."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "insert",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/bitcoin_follower/poller.rs:69",
+      "returnType": "()",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "clear",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/runtime/stack.rs:26",
+      "returnType": "()",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/project.rs:133",
+      "returnType": "&Path",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "packages_dir",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cache.rs:75",
+      "returnType": "PathBuf",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "secret",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:144",
+      "returnType": "Option<&[u8; 32]>",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "parse",
+      "label": "no_def",
+      "definitions": 1,
+      "definedAt": "core/macros/src/regtest.rs:10",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Asked about before and held after: `.parse()` is a method call (the standard library's `str::parse`), and the one `fn parse` here takes no `self`, so the call reaches no definition in this repository."
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "append",
+      "label": "no_def",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:262",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Asked about before and held after. Not a call: `refusing to append (this event was not recorded; …)` is text inside a string literal that starts on an earlier line (src/audit/mod.rs:288-293), which the listing reads line by line."
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "read",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/sessions/src/store.rs:113",
+      "returnType": "Result<Vec<serde_json::Value>>",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Held before and askable after: `session_store.read(session_key)` passes one argument to `pub async fn read(&self, key: &str) -> Result<Vec<serde_json::Value>>`, the one `fn read` outside tests."
+    }
+  ]
 }

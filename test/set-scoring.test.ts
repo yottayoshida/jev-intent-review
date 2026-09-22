@@ -164,6 +164,9 @@ test("a signature that wraps is still read as returning a Result", async () => {
   const fnw = w.functions[0]!;
   assert.match(fnw.signature, /-> Result<PathBuf, String> \{/);
   const call = w.calls.find((k) => k.callee === "read_capped")!;
+  // The target's return type is read from its file, as the callee's is, so the file is in the repository.
+  FILES["src/wrapped.rs"] = WRAPPED;
   const r = await applicabilityOf(fakeDiscoverer, fnw, call);
+  delete FILES["src/wrapped.rs"];
   assert.equal(r.ok, true, r.ok ? "" : r.reason);
 });
