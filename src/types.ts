@@ -137,6 +137,13 @@ export interface UnexpectedChange {
 }
 
 /**
+ * Why a run asked nothing, for a reader that is not a person: the Action's check run titles the run
+ * from this, never from the wording of `skipReason` (ADR 0010). `fork` and `dependabot` are the
+ * cases where a key cannot be given and so cannot be the fix.
+ */
+export type SkipKind = "no_credentials" | "fork" | "dependabot" | "no_intent";
+
+/**
  * What `--json` prints, whichever way the run ended (ADR 0007): skipped, stopped for want of
  * readable requirements, the set built with nothing asked, or finished. No requirement verdict:
  * `requirements` holds the local check's readings per call, and the counts are in each one.
@@ -146,6 +153,7 @@ export interface ReviewReport {
   tool: { name: "jev-intent-review"; version: string };
   exitCode: number;
   skipReason?: string;
+  skipKind?: SkipKind;
   intent: IntentSpec;
   sources: Omit<IntentSource, "text">[];
   requirements: LocalCheckResult[];

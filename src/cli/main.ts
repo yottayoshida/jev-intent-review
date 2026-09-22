@@ -19,7 +19,7 @@ import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
 import { DEFAULT_LOCAL_CHECK, runLocalCheck, type LocalCheckResult } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
 import { reviewChanges } from "../review/unexpected-change.ts";
-import { EXIT, ToolError, type IntentSource, type IntentSpec, type ReviewReport, type UnexpectedChange } from "../types.ts";
+import { EXIT, ToolError, type IntentSource, type IntentSpec, type ReviewReport, type SkipKind, type UnexpectedChange } from "../types.ts";
 import { VERSION } from "../version.ts";
 
 const HELP = `Usage: jev-intent-review [options]
@@ -176,15 +176,49 @@ async function defaultGithub(env: NodeJS.ProcessEnv): Promise<GitHub> {
   return new GitHub({ ...(token ? { token } : {}), ...(env.GITHUB_API_URL ? { apiUrl: env.GITHUB_API_URL } : {}), ...(env.GITHUB_GRAPHQL_URL ? { graphqlUrl: env.GITHUB_GRAPHQL_URL } : {}) });
 }
 
-/** The pull request number of the pull_request event this workflow runs for, if any. */
-function eventPullRequest(env: NodeJS.ProcessEnv): number | undefined {
+/**
+ * What the pull_request event says about where this pull request came from. GitHub gives a run
+ * started by another repository's pull request no secrets, and gives Dependabot's none either, so a
+ * run that asked nothing for want of a key says which of the three it was (ADR 0010).
+ *
+ * The head repository's own `fork` flag is not read: it says that repository is a fork of something,
+ * which is true of a pull request opened inside a fork as well, and those do get the secrets.
+ */
+export function eventOrigin(env: NodeJS.ProcessEnv): "same_repository" | "fork" | "dependabot" | "unknown" {
+  const pr = eventPullRequestOf(env);
+  if (!pr) return "unknown";
+  // A deleted fork leaves `head.repo` empty. The pull request still came from another repository:
+  // this one cannot be deleted while its own pull request is open.
+  const headRepo = pr.head?.repo;
+  if (headRepo === null) return "fork";
+  const head = headRepo?.full_name;
+  const base = pr.base?.repo?.full_name ?? env.GITHUB_REPOSITORY;
+  if (typeof head !== "string" || typeof base !== "string") return "unknown";
+  if (head !== base) return "fork";
+  return pr.user?.login === "dependabot[bot]" ? "dependabot" : "same_repository";
+}
+
+/** The pull request of the pull_request event this workflow runs for, read once for every caller. */
+function eventPullRequestOf(env: NodeJS.ProcessEnv): EventPullRequest | undefined {
   if (env.GITHUB_EVENT_NAME !== "pull_request" || !env.GITHUB_EVENT_PATH) return undefined;
   try {
-    const number = (JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8")) as { pull_request?: { number?: unknown } }).pull_request?.number;
-    return typeof number === "number" ? number : undefined;
+    return (JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8")) as { pull_request?: EventPullRequest }).pull_request;
   } catch {
     return undefined;
   }
+}
+
+interface EventPullRequest {
+  number?: unknown;
+  user?: { login?: unknown };
+  head?: { repo?: { full_name?: unknown } | null };
+  base?: { repo?: { full_name?: unknown } };
+}
+
+/** The pull request number of the pull_request event this workflow runs for, if any. */
+function eventPullRequest(env: NodeJS.ProcessEnv): number | undefined {
+  const number = eventPullRequestOf(env)?.number;
+  return typeof number === "number" ? number : undefined;
 }
 
 /**
@@ -225,6 +259,7 @@ const NO_INTENT: IntentSpec = { version: 1, title: "", summary: "", requirements
 interface ReportParts {
   exitCode: number;
   skipReason?: string;
+  skipKind?: SkipKind;
   intent?: IntentSpec;
   sources: readonly IntentSource[];
   requirements?: LocalCheckResult[];
@@ -244,6 +279,7 @@ function reportOf(revisions: Revisions, repository: string, configSource: string
     tool: { name: "jev-intent-review", version: VERSION },
     exitCode: parts.exitCode,
     ...(parts.skipReason === undefined ? {} : { skipReason: parts.skipReason }),
+    ...(parts.skipKind === undefined ? {} : { skipKind: parts.skipKind }),
     intent: parts.intent ?? NO_INTENT,
     sources: parts.sources.map(({ text: _text, ...source }) => source),
     requirements: parts.requirements ?? [],
@@ -358,7 +394,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     if (resolved.sources.length === 0) {
       const none = "nothing was read from an issue, the pull request's description or --intent";
       if (config.policy.no_intent === "fail") stop("No statement of intent was found.", NO_INTENT, [], `no intent was found: ${none}${notes.length > 0 ? ` (${notes.join(" ")})` : ""}`);
-      return output(report({ exitCode: EXIT.ok, skipReason: `No statement of intent was found: ${none}.`, sources: [], notes, prAuthor }));
+      return output(report({ exitCode: EXIT.ok, skipReason: `No statement of intent was found: ${none}.`, skipKind: "no_intent", sources: [], notes, prAuthor }));
     }
 
     // No model writes or chooses the requirements (ADR 0004): the documented forms are read as
@@ -436,7 +472,20 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // Skipped, not failed, even when nothing could be read: a fork's pull request has no
       // credentials and must not turn red for being written in prose. The report still says what
       // would have been checked and what was not read.
-      return output(report({ exitCode: EXIT.ok, skipReason: `No credentials for the judgments (${needed}) were available, so nothing was judged.`, intent, sources: resolved.sources, notes, prAuthor }));
+      //
+      // Which of the three it was decides what a reader should do about it: add the keys, or leave
+      // this pull request alone, since GitHub withholds them from another repository's and from
+      // Dependabot's whatever the repository sets (ADR 0010).
+      // The kind and the sentence come out of one table, so a change to one cannot leave the other
+      // behind — which is the failure this whole distinction exists to prevent.
+      const origin = eventOrigin(io.env);
+      const skipKind = origin === "fork" || origin === "dependabot" ? origin : ("no_credentials" as const);
+      const why: Record<typeof skipKind, string> = {
+        fork: "This pull request comes from another repository, and GitHub gives such a run no secrets, so nothing was judged.",
+        dependabot: "Dependabot's pull requests are given no secrets, so nothing was judged.",
+        no_credentials: `No credentials for the judgments (${needed}) were available, so nothing was judged.`,
+      };
+      return output(report({ exitCode: EXIT.ok, skipReason: why[skipKind], skipKind, intent, sources: resolved.sources, notes, prAuthor }));
     }
     if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;

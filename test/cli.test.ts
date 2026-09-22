@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { main, type Deps, type Io } from "../src/cli/main.ts";
+import { eventOrigin, main, type Deps, type Io } from "../src/cli/main.ts";
 import { CONFIG_PATH } from "../src/config/config.ts";
 import type { GitHub } from "../src/intent/github.ts";
 import { validateIntentSpec } from "../src/intent/schema.ts";
@@ -32,6 +33,14 @@ function specFile(dir: string, name = "missed-path"): string {
 
 /** The Rust fixture's spec, as a path the run can read. */
 const RUST_SPEC = join(FIXTURES, "integrity-rust", "spec.json");
+
+/**
+ * A pull_request event whose pull request is copied from one that exists (test/fixtures/events/):
+ * the same repository's, another repository's, one whose fork has been deleted, and Dependabot's.
+ * The envelope around it is written by hand, so what these pin is the reading, not the whole shape
+ * of an event GitHub delivers.
+ */
+const EVENT = (name: string) => join(import.meta.dirname, "fixtures", "events", `${name}.json`);
 
 /** No compiler: requirements come from a spec file or from an acceptance-criteria list. */
 function fakeDeps(github?: Partial<GitHub>): Deps & { provider: ReturnType<typeof formsProvider> } {
@@ -208,12 +217,39 @@ test("with no credentials the run is skipped (exit 0), or fails with exit 12 whe
   }
 });
 
+// The event decides which of the reasons a run without credentials gives, so the run is measured
+// from the payload, not from `eventOrigin` alone: the sentence a person reads and the kind the
+// Action switches on are both taken out of the JSON one run printed.
+test("a run without credentials names the reason the event gives, in the sentence and in the kind", async () => {
+  const repo = fixtureRepo("missed-path");
+  try {
+    const cases = [
+      ["same-repository", "no_credentials", /No credentials for the judgments/],
+      ["cross-repository", "fork", /comes from another repository/],
+      ["deleted-fork", "fork", /comes from another repository/],
+      ["dependabot", "dependabot", /Dependabot's pull requests/],
+    ] as const;
+    for (const [event, kind, sentence] of cases) {
+      const run = io(repo.dir, { GITHUB_EVENT_NAME: "pull_request", GITHUB_EVENT_PATH: EVENT(event) });
+      assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", specFile(repo.dir), "--json"], run.value, fakeDeps()), EXIT.ok);
+      const report = JSON.parse(run.out()) as ReviewReport;
+      assert.equal(report.version, 2);
+      assert.equal(report.skipKind, kind, `${event} should be ${kind}`);
+      assert.match(report.skipReason ?? "", sentence);
+    }
+  } finally {
+    repo.remove();
+  }
+});
+
 test("with no intent the run is skipped (exit 0), or fails with exit 11 when the config says so", async () => {
   const repo = fixtureRepo("missed-path");
   try {
     const skipped = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--json"], skipped.value, fakeDeps()), EXIT.ok);
-    assert.match((JSON.parse(skipped.out()) as ReviewReport).skipReason ?? "", /No statement of intent was found/);
+    const noIntent = JSON.parse(skipped.out()) as ReviewReport;
+    assert.match(noIntent.skipReason ?? "", /No statement of intent was found/);
+    assert.equal(noIntent.skipKind, "no_intent");
 
     repo.git("checkout", "-q", repo.base);
     repo.write({ [CONFIG_PATH]: "policy:\n  no_intent: fail\n" });
@@ -748,4 +784,54 @@ test("--skip-change-check leaves the changes unasked and says so; without it eve
   } finally {
     repo.remove();
   }
+});
+
+// ---- where a pull request came from (ADR 0010) ---------------------------------------------------
+
+// The payloads under EVENT are copied from real pull requests. The ones made here are the cases no
+// real pull request of this repository can show: a pull request opened inside a fork (which the
+// `fork` flag gets wrong, and which does get the secrets), and a fork that has been deleted.
+const scratched: string[] = [];
+const scratchFile = (name: string, text: string) => {
+  const dir = mkdtempSync(join(tmpdir(), "jir-event-"));
+  scratched.push(dir);
+  const path = join(dir, name);
+  writeFileSync(path, text);
+  return path;
+};
+const scratchEvent = (name: string, event: unknown) => scratchFile(name, JSON.stringify(event));
+
+test("where a pull request came from is read from the event, and a repository's own fork flag decides nothing", (t) => {
+  t.after(() => {
+    for (const dir of scratched.splice(0)) rmSync(dir, { recursive: true, force: true });
+  });
+  const env = (path: string) => ({ GITHUB_EVENT_NAME: "pull_request", GITHUB_EVENT_PATH: path }) as NodeJS.ProcessEnv;
+  assert.equal(eventOrigin(env(EVENT("same-repository"))), "same_repository");
+  assert.equal(eventOrigin(env(EVENT("cross-repository"))), "fork");
+  assert.equal(eventOrigin(env(EVENT("dependabot"))), "dependabot");
+
+  // Opened inside a fork: `head.repo.fork` is true, as it is for the cross-repository payload, but
+  // head and base are one repository and the run is given the secrets.
+  const insideAFork = scratchEvent("inside-a-fork.json", {
+    action: "opened",
+    number: 7,
+    pull_request: { number: 7, user: { login: "someone" }, head: { repo: { full_name: "someone/cli", fork: true } }, base: { repo: { full_name: "someone/cli", fork: true } } },
+    repository: { full_name: "someone/cli" },
+  });
+  assert.equal(eventOrigin(env(insideAFork)), "same_repository");
+
+  // A deleted fork: GitHub leaves `head.repo` empty, which is not the same as the field being
+  // absent — the pull request came from a repository that is gone, never from this one.
+  assert.equal(eventOrigin(env(EVENT("deleted-fork"))), "fork");
+
+  // Nothing to read from: another event, no file, a file that is not JSON, and one without the
+  // repositories. None of them may claim a pull request came from somewhere.
+  assert.equal(eventOrigin({ GITHUB_EVENT_NAME: "push", GITHUB_EVENT_PATH: EVENT("cross-repository") } as NodeJS.ProcessEnv), "unknown");
+  assert.equal(eventOrigin({ GITHUB_EVENT_NAME: "pull_request" } as NodeJS.ProcessEnv), "unknown");
+  assert.equal(eventOrigin(env(scratchFile("not-json.txt", "{"))), "unknown");
+  assert.equal(eventOrigin(env(scratchEvent("no-repos.json", { pull_request: { number: 1, user: { login: "someone" } } }))), "unknown");
+  // With the base missing, the repository the workflow runs in stands in for it.
+  const noBase = scratchEvent("no-base.json", { pull_request: { number: 1, user: { login: "someone" }, head: { repo: { full_name: "someone/cli" } } } });
+  assert.equal(eventOrigin({ ...env(noBase), GITHUB_REPOSITORY: "owner/cli" }), "fork");
+  assert.equal(eventOrigin({ ...env(noBase), GITHUB_REPOSITORY: "someone/cli" }), "same_repository");
 });
