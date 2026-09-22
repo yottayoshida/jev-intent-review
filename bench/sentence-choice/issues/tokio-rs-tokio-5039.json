@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5039",
+ "url": "https://github.com/tokio-rs/tokio/issues/5039",
+ "title": "Documentation for write_i8 in async_write_ext.rs should use signed integers ",
+ "author": "grydholt",
+ "createdAt": "2022-09-21T15:42:00Z",
+ "closedBy": "tokio-rs/tokio#5040",
+ "body": "**Version**\r\ntokio v1.21.1\r\n\r\nThe documentation for `write_i8` in `io/util/async_write_ext.rs` states\r\n\r\n```\r\n           /// Writes an unsigned 8-bit integer to the underlying writer.\r\n```\r\n\r\nThis seems to be a copy-paste error from `write_u8`. The code example also uses `write_u8` instead of `write_i8`."
+}

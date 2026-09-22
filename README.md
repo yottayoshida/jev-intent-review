@@ -83,7 +83,7 @@ v0.1 is an experimental implementation of the broader intent-review model.
 
 It currently supports:
 
-* Rust repositories
+* Rust repositories — in any other language no function is read and no call is asked about; only the change question runs
 * two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action
 * functions touched by the change and callers one hop out
 * requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](#intent))
@@ -114,26 +114,28 @@ Run against two revisions with an explicit intent spec:
 
 ```sh
 jev-intent-review \
-  --experimental-local-check \
   --base <base> \
   --head <head> \
   --intent-spec spec.json
 ```
+
+That is the whole run: the calls of the functions the change touched and their callers are read under each requirement's form, then every change the pull request made is asked about once. `--experimental-local-check`, which selected this run in 0.1, is still accepted: the report and the exit code are the same without it, and one line on stderr says so.
 
 To inspect which calls would be analyzed without sending anything to Jev:
 
 ```sh
 jev-intent-review \
-  --experimental-local-check \
-  --experimental-candidates-only \
+  --candidates-only \
   --base <base> \
   --head <head> \
   --intent-spec spec.json
 ```
 
-`--pr`, `--issue`, `--intent` and `--intent-file` take the requirements from the issue, the pull request or the text given, in the forms described under [Intent](#intent).
+`--skip-change-check` reads the calls and leaves the changes unasked. `--pr`, `--issue`, `--intent` and `--intent-file` take the requirements from the issue, the pull request or the text given, in the forms described under [Intent](#intent).
 
-Use `--json` for the full machine-readable report.
+Use `--json` for the full machine-readable report (`version: 2`; see [docs/local-check-cli.md](docs/local-check-cli.md)).
+
+The report states no requirement verdict: each call it read is *worth checking*, *holding*, *not settled* or *not required of by the requirement*, and a call worth checking leaves the exit code at 0. A repository that wants CI to fail on one sets `policy.fail_on: [finding]` in `.jev-intent-review.yml`.
 
 ## Intent
 
@@ -141,7 +143,7 @@ No model writes the requirements and no model picks them out of prose. They are 
 
 Whenever the tool prints its report, or stops because it could not read the requirements, every issue and pull request it read is either read into requirements as written — from a requirements section or a `Property:` paragraph, leaving out only HTML comments, code blocks, link reference definitions and characters that display as nothing — or named with the reason it was not. An issue the pull request closes and the tool does not read — in another repository, missing, or past the ten GitHub lists — is named too.
 
-In the review, intent that exists and was not checked withholds VERIFIED: a source as high as any that was read and itself unread, requirements past the first twenty, and issues past the ten GitHub lists.
+Intent that exists and was not checked is said in the report's notes: a source as high as any that was read and itself unread, requirements past the first twenty, and issues past the ten GitHub lists. Nothing is withheld for it, because no requirement verdict is stated ([ADR 0007](docs/adr/0007-the-run-is-the-local-check.md)).
 
 A pull request described only in prose is therefore not checked: the report names it and says why, and a run with credentials stops with exit 11 rather than guess. A run without credentials is skipped, as before, and still says what it would have read. Failures that print no report (exit 10, 12, 13) are outside this.
 

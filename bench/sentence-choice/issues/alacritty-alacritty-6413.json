@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6413",
+ "url": "https://github.com/alacritty/alacritty/issues/6413",
+ "title": "Docs wrong \"--class\" flag ",
+ "author": "jonaz",
+ "createdAt": "2022-10-17T08:47:42Z",
+ "closedBy": "alacritty/alacritty#6418",
+ "body": "Docs wrong after https://github.com/alacritty/alacritty/pull/6282\r\n\r\nforgot to update the --help info? It now differs from man pages? \r\n```\r\nOPTIONS:\r\n        --class <instance> | <instance>,<general>\r\n            Defines window class/app_id on X11/Wayland [default: Alacritty]\r\n```\r\nvs man\r\n```\r\n--class <general> | <general>,<instance>\r\n```"
+}

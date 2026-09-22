@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1875",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1875",
+ "title": "Add support for pofile (.po)?",
+ "author": "Jackenmen",
+ "createdAt": "2021-05-28T13:17:09Z",
+ "closedBy": "BurntSushi/ripgrep#1876",
+ "body": "#### Describe your feature request\r\n\r\nI want to exclude files matching `*.po` which is a Gettext PO file type.\r\nI would assume that `po` should be a name for it, possibly with a `pofile` alias."
+}

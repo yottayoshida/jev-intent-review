@@ -8,10 +8,10 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { main } from "../src/cli/main.ts";
-import { probabilityOf } from "../src/review/requirement.ts";
-import type { ReviewReport } from "../src/types.ts";
-import { FIXTURES, fixtureRepo } from "../test/helpers/repo.ts";
+import { main } from "../../src/cli/main.ts";
+import { probabilityOf } from "../../src/review/requirement.ts";
+import type { ReviewReport } from "../../src/types.ts";
+import { FIXTURES, fixtureRepo } from "../../test/helpers/repo.ts";
 
 interface Case {
   fixture: string;

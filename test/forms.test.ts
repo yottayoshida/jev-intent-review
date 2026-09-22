@@ -13,7 +13,10 @@ import type { CallCandidate } from "../src/plan/candidates.ts";
 import { callTerms, formOf, FORMS, identifierWords, requirementTerms, termsMeet } from "../src/plan/forms.ts";
 import { BAR as OBSERVATION_BAR, describe } from "../src/plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR } from "../src/plan/mapping.ts";
-import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../src/review/local-check-run.ts";
+import { LOCAL_CHECK_INTRO, requirementSection } from "../src/report/markdown.ts";
+import { DEFAULT_LOCAL_CHECK, runLocalCheck, type LocalCheckResult as LocalCheckResultType } from "../src/review/local-check-run.ts";
+
+const renderLocalCheck = (results: readonly LocalCheckResultType[]) => [...LOCAL_CHECK_INTRO, ...results.flatMap((r) => requirementSection(r))].join("\n");
 import { outcomeOf, type Outcome, type Reading } from "../src/review/outcome.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
 import type { Git } from "../src/repository/git.ts";
@@ -257,7 +260,7 @@ function jev(): JudgmentProvider {
   };
 }
 
-const run = (auth: string, requirements: Requirement[]) => runLocalCheck(authRepo(auth), { before: "BEFORE", after: "AFTER" }, requirements, jev(), () => true, DEFAULT_LOCAL_CHECK);
+const run = (auth: string, requirements: Requirement[]) => runLocalCheck(authRepo(auth), { before: "BEFORE", after: "AFTER" }, requirements, jev(), () => true, DEFAULT_LOCAL_CHECK).then((x) => x.requirements);
 const asked = (r: { wouldAsk: { call: string }[] }) => r.wouldAsk.map((w) => w.call.replace(/\(.*$/s, "")).sort();
 
 test("check_before_action end to end: the unguarded action is worth checking, the guarded one holds", async () => {
@@ -305,7 +308,7 @@ test("a callee is left to be asked about inside only when its one definition is 
     { "src/auth.rs": AUTH_UNGUARDED.replace("audit(store)?;", "record_use(store)?;"), "src/cache.rs": CACHE.replace("cache.touch(id)?;", "cache.mark(id)?;") },
     hunk("src/auth.rs", AUTH_UNGUARDED, "audit(store)?;", "record_use(store)?;") + hunk("src/cache.rs", CACHE, "cache.touch(id)?;", "cache.mark(id)?;"),
   );
-  const [r] = await runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [GUARD], jev(), () => true, DEFAULT_LOCAL_CHECK);
+  const [r] = (await runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [GUARD], jev(), () => true, DEFAULT_LOCAL_CHECK)).requirements;
   assert.equal(r!.counts.functions.changed, 2, "both create_session's function and open_session are in the set");
   assert.ok(r!.wouldAsk.some((w) => w.function === "open_session" && w.call.startsWith("create_session")), `the store's call is asked about: ${JSON.stringify(r!.wouldAsk)}`);
   assert.ok(!r!.unchecked.some((u) => u.function === "open_session" && u.call.startsWith("create_session")), JSON.stringify(r!.unchecked));
@@ -321,7 +324,7 @@ test("a name whose search was cut at the cap is not taken to be read here: its o
   const auditLine = AUTH.split("\n").findIndex((l) => l.includes("audit(store)?;")) + 1;
   const diff = `diff --git a/src/auth.rs b/src/auth.rs\n--- a/src/auth.rs\n+++ b/src/auth.rs\n@@ -2 +2,2 @@ pub fn login\n-    open_session(store, key)\n+    let session = open_session(store, key)?;\n+    Ok(session)\n@@ -${auditLine - 1} +${auditLine} @@ pub fn open_session\n-    record_use(store)?;\n+    audit(store)?;\n`;
   const cut = fakeRepo({ "src/auth.rs": AUTH, "src/store.rs": STORE }, { "src/auth.rs": before }, diff, (pattern) => pattern === "open_session");
-  const [r] = await runLocalCheck(cut, { before: "BEFORE", after: "AFTER" }, [GUARD], jev(), () => true, DEFAULT_LOCAL_CHECK);
+  const [r] = (await runLocalCheck(cut, { before: "BEFORE", after: "AFTER" }, [GUARD], jev(), () => true, DEFAULT_LOCAL_CHECK)).requirements;
   assert.equal(r!.counts.functions.changed, 2, "login and open_session are both changed");
   assert.ok(r!.wouldAsk.some((w) => w.function === "login" && w.call.startsWith("open_session")), `asked about from login: ${JSON.stringify(r!.wouldAsk)}`);
   assert.ok(!r!.unchecked.some((u) => u.function === "login"), JSON.stringify(r!.unchecked));

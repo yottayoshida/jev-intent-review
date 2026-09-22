@@ -185,6 +185,17 @@ export const FORMS: Readonly<Record<RequirementForm, Form>> = {
 
 export const formOf = (requirement: Requirement): Form => FORMS[requirement.form ?? DEFAULT_FORM];
 
+/**
+ * The wording of every question a form can send, rendered on one fixed place, so a report can carry
+ * a fingerprint of what was asked (`QUESTIONS_HASH`). Change a criterion or a template and the
+ * fingerprint moves; change nothing and it does not.
+ */
+export const FORMS_FINGERPRINT: Readonly<Record<RequirementForm, { mapping: Questions; observation: Questions }>> = (() => {
+  const fn = { id: "f", path: "src/f.rs", name: "f", startLine: 1, endLine: 1, signature: "fn f() -> Result<(), E>" } as FunctionCandidate;
+  const call = { id: "src/f.rs:call-1", functionId: "f", line: 1, text: "g(x)?;", callee: "g", expression: "g(x)", expressionComplete: true } as CallCandidate;
+  return Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, { mapping: form.mappingQuestion(fn, call), observation: form.observationQuestions(fn, call) }])) as Record<RequirementForm, { mapping: Questions; observation: Questions }>;
+})();
+
 // --- Words, for `check_before_action` -------------------------------------------------------------
 //
 // A call is asked about when its name and the requirement share a word. Both sides are split the

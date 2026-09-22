@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6370",
+ "url": "https://github.com/alacritty/alacritty/issues/6370",
+ "title": "Restart fcitx5 cause Alacritty close.",
+ "author": "llc0930",
+ "createdAt": "2022-10-02T00:57:14Z",
+ "closedBy": "alacritty/alacritty#6383",
+ "body": "> Please describe the bug that you have found:\r\n\r\nRestart fcitx5 cause Alacritty close.\r\n\r\n> and what you would expect to happen instead:\r\n\r\nAlacritty should not be closed.\r\n### System\r\n\r\nOS: Debian GNU/Linux bookworm/sid x86_64\r\nVersion: alacritty 0.12.0-dev (e9ee8dc)\r\nDisplay server: X11\r\nCompositor: picom\r\nWM: dwm\r\n\r\n cargo build with only X11 support\r\n### Logs\r\n[Alacritty-607924.log](https://github.com/alacritty/alacritty/files/9691451/Alacritty-607924.log)"
+}

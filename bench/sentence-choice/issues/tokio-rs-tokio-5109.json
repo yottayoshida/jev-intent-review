@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5109",
+ "url": "https://github.com/tokio-rs/tokio/issues/5109",
+ "title": "Mutex::blocking_lock_owned",
+ "author": "smessmer",
+ "createdAt": "2022-10-16T19:33:03Z",
+ "closedBy": "tokio-rs/tokio#5130",
+ "body": "There is `Mutex::try_lock_owned` and `Mutex::lock_owned`, but I wasn't able to find a `Mutex::blocking_lock_owned`. Is there any specific reason for this omission?\r\n\r\nOr is there a way to get the same behavior using the existing API somehow?"
+}

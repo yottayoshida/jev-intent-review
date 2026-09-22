@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6330",
+ "url": "https://github.com/alacritty/alacritty/issues/6330",
+ "title": "Invalid IPC config commands should not reset config",
+ "author": "chrisduerr",
+ "createdAt": "2022-09-13T05:45:50Z",
+ "closedBy": "alacritty/alacritty#6339",
+ "body": "Currently when sending an invalid IPC config command like `alacritty config msg aoeuaoeu`, the IPC config is actually discarded completely. It should not be possible to discard the config with anything other than `alacritty config msg --reset`."
+}

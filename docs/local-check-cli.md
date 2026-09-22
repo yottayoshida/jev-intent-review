@@ -1,9 +1,12 @@
-# The local check (v0.1)
+# The local check
 
-This is the reference for `--experimental-local-check`: what to give it, how to read what comes
-back, what the exit code means, and what has been measured. The README says what the tool is for;
-this says exactly what v0.1 does. The sections after [the record](#record-of-the-experiments) are
-the working record of how v0.1 got here, in Japanese.
+This is the reference for the run: what to give it, how to read what comes back, what the exit
+code means, and what has been measured. Since [ADR 0007](adr/0007-the-run-is-the-local-check.md)
+the local check *is* the run — `jev-intent-review` with no flag does what `--experimental-local-check`
+did; the flag is accepted, the report and the exit code are the same without it, and one line on
+stderr says so. The README says what the tool is for; this says
+exactly what it does. The sections after [the record](#record-of-the-experiments) are the working
+record of how v0.1 got here, in Japanese; they name the flag as it was used.
 
 ## Writing a requirement
 
@@ -46,9 +49,9 @@ own. Ordinary prose is not turned into requirements — no model writes or picks
 neither way is named in the report's Intent section with the reason, and a run that could read
 nothing stops (exit 11) and prints that section too. The report and `--json` (its `intent`,
 `sources` and `notes`) say where each requirement came from, whether that source's author is the
-pull request's, and which issues the pull request closes were not read. Here that is shown, not
-acted on: the local check's exit code does not change for it (the review withholds VERIFIED
-instead; whether the GitHub Action should act on it is #41's).
+pull request's, and which issues the pull request closes were not read. That is shown, not acted
+on: the exit code does not change for it, and there is no requirement verdict to withhold (whether
+the GitHub Action should act on it is #41's).
 
 ## What it asks
 
@@ -76,7 +79,7 @@ an assumption.
 - anything else from the mapping (`unknown`, under the bar, no answer) → **not settled**.
 
 A request that fails without ending the run leaves its call unanswered and the run goes on; a run
-that reached the host and got no answer at all fails (exit 12). `--experimental-candidates-only`
+that reached the host and got no answer at all fails (exit 12). `--candidates-only`
 stops before the first question and prints which calls are inside the budget and which are not,
 with a reason each; it needs no credentials.
 
@@ -168,8 +171,16 @@ is printed so it can be thrown out. `--json` carries the form, every mapping, ev
 
 ## Exit codes
 
-Findings do not cause a nonzero exit code. Configuration, intent, repository and provider failures
-can (10, 11, 13 and 12). **Exit 0 does not establish that the requirement holds.**
+A call worth checking does not change the exit code: it is a candidate, not a verdict. A repository
+that wants one to fail CI sets `policy.fail_on: [finding]` in `.jev-intent-review.yml`, and the run
+exits 1 when any call is worth checking (`violation`, the value 0.1 knew, is read as `finding` and
+the notes say so). Configuration, intent, repository and provider failures exit 10, 11, 13 and 12.
+**Exit 0 does not establish that the requirement holds.**
+
+After the calls, every change the pull request made is asked about once — is it asked for by any
+requirement? — and listed under *Changes no requirement asked for* when Jev is sure it is not.
+`--skip-change-check` leaves that out. With `--json`, `sent.requests` is what was sent and
+`sent.answered` what Jev answered, in the same unit (an observation request carries two questions).
 
 "Nothing listed" means no call met the conditions for being listed — both answers over the bar and
 disagreeing. It covers calls whose mapping or whose behaviour came back undetermined, below the
@@ -449,7 +460,7 @@ probe で取り直した**（`bench/fixtures/omamori-468/probe_*.rs`、ディレ
 **10 マスすべて実挙動と一致。** 変異版はそれぞれ自分の対象だけを裏返し、挙動不変版は正例と
 同じ。記録は `bench/logs/diff-reach-v1.json`。
 
-到達のほうは**通信なし**で先に確かめられる（`--experimental-candidates-only`）。5 枝とも
+到達のほうは**通信なし**で先に確かめられる（`--candidates-only`）。5 枝とも
 関数 23（変更）+ 20（呼び出し元）、問いを置けるもの 37、予算 20 に**両方の対象呼び出しが
 入る**。呼び出しの総数だけは枝で違う（correct・m-read-baseline・m-raw-override が 739、
 v-read-baseline が 738、v-raw-override が 740）——挙動不変版は書き方を変えているので当然で、
@@ -506,7 +517,7 @@ if let Ok(content) = crate::atomic_file::read_to_string_capped(&path, MAX_TRACKE
 照合していた間は保留されて表に出なかっただけで、それ自体が別の欠陥だった。
 条件も照合も同じ秘匿済みの式を使う。**レポートの印字も同じ**——レポートは配布物なので。
 
-**⑤ 予算に入った呼び出しだけがレポートに出ていなかった。** `--experimental-candidates-only`
+**⑤ 予算に入った呼び出しだけがレポートに出ていなかった。** `--candidates-only`
 は「どれが予算に入るか」を答えるためにあるのに、**選ばれたものだけが印字されない**形に
 なっていた。最初の実機確認で「対象に届いていない」と読み違えた——届いていた。
 

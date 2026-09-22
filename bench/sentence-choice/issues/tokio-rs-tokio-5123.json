@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5123",
+ "url": "https://github.com/tokio-rs/tokio/issues/5123",
+ "title": "Ability to change backpressure boundary in `Framed`",
+ "author": "crusader-mike",
+ "createdAt": "2022-10-25T07:42:07Z",
+ "closedBy": "tokio-rs/tokio#5124",
+ "body": "**Is your feature request related to a problem? Please describe.**\r\nI am using `Framed<TcpStream, ...>` and would like to be able to change backpressure boundary (which is currently hardcoded to 8kb). See [this line](https://github.com/tokio-rs/tokio/blob/master/tokio-util/src/codec/framed_impl.rs#L28).\r\n\r\nTwo questions on related subject:\r\n- is there any point adding buffering between `Framed` and `TcpStream` (e.g. `Framed<BufStream<TcpStream>>`)? (I suspect no, since `Framed` has it's own r/w buffers that can be made to reserve desired space)\r\n- is there any downside in increasing `Framed` read buffer capacity? default value of 8kb looks pretty small nowadays and leads to too many syscalls (per MB transferred)\r\n\r\n**Describe the solution you'd like**\r\nA simple `Framed::set_backpressure_boundary()` function will do...\r\n\r\n**Describe alternatives you've considered**\r\nThe only alternative I see is to copy `Framed` source code to my project.\r\n"
+}

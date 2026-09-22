@@ -1,0 +1,9 @@
+{
+ "issue": "clap-rs/clap#4400",
+ "url": "https://github.com/clap-rs/clap/issues/4400",
+ "title": "Allow using `ValueHint::CommandWithArguments` with `last` (without `trailing_var_args`)",
+ "author": "KSXGitHub",
+ "createdAt": "2022-10-18T11:49:36Z",
+ "closedBy": "clap-rs/clap#4401",
+ "body": "### Please complete the following tasks\n\n- [X] I have searched the [discussions](https://github.com/clap-rs/clap/discussions)\n- [X] I have searched the [open](https://github.com/clap-rs/clap/issues) and [rejected](https://github.com/clap-rs/clap/issues?q=is%3Aissue+label%3AS-wont-fix+is%3Aclosed) issues\n\n### Clap Version\n\n4.0.15\n\n### Describe your use case\n\nI want to a program like this:\r\n\r\n```sh\r\nmy_cli file1 file2 -- command_name arg1 arg2\r\n```\r\n\r\nI also want to generate ZSH completions.\r\n\r\nHowever, `ValueHint::CommandWithArguments` requires the use of `trailing_var_args` which can't be used with `last`.\n\n### Describe the solution you'd like\n\nThis code should be valid:\r\n\r\n```rust\r\n#[derive(Parser)]\r\nstruct MyCli {\r\n  files: Vec<PathBuf>,\r\n  #[clap(last = true, value_hint = ValueHint::CommandWithArguments)]\r\n  command: Vec<OsString>,\r\n}\r\n```\n\n### Alternatives, if applicable\n\n_No response_\n\n### Additional Context\n\n_No response_"
+}

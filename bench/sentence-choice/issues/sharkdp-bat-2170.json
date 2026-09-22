@@ -1,0 +1,9 @@
+{
+ "issue": "sharkdp/bat#2170",
+ "url": "https://github.com/sharkdp/bat/issues/2170",
+ "title": "Unnecessary left padding with `bat --style=plain,changes examples/simple.rs`",
+ "author": "radek-sprta",
+ "createdAt": "2022-04-28T04:58:13Z",
+ "closedBy": "sharkdp/bat#3406",
+ "body": "First of all, thank you for this excellent software.\r\n\r\nBy default, bat uses 2 character wide left padding when displaying content. It would be great to have option to turn this off. And optionally make it part of the `--plain` option. "
+}
