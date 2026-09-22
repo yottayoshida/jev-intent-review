@@ -137,6 +137,16 @@ Use `--json` for the full machine-readable report (`version: 2`; see [docs/local
 
 The report states no requirement verdict: each call it read is *worth checking*, *holding*, *not settled* or *not required of by the requirement*, and a call worth checking leaves the exit code at 0. A repository that wants CI to fail on one sets `policy.fail_on: [finding]` in `.jev-intent-review.yml`.
 
+### Optional JevFuzz trace
+
+Set `JEV_TRACE_FILE` to append one normalized JSONL record for each successful logical Jev judgment. Its parent directory and the file are owner-only (`0700` and `0600`); symlinks and non-private targets are rejected. Records contain provider-independent state, the Jev model name used for that host, typed questions, normalized choices, and a returned model version only when the gateway supplied one. They never include transport headers or API keys.
+
+```sh
+mkdir -m 700 /private/path/intent-review-jev
+export JEV_TRACE_FILE=/private/path/intent-review-jev/trace.jsonl
+jev-intent-review --base <base> --head <head> --intent-spec spec.json
+```
+
 ## GitHub Action
 
 On a pull request, the Action runs the command once and puts the report where the people looking at

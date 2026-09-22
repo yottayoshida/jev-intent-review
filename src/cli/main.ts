@@ -162,10 +162,10 @@ function parse(argv: string[]) {
   return { ...values, prNumber: number("pr"), issueNumber: number("issue") };
 }
 
-function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, fetch?: typeof globalThis.fetch) {
+function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, env: NodeJS.ProcessEnv, fetch?: typeof globalThis.fetch) {
   const client = new JevClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes, ...(fetch ? { fetch } : {}) });
   return {
-    provider: new LimitedProvider(new JevProvider(client), { concurrency: 8, deadline }),
+    provider: new LimitedProvider(new JevProvider(client, { env }), { concurrency: 8, deadline }),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
   };
@@ -440,7 +440,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     }
     if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;
-    const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, deps.fetch);
+    const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, io.env, deps.fetch);
 
     // The calls first, then the changes. One provider for both; there is nothing else to send to.
     const run = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, localOptions);
