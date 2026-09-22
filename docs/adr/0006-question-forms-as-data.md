@@ -63,7 +63,7 @@ helper whose body is not sent, Jev still answered with confidence (0.92–0.96).
   `failure_propagation`. An unknown value is refused when the spec is read. Requirements read from
   a pull request's acceptance-criteria list are all `failure_propagation`. Jev does not choose a
   form. Whether it should is to be measured first, and that decision also settles whether this
-  field stays.
+  field stays. (Measured in ADR 0008, which records the numbers and the owner's ruling.)
 - The four values are **readings per call, not requirement verdicts.** No requirement-level status
   is stated, the Markdown report keeps "Nothing here is a requirement verdict" and no verdict word,
   and a listed call still leaves the exit code at 0. The JSON carries `outcome` and `form` per call.

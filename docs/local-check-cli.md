@@ -35,11 +35,14 @@ the sentence has to say depends on its **form** — what the check asks of each 
 ```
 
 `form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
-from the sentence, and whether Jev could is not measured yet. For `check_before_action` the words
-of the sentence and of `searchHints` decide which calls are asked about (below), so a requirement
-that names no action — "every session-creation path must enforce the same guard" — reaches no
-call, and one whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln`
-(never listed as a call) reaches nothing either. The report says why for each call it holds.
+from the sentence. Whether Jev could is measured — [below](#how-jev-reads-the-form-of-a-sentence),
+on every requirement sentence this repository holds in a spec, fixture or golden file (a spec's
+`ambiguities`, which record what was not read, are not requirements) — and ADR 0008 records what
+was decided on it. For `check_before_action` the words of the sentence and
+of `searchHints` decide which calls are asked about (below), so a requirement that names no
+action — "every session-creation path must enforce the same guard" — reaches no call, and one
+whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as
+a call) reaches nothing either. The report says why for each call it holds.
 
 The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
@@ -189,8 +192,8 @@ the enumeration's own caps are counted in the notes.
 
 ## What has been measured
 
-Everything below is about `failure_propagation` except the last part, which is the one measurement
-of `check_before_action`.
+Everything below is about `failure_propagation` except two parts: the one measurement of
+`check_before_action`, and, last, how Jev reads which form a sentence has.
 
 ### Cases that were not used to tune anything
 
@@ -389,6 +392,75 @@ branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`
 - Before this reading, 436 of those decisions said "does not return a Result" of a call whose label
   says it returns one or is not settled.
 - Deciding took 92 seconds in all, against 99 before (one run of each).
+### How Jev reads the form of a sentence
+
+Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it
+choose one (ADR 0008; `bench/forms/choice/`, log `bench/logs/form-choice-v1.json`; 216 requests,
+every one to Cloudflare). Every requirement sentence this repository holds in a spec, fixture or
+golden file — `run.ts verify` enumerates them and a test fails when one is not in the set — the
+four examples in issue #35, and three written from omamori issues whose fix was a check before an
+action: 72 sentences, each labelled `failure_propagation`, `check_before_action` or `neither`
+before the first request, with who wrote it — `tool` (this project, for its fixtures and benches),
+`model` (the requirement-writing model's first output, repaired; fourteen are fragments cut
+mid-sentence, sent as they are), `text` (read by hand from a real issue or pull request, and
+issue #35's examples), `written` (the three). Jev was sent the sentence alone, three times each,
+and asked which of the two forms its sentence says, or neither; an answer counts at the bar of
+0.6. A fixed keyword rule (`must not` / `never` / `unless` → check, tried first; `fail` /
+`error` → failure) is scored beside it for scale and used by nothing.
+`node bench/forms/choice/run.ts score` recomputes this table from the log, and
+`test/form-choice.test.ts` holds the log to these counts.
+
+| label | who wrote it | sentences | fragments | read as its label in 3/3 | read as check in any run | neither / under the bar in any run | keyword rule right |
+|---|---|---|---|---|---|---|---|
+| failure_propagation | all | 18 | 2 | 16/18 | 0/18 | 2/18 | 3/18 |
+| | tool | 15 | 0 | 14/15 | 0/15 | 1/15 | 0/15 |
+| | model | 2 | 2 | 2/2 | 0/2 | 0/2 | 2/2 |
+| | text + written | 1 | 0 | 0/1 | 0/1 | 1/1 | 1/1 |
+| check_before_action | all | 11 | 1 | 10/11 | 10/11 | 1/11 | 8/11 |
+| | tool | 5 | 0 | 5/5 | 5/5 | 0/5 | 4/5 |
+| | model | 1 | 1 | 1/1 | 1/1 | 0/1 | 0/1 |
+| | text + written | 5 | 0 | 4/5 | 4/5 | 1/5 | 4/5 |
+| neither | all | 43 | 11 | 39/43 | 4/43 | 40/43 | 33/43 |
+| | tool | 2 | 0 | 2/2 | 0/2 | 2/2 | 1/2 |
+| | model | 29 | 11 | 26/29 | 3/29 | 26/29 | 24/29 |
+| | text + written | 12 | 0 | 11/12 | 1/12 | 12/12 | 8/12 |
+
+Read against what ADR 0008 said beforehand the numbers would have to show: no failure sentence
+read as check at the bar in any run (0 of 18); at least 80% of the check sentences read as check
+in every run, and no fewer than the keyword rule gets right (10 of 11; the rule 8); at most 10% of
+the neither sentences read as check in any run (4 of 43, exactly the cap). All three met. What the
+rows by author add:
+
+- The two failure sentences not read as failure in every run are the fixture's "A baseline that
+  cannot be read is not reported as no baseline at all." (0.55, 0.57 and 0.60 — under the bar
+  twice, at it once) and the one read by hand from omamori #553, which says `"error"` only as a
+  JSON value (0.51–0.54). Under the bar they fall to the default, which is what they are asked
+  today. The fourteen template sentences and the two model fragments — the other two sentences not
+  in the template, which do say "fail" and "error" — read at 0.95–1.00.
+- The check sentence under the bar is issue #35's "every session-creation path must enforce the
+  same guard;" (0.52–0.55), which names no operation. Its other example, "disabled API keys must
+  never authenticate;", 0.99–1.00; the three written from issues, 1.00; the fixtures' "Disabled
+  users cannot authenticate.", 0.95–0.97; the model's fragment, 0.98.
+- The four neither sentences read as check are of one shape — "voiding the run if a match is
+  found" (sideeye #594, two sentences, 0.88–0.94), "refuses rather than judging if …" (sideeye
+  #602's second sentence, 0.72–0.73, and the one read by hand from it, 0.65 in one run of three
+  and 0.56 and 0.59 in the others): sentences that say what is refused when a condition holds,
+  which the one reader labelled neither. The cap of four is met by that last sentence, which
+  straddles the bar — in the first measurement it was over it in two runs of three. Once Jev
+  chooses, each is asked the check questions about the calls sharing its words instead of the
+  failure questions it is asked today.
+- No sentence of any class was read as `failure_propagation` that was not labelled so.
+
+Fourteen of the eighteen failure sentences are this tool's own template; the other four are one
+fixture sentence, two model fragments and one from a real pull request. Of the eleven check
+sentences, five are this project's bench and fixture sentences, three were written from real
+issues for this measurement, two are issue #35's as written and one is a model's fragment. The
+table says how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
+
+The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
+read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its
+author's. That wiring is a change of its own and is not in this version — until it lands, every
+requirement read from text is `failure_propagation`, as above.
 
 ## Only Jev
 
