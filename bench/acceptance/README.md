@@ -44,6 +44,10 @@ Used so far:
   `case.json` still says `unseen`: changing it now would stop `replay.ts` from rebuilding the
   measured table from `acceptance-v1.json`. It is changed with the re-run of this set that closes
   `#45`, and until then this line is the record.
+- **cce-rust#168 and dataprof#370** — two pull requests outside this set — were what the narrowing
+  of a name defined more than once was built on (`#45`, second part; `docs/local-check-cli.md`,
+  *Names defined more than once*). They have no case here; this line is the record, and they are
+  not free evidence for anything that narrowing decides from now on.
 
 ## Building a case
 

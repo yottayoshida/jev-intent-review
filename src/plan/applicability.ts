@@ -10,14 +10,21 @@
 //
 // So this resolves the name instead: the callee's definition is looked up in the repository at the
 // pinned commit, and its signature is what decides. A name that resolves to nothing — every method
-// from the standard library, `exists()` among them — or to more than one definition is **held**,
-// not judged. That is narrow on purpose: the first version of this check is for calls whose
-// definitions are in the repository being read.
+// from the standard library, `exists()` among them — is **held**, not judged. That is narrow on
+// purpose: this check is for calls whose definitions are in the repository being read.
+//
+// A name defined more than once used to be held with it. Three things narrow it now: the path the
+// call writes (`SyncState::load_strict`), the form of the call (a method call reaches nothing that
+// takes no `self`), and definitions that are versions of one thing (a trait's method, a function
+// written once per platform), where every version must return a `Result`. What none of them
+// settles is still held — and "not narrowed" is never reported as "not defined here", because a
+// type brought in under another name (`use … as ChannelError`) or a function re-exported from
+// another file is not followed.
 
 import { defines, definedName } from "../change/blocks.ts";
 import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
-import { codeOnly, quoted, returnTypesFor, topLevel } from "./result-type.ts";
+import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
 
 export type Applicability =
   | { ok: true; calleeDefinedAt: string }
@@ -69,10 +76,11 @@ export async function definitionsOf(discoverer: Discoverer, name: string): Promi
  * `definedName` is not asked: it declines names that read as keywords elsewhere (`new` among
  * them), and pybun's 36 `fn new` then read as no definition at all.
  */
-export async function functionDefinitionsOf(discoverer: Discoverer, name: string): Promise<{ found: Definition[]; more: boolean }> {
+export async function functionDefinitionsOf(discoverer: Discoverer, name: string): Promise<{ found: Definition[]; more: boolean; testOnly: number }> {
   const { hits, more } = await discoverer.search(`fn ${name}`);
   const reader = returnTypesFor(discoverer);
   const found: Definition[] = [];
+  let testOnly = 0;
   for (const hit of hits) {
     if (!hit.path.endsWith(".rs") || isTestPath(hit.path)) continue;
     // Not `// the same check as fn parse_header()` at the end of a line, not `"fn emit() {}"`,
@@ -82,9 +90,73 @@ export async function functionDefinitionsOf(discoverer: Discoverer, name: string
     if (code === null || !isRustFunction(code, name)) continue;
     const index = await discoverer.index(hit.path);
     const inTest = (index?.testRegions ?? []).some((r) => hit.line >= r.start && hit.line <= r.end);
-    if (!inTest) found.push({ path: hit.path, line: hit.line, text: hit.text });
+    if (inTest) continue;
+    if (await declaredForTestsOnly(discoverer, hit.path)) testOnly++;
+    else found.push({ path: hit.path, line: hit.line, text: hit.text });
   }
-  return { found, more };
+  return { found, more, testOnly };
+}
+
+const testOnlyFiles = new WeakMap<Discoverer, Map<string, Promise<boolean>>>();
+
+/**
+ * Whether a file is compiled only for tests because a module file declares it
+ * `#[cfg(test)] mod x;`.
+ *
+ * `isTestPath` reads names, and Kontor#385's `reactor_cluster_tests.rs` is source by its name: the
+ * only `impl ReactorCluster` in that repository is inside it, so a call to `ReactorCluster::start`
+ * would resolve to a definition that no shipped code reaches, and the budget would be spent asking
+ * about test code.
+ */
+export function declaredForTestsOnly(discoverer: Discoverer, path: string): Promise<boolean> {
+  let answers = testOnlyFiles.get(discoverer);
+  if (!answers) {
+    answers = new Map();
+    testOnlyFiles.set(discoverer, answers);
+  }
+  let answer = answers.get(path);
+  if (!answer) {
+    answer = readDeclaration(discoverer, path);
+    answers.set(path, answer);
+  }
+  return answer;
+}
+
+async function readDeclaration(discoverer: Discoverer, path: string): Promise<boolean> {
+  const parts = path.split("/");
+  let name = parts[parts.length - 1]!.replace(/\.rs$/, "");
+  let directory = parts.slice(0, -1);
+  if (name === "mod") {
+    name = directory[directory.length - 1] ?? "";
+    directory = directory.slice(0, -1);
+  }
+  if (name === "") return false;
+  const reader = returnTypesFor(discoverer);
+  // Where Rust lets the declaration be: the directory's module file, the crate's root, or the file
+  // named after the directory. One level up only — a module of a module of a test module is left.
+  const parents = [[...directory, "mod.rs"].join("/"), [...directory, "lib.rs"].join("/"), [...directory, "main.rs"].join("/")];
+  if (directory.length > 0) parents.push(`${directory.join("/")}.rs`);
+  // At the file's top level: a `mod x;` indented inside an inline `mod tests { … }` declares
+  // `tests/x.rs`, not this file.
+  const declares = new RegExp(`^(?:#\\[[^\\]]*\\]\\s*)*(?:pub(?:\\([^)]*\\))?\\s+)?mod\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*;`);
+  // Every declaration of this module that can be found: a crate whose `lib.rs` declares it and
+  // whose `main.rs` declares it under `#[cfg(test)]` still compiles it into the library.
+  let declared = 0;
+  let forTests = 0;
+  for (const parent of parents) {
+    if (parent === path) continue;
+    const lines = await reader.codeLinesOf(parent);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) {
+      if (!declares.test(lines[i]!)) continue;
+      declared++;
+      // The attributes of this declaration: the ones on its own line and the ones directly above
+      // it. Not a window of lines — `#[cfg(test)]` / `mod a;` / `mod b;` says nothing about `b`.
+      const attributes = [lines[i]!, ...(await reader.attributes(parent, i + 1))];
+      if (attributes.some((attribute) => /#\[\s*cfg\s*\(\s*test\s*\)\s*\]/.test(attribute))) forTests++;
+    }
+  }
+  return declared > 0 && declared === forTests;
 }
 
 /**
@@ -150,17 +222,171 @@ function unreachable(call: CallCandidate, parameters: readonly string[]): string
   return null;
 }
 
+/** Past this many definitions left after the path, signatures are not read. */
+const NARROW_CAP = 20;
+
+/** Where a definition is written: the item that encloses it, the top of its file, or unread. */
+type Where = ItemHead | { kind: "top" } | "unread";
+
+async function whereWritten(reader: ReturnTypes, definition: Definition): Promise<Where> {
+  const enclosing = await reader.enclosing(definition.path, definition.line);
+  if (enclosing.kind === "unknown") return "unread";
+  if (enclosing.kind === "top") return { kind: "top" };
+  const head = itemHead(enclosing.text);
+  // A header whose type has no name is a header this did not read: `impl<T>` alone on its line,
+  // with `Trait for` and `Q` on the lines below it, names nothing yet.
+  return head.kind === "impl" && head.self === undefined ? "unread" : head;
+}
+
+/**
+ * Where a file's crate begins: everything up to its `src/`. A path with none — `examples/demo.rs`,
+ * or a crate laid out without one — falls back to the file's own directory, never to the whole
+ * repository, or a workspace's other crates come back in.
+ */
+function crateOf(path: string): string {
+  const at = path.lastIndexOf("/src/");
+  if (at >= 0) return path.slice(0, at + "/src/".length);
+  if (path.startsWith("src/")) return "src/";
+  const directory = path.lastIndexOf("/");
+  return directory >= 0 ? path.slice(0, directory + 1) : "";
+}
+
+/** The type `Self` names where the call is written, or undefined when that cannot be read. */
+async function selfType(reader: ReturnTypes, fn: FunctionCandidate): Promise<string | undefined> {
+  const enclosing = await reader.enclosing(fn.path, fn.startLine);
+  if (enclosing.kind !== "item") return undefined;
+  const head = itemHead(enclosing.text);
+  return head.kind === "impl" ? head.self : head.kind === "trait" ? head.name : undefined;
+}
+
+/**
+ * The definitions written under the path the call names (`SyncState::load_strict`,
+ * `control_handlers::handle_sandbox`, `Self::path`), or "unread" when the writing could not be
+ * read and nothing should be narrowed by it.
+ *
+ * An empty list is not "the callee is not defined here": `ChannelError::invalid_input` is
+ * `impl Error` under a `use … as ChannelError`, and `model::values_to_chat_messages` is written in
+ * `model/convert.rs` and re-exported. Neither is followed, so the call is held, not judged.
+ */
+async function underQualifier(reader: ReturnTypes, fn: FunctionCandidate, qualifier: string, definitions: Definition[]): Promise<Definition[] | "unread"> {
+  if (!/^[A-Z]/.test(qualifier)) {
+    // A module's own file, or one of the files it re-exports: only the first is followed. Inside
+    // the crate the call is written in — a workspace has a `util.rs` in every crate, and the one
+    // in another crate is not what `util::parse()` names here.
+    const crate = crateOf(fn.path);
+    return definitions.filter((d) => {
+      if (!d.path.startsWith(crate)) return false;
+      const under = d.path.slice(crate.length);
+      return under === `${qualifier}.rs` || under === `${qualifier}/mod.rs` || under.endsWith(`/${qualifier}.rs`) || under.endsWith(`/${qualifier}/mod.rs`);
+    });
+  }
+  const wanted = qualifier === "Self" ? await selfType(reader, fn) : qualifier;
+  if (wanted === undefined) return "unread";
+  const kept: Definition[] = [];
+  for (const definition of definitions) {
+    const written = await whereWritten(reader, definition);
+    if (written === "unread") return "unread";
+    if (written.kind === "impl" ? written.self === wanted : written.kind === "trait" && written.name === wanted) kept.push(definition);
+  }
+  return kept;
+}
+
+/**
+ * The definitions read together because they are versions of one thing, with the one to name
+ * first: a trait's method (its declaration and the implementations of that trait) or a function
+ * written once per platform (`#[cfg(unix)]` and `#[cfg(not(unix))]` at the top of one file).
+ * Null when they are merely definitions that share a name.
+ *
+ * The trait's declaration must be in this repository. Without that, two `impl TryFrom<A> for B`
+ * blocks would make `try_from` a trait method of this repository's, and every method a dependency
+ * declares would follow.
+ */
+async function versionsOfOneThing(reader: ReturnTypes, definitions: Definition[]): Promise<Definition[] | null> {
+  const written: Exclude<Where, "unread">[] = [];
+  for (const definition of definitions) {
+    const where = await whereWritten(reader, definition);
+    if (where === "unread") return null;
+    written.push(where);
+  }
+  const traits = new Set(written.map((w) => (w.kind === "trait" ? w.name : w.kind === "impl" ? w.trait : undefined)));
+  // Declared once: two `trait Conn` in two files are two things that share a name, and an
+  // implementation of either would answer for both.
+  const declarations = written.filter((w) => w.kind === "trait").length;
+  const declared = written.findIndex((w) => w.kind === "trait");
+  if (traits.size === 1 && !traits.has(undefined) && declarations === 1) {
+    return [definitions[declared]!, ...definitions.filter((_, i) => i !== declared)];
+  }
+  if (written.every((w) => w.kind === "top") && new Set(definitions.map((d) => d.path)).size === 1) {
+    const cfg = await Promise.all(definitions.map(async (d) => (await reader.attributes(d.path, d.line)).some((a) => /#\[\s*cfg\s*\(/.test(a))));
+    if (cfg.every(Boolean)) return definitions;
+  }
+  return null;
+}
+
+type Narrowed = { ok: true; definitions: Definition[]; sole: boolean } | { ok: false; held: Applicability };
+
+/**
+ * The definitions of `bare` this call reaches — one, or several read together — or why that is not
+ * settled. A name defined more than once used to end here; three things narrow it: the path the
+ * call writes, the form of the call, and definitions that are versions of one thing.
+ */
+async function narrow(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, bare: string, found: Definition[]): Promise<Narrowed> {
+  if (found.length === 1) return { ok: true, definitions: found, sole: true };
+  const reader = returnTypesFor(discoverer);
+  const many = `${bare} is defined ${found.length} times here`;
+  const unresolved = (reason: string): Narrowed => ({ ok: false, held: { ok: false, kind: "callee_ambiguous", reason } });
+  let definitions = found;
+
+  const segments = call.callee.split("::");
+  const qualifier = segments.length > 1 ? segments[segments.length - 2]! : undefined;
+  if (qualifier !== undefined && !["crate", "super", "self"].includes(qualifier)) {
+    const under = await underQualifier(reader, fn, qualifier, definitions);
+    // A path this could not apply settles nothing here — and nothing after it may settle the call
+    // either, or the form would pick the very definition the path was going to rule out.
+    if (under === "unread") return unresolved(`${many}, and one of them is under a header this did not read, so \`${qualifier}\` cannot be applied and which one this call reaches is not resolved`);
+    if (under.length === 0) {
+      return unresolved(`${many}, and none of them is written under \`${qualifier}\`; a name brought in under another name or re-exported from another file is not followed, so which one this call reaches is not resolved`);
+    }
+    definitions = under;
+  }
+
+  // The form is asked of a definition the path picked out too: `Foo::new(a, b)` reaches no
+  // `fn new(a)`, and the one definition of a name is held for exactly that reason.
+  if (definitions.length > NARROW_CAP) {
+    const left = definitions.length === found.length ? `more than ${NARROW_CAP} of them` : `more than ${NARROW_CAP} of them left after the path this call writes`;
+    return unresolved(`${many}, ${left}, so their signatures are not read and which one this call reaches is not resolved`);
+  }
+  const reachable: Definition[] = [];
+  for (const definition of definitions) {
+    const signature = await reader.signature(definition.path, definition.line, bare);
+    if (!signature.ok || !unreachable(call, signature.parameters)) reachable.push(definition);
+  }
+  if (reachable.length === 0) {
+    const none =
+      definitions.length === 1
+        ? `the definition of ${bare} this call names (${definitions[0]!.path}:${definitions[0]!.line}) cannot be reached as this call is written`
+        : `none of the ${definitions.length} definitions of ${bare} left here can be reached as this call is written`;
+    return { ok: false, held: { ok: false, kind: "callee_unresolved", reason: `${none}, so what it returns is not established here` } };
+  }
+  definitions = reachable;
+  if (definitions.length === 1) return { ok: true, definitions, sole: false };
+
+  const versions = await versionsOfOneThing(reader, definitions);
+  if (!versions) return unresolved(`${many}, so which one this call reaches is not resolved`);
+  return { ok: true, definitions: versions, sole: false };
+}
+
 /**
  * Whether `call_failure_not_returned_as_success` can be asked here.
  *
  * Both halves come from a signature, never from how a line looks (`result-type.ts`):
  *
  *   - the target must return a `Result`, or "a success" and "an error" sort nothing it returns;
- *   - the callee must be defined once in this repository and return a `Result`, or there is no
- *     error to assume.
+ *   - the callee must be settled to a definition in this repository — one `fn` of its name, or the
+ *     one `narrow` selects out of several — and return a `Result`, or there is no error to assume.
  *
- * "Does not return a Result" is said only of a return type read to its end. The callee is the one
- * `fn` of its name here, found by name, so the reason names the definition it read.
+ * "Does not return a Result" is said only of a return type read to its end, and the reason names
+ * the definition it read.
  */
 export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<Applicability> {
   const reader = returnTypesFor(discoverer);
@@ -172,23 +398,44 @@ export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandid
     return { ok: false, kind: "target_return_unknown", reason: `whether ${fn.name} returns a Result is not settled here: ${target.why}` };
   }
   const bare = call.callee.split("::").pop()!;
-  const { found, more } = await functionDefinitionsOf(discoverer, bare);
+  const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);
   if (more) return { ok: false, kind: "callee_return_unknown", reason: `the search for \`fn ${bare}\` stopped at its cap, so not every definition of ${bare} was seen` };
-  if (found.length === 0) return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
-  if (found.length > 1) return { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here, so which one this call reaches is not resolved` };
-  const def = found[0]!;
+  if (found.length === 0) {
+    // Definitions this repository compiles only for tests are not definitions this call reaches,
+    // and their absence is not the absence of a definition.
+    if (testOnly > 0) return { ok: false, kind: "callee_ambiguous", reason: `every definition of ${bare} here (${testOnly}) is in a file declared under \`#[cfg(test)] mod\`, so what this call reaches outside tests is not established here` };
+    return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
+  }
+  const narrowed = await narrow(discoverer, fn, call, bare, found);
+  if (!narrowed.ok) return narrowed.held;
+  const { definitions, sole } = narrowed;
+  const def = definitions[0]!;
   const at = `${def.path}:${def.line}`;
-  const signature = await reader.signature(def.path, def.line, bare);
-  if (signature.ok) {
-    const why = unreachable(call, signature.parameters);
-    if (why) return { ok: false, kind: "callee_unresolved", reason: `the one function named ${bare} in this repository (${at}) ${why}, so this call does not reach it and what it returns is not established here` };
+
+  if (definitions.length === 1) {
+    const named = sole ? `the one function named ${bare} in this repository (${at})` : `the definition of ${bare} this call reaches (${at})`;
+    const signature = await reader.signature(def.path, def.line, bare);
+    if (sole && signature.ok) {
+      const why = unreachable(call, signature.parameters);
+      if (why) return { ok: false, kind: "callee_unresolved", reason: `${named} ${why}, so this call does not reach it and what it returns is not established here` };
+    }
+    const callee = await reader.readingOf(signature, def.path);
+    if (callee.kind === "not") {
+      return { ok: false, kind: "callee_not_result", reason: `${named} returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` };
+    }
+    if (callee.kind === "unknown") {
+      return { ok: false, kind: "callee_return_unknown", reason: `whether ${named} returns a Result is not settled here: ${callee.why}` };
+    }
+    return { ok: true, calleeDefinedAt: at };
   }
-  const callee = await reader.readingOf(signature, def.path);
-  if (callee.kind === "not") {
-    return { ok: false, kind: "callee_not_result", reason: `the one function named ${bare} in this repository (${at}) returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` };
-  }
-  if (callee.kind === "unknown") {
-    return { ok: false, kind: "callee_return_unknown", reason: `whether the one function named ${bare} in this repository (${at}) returns a Result is not settled here: ${callee.why}` };
+
+  // Versions of one thing: which one runs is not settled, so all of them must return a Result.
+  const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
+  for (const [i, reading] of readings.entries()) {
+    if (reading.kind === "returns") continue;
+    const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
+    const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
+    return { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` };
   }
   return { ok: true, calleeDefinedAt: at };
 }
