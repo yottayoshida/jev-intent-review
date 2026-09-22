@@ -1,10 +1,10 @@
 {
   "what": "Whether each call can be asked about, with the tool before and after reading whole signatures and aliases (#45, first part), on 13 pre-check runs, scored against labels written by hand before the change. No request sent.",
   "tool": {
-    "before": "c8ab52ffa7bc24f25eaa653d3cfaf5e93c50c8ef",
+    "before": "779cf008fce9aaf229e997b39083381ea045009a",
     "after": {
-      "commit": "c8ab52ffa7bc24f25eaa653d3cfaf5e93c50c8ef",
-      "src": "b78910de72ad39e7f1c72f41fe51ac77b685a0e470c9a35134edaf4212de238c"
+      "commit": "9ce29b37c3f5300448a66739d834be0c75de54b8",
+      "src": "a67feeac350cb8dc2bb44325346714c6b9c23ba64c1382e078cebca129c0cad3"
     }
   },
   "budget": 20,
@@ -21,8 +21,8 @@
         "after": {}
       },
       "ms": {
-        "before": 43,
-        "after": 37
+        "before": 41,
+        "after": 40
       },
       "watched": [],
       "scored": {
@@ -63,8 +63,8 @@
         }
       },
       "ms": {
-        "before": 11045,
-        "after": 8876
+        "before": 15158,
+        "after": 12864
       },
       "watched": [
         {
@@ -766,8 +766,8 @@
         }
       },
       "ms": {
-        "before": 10913,
-        "after": 13785
+        "before": 12189,
+        "after": 11993
       },
       "watched": [
         {
@@ -2268,8 +2268,8 @@
         }
       },
       "ms": {
-        "before": 2740,
-        "after": 3049
+        "before": 2604,
+        "after": 2598
       },
       "watched": [],
       "scored": {
@@ -2350,8 +2350,8 @@
         }
       },
       "ms": {
-        "before": 8957,
-        "after": 3841
+        "before": 7775,
+        "after": 3903
       },
       "watched": [
         {
@@ -2685,8 +2685,8 @@
         }
       },
       "ms": {
-        "before": 7619,
-        "after": 4103
+        "before": 8012,
+        "after": 4402
       },
       "watched": [
         {
@@ -3193,8 +3193,8 @@
         }
       },
       "ms": {
-        "before": 8925,
-        "after": 6544
+        "before": 8782,
+        "after": 7238
       },
       "watched": [],
       "scored": {
@@ -4091,8 +4091,8 @@
         }
       },
       "ms": {
-        "before": 8536,
-        "after": 9651
+        "before": 8496,
+        "after": 9616
       },
       "watched": [
         {
@@ -6881,8 +6881,8 @@
         }
       },
       "ms": {
-        "before": 9004,
-        "after": 9162
+        "before": 9795,
+        "after": 9728
       },
       "watched": [
         {
@@ -9671,8 +9671,8 @@
         }
       },
       "ms": {
-        "before": 8855,
-        "after": 9889
+        "before": 8554,
+        "after": 9977
       },
       "watched": [
         {
@@ -12461,8 +12461,8 @@
         }
       },
       "ms": {
-        "before": 8416,
-        "after": 8590
+        "before": 8732,
+        "after": 9683
       },
       "watched": [
         {
@@ -15251,8 +15251,8 @@
         }
       },
       "ms": {
-        "before": 8790,
-        "after": 9866
+        "before": 8562,
+        "after": 10219
       },
       "watched": [
         {

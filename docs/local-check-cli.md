@@ -388,7 +388,7 @@ branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`
   arguments). Nine callees outside the labelled items were labelled afterwards and are marked so.
 - Before this reading, 436 of those decisions said "does not return a Result" of a call whose label
   says it returns one or is not settled.
-- Deciding took 84 seconds in all, against 95 before (one run of each).
+- Deciding took 92 seconds in all, against 99 before (one run of each).
 
 ## Only Jev
 
