@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "moltis-org/moltis#1064 — a check-before-action requirement written for generate_title_for_session, to count reach",
+  "summary": "Written before the count, for `generate_title_for_session` in crates/gateway/src/session/title.rs at 4106d46d: a title is generated only once the session has enough messages.",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A title must not be generated for a session that has fewer messages than the minimum.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": [],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

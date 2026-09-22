@@ -18,8 +18,15 @@
 //
 // Nothing here knows a function name, a helper name or an expected answer.
 
-import type { Applicability } from "./applicability.ts";
 import type { CallCandidate, Candidates, FunctionCandidate } from "./candidates.ts";
+
+/**
+ * Whether a question can be put to a call, as the requirement's form decides it.
+ *
+ * What decides it differs by form (docs/adr/0006-question-forms-as-data.md); what this module
+ * needs is only the answer, and the reason when it is no.
+ */
+export type Askability = { ok: true } | { ok: false; kind: string; reason: string };
 
 /**
  * Why this call is in the set: its function holds a changed line, or its function calls one that
@@ -36,7 +43,7 @@ export interface Site {
   origin: SiteOrigin;
   /** How the function got in. The packet's "changed by this pull request" is read off this. */
   fnOrigin: FunctionOrigin;
-  applicability?: Applicability;
+  applicability?: Askability;
 }
 
 /** One file's contribution: its listing, plus which of its functions the change reached. */
@@ -101,11 +108,11 @@ export function roundRobin(sites: readonly Site[], budget: number): { taken: Sit
  * were never crowded out by the first's however many there were.
  *
  * `decide` is passed in rather than imported so this stays testable without a repository; the CLI
- * hands it `applicabilityOf` bound to the commit being read.
+ * hands it the requirement's form, bound to that requirement and to the commit being read.
  */
 export async function selectSites(
   sources: readonly SiteSource[],
-  decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Applicability>,
+  decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Askability>,
   budget: number,
 ): Promise<Selection> {
   // Which finder reached each function. A function the change touched keeps that label even when

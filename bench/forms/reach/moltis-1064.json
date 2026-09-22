@@ -1,0 +1,180 @@
+{
+  "case": "moltis-1064",
+  "tool": {
+    "commit": "529b30afa648f1d32656766bbd097a8336e9f63a",
+    "note": "the source was uncommitted when counted; this is the commit it was built on"
+  },
+  "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+  "head": "4106d46dad04481a932597141739e42a5452cc86",
+  "spec": {
+    "file": "moltis-1064.spec.json",
+    "sha256": "57027acf9b0a209397d39bf5036bc931047d0224759e83b2fdc7b788b7eee0ad",
+    "text": "A title must not be generated for a session that has fewer messages than the minimum."
+  },
+  "form": "check_before_action",
+  "target": {
+    "function": "generate_title_for_session",
+    "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+    "position": 18
+  },
+  "counts": {
+    "budget": 20,
+    "functions": {
+      "changed": 6,
+      "calls_changed": 3
+    },
+    "calls": 170,
+    "applicable": 22,
+    "asked": 0,
+    "mapped": 0,
+    "governed": 0,
+    "overBudget": 2,
+    "notApplicable": 148,
+    "outcomes": {
+      "violates": 0,
+      "satisfies": 0,
+      "unknown": 0,
+      "aside": 0
+    }
+  },
+  "wouldAsk": [
+    "send_impl · MessageContent::Multimodal(blocks)",
+    "register · active_session_keys()",
+    "try_generate_title_if_needed · as_ref()",
+    "generate_title_for_session · as_ref()",
+    "dispatch_command · resolve_channel_session(&reply_to, session_metadata)",
+    "trigger_auto_title · to_string()",
+    "try_generate_title_if_needed · get(session_key)",
+    "generate_title_for_session · as_ref()",
+    "dispatch_command · session_handlers::handle_new( state, session_metadata, &session_key, &reply_to, sender_id,",
+    "generate_title_for_session · read(session_key)",
+    "dispatch_command · session_handlers::handle_fork(state, &session_key, args)",
+    "generate_title_for_session · as_deref()",
+    "dispatch_command · session_handlers::handle_clear(state, &session_key)",
+    "generate_title_for_session · as_deref()",
+    "dispatch_command · session_handlers::handle_compact(state, &session_key)",
+    "generate_title_for_session · moltis_agents::model::values_to_chat_messages(&history)",
+    "dispatch_command · session_handlers::handle_title(state, &session_key)",
+    "generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs)",
+    "dispatch_command · session_handlers::handle_context(state, &session_key)",
+    "generate_title_for_session · clone()"
+  ],
+  "heldInTarget": [
+    {
+      "call": "len()",
+      "why": "no word of `len()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "context(\"failed to read session history\")",
+      "why": "no word of `context(\"failed to read session history\")`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "get(session_key)",
+      "why": "no word of `get(session_key)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "and_then(|e| e.model)",
+      "why": "no word of `and_then(|e| e.model)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "read()",
+      "why": "no word of `read()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "read()",
+      "why": "no word of `read()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "and_then(|id| reg.get(id))",
+      "why": "no word of `and_then(|id| reg.get(id))`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "get(id)",
+      "why": "no word of `get(id)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "is_some()",
+      "why": "no word of `is_some()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "is_none()",
+      "why": "no word of `is_none()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "list_models()",
+      "why": "no word of `list_models()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "iter()",
+      "why": "no word of `iter()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "map(|m| m.id.as_str())",
+      "why": "no word of `map(|m| m.id.as_str())`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "as_str()",
+      "why": "no word of `as_str()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "collect()",
+      "why": "no word of `collect()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "unwrap_or_default()",
+      "why": "no word of `unwrap_or_default()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "and_then(|id| reg.get(id))",
+      "why": "no word of `and_then(|id| reg.get(id))`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "get(id)",
+      "why": "no word of `get(id)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "or(from_session)",
+      "why": "no word of `or(from_session)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "or_else(|| reg.first())",
+      "why": "no word of `or_else(|| reg.first())`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "first()",
+      "why": "no word of `first()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "upsert(session_key, Some(title.clone()))",
+      "why": "no word of `upsert(session_key, Some(title.clone()))`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "with_context(|| format!(\"failed to persist title for session {session_key}\"))",
+      "why": "no word of `with_context(|| format!(\"failed to persist title for session {session_key}\"))`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "broadcast( state, \"session\", serde_json::json!({ \"kind\": \"patched\", \"sessionKey\": session_key,",
+      "why": "no word of `broadcast( state, \"session\", serde_json::json!({ \"kind\": \"patched\", \"sessionKey\": session_key,`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "BroadcastOpts::default()",
+      "why": "no word of `BroadcastOpts::default()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    }
+  ],
+  "heldReasons": {
+    "no word of `…`'s name is in the requirement or its search hints, so a check befo": 144,
+    "`…` (crates/gateway/src/session/title.rs:61) is read on its own in this run, so ": 2,
+    "`…` (crates/gateway/src/session/title.rs:36) is read on its own in this run, so ": 1,
+    "`…` (crates/gateway/src/session/title.rs:29) is read on its own in this run, so ": 1,
+    "the budget of 20 was already spent": 2
+  },
+  "notes": [
+    "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
+    "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
+    "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
+    "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
+    "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
+    "the callers of register were not followed (more references than the search returns)",
+    "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+  ]
+}

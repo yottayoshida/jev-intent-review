@@ -1,0 +1,119 @@
+{
+  "case": "grovedb-500",
+  "tool": {
+    "commit": "529b30afa648f1d32656766bbd097a8336e9f63a",
+    "note": "the source was uncommitted when counted; this is the commit it was built on"
+  },
+  "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+  "head": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+  "spec": {
+    "file": "grovedb-500.spec.json",
+    "sha256": "707c42616020ffed20c53074edb0db8e9d7e3b1117c8bd71132449429a68a411",
+    "text": "While a restore is being finalized, the tree heights must not be rewritten unless verifying the heights has failed."
+  },
+  "form": "check_before_action",
+  "target": {
+    "function": "finalize",
+    "call": "rewrite_heights(grove_version)",
+    "position": 10
+  },
+  "counts": {
+    "budget": 20,
+    "functions": {
+      "changed": 1,
+      "calls_changed": 13
+    },
+    "calls": 215,
+    "applicable": 17,
+    "asked": 0,
+    "mapped": 0,
+    "governed": 0,
+    "overBudget": 0,
+    "notApplicable": 198,
+    "outcomes": {
+      "violates": 0,
+      "satisfies": 0,
+      "unknown": 0,
+      "aside": 0
+    }
+  },
+  "wouldAsk": [
+    "finalize · Error::ChunkRestoringError( ChunkError::RestorationNotComplete, )",
+    "test_single_insert · DenseFixedSizedMerkleTree::new(1, MemStorageContext::new())",
+    "test_sequential_fill_height_2 · DenseFixedSizedMerkleTree::new(2, MemStorageContext::new())",
+    "finalize · Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", ))",
+    "test_single_insert · capacity()",
+    "test_sequential_fill_height_2 · capacity()",
+    "finalize · verify_height(grove_version)",
+    "test_single_insert · insert(b\"hello\")",
+    "test_sequential_fill_height_2 · insert(b\"root_val\")",
+    "finalize · rewrite_heights(grove_version)",
+    "test_single_insert · count()",
+    "test_sequential_fill_height_2 · insert(b\"left_val\")",
+    "finalize · Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", ))",
+    "test_sequential_fill_height_2 · insert(b\"right_val\")",
+    "finalize · verify(self.merk.tree_type != TreeType::NormalTree, grove_version)",
+    "test_sequential_fill_height_2 · count()",
+    "finalize · Error::ChunkRestoringError(ChunkError::InternalError( \"restored tree invalid\", ))"
+  ],
+  "heldInTarget": [
+    {
+      "call": "is_empty()",
+      "why": "no word of `is_empty()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "is_empty()",
+      "why": "no word of `is_empty()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+      "why": "no word of `load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+      "why": "no word of `map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "ChunkError::InternalError( \"failed to load base root during finalize\", )",
+      "why": "no word of `ChunkError::InternalError( \"failed to load base root during finalize\", )`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "is_err()",
+      "why": "no word of `is_err()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+      "why": "no word of `load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+      "why": "no word of `map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "ChunkError::InternalError( \"failed to reload base root after height rewrite\", )",
+      "why": "no word of `ChunkError::InternalError( \"failed to reload base root after height rewrite\", )`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "is_empty()",
+      "why": "no word of `is_empty()`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    },
+    {
+      "call": "ChunkError::InternalError( \"restored tree invalid\", )",
+      "why": "no word of `ChunkError::InternalError( \"restored tree invalid\", )`'s name is in the requirement or its search hints, so a check before it is not asked about"
+    }
+  ],
+  "heldReasons": {
+    "no word of `…`'s name is in the requirement or its search hints, so a check befo": 184,
+    "`…` (merk/src/merk/restore.rs:501) is read on its own in this run, so a check be": 14
+  },
+  "notes": [
+    "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
+    "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
+    "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
+    "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
+    "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
+    "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
+    "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
+    "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+  ]
+}

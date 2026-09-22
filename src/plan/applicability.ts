@@ -25,10 +25,19 @@ export type Applicability =
   | { ok: true; calleeDefinedAt: string }
   | { ok: false; kind: "target_not_result" | "callee_unresolved" | "callee_ambiguous" | "callee_not_result"; reason: string };
 
-/** The definitions of a bare name outside tests, at this commit. */
-async function definitionsOf(discoverer: Discoverer, name: string): Promise<{ path: string; line: number; text: string }[]> {
-  const { hits } = await discoverer.search(name);
-  const found: { path: string; line: number; text: string }[] = [];
+export interface Definition {
+  path: string;
+  line: number;
+  text: string;
+}
+
+/**
+ * The definitions of a bare name outside tests, at this commit, and whether the search that found
+ * them was cut: past the search's cap a name may have definitions this did not see.
+ */
+export async function definitionsOfName(discoverer: Discoverer, name: string): Promise<{ found: Definition[]; more: boolean }> {
+  const { hits, more } = await discoverer.search(name);
+  const found: Definition[] = [];
   for (const hit of hits) {
     if (!defines(hit.text, name) || isTestPath(hit.path)) continue;
     if (definedName(hit.text) !== name) continue;
@@ -36,7 +45,12 @@ async function definitionsOf(discoverer: Discoverer, name: string): Promise<{ pa
     const inTest = (index?.testRegions ?? []).some((r) => hit.line >= r.start && hit.line <= r.end);
     if (!inTest) found.push({ path: hit.path, line: hit.line, text: hit.text });
   }
-  return found;
+  return { found, more };
+}
+
+/** The definitions of a bare name outside tests, at this commit, as far as the search reached. */
+export async function definitionsOf(discoverer: Discoverer, name: string): Promise<Definition[]> {
+  return (await definitionsOfName(discoverer, name)).found;
 }
 
 /**

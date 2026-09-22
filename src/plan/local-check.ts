@@ -104,7 +104,11 @@ export function locateCall(body: string, call: CallCandidate): { ok: boolean; fo
   return { ok: true, found };
 }
 
-export type Observation = "returns_error" | "returns_success" | "cannot_determine" | "withheld";
+/**
+ * An observation answer's name, as the form's question offers it (`returns_success`, `reaches_it`…),
+ * or `cannot_determine` for an answer under the bar, or `withheld` for none.
+ */
+export type Observation = string;
 
 export interface LocalResult {
   /** What was observed about this one call, at this one place. */
@@ -120,18 +124,15 @@ export interface LocalResult {
  * The reading, with no claim about the requirement attached.
  *
  * Whether the requirement requires this of the call is a separate question, asked separately, and
- * joined to this one only where both answers clear the bar.
+ * joined to this one by the rule in `review/outcome.ts`.
+ *
+ * `reading` is the form's: why each answer reads as it does. An answer it has no sentence for reads
+ * as its `cannot_determine`.
  */
-export function describe(answer: ChoiceAnswer | undefined, probability: number): LocalResult {
+export function describe(answer: ChoiceAnswer | undefined, probability: number, reading: Readonly<Record<string, string>>): LocalResult {
   if (!answer) return { observation: "withheld", probability: 0, probabilities: {}, why: "no answer was read" };
   const probabilities = { ...answer.probabilities };
   if (probability < BAR) return { observation: "cannot_determine", probability, probabilities, why: `the answer did not clear ${BAR} (${answer.choice} ${probability.toFixed(2)})` };
-  const choice = answer.choice as Observation;
-  const why =
-    choice === "returns_success"
-      ? "the failed call is returned to the caller as a success"
-      : choice === "returns_error"
-        ? "the failed call is not returned as a success"
-        : "the code shown does not settle what is returned";
-  return { observation: choice, probability, probabilities, why };
+  const choice = answer.choice;
+  return { observation: choice, probability, probabilities, why: reading[choice] ?? reading.cannot_determine ?? "the code shown does not settle it" };
 }

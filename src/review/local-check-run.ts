@@ -2,22 +2,25 @@
 //
 // What the ordinary run does is ask, for each place discovery offers, whether the requirement
 // holds there. Measured over ten real pull requests that never produced a VERIFIED. This path asks
-// something smaller and answerable instead: **when this call fails, does this function return a
-// success?** The bench that settled its wording is in `docs/`; what is new here is that a run can
-// reach it from a pull request rather than from a person naming a function and a call.
+// something smaller and answerable instead, about one call at a time — **when this call fails, does
+// this function return a success?**, or **in a case the requirement forbids it, is this call still
+// made?** Which of those is the requirement's form (`plan/forms.ts`, docs/adr/0006). The bench that
+// settled the first wording is in `docs/`; what is new here is that a run can reach it from a pull
+// request rather than from a person naming a function and a call.
 //
 // The shape:
 //
 //   1. the change offers the functions holding changed lines, and one hop out their callers
 //   2. every call in every one of those functions is added — the diff says which body, and the
 //      defect is usually a different call in it
-//   3. calls whose callee resolves here to something returning a `Result` are askable; the rest are
-//      held, with the reason, in the report
+//   3. the form says which calls are askable — for failures, a callee resolving here to something
+//      returning a `Result` — and the rest are held, with the reason, in the report
 //   4. **one** judgment budget for the requirement, spent round-robin over functions, so neither a
 //      busy body nor a busy file can take the run
-//   5. each of those calls gets two Jev questions, asked separately: does the requirement require
-//      that this call's failure not reach the caller as a success, and what does the function
-//      return when it does fail. Where both clear the bar and disagree, the call is listed
+//   5. each of those calls gets the form's two Jev questions, asked separately: what the requirement
+//      requires of the call, and what the function does under the form's assumption. One rule for
+//      every form (`outcome.ts`) reads the two answers as holding, worth checking, not settled, or
+//      not required of; a call read as going against the requirement is listed
 //
 // **Only Jev is asked anything.** A second model used to open files, pick calls and write the
 // mapping's prose; the transport refuses every model but Jev now, and what that model was giving
@@ -26,27 +29,29 @@
 // Nothing in this file knows a function name, a helper name or an expected answer.
 //
 // **A local observation is not a requirement verdict.** A changed line says the work was done
-// there; resolving that a callee returns a `Result` makes a question askable. Neither makes the
-// requirement apply — the mapping is what says that, it is asked separately, and it is never told
-// what the code does. No requirement-level status is stated, and a finding does not make the run
-// exit nonzero — a configuration, repository or provider failure still does. A finding is two
-// readings that disagree, printed with everything needed to disagree with them.
+// there; the form's condition makes a question askable. Neither makes the requirement apply — the
+// mapping is what says that, it is asked separately, and it is never told what the code does. The
+// four outcomes are readings of one call each. No requirement-level status is stated, and a finding
+// does not make the run exit nonzero — a configuration, repository or provider failure still does.
+// A finding is two readings that disagree, printed with everything needed to disagree with them.
 
 import { analyzeChange } from "../change/seeds.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
 import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
-import type { JudgmentProvider } from "../judgments/provider.ts";
+import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import { codeSpan, intentSection } from "../report/markdown.ts";
-import type { Candidate, IntentSource, IntentSpec, Requirement } from "../types.ts";
-import { applicabilityOf, type Applicability } from "../plan/applicability.ts";
+import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type IntentSource, type IntentSpec, type Requirement, type RequirementForm } from "../types.ts";
+import { applicabilityOf, definitionsOfName } from "../plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
+import { DEFAULT_FORM, formOf, FORMS } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
-import { BAR, conditionFor, describe, locateCall, questionsFor, type LocalResult } from "../plan/local-check.ts";
-import { acceptMapping, mappingQuestionFor, MAPPING_BAR, MAPPING_PROPERTY, type MappingAnswer, type MappingVerdict, whyListed } from "../plan/mapping.ts";
-import { selectSites, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
+import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
+import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
+import { selectSites, type Askability, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
+import { OUTCOMES, outcomeOf, type Outcome } from "./outcome.ts";
 import { probabilityOf } from "./requirement.ts";
 
 export interface LocalCheckOptions {
@@ -70,7 +75,11 @@ export interface Observed {
   function: string;
   call: string;
   origin: Site["origin"];
+  /** The same call's entry in `mappings`. */
+  callId: string;
   result: LocalResult;
+  /** What the one rule made of the mapping and this reading, for this call only. */
+  outcome: Outcome;
 }
 
 export interface Unchecked {
@@ -101,7 +110,8 @@ export interface Finding {
   quote: string;
   /** The condition that was assumed when the function was read. */
   condition: string;
-  property: typeof MAPPING_PROPERTY;
+  /** What the mapping asked the requirement to require of the call: the form's name for it. */
+  property: string;
   mapping: MappingAnswer;
   observation: LocalResult["observation"];
   probability: number;
@@ -137,6 +147,8 @@ export interface MappingRecord {
 export interface LocalCheckResult {
   requirementId: string;
   requirementText: string;
+  /** What was asked of each call: the requirement's form. */
+  form: RequirementForm;
   /**
    * What the budget selected, before anything was asked.
    *
@@ -164,6 +176,8 @@ export interface LocalCheckResult {
     governed: number;
     overBudget: number;
     notApplicable: number;
+    /** The calls asked about, by outcome. They add up to `asked`. */
+    outcomes: Record<Outcome, number>;
   };
   notes: string[];
 }
@@ -202,28 +216,80 @@ export async function runLocalCheck(
   // diff that only touched comments or imports in a Rust file: no function, and no note either.
   if (![...fromChange.sources.values()].some((s) => (s.changed?.length ?? 0) > 0)) changeNotes.push("the change touched no Rust function at this commit");
 
-  // Whether a question can be put to a call depends on the commit and on nothing else, and the
-  // change's candidates are the same for every requirement. Deciding it once is the difference
-  // between one pass over the calls and one pass per requirement.
-  const decided = new Map<string, Promise<Applicability>>();
-  const decide = (fn: FunctionCandidate, call: CallCandidate): Promise<Applicability> => {
+  // Whether the target and the callee return a `Result` depends on the commit and on nothing else,
+  // and the change's candidates are the same for every requirement. Deciding it once is the
+  // difference between one pass over the calls and one pass per requirement.
+  //
+  // Only that is shared. Whether a question can be put to a call is the form's to say and may read
+  // the requirement's words, so it is decided per requirement: a shared answer let the second
+  // requirement of a spec be judged by the first one's form, or by the first one's words.
+  const resultAnswers = new Map<string, Promise<Askability>>();
+  const resultOf = (fn: FunctionCandidate, call: CallCandidate): Promise<Askability> => {
     const key = `${fn.id}\u0000${call.id}`;
-    let answer = decided.get(key);
+    let answer = resultAnswers.get(key);
     if (!answer) {
       answer = applicabilityOf(discoverer, fn, call);
-      decided.set(key, answer);
+      resultAnswers.set(key, answer);
     }
     return answer;
   };
 
+  // A request that fails without ending the run leaves its call unanswered, and the run goes on. But
+  // a host that answered nothing at all is not a run of "not settled": it is the host failing, as the
+  // default review reads it too. A run that stopped on its own budget reached nothing, and keeps its
+  // report.
+  let hostReached = 0;
+  let answered = 0;
+  let failedAt: string | undefined;
+  const ask = async (packet: unknown, questions: Questions): Promise<{ answers: Record<string, ChoiceAnswer | undefined>; failure?: string }> => {
+    try {
+      const answers = await judge.judge(packet, questions);
+      hostReached += 1;
+      answered += 1;
+      return { answers };
+    } catch (error) {
+      const failure = callsOwn(error);
+      if (!(error instanceof ProviderError && error.kind === "budget")) hostReached += 1;
+      if (error instanceof ProviderError && error.where !== undefined) failedAt = error.where;
+      return { answers: {}, failure };
+    }
+  };
+
+  // The functions whose own calls this run enumerates: a form may leave a call into one of them to
+  // be asked about inside it. A callee is one of them only when its one definition in the repository
+  // is at one of them — by the name alone, a same-named function elsewhere in the change had the
+  // call to the other one held for a reason that was not true of it. Definitions depend on the
+  // commit alone, so a name is looked up once.
+  const enumerated: FunctionCandidate[] = [];
+  for (const source of fromChange.sources.values()) {
+    const ids = new Set([...(source.changed ?? []), ...(source.callsChanged ?? [])]);
+    for (const fn of source.candidates.functions) if (ids.has(fn.id)) enumerated.push(fn);
+  }
+  const definitions = new Map<string, ReturnType<typeof definitionsOfName>>();
+  const readHere = async (callee: string): Promise<FunctionCandidate | null> => {
+    let defs = definitions.get(callee);
+    if (!defs) {
+      defs = definitionsOfName(discoverer, callee);
+      definitions.set(callee, defs);
+    }
+    // A search cut at its cap may have missed a definition: the one it found is then not known to
+    // be the only one, and the call is asked about where it is.
+    const { found, more } = await defs;
+    if (more || found.length !== 1) return null;
+    const def = found[0]!;
+    return enumerated.find((fn) => fn.name === callee && fn.path === def.path && def.line >= fn.startLine && def.line <= fn.endLine) ?? null;
+  };
+
   const out: LocalCheckResult[] = [];
   for (const requirement of requirements) {
+    const form = formOf(requirement);
     const notes = [...changeNotes];
     const observed: Observed[] = [];
     const unchecked: Unchecked[] = [];
     const mappings: MappingRecord[] = [];
     const findings: Finding[] = [];
 
+    const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere });
     const selection = await selectSites([...fromChange.sources.values()], decide, options.budget);
     for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
     for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: `the budget of ${options.budget} was already spent` });
@@ -257,21 +323,13 @@ export async function runLocalCheck(
         unchecked.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, why: located.reason ?? "the call could not be located in the body read here" });
         continue;
       }
-      const condition = conditionFor(site.fn, site.call);
-      const expression = condition.operation.replace(/`/g, "");
       const place = { file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin };
 
       // Two questions, two requests. The mapping is about the requirement's words and must not be
-      // asked under the failure the observation assumes — nor in the same breath as it.
-      let unanswered = "the mapping question was not answered";
-      const mappingAnswers = await judge.judge(evidence.packet, mappingQuestionFor(site.fn, site.call, expression)).catch((error: unknown) => {
-        // A failure that ends the run ends it here. Any other is this call's alone, and the report
-        // says what kind it was and which host it came from — never the host's own words, which
-        // would be printed as Markdown.
-        if (!(error instanceof ProviderError) || FATAL_KINDS.has(error.kind)) throw error;
-        unanswered = `the mapping question was not answered (${error.kind}${error.where === undefined ? "" : ` from ${error.where}`})`;
-        return {} as Record<string, never>;
-      });
+      // asked under the assumption the observation makes — nor in the same breath as it.
+      const asking = await ask(evidence.packet, form.mappingQuestion(site.fn, site.call));
+      const mappingAnswers = asking.answers;
+      const unanswered = asking.failure ? `the mapping question was not answered (${asking.failure})` : "the mapping question was not answered";
       mapped += 1;
       const mapping = acceptMapping(mappingAnswers.requirement_governs);
       mappings.push({
@@ -292,16 +350,26 @@ export async function runLocalCheck(
               : `read as \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}), which is below the bar of ${MAPPING_BAR} or not a requirement of this call`,
       });
 
-      const answers = await judge.judge(evidence.packet, questionsFor(condition));
-      const answer = answers.on_error_result;
+      // The observation's failure is handled as the mapping's is: until it was, a failure the mapping
+      // survived — a malformed answer, a spent budget — ended the whole run here instead.
+      const reading = await ask(evidence.packet, form.observationQuestions(site.fn, site.call));
+      const answer = reading.answers[form.observationKey];
       const p = answer ? probabilityOf(answer, answer.choice) : 0;
       asked += 1;
-      const result = describe(answer, p);
-      observed.push({ ...place, result });
+      const described = describe(answer, p, form.words.reading);
+      const result = reading.failure ? { ...described, why: `the observation question was not answered (${reading.failure})` } : described;
 
-      // A finding needs both halves, each over the same bar: a requirement read as requiring this
-      // of the call, and a reading of the call that returns a success anyway.
-      if (mapping.governs && result.observation === "returns_success") {
+      // The one rule, for every form. Its readings are the answers as the report records them: the
+      // mapping's verdict and number, and the observation after the bar has been applied to it.
+      const outcome = outcomeOf(
+        mapping.verdict === "no_answer" ? undefined : { choice: mapping.verdict, probability: mapping.probability },
+        result.observation === "withheld" ? undefined : { choice: result.observation, probability: result.probability },
+        form,
+        { mapping: MAPPING_BAR, observation: BAR },
+      );
+      observed.push({ ...place, callId: site.call.id, result, outcome });
+
+      if (outcome === "violates") {
         findings.push({
           requirementId: requirement.id,
           file: place.file,
@@ -309,19 +377,21 @@ export async function runLocalCheck(
           function: place.function,
           call: place.call,
           quote,
-          condition: `${condition.setup} ${condition.occurrence}, ${condition.operation} returns ${condition.yields}. ${condition.others}`,
-          property: MAPPING_PROPERTY,
+          condition: form.words.assumed(site.fn, site.call),
+          property: form.property,
           mapping,
           observation: result.observation,
           probability: result.probability,
-          why: whyListed(site.fn.name, mapping, result.observation, result.probability),
+          why: form.words.whyListed(site.fn.name, mapping, result.observation, result.probability),
         });
       }
     }
 
+    const outcomes = Object.fromEntries(OUTCOMES.map((o) => [o, observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>;
     out.push({
       requirementId: requirement.id,
       requirementText: requirement.text,
+      form: form.name,
       wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
@@ -337,12 +407,25 @@ export async function runLocalCheck(
         governed: mappings.filter((m) => m.governs).length,
         overBudget: selection.overBudget.length,
         notApplicable: selection.held.length,
+        outcomes,
       },
       // A file both the change and the requirement's words reached has its cap counted twice.
       notes: [...new Set(notes)],
     });
   }
+  if (hostReached > 0 && answered === 0) {
+    throw new ToolError(`no judgment came back from ${failedAt ?? "the judgment provider"}: ${hostReached} request(s) were sent and none was answered`, EXIT.provider);
+  }
   return out;
+}
+
+/**
+ * What a failed request was, for the report: the kind and the host, never the host's own words, which
+ * would be printed as Markdown. A failure that ends the run is thrown on from here.
+ */
+function callsOwn(error: unknown): string {
+  if (!(error instanceof ProviderError) || FATAL_KINDS.has(error.kind)) throw error;
+  return `${error.kind}${error.where === undefined ? "" : ` from ${error.where}`}`;
 }
 
 const ORIGIN_WORDS: Record<Site["origin"], string> = {
@@ -351,29 +434,36 @@ const ORIGIN_WORDS: Record<Site["origin"], string> = {
 };
 
 /**
- * The report: what is worth checking, then what was read, then what was not checked and why.
+ * The report: what is worth checking, then what was read and how each call came out, then what was
+ * not checked and why.
  *
- * Every sentence in it is this file's or the input's. Nothing is a model's prose — the two model
- * answers appear as a choice and a number, named as Jev's, and the reasoning between them is
- * assembled from the parts. No requirement-level verdict appears anywhere.
+ * Every sentence in it is this file's, a form's or the input's. Nothing is a model's prose — the two
+ * model answers appear as a choice and a number, named as Jev's, and the reasoning between them is
+ * assembled from the parts. No requirement-level verdict appears anywhere, and neither does the
+ * name of any outcome: the sections say what each call was read as.
  */
 export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { intent: IntentSpec; sources: readonly Omit<IntentSource, "text">[]; prAuthor?: string; notes?: readonly string[] }): string {
   const lines: string[] = [
     "# Local check (experimental)",
     "",
-    `Two questions are put to Jev about each call, separately: whether the requirement requires that a failure of it not reach the caller as a success, and what the function returns when it does fail. The bar for each is ${BAR}.`,
+    `Two questions are put to Jev about each call, separately: what the requirement requires of the call, and what the function does under an assumption. Which two is the requirement's form, named with it. The bar for each is ${BAR}.`,
     "",
-    "**Nothing here is a requirement verdict.** A call is listed when both answers clear the bar and disagree; the two answers do not check each other, and everything either of them rests on is printed.",
+    "**Nothing here is a requirement verdict.** One rule, the same for every form, reads each call as worth checking, holding, not settled, or not required of by the requirement. The two answers do not check each other, and everything either of them rests on is printed.",
     "",
     ...(read ? intentSection(read.intent, read.sources, read) : []),
   ];
   for (const r of results) {
     const c = r.counts;
+    // A result built without a form — a record from before forms, a test's — reads as the default.
+    const form = FORMS[r.form ?? DEFAULT_FORM];
     // The requirement is the author's text: a code span, so no line of it can become a heading, a
     // comment that hides the rest of the report, or a workflow command; and redacted for display.
     lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
+    lines.push(`Form: \`${r.form}\`. ${form.words.intro}`, "");
     lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
-    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`, "");
+    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
+    if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
+    lines.push("");
 
     if (r.findings.length > 0) {
       lines.push("### Worth checking", "");
@@ -382,7 +472,7 @@ export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { 
         lines.push(`- **Requirement ${f.requirementId}**: ${codeSpan(f.quote)}`);
         lines.push(`- **Assumed**: ${f.condition}`);
         lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
-        lines.push(`- **Jev, on what the function returns**: ${f.observation} (${f.probability.toFixed(2)})`);
+        lines.push(`- **${form.words.asks}**: ${f.observation} (${f.probability.toFixed(2)})`);
         lines.push(`- **Why it is listed**: ${f.why}`, "");
       }
     }
@@ -402,19 +492,20 @@ export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { 
     }
     for (const o of r.observed) {
       lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
-      lines.push(`  - when that call fails: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
+      lines.push(`  - ${form.words.observed}: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
     }
-    // Both sections come off the same list, so a call cannot be in one reading and not the other.
-    const governed = r.mappings.filter((m) => m.governs);
-    const rest = r.mappings.filter((m) => !m.governs);
-    if (governed.length > 0) {
-      lines.push("", "### Read as required by the requirement", "", "Whether or not the reading of the call agreed with it. A run that lists nothing still read something, and this is what it read.", "");
-      for (const m of governed) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why}`);
-    }
-    if (rest.length > 0) {
-      lines.push("", "### Read, but not required of by the requirement", "");
-      for (const m of rest) lines.push(`- ${m.file} · ${m.function} — \`${m.call}\`: ${m.why}`);
-    }
+    // Every call read is in exactly one of these, or under "Worth checking" above: all come off the
+    // outcome the rule gave it, so a call cannot be in two readings or in none.
+    const mappingOf = new Map(r.mappings.map((m) => [m.callId, m]));
+    const section = (outcome: Outcome, heading: string, note: string | undefined, why: (o: Observed, m: MappingRecord | undefined) => string) => {
+      const these = r.observed.filter((o) => o.outcome === outcome);
+      if (these.length === 0) return;
+      lines.push("", `### ${heading}`, "", ...(note ? [note, ""] : []));
+      for (const o of these) lines.push(`- ${o.file} · ${o.function} — \`${o.call}\`: ${why(o, mappingOf.get(o.callId))}`);
+    };
+    section("satisfies", "Read as holding", "Two readings that agree. Where what decides it is in code that was not sent, they can agree and be wrong.", (o, m) => `${m?.why ?? "the mapping was not recorded"}; ${o.result.why} (${o.result.probability.toFixed(2)})`);
+    section("unknown", "Not settled", "A call read, and not settled either way by the two answers.", (o, m) => (m?.governs ? `${m.why}, but ${o.result.why}` : (m?.why ?? "the mapping was not recorded")));
+    section("aside", "Read, but not required of by the requirement", undefined, (_o, m) => (m ? `read as \`${m.verdict}\` (${m.probability.toFixed(2)}): not a requirement of this call` : "the mapping was not recorded"));
     if (r.unchecked.length > 0) {
       lines.push("", "### Not checked", "");
       for (const u of r.unchecked) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\` _(${ORIGIN_WORDS[u.origin]})_: ${u.why}`);

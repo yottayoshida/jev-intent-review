@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "dashpay/grovedb#500 — a check-before-action requirement written for finalize, to count reach",
+  "summary": "Written before the count, for `Restorer::finalize` in merk/src/merk/restore.rs at c0e02819: heights are rewritten only after verifying them has failed.",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "While a restore is being finalized, the tree heights must not be rewritten unless verifying the heights has failed.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": [],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

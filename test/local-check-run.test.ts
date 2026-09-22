@@ -10,7 +10,7 @@ import { DEFAULT_LOCAL_CHECK, runLocalCheck, renderLocalCheck, type LocalCheckOp
 import type { Git } from "../src/repository/git.ts";
 import { ProviderError } from "../src/judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
-import type { ChoiceAnswer, Requirement } from "../src/types.ts";
+import { EXIT, ToolError, type ChoiceAnswer, type Requirement } from "../src/types.ts";
 
 /** The changed file. Line 9 is the call the change introduced. */
 const INTEGRITY = `use std::path::Path;
@@ -231,7 +231,53 @@ test("the mapping is recorded whether or not anything came of it", async () => {
   assert.ok(kept, JSON.stringify(r.mappings));
   assert.equal(kept.probability, 0.9);
   assert.deepEqual(kept.probabilities, { applies: 0.9 });
-  assert.match(text, /### Read as required by the requirement/);
+  // A governed call whose reading keeps the requirement is read as holding — the section the
+  // governed readings used to share with the ones that did not settle anything.
+  assert.match(text, /### Read as holding/);
+  assert.ok(!/### Read as required by the requirement/.test(text));
+  assert.ok(r.observed.every((o) => o.outcome === "satisfies"), JSON.stringify(r.observed.map((o) => o.outcome)));
+});
+
+test("an observation that failed leaves its call not settled, says why, and the run goes on", async () => {
+  const where = "Cloudflare Workers AI (https://api.cloudflare.com)";
+  const { judge } = jev();
+  const failing: JudgmentProvider = {
+    model: judge.model,
+    async judge(state, questions) {
+      const packet = state as { candidate: { symbol?: string } };
+      if (Object.hasOwn(questions, "on_error_result") && packet.candidate.symbol === "show") throw new ProviderError("bad_response", `${where}: [the host's own words](https://evil.example)`, undefined, where);
+      return judge.judge(state, questions);
+    },
+  };
+  const [r] = await runLocalCheck(repo(), REVISIONS, [requirement], failing, () => true, DEFAULT_LOCAL_CHECK);
+  const show = r!.observed.find((o) => o.function === "show");
+  assert.ok(show, JSON.stringify(r!.observed));
+  assert.equal(show.outcome, "unknown");
+  assert.equal(show.result.observation, "withheld");
+  assert.equal(show.result.why, `the observation question was not answered (bad_response from ${where})`);
+  assert.equal(r!.observed.find((o) => o.function === "read_baseline")?.outcome, "satisfies", "the other call is read as before");
+  const text = renderLocalCheck([r!]);
+  assert.match(text, /### Not settled/);
+  assert.ok(!text.includes("the host's own words"));
+});
+
+test("a host that answered nothing at all fails the run and is named; a run stopped by its own budget does not", async () => {
+  const where = "TypeSafe (https://api.typesafe.ai)";
+  const nothing = (error: ProviderError): JudgmentProvider => ({
+    model: "typesafe/jev",
+    async judge() {
+      throw error;
+    },
+  });
+  await assert.rejects(runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("bad_response", "unreadable", undefined, where)), () => true, DEFAULT_LOCAL_CHECK), (e: unknown) => {
+    assert.ok(e instanceof ToolError, String(e));
+    assert.equal(e.exitCode, EXIT.provider);
+    assert.match(e.message, new RegExp(`no judgment came back from ${where.replace(/[.()]/g, "\\$&")}: 4 request\\(s\\) were sent and none was answered`));
+    return true;
+  });
+  // The run's own budget reached nothing: the calls are not settled, and the report stands.
+  const [r] = await runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("budget", "the run's request budget ran out")), () => true, DEFAULT_LOCAL_CHECK);
+  assert.ok(r!.observed.length > 0 && r!.observed.every((o) => o.outcome === "unknown"));
 });
 
 test("a changed function is told to the model as changed", async () => {

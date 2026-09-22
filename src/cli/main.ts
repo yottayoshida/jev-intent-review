@@ -46,18 +46,24 @@ Experimental:
   --experimental-local-check
                         the v0.1 path. For each requirement, take the Rust functions the
                         change touched and their callers one hop out, and ask Jev two
-                        things about each call: whether the requirement requires that a
-                        failure of it not reach the caller as a success, and what the
-                        function returns when it does. Where both clear the bar and
-                        disagree, the call is listed as worth checking, with the
-                        requirement's words, the code, the assumed failure and both
-                        answers. Requirements come from --intent-spec or the forms
-                        under Intent below; no file, function or expected answer is
-                        named on the command line. No requirement verdict is stated.
-                        Findings do not cause a nonzero exit code; configuration, intent,
-                        repository and provider failures can. Nothing listed means no call
-                        met the conditions -- including calls left undetermined -- and
-                        exit 0 does not establish that the requirement holds.
+                        things about each call, as the requirement's "form" says. The
+                        default, failure_propagation: whether the requirement requires
+                        that a failure of the call not reach the caller as a success,
+                        and what the function returns when it does. The other,
+                        check_before_action (set "form" in --intent-spec): whether the
+                        requirement requires a check to pass before the call, and whether
+                        the function still makes the call when the check does not pass.
+                        One rule reads each call as holding, worth checking, not settled,
+                        or not required of. A call worth checking is listed with the
+                        requirement's words, the code, the assumption and both answers.
+                        Requirements come from --intent-spec or, as written, from the
+                        issue and pull request as under Intent below; no file, function
+                        or expected answer is named on the command line. No requirement
+                        verdict is stated. Findings do not cause a nonzero exit code;
+                        configuration, intent, repository and provider failures can.
+                        Nothing listed means no call met the conditions -- including
+                        calls left undetermined -- and exit 0 does not establish that the
+                        requirement holds.
   --experimental-candidates-only
                         with the above: build the set and stop. Prints which calls fit the
                         budget and which do not, with a reason each, and asks nothing --

@@ -46,7 +46,7 @@ const MAX_TERMS = 8;
 const COMMON_FILES = 40;
 
 const WORD = /^[\p{L}_$][\p{L}\p{N}_$.-]*$/u;
-const STOP_WORDS = new Set(
+export const STOP_WORDS = new Set(
   "about above after again against all also and any are because been before being below between both but can cannot could did does doing down during each every few for from further had has have having here how into its itself just more most must need never not now off once only other our out over own same should some such than that the their them then there these they this those through too under until upon very was were what when where which while who whom why will with within without would you your".split(" "),
 );
 // A declaration that runs nothing (an interface, a type, a struct): a place a requirement about
