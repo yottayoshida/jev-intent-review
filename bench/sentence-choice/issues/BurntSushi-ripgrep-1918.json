@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1918",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1918",
+ "title": "Add support for cuda files",
+ "author": "eyal0",
+ "createdAt": "2021-06-30T13:15:56Z",
+ "closedBy": "BurntSushi/ripgrep#1919",
+ "body": "CUDA programming is usually done within .cu and .cuh files, though it can also include the usual c/c++ file extensions.  Please add \"cuda\" as another one of the ripgrep types."
+}

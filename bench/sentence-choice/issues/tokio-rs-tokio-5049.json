@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5049",
+ "url": "https://github.com/tokio-rs/tokio/issues/5049",
+ "title": "Re-enable the custom-executor example",
+ "author": "Darksonn",
+ "createdAt": "2022-09-25T08:01:02Z",
+ "closedBy": "tokio-rs/tokio#5060",
+ "body": "The custom-executor example was disabled in #5048. We should re-enable it on master."
+}

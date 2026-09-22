@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1293",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1293",
+ "title": "For to --iglob even if -g",
+ "author": "sumonto",
+ "createdAt": "2019-06-05T22:26:35Z",
+ "closedBy": "BurntSushi/ripgrep#1294",
+ "body": "#### What version of ripgrep are you using?\r\n\r\nripgrep 11.0.1\r\n-SIMD -AVX (compiled)\r\n+SIMD +AVX (runtime)\r\n\r\n\r\n#### How did you install ripgrep?\r\n\r\nbrew install\r\n\r\n#### What operating system are you using ripgrep on?\r\n\r\nMac OSx lastest\r\n\r\n#### Describe your question, feature request, or bug.\r\n\r\nHow do I force --iglob for all my searches even if I specify -g ..\r\nI would like to avoid having to write a custom function/wrapper\r\n\r\nThanks"
+}

@@ -1,0 +1,9 @@
+{
+ "issue": "clap-rs/clap#4342",
+ "url": "https://github.com/clap-rs/clap/issues/4342",
+ "title": "help for `help` says \"Print this message or the help of the given subcommand(s)\" but only takes one subcommand",
+ "author": "joshtriplett",
+ "createdAt": "2022-10-03T21:43:43Z",
+ "closedBy": "clap-rs/clap#4465",
+ "body": "The help text for the `help` subcommand says:\r\n```\r\n  help   Print this message or the help of the given subcommand(s)\r\n```\r\nThat phrasing makes it *sound* like `help` could show help for multiple subcommands at once (e.g. `cmd help subcmd1 subcmd2 subcmd3`). However, the `help` subcommand only takes one subcommand to show help for, not multiple. Given that, I think the help should be:\r\n```\r\n  help   Print this message or the help of the given subcommand\r\n```\r\n\r\nThe output of `help help` says:\r\n```\r\n  [COMMAND]...  The subcommand whose help message to display\r\n```\r\nWhich seems more correct: it says \"The subcommand\", singular."
+}

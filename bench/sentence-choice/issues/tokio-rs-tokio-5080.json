@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5080",
+ "url": "https://github.com/tokio-rs/tokio/issues/5080",
+ "title": "LengthDelimitedCodec::length_field_type()/length_field_len() should also update max_frame_length",
+ "author": "crusader-mike",
+ "createdAt": "2022-10-06T21:22:59Z",
+ "closedBy": "tokio-rs/tokio#6414",
+ "body": "**Version** tokio-util v0.7.2\r\n\r\n**Platform** Win7\r\n\r\n**Description**\r\nCurrently `LengthDelimitedCodec`s `Encoder`truncates frame length, which leads to corrupted data (e.g. 6Mb frame prefixed with 2-bytes length).\r\n\r\nI expected to see this happen:\r\n- calling `length_field_type::<u16>()` (or `length_field_len(2)`) should also set `max_frame_length` to `min(65535, max_frame_length)`\r\n- calling `max_frame_length(N)` should also update `length_field_len` to smallest M such that `N < (1 << 8*M)` (probably not a good idea since it will change network-lvl presentation... maybe panic, if `length_field_len` is too small to accomodate `N`?)\r\n"
+}

@@ -1,0 +1,9 @@
+{
+ "issue": "sharkdp/bat#2227",
+ "url": "https://github.com/sharkdp/bat/issues/2227",
+ "title": "Read from `.sublime-syntax`'s `hidden_file_extensions`",
+ "author": "0x326",
+ "createdAt": "2022-06-27T12:59:37Z",
+ "closedBy": "sharkdp/bat#3613",
+ "body": "Would it be possible for bat to read from the `hidden_file_extensions` property of `.sublime-syntax` files in addition to the `file_extension` property?  For some projects, file types are have a different extension than usual, such as XML in C# and VB.NET projects (`.csproj` and `.vbproj` are written in XML syntax). These less common extensions seem to be already listed in some `.sublime-syntax` files, but are not currently being read by bat ([example](https://github.com/sublimehq/Packages/blob/e5ab29824b32e85d870612f3f75a0eaa645cc93a/XML/XML.sublime-syntax#L64)).\r\n\r\nExpected behavior: Syntax highlighting of files such as `.csproj`\r\n\r\nCurrent behavior: No syntax highlighting"
+}

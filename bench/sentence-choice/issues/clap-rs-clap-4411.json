@@ -1,0 +1,9 @@
+{
+ "issue": "clap-rs/clap#4411",
+ "url": "https://github.com/clap-rs/clap/issues/4411",
+ "title": "create skip_with_default attribute for Subcommands",
+ "author": "0xForerunner",
+ "createdAt": "2022-10-20T21:06:56Z",
+ "closedBy": "clap-rs/clap#4412",
+ "body": "### Please complete the following tasks\n\n- [X] I have searched the [discussions](https://github.com/clap-rs/clap/discussions)\n- [X] I have searched the [open](https://github.com/clap-rs/clap/issues) and [rejected](https://github.com/clap-rs/clap/issues?q=is%3Aissue+label%3AS-wont-fix+is%3Aclosed) issues\n\n### Clap Version\n\n4.0.17\n\n### Describe your use case\n\nThe enum that I'm using with clap derive also serves as an external API so there are certain things it must have. It looks like this:\r\n\r\n```rust\r\n#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema, Parser)]\r\n#[serde(rename_all = \"snake_case\")]\r\npub enum Msg {\r\n    #[command(subcommand)]\r\n    Base(BaseMsg),\r\n    #[clap(skip_with_default=my_default_function)] // This is the feature I would like to add\r\n    Receive(ExternalStruct),\r\n    AddAssets {\r\n        #[arg(value_parser=serde_json::from_str::<[AssetInfo; 2]>)]\r\n        assets: [AssetInfo; 2],\r\n    },\r\n```\r\n\r\nBecause Default is not implemented for ExternalStruct I cannot skip the variant regularly.\n\n### Describe the solution you'd like\n\nAn attribute like \r\n```\r\n#[clap(skip_with_default=my_default_function)]\r\n```\r\nShould work perfectly for me. I'm currently not aware of any other solution.\n\n### Alternatives, if applicable\n\n_No response_\n\n### Additional Context\n\n_No response_"
+}

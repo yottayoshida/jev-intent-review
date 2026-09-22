@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1207",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1207",
+ "title": "finding zero bytes in utf-16 encoded files",
+ "author": "LesnyRumcajs",
+ "createdAt": "2019-02-28T19:42:09Z",
+ "closedBy": "BurntSushi/ripgrep#1237",
+ "body": "#### What version of ripgrep are you using?\r\nripgrep 0.10.0\r\n-SIMD -AVX (compiled)\r\n+SIMD +AVX (runtime)\r\n\r\n#### How did you install ripgrep?\r\ncargo install ripgrep\r\n\r\n#### What operating system are you using ripgrep on?\r\n\r\nFedora 29\r\n\r\n#### Describe your question, feature request, or bug.\r\nI'm struggling to find files that contain 00 bytes. I created an UTF-16 LE file with text `test` (hexdump)\r\n```\r\n00000000: fffe 7400 6500 7300 7400 0a00            ..t.e.s.t...\r\n```\r\nGiven that there are 00 bytes inside I'm issuing a command `rg -cuuu '(?-u:\\x00)'` but get no results at all. It works for searching for `t`, like \r\n```\r\nrg -cuuu '(?-u:\\x73)'\r\ntest.txt:1\r\n```\r\nFrom my understanding the `-uuu` flag along with some UTF escaping should do the trick. It works fine for non-zero bytes. It also works for binary files (tried with a file comprising of a single 00 byte). Am I missing something?"
+}

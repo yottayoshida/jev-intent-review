@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6378",
+ "url": "https://github.com/alacritty/alacritty/issues/6378",
+ "title": "Add support for the kitty keyboard protocol",
+ "author": "Munksgaard",
+ "createdAt": "2022-10-05T12:35:56Z",
+ "closedBy": "alacritty/alacritty#7125",
+ "body": "I'm developing a terminal application using [crossterm](https://github.com/crossterm-rs/crossterm), and I would like to use the number keys as modifiers instead of ctrl and alt. That can be done through the use of [`PushKeyboardEnhancementFlags`](https://docs.rs/crossterm/latest/crossterm/event/struct.PushKeyboardEnhancementFlags.html), whereupon my program will receive [`Release`](https://docs.rs/crossterm/latest/crossterm/event/enum.KeyEventKind.html#variant.Release) and [`Repeat`](https://docs.rs/crossterm/latest/crossterm/event/enum.KeyEventKind.html#variant.Repeat) events in addition to just [`Press`](https://docs.rs/crossterm/latest/crossterm/event/enum.KeyEventKind.html#variant.Press). However, it seems like that functionality is dependent on the terminal implementing the [kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/), which alacritty doesn't.\r\n\r\nAre there any plans for implementing such a feature, or is there a better way to achieve the same goal (arbitrary keys as modifiers) in alacritty?"
+}

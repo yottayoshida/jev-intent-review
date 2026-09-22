@@ -1,0 +1,9 @@
+{
+ "issue": "sharkdp/bat#2359",
+ "url": "https://github.com/sharkdp/bat/issues/2359",
+ "title": "Incomplete syntax highlighting for ssh config?",
+ "author": "XenHat",
+ "createdAt": "2022-10-06T14:09:35Z",
+ "closedBy": "sharkdp/bat#2697",
+ "body": "_Sorry if this is a duplicate, I could not find an issue that matched this._\r\n\r\nThere seem to be a missing keyword match for `User` while parsing ssh configurations:\r\n![Screenshot_20221006_100551](https://user-images.githubusercontent.com/980408/194334341-57b58620-8ac6-44e4-ab87-42a7f1f7838f.png)\r\n\r\nWhile not explicitly referenced in [ssh_config(5)](https://man.archlinux.org/man/ssh_config.5), it is mentioned in [the Arch Linux wiki](https://wiki.archlinux.org/title/OpenSSH#Configuration) and does appear to work:\r\n\r\n```~ ∙ ssh -v zarya 2>&1 | grep DOES_THIS                                                                         130 ↵\r\ndebug1: Control socket \"/home/xenhat/.ssh/sockets/DOES_THIS_WORK/\" does not exist\r\nunix_listener: cannot bind to path /home/xenhat/.ssh/sockets/DOES_THIS_WORK/.iZ9SgH1lGBRJVscA: No such file or directory\r\n```\r\n\r\nSomething to note, however: neovim also fails to apply the ssh-specific parsing:\r\n![Screenshot_20221006_100805](https://user-images.githubusercontent.com/980408/194334727-8021f36d-828b-4c35-811c-784e27c40840.png)\r\n\r\nSo after all, I'm not sure if this actionable at all, but I thought I should mention it.\r\n\r\n\r\n\r\n"
+}
