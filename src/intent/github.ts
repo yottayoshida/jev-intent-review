@@ -4,6 +4,7 @@
 
 import { execFile } from "node:child_process";
 import { EXIT, ToolError } from "../types.ts";
+import { visibleLines } from "./compiler.ts";
 
 export interface Issue {
   number: number;
@@ -20,6 +21,9 @@ export interface PullRequest extends Issue {
   headSha: string;
   issues: Issue[];
   missingIssues?: number[]; // named with a closing keyword but not found
+  foreignIssues?: string[]; // closed, but in another repository (`owner/name#N`): not read as this one's
+  /** How many more issues it closes than GitHub listed: they were not read. */
+  issuesNotListed?: number;
 }
 
 /** A 404: callers decide whether a missing thing ends the run. */
@@ -54,15 +58,20 @@ export function parseRepository(value: string): { owner: string; name: string } 
 
 const CLOSING = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s+(?:([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+))?#(\d+)\b/gi;
 
-/** Issue numbers in this repository that `text` closes with a keyword (`Fixes #12`). */
-export function closedIssueNumbers(text: string, repo: { owner: string; name: string }): number[] {
+/**
+ * The issues that `text` closes with a keyword (`Fixes #12`), as the page shows it — a keyword in a
+ * comment or a code block closes nothing: this repository's by number, and another repository's as
+ * `owner/name#N`, to be named rather than read.
+ */
+export function closingReferences(text: string, repo: { owner: string; name: string }): { numbers: number[]; foreign: string[] } {
   const numbers = new Set<number>();
-  for (const match of text.matchAll(CLOSING)) {
+  const foreign = new Set<string>();
+  for (const match of visibleLines(text).join("\n").matchAll(CLOSING)) {
     const [, owner, name, number] = match;
-    if (owner && (owner.toLowerCase() !== repo.owner.toLowerCase() || name?.toLowerCase() !== repo.name.toLowerCase())) continue;
-    numbers.add(Number(number));
+    if (owner && (owner.toLowerCase() !== repo.owner.toLowerCase() || name?.toLowerCase() !== repo.name.toLowerCase())) foreign.add(`${owner}/${name}#${number}`);
+    else numbers.add(Number(number));
   }
-  return [...numbers].sort((a, b) => a - b);
+  return { numbers: [...numbers].sort((a, b) => a - b), foreign: [...foreign] };
 }
 
 export class GitHub {
@@ -125,23 +134,34 @@ export class GitHub {
 
   async #fetchPullRequest(repo: { owner: string; name: string }, number: number): Promise<PullRequest> {
     if (this.#token) {
-      const query = `query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){number title body url author{login} baseRefName baseRefOid headRefOid closingIssuesReferences(first:10){nodes{number title body url author{login}}}}}}`;
+      const query = `query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){nameWithOwner pullRequest(number:$number){number title body url author{login} baseRefName baseRefOid headRefOid closingIssuesReferences(first:10){totalCount nodes{number title body url author{login} repository{nameWithOwner}}}}}}`;
       const data = (await this.#request(this.#graphql, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, variables: { owner: repo.owner, name: repo.name, number } }),
-      })) as { data?: { repository?: { pullRequest?: Record<string, unknown> | null } | null }; errors?: { message?: string }[] };
+      })) as { data?: { repository?: { nameWithOwner?: string; pullRequest?: Record<string, unknown> | null } | null }; errors?: { message?: string }[] };
       const pr = data.data?.repository?.pullRequest;
       if (!pr) throw new ToolError(`GitHub has no pull request #${number} in ${repo.owner}/${repo.name}${data.errors?.[0]?.message ? ` (${data.errors[0].message})` : ""}`, EXIT.intent);
-      const nodes = ((pr.closingIssuesReferences as { nodes?: Record<string, unknown>[] } | undefined)?.nodes ?? []).map(toIssue);
-      return { ...toIssue(pr), baseRefName: String(pr.baseRefName ?? ""), baseSha: String(pr.baseRefOid ?? ""), headSha: String(pr.headRefOid ?? ""), issues: nodes };
+      // `Fixes other/repo#12` closes an issue in another repository, and GitHub lists it here with the
+      // rest. Read as this repository's `issue#12`, its text would stand as the intent at an issue's
+      // authority, indistinguishable from the real #12 — whoever owns that repository wrote it.
+      // Compared with the repository's name as GitHub gives it, which a clone's old remote may not be.
+      const own = (data.data?.repository?.nameWithOwner ?? `${repo.owner}/${repo.name}`).toLowerCase();
+      const closing = pr.closingIssuesReferences as { totalCount?: number; nodes?: Record<string, unknown>[] } | undefined;
+      const nodes = closing?.nodes ?? [];
+      const notListed = Math.max(0, Number(closing?.totalCount ?? nodes.length) - nodes.length);
+      const inRepo = (n: Record<string, unknown>) => String((n.repository as { nameWithOwner?: string } | undefined)?.nameWithOwner ?? "").toLowerCase() === own;
+      const foreign = nodes.filter((n) => !inRepo(n)).map((n) => `${String((n.repository as { nameWithOwner?: string } | undefined)?.nameWithOwner ?? "another repository")}#${Number(n.number)}`);
+      return { ...toIssue(pr), baseRefName: String(pr.baseRefName ?? ""), baseSha: String(pr.baseRefOid ?? ""), headSha: String(pr.headRefOid ?? ""), issues: nodes.filter(inRepo).map(toIssue), ...(foreign.length ? { foreignIssues: foreign } : {}), ...(notListed > 0 ? { issuesNotListed: notListed } : {}) };
     }
     const pr = (await this.#request(`${this.#api}/repos/${repo.owner}/${repo.name}/pulls/${number}`)) as Record<string, unknown>;
-    const base = pr.base as { ref?: string; sha?: string } | undefined;
+    const base = pr.base as { ref?: string; sha?: string; repo?: { full_name?: string } } | undefined;
     const head = pr.head as { sha?: string } | undefined;
     const issues: Issue[] = [];
     const missing: number[] = [];
-    for (const n of closedIssueNumbers(`${String(pr.title ?? "")}\n${String(pr.body ?? "")}`, repo)) {
+    // This repository under the name GitHub gives it, as in the GraphQL path: a clone's remote may be older.
+    const closes = closingReferences(`${String(pr.title ?? "")}\n${String(pr.body ?? "")}`, parseRepository(base?.repo?.full_name ?? "") ?? repo);
+    for (const n of closes.numbers) {
       try {
         issues.push(await this.issue(repo, n));
       } catch (error) {
@@ -150,7 +170,7 @@ export class GitHub {
         else throw error;
       }
     }
-    return { ...toIssue(pr), baseRefName: base?.ref ?? "", baseSha: base?.sha ?? "", headSha: head?.sha ?? "", issues, ...(missing.length ? { missingIssues: missing } : {}) };
+    return { ...toIssue(pr), baseRefName: base?.ref ?? "", baseSha: base?.sha ?? "", headSha: head?.sha ?? "", issues, ...(missing.length ? { missingIssues: missing } : {}), ...(closes.foreign.length ? { foreignIssues: closes.foreign } : {}) };
   }
 }
 

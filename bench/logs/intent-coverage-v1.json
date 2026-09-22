@@ -1,0 +1,609 @@
+{
+  "tool": {
+    "version": "0.1.1"
+  },
+  "measured": "2026-09-21",
+  "summary": {
+    "before": {
+      "read": 0,
+      "of": 11,
+      "how": "compileChecklist at a9bed91, measured 2026-09-21"
+    },
+    "measuredTen": {
+      "read": 7,
+      "withCallsToCheck": 2,
+      "of": 10
+    },
+    "omamori476": {
+      "read": 0
+    },
+    "holdout": {
+      "read": 21,
+      "leftOutOnly": 4,
+      "of": 70,
+      "byRepo": {
+        "omamori": {
+          "read": 5,
+          "of": 35
+        },
+        "sideeye": {
+          "read": 16,
+          "of": 35
+        }
+      }
+    }
+  },
+  "frozen": [
+    {
+      "case": "omamori-476",
+      "read": [],
+      "unread": [
+        {
+          "sourceId": "issue#468",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        },
+        {
+          "sourceId": "pr#476",
+          "type": "pr_description",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": null
+    },
+    {
+      "case": "omamori-551",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#551",
+          "chars": 287
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#526",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 0
+    },
+    {
+      "case": "omamori-553",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#553",
+          "chars": 248
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#485",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 4
+    },
+    {
+      "case": "omamori-554",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#554",
+          "chars": 211
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#494",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 17
+    },
+    {
+      "case": "omamori-557",
+      "read": [],
+      "unread": [
+        {
+          "sourceId": "issue#465",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        },
+        {
+          "sourceId": "pr#557",
+          "type": "pr_description",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": null
+    },
+    {
+      "case": "omamori-558",
+      "read": [],
+      "unread": [
+        {
+          "sourceId": "issue#470",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        },
+        {
+          "sourceId": "pr#558",
+          "type": "pr_description",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": null
+    },
+    {
+      "case": "sideeye-594",
+      "read": [],
+      "unread": [
+        {
+          "sourceId": "issue#510",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        },
+        {
+          "sourceId": "pr#594",
+          "type": "pr_description",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": null
+    },
+    {
+      "case": "sideeye-602",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#602",
+          "chars": 537
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#597",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 0
+    },
+    {
+      "case": "sideeye-609",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#609",
+          "chars": 586
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#599",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 0
+    },
+    {
+      "case": "sideeye-626",
+      "read": [
+        {
+          "id": "R1",
+          "source": "pr#626",
+          "chars": 390
+        }
+      ],
+      "unread": [
+        {
+          "sourceId": "issue#625",
+          "type": "github_issue",
+          "reason": "no requirements section (Acceptance criteria, Acceptance, Requirements, Definition of done, Done when) and no Property: paragraph"
+        }
+      ],
+      "leftOut": 0,
+      "calls": 0
+    },
+    {
+      "case": "sideeye-627",
+      "read": [
+        {
+          "id": "R1",
+          "source": "issue#617",
+          "chars": 96
+        },
+        {
+          "id": "R2",
+          "source": "issue#617",
+          "chars": 128
+        },
+        {
+          "id": "R3",
+          "source": "issue#617",
+          "chars": 98
+        },
+        {
+          "id": "R4",
+          "source": "issue#617",
+          "chars": 102
+        },
+        {
+          "id": "R5",
+          "source": "pr#627",
+          "chars": 258
+        }
+      ],
+      "unread": [],
+      "leftOut": 0,
+      "calls": 0
+    }
+  ],
+  "holdout": [
+    {
+      "case": "omamori-562",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-561",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-560",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-559",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-555",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-552",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-550",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-549",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-548",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-547",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-546",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-545",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-541",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-538",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-537",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-536",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-535",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-534",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-533",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-532",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-531",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-530",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-529",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-528",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-525",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-524",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-523",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-522",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-517",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-516",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-513",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-512",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-511",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-510",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "omamori-508",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-650",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-649",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-648",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-646",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-645",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-644",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-643",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-642",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-641",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-640",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-637",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-636",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-635",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-633",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-631",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-628",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-624",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-623",
+      "read": 0,
+      "leftOut": 1
+    },
+    {
+      "case": "sideeye-622",
+      "read": 0,
+      "leftOut": 1
+    },
+    {
+      "case": "sideeye-616",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-615",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-614",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-613",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-612",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-611",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-610",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-608",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-604",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-601",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-600",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-596",
+      "read": 0,
+      "leftOut": 1
+    },
+    {
+      "case": "sideeye-595",
+      "read": 1,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-593",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-591",
+      "read": 0,
+      "leftOut": 0
+    },
+    {
+      "case": "sideeye-590",
+      "read": 0,
+      "leftOut": 1
+    }
+  ]
+}

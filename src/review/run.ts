@@ -33,6 +33,9 @@ export interface RunInput {
   notes?: string[]; // from resolving the intent, for the report
   endpoint?: string; // where the judgments were sent: scheme, host and port
   host?: Host; // which host that is, as the user chose it
+  /** Reasons from reading the intent that no verdict here can overcome: intent as high as what was read, left unread. */
+  intentBlockers?: string[];
+  pullRequestAuthor?: string;
 }
 
 const BUDGET = "the run's request, byte or time budget ran out";
@@ -74,7 +77,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
   trace(`calls around the changed lines: ${change.calledSymbols.filter((s) => !s.onChangedLine).map((s) => s.name).join(", ") || "(none)"}`);
 
   // Reasons this run cannot vouch that a requirement holds, whatever Jev answers.
-  const blockers: string[] = [];
+  const blockers: string[] = [...(input.intentBlockers ?? [])];
   const notes: string[] = [...(input.notes ?? [])];
   if (loaded.changedInPullRequest) {
     notes.push("The change edits .jev-intent-review.yml; the version before the change was used.");
@@ -227,14 +230,24 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
   // What it throws is what the run cannot go on with — a refused token, an empty balance, a URL
   // that runs no models, or a fault in this tool — and the command line reads all of those as the
   // judgment provider failing, exit 12. Everything it can go on with comes back in its notes.
-  const changes = await reviewChanges({
-    change,
-    requirements: intent.requirements,
-    provider,
-    maxChars: config.evidence.max_primary_chars,
-    threshold: config.judgment.violation_probability,
-    trace,
-  });
+  // Not with the pull request's own description, though: a requirement its author wrote after the
+  // change could justify any line of it (ADR 0004). An issue the same person wrote still counts.
+  const typeOf = new Map(input.sources.map((s) => [s.id, s.type]));
+  const justifying = intent.requirements.filter((r) => r.sourceRefs.length === 0 || !r.sourceRefs.every((ref) => typeOf.get(ref.sourceId) === "pr_description"));
+  // With none left, the question is not asked at all: asked against an empty list, every change
+  // would read as one no requirement asked for.
+  if (justifying.length === 0) notes.push("The changes were not checked against the requirements: every requirement came from the pull request's own description, which cannot justify the change it describes.");
+  const changes =
+    justifying.length === 0
+      ? { unexpected: [], reached: 0, answered: 0, sent: [], notes: [] }
+      : await reviewChanges({
+          change,
+          requirements: justifying,
+          provider,
+          maxChars: config.evidence.max_primary_chars,
+          threshold: config.judgment.violation_probability,
+          trace,
+        });
   reached += changes.reached;
   answered += changes.answered;
   notes.push(...changes.notes);
@@ -264,6 +277,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
       questionsHash: QUESTIONS_HASH,
       configSource: loaded.source,
       notes,
+      ...(input.pullRequestAuthor ? { pullRequestAuthor: input.pullRequestAuthor } : {}),
     },
   };
 }

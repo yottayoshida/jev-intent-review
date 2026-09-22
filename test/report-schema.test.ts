@@ -195,6 +195,14 @@ test("the missed-path fixture's spec is a valid IntentSpec", () => {
   assert.equal(validateIntentSpec(fixture.spec, "fixture").requirements[0]?.id, "R1");
 });
 
+test("the report names a requirement's source as the pull request author's from the metadata, not only from the description", () => {
+  const base = report();
+  const withRefs = { ...base.intent, requirements: base.intent.requirements.map((r) => ({ ...r, sourceRefs: [{ sourceId: "issue#1", quote: r.text }] })) };
+  const own = renderMarkdown(report({ intent: withRefs, metadata: { ...base.metadata, pullRequestAuthor: "alice" } }));
+  assert.match(own, /R1 read from `issue#1` \(an issue, by `alice`, the pull request's author\): `Disabled users cannot authenticate\.`/);
+  assert.doesNotMatch(renderMarkdown(report({ intent: withRefs })), /the pull request's author/);
+});
+
 test("VERSION matches package.json", () => {
   const pkg = JSON.parse(readFileSync(join(import.meta.dirname, "..", "package.json"), "utf8"));
   assert.equal(VERSION, pkg.version);

@@ -5,20 +5,20 @@ import { readFileSync, realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { loadConfig, type Config } from "../config/config.ts";
-import { compileChecklist } from "../intent/compiler.ts";
+import { onlyFromPullRequest, readingBlockers, readRequirements, type Reading } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
-import { resolveIntent } from "../intent/resolver.ts";
+import { issuesNotListed, resolveIntent } from "../intent/resolver.ts";
 import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedProvider, PROVIDER_KEYS, ProviderError, type Endpoint } from "../judgments/client.ts";
 import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
-import { renderJson, renderMarkdown } from "../report/markdown.ts";
+import { intentSection, renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
 import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
 import { runReview } from "../review/run.ts";
-import { EXIT, ToolError, type IntentSource, type ReviewReport } from "../types.ts";
+import { EXIT, ToolError, type IntentSource, type IntentSpec, type ReviewReport } from "../types.ts";
 import { VERSION } from "../version.ts";
 
 const HELP = `Usage: jev-intent-review [options]
@@ -51,8 +51,8 @@ Experimental:
                         function returns when it does. Where both clear the bar and
                         disagree, the call is listed as worth checking, with the
                         requirement's words, the code, the assumed failure and both
-                        answers. Requirements come from --intent-spec or an
-                        acceptance-criteria list; no file, function or expected answer is
+                        answers. Requirements come from --intent-spec or the forms
+                        under Intent below; no file, function or expected answer is
                         named on the command line. No requirement verdict is stated.
                         Findings do not cause a nonzero exit code; configuration, intent,
                         repository and provider failures can. Nothing listed means no call
@@ -73,10 +73,16 @@ Model: Jev, and nothing else -- typesafe/jev on Cloudflare and for JEV_API_URL, 
 TypeSafe, typesafe-ai/jev on Vercel AI Gateway. A request for any other model is refused
 before it is built, so no other model can be reached from here.
 
-Intent: --intent-spec, or an acceptance-criteria list in the issue, the pull request or
---intent (a heading such as "Acceptance criteria" and one item per line). Ordinary prose is
-not turned into requirements -- no model writes them -- and a run given only prose stops
-and says which two forms do work.
+Intent: --intent-spec, or two forms read as written from the issue, the pull request,
+--intent or --intent-file: the items of a requirements section ("Acceptance criteria",
+"Acceptance", "Requirements", "Definition of done", "Done when"), and a paragraph that
+begins "Property:" (docs/writing-requirements.md). No model writes or picks requirements.
+Whenever the tool prints its report, or stops because it could not read the requirements,
+every issue and pull request it read is either read into requirements as written -- leaving
+out only HTML comments, code blocks, link reference definitions and characters that display
+as nothing -- or named with the reason it was not. With credentials, a run that reads
+nothing stops (exit 11); without them it is skipped. Failures that print no report (exit 10,
+12, 13) are outside this.
 
 Environment: JEV_PROVIDER names where Jev is asked -- cloudflare (CLOUDFLARE_ACCOUNT_ID and
 CLOUDFLARE_API_TOKEN), typesafe (TYPESAFE_API_KEY) or vercel (AI_GATEWAY_API_KEY). Each key
@@ -208,20 +214,32 @@ async function baseOf(git: Git, pr: PullRequest, head: string): Promise<string> 
   return best?.rev ?? shared ?? known ?? pr.baseRefName;
 }
 
-function skippedReport(reason: string, revisions: Revisions, repository: string, configSource: string, sources: IntentSource[], model: string): ReviewReport {
+const NO_INTENT: IntentSpec = { version: 1, title: "", summary: "", requirements: [], nonGoals: [], ambiguities: [] };
+
+function skippedReport(
+  reason: string,
+  revisions: Revisions,
+  repository: string,
+  configSource: string,
+  sources: IntentSource[],
+  model: string,
+  read: { intent?: IntentSpec; notes: string[]; prAuthor?: string | undefined },
+): ReviewReport {
+  const intent = read.intent ?? NO_INTENT;
   return {
     version: 1,
     tool: { name: "jev-intent-review", version: VERSION },
     verdict: "skipped",
     exitCode: EXIT.ok,
     skipReason: reason,
-    intent: { version: 1, title: "", summary: "", requirements: [], nonGoals: [], ambiguities: [] },
+    // What would have been checked, and what could not be read: a skipped run still says both.
+    intent,
     sources: sources.map(({ text: _text, ...source }) => source),
     requirements: [],
     unexpectedChanges: [],
     discovery: { candidateCount: 0, changedCandidates: 0, unchangedCandidates: 0, incompleteReasons: [], searches: [] },
     sent: { requests: 0, bytes: 0, locations: [] },
-    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: [] },
+    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: read.notes, ...(read.prAuthor ? { pullRequestAuthor: read.prAuthor } : {}) },
   };
 }
 
@@ -314,52 +332,92 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       { github: getGithub, includePrDescription: config.intent.include_pr_description, preferIssue: config.intent.prefer_issue },
     );
     for (const source of resolved.sources) trace(`intent source ${source.id} (${source.type}, authority ${source.authority}${source.author ? `, by ${source.author}` : ""})`);
+    // Issues the pull request closes that were not read — in another repository, missing, or past
+    // what GitHub listed — are named by every way this run can end, not only by a finished review.
+    const notes = resolved.notes;
+    const prAuthor = resolved.pullRequest?.author;
+    // A run that stops for want of intent still prints what was read: stdout carries the same Intent
+    // section a finished run does, stderr the one line.
+    const stop = (headline: string, intent: IntentSpec, sources: Omit<IntentSource, "text">[], message: string): never => {
+      io.stdout(
+        args.json
+          ? `${JSON.stringify({ revisions, sources, intent, notes }, null, 2)}\n`
+          : `${["# jev-intent-review", "", `**Result: nothing was checked.** ${headline}`, "", ...intentSection(intent, sources, { prAuthor, notes })].join("\n")}\n`,
+      );
+      throw new ToolError(message, EXIT.intent);
+    };
     if (resolved.sources.length === 0) {
-      if (config.policy.no_intent === "fail") throw new ToolError("no intent was found: the pull request links no issue and has no description, and no --intent was given", EXIT.intent);
-      return output(skippedReport("No statement of intent was found (no linked issue, no pull request description, no --intent).", revisions, repository, loaded.source, [], model));
+      const none = "nothing was read from an issue, the pull request's description or --intent";
+      if (config.policy.no_intent === "fail") stop("No statement of intent was found.", NO_INTENT, [], `no intent was found: ${none}${notes.length > 0 ? ` (${notes.join(" ")})` : ""}`);
+      return output(skippedReport(`No statement of intent was found: ${none}.`, revisions, repository, loaded.source, [], model, { notes, prAuthor }));
     }
+
+    // No model writes or chooses the requirements (ADR 0004): the documented forms are read as
+    // written, each source on its own. That asks nothing, so it happens before the credentials gate,
+    // and every way this run ends below says what was read and what was not.
+    const reading: Reading = resolved.spec ? { spec: resolved.spec, unread: [], notChecked: [] } : readRequirements(resolved.sources);
+    const intent = reading.spec;
+    for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
+    for (const u of reading.unread) trace(`not read: ${u.sourceId} (${u.reason})`);
+    const shownSources = resolved.sources.map(({ text: _text, ...source }) => source);
+    // Intent given on the command line was given on purpose; it is not dropped quietly because
+    // something else could be read.
+    const explicitUnread = reading.unread.filter((u) => u.type === "cli" || u.type === "file");
+    const specFile = resolved.spec ? resolved.sources.find((s) => s.type === "spec")?.id.replace(/^file:/, "") : undefined;
+    const unreadable =
+      intent.requirements.length === 0
+        ? specFile !== undefined
+          ? `the IntentSpec file ${specFile} lists no requirement`
+          : `no requirement could be read as written from ${reading.unread.map((u) => `${u.sourceId} (${u.reason})`).join("; ") || "the intent given"}`
+        : explicitUnread.length > 0
+          ? `the intent given on the command line could not be read as written: ${explicitUnread.map((u) => `${u.sourceId} (${u.reason})`).join("; ")}`
+          : undefined;
+    const howToWrite = specFile !== undefined ? "list at least one in its requirements" : "state requirements under an 'Acceptance criteria' heading, one per item, or in a 'Property:' paragraph (docs/writing-requirements.md), or give --intent-spec";
+    const stopUnread = (): never =>
+      stop(
+        intent.requirements.length === 0 ? "No requirement could be read as written." : "The intent given on the command line could not be read as written.",
+        intent,
+        shownSources,
+        `${unreadable}: ${howToWrite}`,
+      );
+    const localCheckOutput = (results: unknown[]) =>
+      io.stdout(
+        args.json
+          ? `${JSON.stringify({ revisions, sources: shownSources, intent, notes, requirements: results }, null, 2)}\n`
+          : `${renderLocalCheck(results as Parameters<typeof renderLocalCheck>[0], { intent, sources: shownSources, notes, ...(prAuthor ? { prAuthor } : {}) })}\n`,
+      );
 
     if (args["experimental-candidates-only"]) {
       // Before the credentials gate on purpose: this asks nothing, so it must not need an account
       // to run. The planner and the judge are stubs that throw — if the path ever reaches one, the
       // run fails loudly rather than quietly making the request this flag promises not to make.
       if (!args["experimental-local-check"]) throw new ToolError("--experimental-candidates-only only applies with --experimental-local-check", EXIT.config);
-      if (!resolved.spec) throw new ToolError("--experimental-candidates-only asks no model, so the requirements have to come from --intent-spec", EXIT.intent);
+      if (unreadable) stopUnread();
       const asksNothing = () => {
         throw new Error("--experimental-candidates-only reached a model");
       };
       const results = await runLocalCheck(
         git,
         revisions,
-        resolved.spec.requirements,
+        intent.requirements,
         { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
         pathFilter(config.repository.include, config.repository.ignore),
         { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
       );
-      io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
+      localCheckOutput(results);
       return EXIT.ok;
     }
 
     if (!endpoint) {
       if (config.policy.missing_credentials === "fail") throw new ToolError(`no credentials for the judgments: set ${needed}`, EXIT.provider);
-      return output(skippedReport(`No credentials for the judgments (${needed}) were available, so nothing was judged.`, revisions, repository, loaded.source, resolved.sources, model));
+      // Skipped, not failed, even when nothing could be read: a fork's pull request has no
+      // credentials and must not turn red for being written in prose. The report still says what
+      // would have been checked and what was not read.
+      return output(skippedReport(`No credentials for the judgments (${needed}) were available, so nothing was judged.`, revisions, repository, loaded.source, resolved.sources, model, { intent, notes, prAuthor }));
     }
+    if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;
     const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, deps.fetch);
-
-    // No model writes the requirements. Jev answers typed questions; it does not author a spec,
-    // and reaching for a general instruct model to do it is how a second model got in. Prose that
-    // is not an acceptance-criteria list is refused with the two forms that do work, rather than
-    // guessed at.
-    const intent = resolved.spec ?? compileChecklist(resolved.sources);
-    if (!intent) {
-      throw new ToolError(
-        "the intent could not be read without asking a model to write it: give the requirements with --intent-spec (a spec file), or state them in the issue or pull request as an acceptance-criteria list, one checkable statement per item",
-        EXIT.intent,
-      );
-    }
-    if (intent.requirements.length === 0) throw new ToolError("the intent holds no requirement to check", EXIT.intent);
-    for (const r of intent.requirements) trace(`${r.id}: ${r.text}`);
 
     if (args["experimental-local-check"]) {
       // The experimental path (docs/local-check-cli.md): from each requirement to observations
@@ -368,12 +426,31 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       const include = pathFilter(config.repository.include, config.repository.ignore);
       // One provider, two questions. Both go to Jev; there is nothing else to send to.
       // `--experimental-candidates-only` returned above, before the credentials gate.
-      const results = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, DEFAULT_LOCAL_CHECK);
-      io.stdout(args.json ? `${JSON.stringify({ revisions, requirements: results }, null, 2)}\n` : `${renderLocalCheck(results)}\n`);
+      localCheckOutput(await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, DEFAULT_LOCAL_CHECK));
       return EXIT.ok;
     }
 
-    const report = await runReview({ git, revisions, loaded, intent, sources: resolved.sources, prBodyOnly: resolved.prBodyOnly, provider: judges.provider, sent: judges.sent, repository, trace, notes: resolved.notes, endpoint: judges.origin, host: endpoint.host });
+    // Intent this run did not check against, which no verdict can overcome (ADR 0004): a source as
+    // high as anything read and itself unread, requirements past the first twenty, and issues the
+    // pull request closes beyond what GitHub listed.
+    const intentBlockers = [...readingBlockers(reading, resolved.sources), ...(resolved.pullRequest?.issuesNotListed ? [issuesNotListed(resolved.pullRequest.issuesNotListed)] : [])];
+    const report = await runReview({
+      git,
+      revisions,
+      loaded,
+      intent,
+      sources: resolved.sources,
+      prBodyOnly: onlyFromPullRequest(intent, resolved.sources),
+      provider: judges.provider,
+      sent: judges.sent,
+      repository,
+      trace,
+      notes,
+      endpoint: judges.origin,
+      host: endpoint.host,
+      intentBlockers,
+      ...(prAuthor ? { pullRequestAuthor: prAuthor } : {}),
+    });
     return output(report);
   } catch (error) {
     if (error instanceof ToolError) {

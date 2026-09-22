@@ -110,6 +110,18 @@ test("with no intent the review is skipped (exit 0), or fails with exit 11 when 
     const after = repo.commit("a change");
     const strict = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--base", base, "--head", after], strict.value, fakeDeps()), EXIT.intent);
+
+    // A pull request whose only link is to another repository's issue: nothing is read, and that issue is named either way.
+    const foreignOnly = { ...pullRequest(after, base, ""), title: "", foreignIssues: ["attacker/evil#5"] };
+    const env = { ...CREDENTIALS, GITHUB_REPOSITORY: "o/r" };
+    const named = /The pull request closes attacker\/evil#5, an issue in another repository; it was not read/;
+    const stopped = io(repo.dir, env);
+    assert.equal(await main(["--pr", "7", "--base", base, "--head", after], stopped.value, fakeDeps({ pullRequest: async () => foreignOnly })), EXIT.intent);
+    assert.match(stopped.out(), named);
+    assert.match(stopped.err(), /no intent was found: nothing was read from an issue, the pull request's description or --intent \(The pull request closes attacker\/evil#5/);
+    const lenient = io(repo.dir, env); // the base before the config: no_intent is skip
+    assert.equal(await main(["--pr", "7", "--base", repo.base, "--head", repo.head, "--json"], lenient.value, fakeDeps({ pullRequest: async () => ({ ...foreignOnly, headSha: repo.head, baseSha: repo.base }) })), EXIT.ok);
+    assert.match((JSON.parse(lenient.out()) as { metadata: { notes: string[] } }).metadata.notes.join("\n"), named);
   } finally {
     repo.remove();
   }
@@ -122,12 +134,16 @@ test("--intent is read as written when it is a list, and prose is refused with t
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent", "Acceptance criteria:\n* Disabled users cannot authenticate by any path", "--json"], viaList.value, fakeDeps()), EXIT.violation);
     assert.deepEqual(JSON.parse(viaList.out()).sources.map((s: { id: string }) => s.id), ["cli"]);
 
-    // No model writes requirements any more, so prose that is not a list stops the run and says
-    // which two forms do work. It used to be handed to a general instruct model.
+    // No model writes requirements any more, so prose in none of the forms stops the run. It names
+    // the source it read and why that could not be taken, on stderr and in the report on stdout,
+    // and says which forms do work. It used to be handed to a general instruct model.
     const viaProse = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent", "Prevent disabled users from authenticating."], viaProse.value, fakeDeps()), EXIT.intent);
+    assert.match(viaProse.err(), /no requirement could be read as written from cli \(no requirements section .* and no Property: paragraph\)/);
     assert.match(viaProse.err(), /--intent-spec/);
-    assert.match(viaProse.err(), /acceptance-criteria list/);
+    assert.match(viaProse.err(), /'Acceptance criteria' heading/);
+    assert.match(viaProse.out(), /^## Intent$/m);
+    assert.match(viaProse.out(), /- cli was not read as requirements: no requirements section/);
 
     const event = join(repo.dir, "event.json");
     writeFileSync(event, JSON.stringify({ pull_request: { number: 7 } }));
@@ -137,6 +153,125 @@ test("--intent is read as written when it is a list, and prose is refused with t
     const report = JSON.parse(viaEvent.out());
     assert.deepEqual(report.sources.map((s: { id: string; author: string }) => [s.id, s.author]), [["pr#7", "dev"]]);
     assert.match(report.metadata.notes.join(" "), /only from the pull request's own description, written by its author dev/);
+  } finally {
+    repo.remove();
+  }
+});
+
+test("every way a run that prints its report can end names what it read and what it did not (ADR 0004)", async () => {
+  const repo = fixtureRepo("missed-path");
+  // omamori #476 and the issue it closes, as frozen from GitHub: prose, in none of the forms.
+  const frozen = JSON.parse(readFileSync(join(import.meta.dirname, "..", "bench", "corpus", "omamori-476.intent.json"), "utf8")) as { sources: { id: string; text: string }[] };
+  const text = (id: string) => frozen.sources.find((s) => s.id === id)?.text ?? "";
+  const issue = (number: number, body: string) => ({ number, title: "", body, author: "yottayoshida", url: "" });
+  const pr = (body: string, issues: ReturnType<typeof issue>[], more: { foreignIssues?: string[]; issuesNotListed?: number } = {}) => ({ ...pullRequest(repo.head, repo.base, body), number: 476, author: "yottayoshida", issues, ...more });
+  const FOREIGN = /The pull request closes attacker\/evil#5, an issue in another repository; it was not read/;
+  const event = join(repo.dir, "event.json");
+  writeFileSync(event, JSON.stringify({ pull_request: { number: 476 } }));
+  const onEvent = { GITHUB_EVENT_NAME: "pull_request", GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: "o/r" };
+  const args = ["--base", repo.base, "--head", repo.head, "--json"];
+  const deps = (p: ReturnType<typeof pr>) => {
+    const d = fakeDeps({ pullRequest: async () => p });
+    return d;
+  };
+  const ambiguities = (out: string) => (JSON.parse(out) as { intent: IntentSpec }).intent.ambiguities.map((a) => a.text).join("\n");
+  try {
+    // The pull request also closes an issue in another repository, which is never read: every way
+    // the run ends names it.
+    const prose = pr(text("pr#476"), [issue(468, text("issue#468"))], { foreignIssues: ["attacker/evil#5"] });
+
+    // With credentials: nothing could be read, so the run stops (exit 11), names both sources on
+    // stdout and stderr, and asks Jev nothing.
+    const stopped = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+    const stoppedDeps = deps(prose);
+    assert.equal(await main(args, stopped.value, stoppedDeps), EXIT.intent);
+    assert.match(ambiguities(stopped.out()), /issue#468 was not read as requirements/);
+    assert.match(ambiguities(stopped.out()), /pr#476 was not read as requirements/);
+    assert.match((JSON.parse(stopped.out()) as { notes: string[] }).notes.join("\n"), FOREIGN);
+    assert.match(stopped.err(), /issue#468 \(no requirements section/);
+    const judged = stoppedDeps.judges?.({} as never, {} as never, 0).sent().requests;
+    assert.equal(judged, 0, "Jev was asked nothing");
+    const stoppedText = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+    assert.equal(await main(["--base", repo.base, "--head", repo.head], stoppedText.value, deps(prose)), EXIT.intent);
+    assert.match(stoppedText.out(), /\*\*Result: nothing was checked\.\*\* No requirement could be read as written\./);
+    assert.match(stoppedText.out(), FOREIGN);
+
+    // Without credentials: skipped, not failed — a fork's pull request in prose must not turn red —
+    // and the skipped report names the same two sources, and the issue it did not read.
+    const skipped = io(repo.dir, onEvent);
+    assert.equal(await main(args, skipped.value, deps(prose)), EXIT.ok);
+    assert.equal(JSON.parse(skipped.out()).verdict, "skipped");
+    assert.match(ambiguities(skipped.out()), /issue#468 was not read[\s\S]*pr#476 was not read/);
+    assert.match((JSON.parse(skipped.out()) as { metadata: { notes: string[] } }).metadata.notes.join("\n"), FOREIGN);
+    const skippedText = io(repo.dir, onEvent);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head], skippedText.value, deps(prose)), EXIT.ok);
+    assert.match(skippedText.out(), /^## Intent$/m);
+    assert.match(skippedText.out(), /pr#476 was not read as requirements/);
+    assert.match(skippedText.out(), FOREIGN);
+
+    // The local check names it too, before any credentials are needed.
+    const local = io(repo.dir, onEvent);
+    const listed = pr("## Acceptance criteria\n- Disabled users cannot authenticate by any path", [], { foreignIssues: ["attacker/evil#5"] });
+    assert.equal(await main([...args, "--experimental-local-check", "--experimental-candidates-only"], local.value, deps(listed)), EXIT.ok);
+    assert.match((JSON.parse(local.out()) as { notes: string[] }).notes.join("\n"), FOREIGN);
+    const localText = io(repo.dir, onEvent);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--experimental-local-check", "--experimental-candidates-only"], localText.value, deps(listed)), EXIT.ok);
+    assert.match(localText.out(), FOREIGN);
+
+    // An issue with a list and a pull request in prose: the issue is read, the pull request named —
+    // once, in the intent, not again in the notes.
+    const mixed = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+    assert.equal(await main(args, mixed.value, deps(pr(text("pr#476"), [issue(468, "## Acceptance\n- Disabled users cannot authenticate by any path")]))), EXIT.violation);
+    const mixedReport = JSON.parse(mixed.out()) as { intent: IntentSpec; metadata: { notes: string[] } };
+    assert.deepEqual(mixedReport.intent.requirements.map((r) => [r.sourceRefs[0]?.sourceId, r.text]), [["issue#468", "Disabled users cannot authenticate by any path"]]);
+    assert.match(mixedReport.intent.ambiguities.map((a) => a.text).join("\n"), /pr#476 was not read as requirements/);
+    assert.doesNotMatch(mixedReport.metadata.notes.join("\n"), /was not read as requirements/);
+
+    // Intent given on the command line is not dropped because something else could be read, and the
+    // headline says that is why nothing was checked.
+    const file = join(repo.dir, "intent.md");
+    writeFileSync(file, "Please make disabled users unable to log in.");
+    const explicit = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-file", file], explicit.value, deps(pr("## Acceptance criteria\n- Disabled users cannot authenticate by any path", []))), EXIT.intent);
+    assert.match(explicit.err(), /the intent given on the command line could not be read as written: file:/);
+    assert.match(explicit.out(), /\*\*Result: nothing was checked\.\*\* The intent given on the command line could not be read as written\./);
+
+    // The pull request's own Property read, the issue above it in prose: a blocker, and the changes
+    // are not checked against the author's own words.
+    const own = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+    await main(args, own.value, deps(pr("Property: disabled users cannot authenticate by any path.", [issue(468, text("issue#468"))])));
+    const ownReport = JSON.parse(own.out()) as { requirements: { scope: { blocking: string[] } }[]; metadata: { notes: string[] } };
+    assert.match(JSON.stringify(ownReport.requirements.map((r) => r.scope.blocking)), /issue#468, which no source that was read outranks, was not read as requirements/);
+    assert.match(ownReport.metadata.notes.join("\n"), /The changes were not checked against the requirements: every requirement came from the pull request's own description/);
+    assert.match(ownReport.metadata.notes.join("\n"), /only from the pull request's own description/);
+    // Whose claim a requirement is, is said from the pull request's author even when its description is not a source.
+    assert.equal((ownReport.metadata as { pullRequestAuthor?: string }).pullRequestAuthor, "yottayoshida");
+
+    // An IntentSpec that lists no requirement is named as that, not as prose to rewrite in a form.
+    const emptySpec = join(repo.dir, "empty-spec.json");
+    writeFileSync(emptySpec, JSON.stringify({ ...(JSON.parse(readFileSync(specFile(repo.dir), "utf8")) as object), requirements: [] }));
+    for (const extra of [[], ["--experimental-local-check", "--experimental-candidates-only"]]) {
+      const empty = io(repo.dir, CREDENTIALS);
+      assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", emptySpec, ...extra], empty.value, fakeDeps()), EXIT.intent);
+      assert.match(empty.err(), /the IntentSpec file .*empty-spec\.json lists no requirement: list at least one in its requirements/);
+    }
+
+    // Intent that exists and was not checked blocks a verdict, whoever wrote what was read (ADR 0004):
+    // an issue in prose beside another issue that was read, requirements past the first twenty, and
+    // issues past the ten GitHub lists.
+    const blocking = async (p: ReturnType<typeof pr>) => {
+      const run = io(repo.dir, { ...CREDENTIALS, ...onEvent });
+      await main(args, run.value, deps(p));
+      const report = JSON.parse(run.out()) as { verdict: string; requirements: { status: string; scope: { blocking: string[] } }[] };
+      // A blocker withholds VERIFIED (requirement.ts); a violation Jev is sure of still stands.
+      assert.ok(report.requirements.length > 0 && report.requirements.every((r) => r.status !== "verified"), JSON.stringify(report.requirements.map((r) => r.status)));
+      return JSON.stringify(report.requirements.map((r) => r.scope.blocking));
+    };
+    const listItem = "## Acceptance\n- Disabled users cannot authenticate by any path";
+    assert.match(await blocking(pr("", [issue(468, listItem), issue(469, text("issue#468"))])), /issue#469, which no source that was read outranks, was not read as requirements/);
+    const many = `## Acceptance\n${Array.from({ length: 21 }, (_, i) => `- Disabled users cannot authenticate by path ${i + 1}`).join("\n")}`;
+    assert.match(await blocking(pr("", [issue(468, many)])), /1 requirement\(s\) from issue#468 were read past the first 20 and not checked/);
+    assert.match(await blocking(pr("", [issue(468, listItem)], { issuesNotListed: 3 })), /closes 3 more issue\(s\) than GitHub listed \(the first 10\); they were not read/);
   } finally {
     repo.remove();
   }

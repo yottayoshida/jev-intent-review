@@ -217,6 +217,8 @@ export interface ReviewReport {
     questionsHash: string;
     configSource: string;
     notes: string[];
+    /** The pull request's author, when there is one: whose own claims the requirements are is said by it. */
+    pullRequestAuthor?: string;
   };
 }
 

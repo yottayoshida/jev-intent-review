@@ -1,0 +1,67 @@
+{
+ "about": "The requirements each frozen case must read, checked by hand against the text (paragraph and item boundaries) and against an independent reading, 2026-09-21. Cases with none read are listed with an empty list.",
+ "cases": {
+  "omamori-476": [],
+  "omamori-551": [
+   {
+    "source": "pr#551",
+    "text": "the canary's own failure line — `test-isolation-canary: FAIL — a test wrote outside its own isolated_home()/with_test_home() override.` (`scripts/test-isolation-canary.sh`) — is true on a machine that has omamori installed: it is printed only when a test wrote outside its isolated home."
+   }
+  ],
+  "omamori-553": [
+   {
+    "source": "pr#553",
+    "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+   }
+  ],
+  "omamori-554": [
+   {
+    "source": "pr#554",
+    "text": "a shell command blocked by `hook-check --json-error` — `layer2:meta-pattern`, `layer2:rule`, the structural layers — is recorded in the audit chain exactly as in text mode, and stderr stays a single JSON object."
+   }
+  ],
+  "omamori-557": [],
+  "omamori-558": [],
+  "sideeye-594": [],
+  "sideeye-602": [
+   {
+    "source": "pr#602",
+    "text": "from the header of `spike/loop-closure-timew/judge.sh`, whose first line is \"nothing the agent can edit is trusted\", and which until now listed the eval container's own outputs as an explicit exception (ADR 0066 named the same thing as a residual): after this PR, *`judge.sh eval`'s verdict on the container's outputs rests only on bytes `sideeye` and the shell put on the container's stdout; if the agent-built binary rewrites the replay report, its rc, or the functional gate's status or export, the judge refuses rather than judging.*"
+   }
+  ],
+  "sideeye-609": [
+   {
+    "source": "pr#609",
+    "text": "`docs/report-schema.md`'s `next_step` row: the step is \"chosen at the site that raised the refusal, where the cause is known\", and \"pass a flag\" is one of the actions it may name. After this PR: **when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`, together with where that mode's hazards are written** (the README entry under \"What the target has to be\" that begins \"Under `--observe syscalls`, a process whose `SIGSYS` is blocked or reset\", and the schema's \"What `--observe syscalls` does not see\")."
+   }
+  ],
+  "sideeye-626": [
+   {
+    "source": "pr#626",
+    "text": "from `CHANGELOG.md`'s `### Changed` entry: a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines, copies its report, transcript and world directory under `failed/`, and the CI step uploads `failed/` when it is red. The check itself is unchanged: twelve runs per toy, every one required to PASS over nine crash points."
+   }
+  ],
+  "sideeye-627": [
+   {
+    "source": "issue#617",
+    "text": "MCP explore in the default mode ends `UNKNOWN` with a next step pointing to syscall observation;"
+   },
+   {
+    "source": "issue#617",
+    "text": "the same MCP tool call with `observe: \"syscalls\"` reaches the same PASS or FAIL that the CLI reaches under `--observe syscalls`;"
+   },
+   {
+    "source": "issue#617",
+    "text": "omitting `observe` produces the byte-for-byte-compatible request behavior existing clients expect;"
+   },
+   {
+    "source": "issue#617",
+    "text": "the README/MCP first-call acceptance continues to run on Linux and macOS, with the new field optional."
+   },
+   {
+    "source": "pr#627",
+    "text": "from `docs/mcp.md`: **`sideeye_explore_config` takes an optional `observe` — the same closed choice as the command line, `wrappers` (the default) or `syscalls` — so a refusal whose `next_step` names `--observe syscalls` can be followed through this server.**"
+   }
+  ]
+ }
+}

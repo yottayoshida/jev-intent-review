@@ -86,7 +86,7 @@ It currently supports:
 * Rust repositories
 * requirements describing how failures must propagate
 * functions touched by the change and callers one hop out
-* explicit requirements from an intent spec or acceptance-criteria list
+* requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](#intent))
 * Jev as the only judgment model
 
 It does **not** yet claim complete repository-wide verification or a requirement-level `VERIFIED` verdict.
@@ -131,9 +131,19 @@ jev-intent-review \
   --intent-spec spec.json
 ```
 
-`--pr` and `--issue` can also be used when the source contains an explicit acceptance-criteria list.
+`--pr`, `--issue`, `--intent` and `--intent-file` take the requirements from the issue, the pull request or the text given, in the forms described under [Intent](#intent).
 
 Use `--json` for the full machine-readable report.
+
+## Intent
+
+No model writes the requirements and no model picks them out of prose. They are read from two forms, as written: the items of a requirements section (`## Acceptance criteria`, `## Acceptance`, `## Requirements`, `## Definition of done`, `## Done when`), and a paragraph that begins `Property:`. [docs/writing-requirements.md](docs/writing-requirements.md) has the details and an issue template to copy.
+
+Whenever the tool prints its report, or stops because it could not read the requirements, every issue and pull request it read is either read into requirements as written — from a requirements section or a `Property:` paragraph, leaving out only HTML comments, code blocks, link reference definitions and characters that display as nothing — or named with the reason it was not. An issue the pull request closes and the tool does not read — in another repository, missing, or past the ten GitHub lists — is named too.
+
+In the review, intent that exists and was not checked withholds VERIFIED: a source as high as any that was read and itself unread, requirements past the first twenty, and issues past the ten GitHub lists.
+
+A pull request described only in prose is therefore not checked: the report names it and says why, and a run with credentials stops with exit 11 rather than guess. A run without credentials is skipped, as before, and still says what it would have read. Failures that print no report (exit 10, 12, 13) are outside this.
 
 ## Jev endpoint
 
