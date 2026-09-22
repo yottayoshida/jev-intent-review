@@ -20,6 +20,20 @@ test("every requirement sentence in the repository's spec, fixture and golden fi
   assert.deepEqual(left, []);
 });
 
+test("the committed log scores as the documentation says", () => {
+  const log = JSON.parse(readFileSync(`${ROOT}bench/logs/form-choice-v1.json`, "utf8")) as Log;
+  const all = rows(committedSet(), log);
+  assert.equal(all.length, 72);
+  assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 216);
+  const f = summarise(all, "failure_propagation", "all");
+  const c = summarise(all, "check_before_action", "all");
+  const n = summarise(all, "neither", "all");
+  assert.deepEqual([f.sentences, f.rightEveryRun, f.checkInAnyRun], [18, 16, 0]);
+  assert.deepEqual([c.sentences, c.rightEveryRun, c.checkInAnyRun, c.keywordRight], [11, 10, 10, 8]);
+  assert.deepEqual([n.sentences, n.rightEveryRun, n.checkInAnyRun], [43, 39, 4]);
+  assert.ok(barLines(all).every((line) => line.endsWith("— met")), barLines(all).join("\n"));
+});
+
 test("an answer whose choice the question did not offer reads as none, not as a label", () => {
   assert.equal(readAtBar(answer("constructor", 0.99)), "none");
   assert.equal(readAtBar(answer("neither", 0.99)), "neither");

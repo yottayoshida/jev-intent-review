@@ -34,10 +34,10 @@ The measurement (`bench/forms/choice/`, log `bench/logs/form-choice-v1.json`):
   hand from a real issue or pull request, `bench/corpus/intent-golden.json`, and issue #35's
   examples) and `written` (the three above). Identical sentences count once; the set's hash is
   recorded at the head of the log before the first request, and no label is changed after it.
-  The set's limit is stated with its numbers: fifteen of the eighteen failure sentences are this
-  tool's own template, and the check sentences that are not this tool's are four — one as its
-  author wrote it, three written from an issue's text — with one more that is a model's
-  fragment. The `model` sentences are kept because that is the shape a requirement read from
+  The set's limit is stated with its numbers: fourteen of the eighteen failure sentences are this
+  tool's own template, and of the check sentences only three are not in this project's words —
+  issue #35's two and a model's fragment — with three more written from real issues for the
+  measurement. The `model` sentences are kept because that is the shape a requirement read from
   text arrives in (`readRequirementText`); their numbers are shown apart from the rest.
 - **The question**: one typed choice per sentence, over the sentence alone (`requirement.text`,
   redacted as every packet is; no code, no hints): which of the two forms its sentence says, or
@@ -71,6 +71,43 @@ What the numbers would have to show for Jev to be given the choice, written befo
   is shown for all three classes.
 
 The owner's ruling on the numbers, and what it settles, is recorded here when it is given.
+
+### The numbers and the ruling (2026-09-22)
+
+72 sentences (failure 18, check 11, neither 43; tool 22, model 32, text 15, written 3; 14
+fragments), three runs each, 216 requests to Cloudflare, log `bench/logs/form-choice-v1.json`,
+set committed at e8d0406 before the first request. A first set of 69, committed at e04ff98, had
+left out the requirements of three test fixtures; its measurement (207 requests, 38ee6ac in the
+pull request's history) was set aside and the whole measurement taken again on the completed
+set — the shared sentences read the same at the bar except the fixture's baseline sentence,
+under the bar three times there and twice here. `verify` now enumerates every requirement sentence
+in the repository's spec, fixture and golden files and a test fails when one is not in the set.
+The table is in `docs/local-check-cli.md` ("How Jev reads the form of a sentence"),
+`node bench/forms/choice/run.ts score` recomputes it, and `test/form-choice.test.ts` holds the
+log to its counts.
+
+- Failure sentences read as check at the bar in any run: **0 of 18** (bar 0 — met). Two are not
+  read as failure in every run — the two not written in the template — and fall to the default
+  when under the bar.
+- Check sentences read as check at the bar in every run: **10 of 11** (91%; bar 80%, and the
+  keyword rule's 8 — met). The one under the bar names no operation ("every session-creation path
+  must enforce the same guard;", 0.52–0.55).
+- Neither sentences read as check at the bar in any run: **4 of 43** (bar at most 4 — met, exactly).
+  All four say what is refused or voided when a condition holds.
+- Nothing was read as failure that was not labelled so.
+- Of the eleven check sentences, five are this project's bench and fixture sentences, three were
+  written from real issues for this measurement, two are issue #35's as written and one is a
+  model's fragment; fourteen of the eighteen failure sentences are this tool's template. The
+  numbers say how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
+
+**Ruling: Jev chooses.** For a requirement read from an issue, a pull request, `--intent` or
+`--intent-file`, the run will put this question once, before the calls, and read the answer by
+the rule above; a spec's `form` stays its author's and is not asked; `--candidates-only` asks
+nothing and says so. That change is its own pull request (with the report's form line, `formBy`
+in `--json`, and the notes in the plan that measured this: the question is put only on the full
+run's path, `neither` is never a form, the fake provider's tripwire is loosened for this key
+only, and requirements read from text carry no `searchHints`). Until it lands, every requirement
+read from text is `failure_propagation`. The `form` field stays.
 
 ## Alternatives considered
 
