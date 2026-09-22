@@ -61,7 +61,7 @@ an assumption.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
-| a call can be asked about when | its callee is defined once in the repository and returns a `Result`, and so does the function | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| a call can be asked about when | its callee is defined once in the repository — as far as a search of 200 hits reaches (`#45`) — and returns a `Result`, and so does the function | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
 | the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
@@ -79,6 +79,21 @@ A request that fails without ending the run leaves its call unanswered and the r
 that reached the host and got no answer at all fails (exit 12). `--experimental-candidates-only`
 stops before the first question and prints which calls are inside the budget and which are not,
 with a reason each; it needs no credentials.
+
+The budget is dealt one call per function at a time — the functions the change touched first, then
+their callers — so no single body takes it. Inside a function, the askable calls whose callee
+resolved to a function the change touched are asked before its other calls, and the rest follow in
+the order they appear. When a function gets fewer questions than it has askable calls, that decides
+which calls they go to; when more functions hold an askable call than the budget, the functions late
+in the order get none, and each of the others gets one, for its first call.
+
+Where a callee resolved to is the `failure_propagation` form's answer: the lookup by name that
+decides whether a question can be put to the call, which keeps the one definition it finds — so two
+functions with one name are told apart only when that lookup sees both, and a search stopped at its
+cap of 200 hits may not. The `check_before_action` form resolves no callee for a call it asks
+about — a call whose callee is a function this run reads is not askable there — so its calls keep
+the order they appear in. A changed function the listing's caps left out (see *Notes*) is not
+counted as one.
 
 ## Reading the output
 
@@ -259,6 +274,37 @@ check-before-action sentence written for the changed function of each acceptance
 guarded call inside the budget on both — grovedb#500's `rewrite_heights` 10th of 17 askable calls
 among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Whether Jev reads
 those right is not measured.
+
+### The order inside a function
+
+The calls into a function the change touched go first in their function (see *What it asks*). What
+this rests on is one case, and it is the case the order was chosen from: in Kontor#385 the call the
+pull request fixed, `batch_to_decided(b)`, sits six lines below a query into a file the pull
+request never touched, and once more calls can be asked about (`#45`), that query takes the
+function's only turn and the fixed call falls outside the budget. Kontor#385 is therefore a
+regression case from here on. The opposite shape — a defect in a call to an unchanged function,
+beside a call into a changed one — is not in any case measured, so whether this order is better
+than line order in general is not known.
+
+Measured without a request, on the eight cases of the acceptance set's pre-check (with every
+version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`, 20 runs
+(`bench/logs/order-first-pass-v1.json`, `node bench/order-first-pass.ts`):
+
+- how many calls each function gets, and in what order the functions take their turns, is the same
+  as in line order in every run;
+- with today's check (the `failure_propagation` form's), the order changes which call is asked in
+  Kontor#385 (three functions) and in omamori `#468` (one function, `run_override_disable`, on every
+  branch); in the other seven cases nothing changes, since every askable call fits in the budget;
+- with a wider check standing in for `#45` (any type whose name ends in `Result` taken as one, and a
+  callee's definition found by `fn <name>` and held when that search is cut — which holds one call
+  today's check asks about, `verify(...)` in grovedb#500's `finalize`), every
+  defect inside the diff stays inside the budget — omamori's two targets, moltis#1064's and
+  grovedb#500's in every version, Kontor#385's — and without the order Kontor#385's falls out.
+  Kontor#385's unchanged caller is outside the budget either way.
+
+The two calls the order swaps on omamori `#468` were asked of Jev three times on every branch under
+both requirements (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in
+any run. On that case the order adds no finding and loses none.
 
 ## Only Jev
 

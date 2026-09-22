@@ -1,0 +1,1712 @@
+{
+  "what": "Which calls the budget of 20 reaches, with the order inside a function (calls into a function the change touched first) and without it, under today's applicability check and a wider stand-in for #45. No request sent.",
+  "tool": {
+    "commit": "18ac68c7c6424989fde91ac3801a191da3ac63b6",
+    "src": "89e09e4b8ca541a5e0c5d7ce5d6b213bc7c168ac51fc3224bea18a59f5b31aa1"
+  },
+  "budget": 20,
+  "rows": [
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "4106d46dad04481a932597141739e42a5452cc86"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 2,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "target_not_result"
+          ]
+        }
+      ],
+      "ms": 9668
+    },
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "4106d46dad04481a932597141739e42a5452cc86"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 31,
+      "movedUp": 4,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 5633
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "fa45a528825734c277a84107af93b4ea9ff105d0"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 2,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "target_not_result"
+          ]
+        }
+      ],
+      "ms": 9869
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "check": "widened",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "fa45a528825734c277a84107af93b4ea9ff105d0"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 31,
+      "movedUp": 4,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 5572
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "e14b5b7d1268fc583d428735086583335943e684"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 2,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "target_not_result"
+          ]
+        }
+      ],
+      "ms": 9893
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "check": "widened",
+      "revisions": {
+        "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "after": "e14b5b7d1268fc583d428735086583335943e684"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 31,
+      "movedUp": 4,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 5472
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "d2697974d470b2adde91472e85ed5c14e78174b4",
+        "after": "e5f20ac177a50c402b266ba5516d9559b8938686"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 3,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "target_not_result"
+          ]
+        }
+      ],
+      "ms": 9726
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "check": "widened",
+      "revisions": {
+        "before": "d2697974d470b2adde91472e85ed5c14e78174b4",
+        "after": "e5f20ac177a50c402b266ba5516d9559b8938686"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 32,
+      "movedUp": 4,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 5295
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "check": "shipped",
+      "revisions": {
+        "before": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+        "after": "4697c3977399b015efd2ac38fd9aec6797783117"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 2,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "target_not_result"
+          ]
+        }
+      ],
+      "ms": 9108
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "check": "widened",
+      "revisions": {
+        "before": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+        "after": "4697c3977399b015efd2ac38fd9aec6797783117"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 30,
+      "movedUp": 4,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "crates/gateway/src/session/title.rs",
+          "function": "generate_title_for_session",
+          "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+          "function": "dispatch_command",
+          "call": "session_handlers::handle_title(state, &session_key)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6199
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 8,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7108
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 12,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 1416
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "26efc3e5a004ad96250d823e95e7ca893e13d62f"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 8,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7046
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "check": "widened",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "26efc3e5a004ad96250d823e95e7ca893e13d62f"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 12,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 1429
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "87e06509bc8da68b9c815ad5799f507d81183c69"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 8,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7288
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "check": "widened",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "87e06509bc8da68b9c815ad5799f507d81183c69"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 12,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 1464
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "check": "shipped",
+      "revisions": {
+        "before": "ad3f80263ed21321bee9f450a854d0ee92356b8a",
+        "after": "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 9,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7951
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "check": "widened",
+      "revisions": {
+        "before": "ad3f80263ed21321bee9f450a854d0ee92356b8a",
+        "after": "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 13,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "merk/src/merk/restore.rs",
+          "function": "finalize",
+          "call": "rewrite_heights(grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 1679
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      },
+      "functionsWithAnAskableCall": 2,
+      "applicable": 2,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "fixed",
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "callee_not_result"
+          ]
+        },
+        {
+          "tag": "B",
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "process_chunk(chunk_id, ops, grove_version)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "callee_not_result"
+          ]
+        }
+      ],
+      "ms": 8063
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "after": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      },
+      "functionsWithAnAskableCall": 3,
+      "applicable": 10,
+      "movedUp": 2,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [
+        {
+          "tag": "fixed",
+          "file": "merk/src/merk/restore.rs",
+          "function": "process_chunk",
+          "call": "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "grovedb/src/replication/state_sync_session.rs",
+          "function": "apply_inner_chunk",
+          "call": "process_chunk(chunk_id, ops, grove_version)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 1755
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f",
+        "after": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      },
+      "functionsWithAnAskableCall": 24,
+      "applicable": 47,
+      "movedUp": 9,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-8",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "line": 44,
+          "call": "refresh_validator_set()"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-89",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "line": 256,
+          "call": "refresh_validator_set()"
+        },
+        {
+          "id": "core/indexer/src/reactor/mod.rs:call-36",
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "line": 206,
+          "call": "try_fulfill_pending_proposal()"
+        }
+      ],
+      "left": [
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-1",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "line": 25,
+          "call": "rollback_to_height(&self.db_conn(), height)"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-81",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "line": 236,
+          "call": "savepoint()"
+        },
+        {
+          "id": "core/indexer/src/reactor/mod.rs:call-33",
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "line": 201,
+          "call": "drain_deferred_decisions()"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "enumerated": 1,
+          "applicable": 0,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": [
+            "callee_not_result"
+          ]
+        }
+      ],
+      "ms": 10783
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f",
+        "after": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      },
+      "functionsWithAnAskableCall": 33,
+      "applicable": 108,
+      "movedUp": 21,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-77",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "make_value",
+          "line": 228,
+          "call": "validate_batch( &conn, last_height, last_hash, &candidate_txids, last_height,"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-89",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "validate_and_accept_proposal",
+          "line": 288,
+          "call": "validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-152",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "line": 522,
+          "call": "make_value()"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-176",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_finalized",
+          "line": 621,
+          "call": "process_decided_batch( *anchor_height, *anchor_hash, certificate.height, &cert_bytes, &full_txs,"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-8",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "line": 44,
+          "call": "refresh_validator_set()"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-89",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "line": 256,
+          "call": "refresh_validator_set()"
+        },
+        {
+          "id": "core/indexer/src/reactor/consensus_state.rs:call-125",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "line": 489,
+          "call": "batch_to_decided(b)"
+        },
+        {
+          "id": "core/indexer/src/reactor/handlers.rs:call-37",
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "line": 199,
+          "call": "handle_get_value(height, round, timeout, reply)"
+        }
+      ],
+      "left": [
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-51",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "make_value",
+          "line": 186,
+          "call": "to_string()"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-87",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "validate_and_accept_proposal",
+          "line": 284,
+          "call": "to_string()"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-149",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "line": 518,
+          "call": "send_proposal_parts(&proposal, Round::Nil)"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-167",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_finalized",
+          "line": 585,
+          "call": "encode_commit_certificate(&certificate)"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-1",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "line": 25,
+          "call": "rollback_to_height(&self.db_conn(), height)"
+        },
+        {
+          "id": "core/indexer/src/reactor/blocks.rs:call-81",
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "line": 236,
+          "call": "savepoint()"
+        },
+        {
+          "id": "core/indexer/src/reactor/consensus_state.rs:call-119",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "line": 483,
+          "call": "select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)"
+        },
+        {
+          "id": "core/indexer/src/reactor/handlers.rs:call-36",
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "line": 190,
+          "call": "handle_started_round(height, round, proposer, role, reply_value)"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "A",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 0,
+          "held": []
+        },
+        {
+          "tag": "B",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 0,
+          "inBudgetWithoutOrder": 0,
+          "held": []
+        }
+      ],
+      "ms": 7212
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
+        "after": "a808734a5b264a433e74f96126b9a8159c19e641"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 7,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 2394
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
+        "after": "a808734a5b264a433e74f96126b9a8159c19e641"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 7,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 2241
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
+        "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      },
+      "functionsWithAnAskableCall": 5,
+      "applicable": 11,
+      "movedUp": 1,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 8278
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
+        "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      },
+      "functionsWithAnAskableCall": 10,
+      "applicable": 18,
+      "movedUp": 5,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 5066
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "aa6c8094345db28af71d42a3b7a4cd80252dfe2a",
+        "after": "33cd86eea40565d08b2cd662d8c9c31e7a3de147"
+      },
+      "functionsWithAnAskableCall": 0,
+      "applicable": 0,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 0
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "aa6c8094345db28af71d42a3b7a4cd80252dfe2a",
+        "after": "33cd86eea40565d08b2cd662d8c9c31e7a3de147"
+      },
+      "functionsWithAnAskableCall": 0,
+      "applicable": 0,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 0
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "check": "shipped",
+      "revisions": {
+        "before": "0cb4ca5cd99efa87183b07519748621a43adce20",
+        "after": "f46e703543e434c91fe3031184a48eebb7b63d1b"
+      },
+      "functionsWithAnAskableCall": 0,
+      "applicable": 0,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 0
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "check": "widened",
+      "revisions": {
+        "before": "0cb4ca5cd99efa87183b07519748621a43adce20",
+        "after": "f46e703543e434c91fe3031184a48eebb7b63d1b"
+      },
+      "functionsWithAnAskableCall": 0,
+      "applicable": 0,
+      "movedUp": 0,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [],
+      "left": [],
+      "targets": [],
+      "ms": 0
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "check": "shipped",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "e58c04f6df082146969320b91f09aa7a0123ac1f"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 37,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7346
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "check": "widened",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "e58c04f6df082146969320b91f09aa7a0123ac1f"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 43,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6836
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "check": "shipped",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "46cd434299a05ff8c6d2664f720f0606d7e11579"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 37,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7721
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "check": "widened",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "46cd434299a05ff8c6d2664f720f0606d7e11579"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 43,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6736
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "check": "shipped",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "a3dae0a134cc70952fe467bad860a714e4c45792"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 37,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7976
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "check": "widened",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "a3dae0a134cc70952fe467bad860a714e4c45792"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 43,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6887
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "check": "shipped",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 37,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7726
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "check": "widened",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 43,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6704
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "check": "shipped",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 37,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 7282
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "check": "widened",
+      "revisions": {
+        "before": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+        "after": "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      },
+      "functionsWithAnAskableCall": 22,
+      "applicable": 43,
+      "movedUp": 20,
+      "perFunctionCountsUnchanged": true,
+      "functionOrderUnchanged": true,
+      "entered": [
+        {
+          "id": "src/cli/config_cmd.rs:call-259",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 949,
+          "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/cli/config_cmd.rs:call-251",
+          "file": "src/cli/config_cmd.rs",
+          "function": "run_override_disable",
+          "line": 935,
+          "call": "guard_ai_config_modification(\"override disable\")"
+        }
+      ],
+      "targets": [
+        {
+          "tag": "R1",
+          "file": "src/integrity.rs",
+          "function": "read_baseline",
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        },
+        {
+          "tag": "R2",
+          "file": "src/config.rs",
+          "function": "raw_override_disables",
+          "call": "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)",
+          "enumerated": 1,
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
+        }
+      ],
+      "ms": 6449
+    }
+  ]
+}

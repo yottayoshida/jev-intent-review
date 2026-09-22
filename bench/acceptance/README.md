@@ -34,6 +34,12 @@ how often a real repository's failure handling fits v0.1's question is itself a 
 The same requirement on another function does not count as a second requirement. A case that is
 used to fix anything becomes a regression case from then on and is never counted as unseen again.
 
+Used so far:
+
+- **kontor-385** chose the order inside a function (the calls into a function the change touched
+  first; `docs/local-check-cli.md`, *The order inside a function*). It has no `case.json` — it
+  stopped at condition (c) and was never built or sent to Jev — so this line is the record.
+
 ## Building a case
 
 Each case is a directory under `cases/` with `case.json`, the requirement as a spec file, one patch
