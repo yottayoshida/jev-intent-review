@@ -14,12 +14,13 @@ How they were chosen, by a rule fixed before any body was read:
 - Newest first; in each repository, whole issues until its sentences reach 75.
 - Left out: bot authors, bodies with a generation marker, non-English bodies, bodies the tool already
   reads requirements from (ADR 0004), bodies with no sentence or more than 45, a third issue by the
-  same author, and the maintainer's own.
+  same author, and issues by this repository's maintainer (yottayoshida).
 
-The pool is what GitHub's search returned on 2026-09-22. Every chosen body was last edited before
-the end of 2022.
+The pool is what GitHub's search returned on 2026-09-22, and is not kept here. When they were
+copied, every chosen body had last been edited before the end of 2022 (GitHub's `lastEditedAt`,
+which these files do not keep).
 
 Two notes on the content: `BurntSushi-ripgrep-1703.json` is by a deleted account (`ghost`); and
 `sharkdp-bat-2151.json` is almost all one code block, a published scanning script for an old
 vulnerability, pasted there as a syntax-highlighting sample. Code blocks are not shown to Jev or to
-the person labelling (`units.ts`), so only its one sentence is asked about.
+the annotators (`units.ts`), so only its one sentence is asked about.

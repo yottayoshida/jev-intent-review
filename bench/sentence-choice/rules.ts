@@ -10,9 +10,11 @@
 // of them after the labels exist is a new measurement.
 //
 // The labels are not a person's. The maintainer asked that Claude label the sentences rather than
-// label them by hand; so three annotators, each a fresh Claude with no knowledge of the others or of
-// Jev's answers (none existed), label every unit from the same definitions and the same context Jev
-// is shown, and the label is the one at least two of them gave.
+// label them by hand; so three annotators, each a fresh Claude agent that saw neither the others'
+// labels nor any answer of Jev's (none existed), label every unit from the definitions Jev is given
+// and one more ("not a sentence"), and the label is the one at least two of them gave. What each annotator read beyond Jev's five
+// fields — the unit's id, the other units of its share, the workspace's instructions — is written
+// in docs/writing-requirements.md.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -69,8 +71,8 @@ export function buildRules(units: readonly Unit[]) {
     // Each unit's label is the one at least `majority` of `count` annotators gave; with none, it is
     // `noMajority`, which counts against Jev when Jev chooses the unit.
     annotators: { count: 3, majority: 2, noMajority: "cannot_tell" },
-    // The order the units are given to the annotators in: shuffled across issues, so no annotator
-    // reads an issue's sentences one after another and builds up more than the unit shows.
+    // The order the units are given to the annotators in: shuffled across issues, so an issue's
+    // sentences are not read one after another. The ids still say which issue a unit is from.
     order: { seed: ORDER_SEED, ids: shuffled(ids, ORDER_SEED) },
   };
 }

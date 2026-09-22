@@ -5,9 +5,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { labelsFrom, NOT_A_SENTENCE, packetProblems, packets, PARTS, parts } from "../bench/sentence-choice/annotate.ts";
+import { labelsFrom, NOT_A_SENTENCE, packetProblems, packets, PARTS, parts, type Answers, type Packet } from "../bench/sentence-choice/annotate.ts";
 import { DEFINITIONS, SENTENCE_QUESTIONS } from "../bench/sentence-choice/question.ts";
-import { FIXED_FILES, fleissKappa, LABEL_FILE, labelsOf, score, sha256, verify, wilson, type Head, type Labels, type Log } from "../bench/sentence-choice/replay.ts";
+import { FIXED_FILES, fleissKappa, isChoice, LABEL_FILE, labelsOf, LOG as RECORD, render, score, sha256, verify, wilson, type Head, type Labels, type Log } from "../bench/sentence-choice/replay.ts";
 import { buildRules, type Rules } from "../bench/sentence-choice/rules.ts";
 import { allUnits, readIssues, type Unit } from "../bench/sentence-choice/units.ts";
 
@@ -105,7 +105,7 @@ test("a label is what two of the three annotators gave, and votes that do not fi
   assert.equal(fleissKappa([3, 0, 3, 0], 3), 1);
 });
 
-test("every annotator reads one part of the fixed order, with the definitions and the fields Jev is shown, and nothing more", () => {
+test("every annotator reads one part of the fixed order: the definitions, and each unit's id with the fields Jev is shown", () => {
   const units = allUnits();
   const rules = JSON.parse(read("rules.json")) as Rules;
   const split = parts(rules);
@@ -118,7 +118,7 @@ test("every annotator reads one part of the fixed order, with the definitions an
     assert.deepEqual([...p.ids].sort(), [...part].sort(), p.id);
     const lines = p.text.split("\n").filter((l) => l.startsWith("{"));
     assert.deepEqual(lines.map((l) => (JSON.parse(l) as { id: string }).id), p.ids, "each unit once, in the packet's own order");
-    // Exactly the five fields Jev is shown, beside the id.
+    // The five fields Jev is shown, and the id, which Jev is not (the docs say so).
     assert.deepEqual(Object.keys(JSON.parse(lines[0] as string)), ["id", "title", "heading", "lead_in", "paragraph", "sentence"]);
     for (const text of [...Object.values(DEFINITIONS), NOT_A_SENTENCE]) assert.ok(p.text.includes(text), `${p.id} carries every definition`);
   }
@@ -130,7 +130,7 @@ test("labels.json is made only from one complete answer per packet, and records 
   const units = allUnits();
   const rules = JSON.parse(read("rules.json")) as Rules;
   const all = packets(units, rules);
-  const answer = (p: (typeof all)[number], label = (i: number) => (i === 0 && p.annotator === 1 ? "required_behavior" : "neither")) => ({ packet: p.id, labels: p.ids.map((id, i) => ({ id, label: label(i) })) });
+  const answer = (p: Packet, label = (i: number) => (i === 0 && p.annotator === 1 ? "required_behavior" : "neither")) => ({ packet: p.id, labels: p.ids.map((id, i) => ({ id, label: label(i) })) });
   const answers = all.map((p) => answer(p));
   const labels = labelsFrom(answers, units, rules, "l", "t");
   assert.equal(Object.keys(labels.votes).length, units.length);
@@ -142,14 +142,14 @@ test("labels.json is made only from one complete answer per packet, and records 
   assert.deepEqual(packetProblems(labels, units, rules), []);
   assert.match(packetProblems({ ...labels, packets: { ...labels.packets, "part1-annotator1": "0" } }, units, rules).join(), /packet part1-annotator1/);
 
-  const p1 = all[0] as (typeof all)[number];
-  const otherPart = all.find((p) => p.part === 2) as (typeof all)[number];
+  const p1 = all[0] as Packet;
+  const otherPart = all.find((p) => p.part === 2) as Packet;
   const without = (i: number) => answers.filter((_, j) => j !== i);
   assert.throws(() => labelsFrom(without(0), units, rules, "", ""), /part1-annotator1 was answered 0 times/);
-  assert.throws(() => labelsFrom([...answers, answers[0] as (typeof answers)[number]], units, rules, "", ""), /part1-annotator1 was answered 2 times/);
-  const change = (labelsOfP1: { id: string; label: string }[]) => labelsFrom([{ packet: p1.id, labels: labelsOfP1 }, ...without(0)], units, rules, "", "");
+  assert.throws(() => labelsFrom([...answers, answers[0] as Answers], units, rules, "", ""), /part1-annotator1 was answered 2 times/);
+  const change = (labelsOfP1: Answers["labels"]) => labelsFrom([{ packet: p1.id, labels: labelsOfP1 }, ...without(0)], units, rules, "", "");
   assert.throws(() => change(answer(p1).labels.slice(1)), /leaves 1 units unlabelled/);
-  assert.throws(() => change([...answer(p1).labels, answer(p1).labels[0] as { id: string; label: string }]), /twice/);
+  assert.throws(() => change([...answer(p1).labels, answer(p1).labels[0] as Answers["labels"][number]]), /twice/);
   assert.throws(() => change([...answer(p1).labels.slice(1), { id: p1.ids[0] as string, label: "required" }]), /the label "required"/);
   assert.throws(() => change([...answer(p1).labels, { id: otherPart.ids[0] as string, label: "neither" }]), /did not show/);
   assert.throws(() => labelsFrom([...answers, { packet: "part4-annotator1", labels: [] }], units, rules, "", ""), /packets that do not exist: part4-annotator1/);
@@ -169,6 +169,43 @@ test("the decision needs every run: all clear is adopt, all below is reject, any
   assert.equal(score(units, labels, log([95, 2], [95, 2], [60, 40]), rules).decision, "undetermined");
   assert.equal(score(units, labels, log([50, 50], [50, 50], [50, 50]), rules).decision, "reject");
   assert.equal(score(units, labels, log([95, 2], [95, 2]), rules).decision, "undetermined", "fewer runs than the rules ask for decide nothing");
+});
+
+test("the section in docs/writing-requirements.md is what the committed record, labels and rules give, checked against their commits", () => {
+  const log = JSON.parse(readFileSync(RECORD, "utf8")) as Log;
+  const rules = JSON.parse(read("rules.json")) as Rules;
+  const labels = JSON.parse(read(LABEL_FILE)) as Labels;
+  const units = allUnits();
+  // Against the real history: the fixed files before the labels, each as the record says.
+  assert.deepEqual([...verify(log.head), ...packetProblems(labels, units, rules)], []);
+  assert.equal(log.runs.length, rules.runs, "every run the rules ask for is in the record");
+  const doc = readFileSync(join(import.meta.dirname, "..", "docs", "writing-requirements.md"), "utf8");
+  const begin = "<!-- sentence-choice:begin -->\n";
+  const end = "\n<!-- sentence-choice:end -->";
+  assert.equal(doc.split(begin).length, 2, "exactly one sentence-choice:begin marker");
+  assert.equal(doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end)), render(score(units, labels, log, rules), log.head, rules));
+
+  // The numbers written by hand above the section are the record's too.
+  const flat = doc.replace(/\s+/g, " ");
+  const and = (xs: number[]) => `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
+  const issueOf = new Map(units.map((u) => [u.id, u.issue]));
+  const beside = packets(units, rules).map((p) => {
+    const issues = p.ids.map((id) => issueOf.get(id));
+    return issues.filter((i) => issues.filter((j) => j === i).length > 1).length;
+  });
+  assert.ok(flat.includes(`${Math.min(...beside)} to ${Math.max(...beside)} of about 164`), `beside: ${beside.join(" ")}`);
+  const label = labelsOf(labels, rules);
+  const margin = log.runs.map((r) => {
+    const chosen = units.filter((u) => isChoice(r.answers[u.id], rules)).map((u) => u.id);
+    const wrong = chosen.filter((id) => label[id] !== rules.positive);
+    let relabel = 0;
+    while (wilson(chosen.length - wrong.length + relabel, chosen.length, rules.interval.z).lo < rules.gate.precision) relabel++;
+    return { wrong: wrong.length, relabel, voted: wrong.filter((id) => labels.votes[id]?.includes(rules.positive)).length };
+  });
+  const said = `${and(margin.map((m) => m.wrong))} in the three runs — had ${and(margin.map((m) => m.relabel))} of them`;
+  assert.ok(flat.includes(said), said);
+  assert.equal(new Set(margin.map((m) => m.voted)).size, 1, "the docs give one number for every run");
+  assert.ok(flat.includes(`But only ${margin[0]?.voted} of them in each run had even one annotator's vote`), JSON.stringify(margin));
 });
 
 test("a record is scored only with the files and commits it was made with, the question fixed before the labels", () => {

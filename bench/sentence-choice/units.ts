@@ -4,12 +4,13 @@
 //   node bench/sentence-choice/units.ts --check   exit 1 if units.json is not what issues/ gives
 //
 // A unit is one sentence and what a reader sees around it: the issue's title, the heading it sits
-// under, the line that leads into it, and its paragraph. Jev is shown exactly that, and so is the
-// person who labels it — neither sees the rest of the issue.
+// under, the line that leads into it, and its paragraph. Jev is shown exactly that, and never the
+// rest of the issue. The annotators who label it read the same fields, with the unit's id and the
+// other units of their share beside it (annotate.ts, docs/writing-requirements.md).
 //
 // 1. Visible lines only: the product's visibleLines (comments, code blocks, reference definitions
 //    and characters that display as nothing are left out). Code is not shown to Jev or to the
-//    labeller, as the product would not read it either.
+//    annotators, as the product would not read it either.
 // 2. Skipped lines: headings, table rows, lines that are only bold text or only an HTML tag, and
 //    checklist items (`- [ ]`, `- [x]`), which are template boilerplate. A bold-only line is taken as
 //    a heading.
