@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1962",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1962",
+ "title": "Documentation for '--quiet' is misleading",
+ "author": "zachriggle",
+ "createdAt": "2021-08-03T18:08:59Z",
+ "closedBy": "BurntSushi/ripgrep#2462",
+ "body": "The documentation for the `--quiet` flag is misleading with the `--files` flag.\r\n\r\nThe current documentation states:\r\n\r\n```\r\n       -q, --quiet\r\n           Do not print anything to stdout. If a match is found in a file,\r\n           then ripgrep will stop searching. This is useful when ripgrep is\r\n           used only for its exit code (which will be an error if no matches\r\n           are found).\r\n\r\n           When --files is used, then ripgrep will stop finding files after\r\n           finding the first file that matches all ignore rules.\r\n```\r\n\r\nThe very last part, \"the first file that matches all ignore rules\" seems like it's worded backwards.  I get what it means, it's just oddly worded.  It might be better to state instead \"the first file that does not match any ignore rules\".\r\n\r\nJust an opinion, feel free to close if you disagree.\r\n\r\n#### What version of ripgrep are you using?\r\n\r\n```\r\nrg --version\r\nripgrep 13.0.0\r\n-SIMD -AVX (compiled)\r\n+SIMD +AVX (runtime)\r\n```"
+}

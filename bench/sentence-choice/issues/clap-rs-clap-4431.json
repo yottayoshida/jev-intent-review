@@ -1,0 +1,9 @@
+{
+ "issue": "clap-rs/clap#4431",
+ "url": "https://github.com/clap-rs/clap/issues/4431",
+ "title": "Visual bugs in `cmd` with stray underlines",
+ "author": "thatbakamono",
+ "createdAt": "2022-10-30T14:36:19Z",
+ "closedBy": "clap-rs/clap#4767",
+ "body": "### Please complete the following tasks\r\n\r\n- [X] I have searched the [discussions](https://github.com/clap-rs/clap/discussions)\r\n- [X] I have searched the [open](https://github.com/clap-rs/clap/issues) and [rejected](https://github.com/clap-rs/clap/issues?q=is%3Aissue+label%3AS-wont-fix+is%3Aclosed) issues\r\n\r\n### Rust Version\r\n\r\n`rustc 1.65.0-nightly (f03ce3096 2022-08-08)`\r\n\r\n### Clap Version\r\n\r\n`4.0.18`\r\n\r\n### Minimal reproducible code\r\n\r\n```rs\r\nuse clap::Command;\r\n\r\nfn main() {\r\n    Command::new(\"repro\").get_matches();\r\n}\r\n```\r\n\r\n### Steps to reproduce the bug with the above code\r\n\r\n`cargo run -- --help`\r\n\r\n### Actual Behaviour\r\n\r\n![image](https://user-images.githubusercontent.com/13699966/198883926-98b158b4-a581-40fd-b0bd-c845f19404b5.png)\r\n\r\n### Expected Behaviour\r\n\r\n![image](https://user-images.githubusercontent.com/13699966/198883870-d65286e6-7ce9-4d28-bb94-9b33ad42b328.png)\r\n\r\n### Additional Context\r\n\r\nThe first screenshot shows cmd, the second screenshot shows windows terminal. I wasn't able to trigger this bug in windows terminal but it's worth noting that even in cmd, it doesn't always happen:\r\n![image](https://user-images.githubusercontent.com/13699966/198883969-7bccb1f1-4c99-4d22-b16e-50bb34394e45.png)\r\n\r\n### Debug Output\r\n\r\n_No response_"
+}

@@ -83,7 +83,7 @@ async function once(repo: string, base: string, head: string, candidatesOnly: bo
     origins.add(new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url).origin);
     return fetch(input, init);
   };
-  const args = ["--experimental-local-check", "--intent-spec", join(HERE, "spec.json"), "--base", base, "--head", head, "--json", ...(candidatesOnly ? ["--experimental-candidates-only"] : [])];
+  const args = ["--skip-change-check", "--intent-spec", join(HERE, "spec.json"), "--base", base, "--head", head, "--json", ...(candidatesOnly ? ["--candidates-only"] : [])];
   const exit = await main(args, { stdout: (t) => void out.push(t), stderr: (t) => void err.push(t), cwd: repo, env: process.env }, { fetch: counting });
   const report = out.length > 0 ? (JSON.parse(out.join("")) as { requirements: LocalCheckResult[] }) : { requirements: [] };
   const r = report.requirements[0];

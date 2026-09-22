@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#2111",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/2111",
+ "title": "decompression binaries are searched for even when they will never be used",
+ "author": "Antiever",
+ "createdAt": "2021-12-21T14:27:48Z",
+ "closedBy": "BurntSushi/ripgrep#3181",
+ "body": "####  Feature request\r\n\r\nSwitch for turn off tools check\r\n\r\nFor example, lets say I want to do multiple replacements like so:\r\n\r\n```\r\nrg --passthru \"!RE1!\" \"!file!\" -or \"!RP1!\" |^\r\nrg  --passthru \"!RE2!\" -or \"!RP2!\"  |^\r\n...\r\nrg  --passthru \"!RE6!\" -or \"!RP6!\"  |^\r\nrg  --passthru \"!RE7!\" -or \"!RP7!\"\r\n```\r\nand every new instance of rg wiil do:\r\n```\r\ndecompress.rs:482: gzip: could not find executable in PATH\r\ndecompress.rs:482: gzip: could not find executable in PATH\r\ndecompress.rs:482: bzip2: could not find executable in PATH\r\ndecompress.rs:482: bzip2: could not find executable in PATH\r\ndecompress.rs:482: xz: could not find executable in PATH\r\ndecompress.rs:482: xz: could not find executable in PATH\r\ndecompress.rs:482: lz4: could not find executable in PATH\r\ndecompress.rs:482: xz: could not find executable in PATH\r\ndecompress.rs:482: brotli: could not find executable in PATH\r\ndecompress.rs:482: zstd: could not find executable in PATH\r\ndecompress.rs:482: zstd: could not find executable in PATH\r\ndecompress.rs:482: uncompress: could not find executable in PATH\r\n```\r\nSo this kind of switch can speed up things a little bit\r\n\r\n\r\n"
+}

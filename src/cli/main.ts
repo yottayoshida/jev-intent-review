@@ -12,13 +12,14 @@ import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedPro
 import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
-import { intentSection, renderJson, renderMarkdown } from "../report/markdown.ts";
+import { isSensitivePath } from "../evidence/redact.ts";
+import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
-import { DEFAULT_LOCAL_CHECK, renderLocalCheck, runLocalCheck } from "../review/local-check-run.ts";
+import { DEFAULT_LOCAL_CHECK, runLocalCheck, type LocalCheckResult } from "../review/local-check-run.ts";
 import { pathFilter } from "../config/glob.ts";
-import { runReview } from "../review/run.ts";
-import { EXIT, ToolError, type IntentSource, type IntentSpec, type ReviewReport } from "../types.ts";
+import { reviewChanges } from "../review/unexpected-change.ts";
+import { EXIT, ToolError, type IntentSource, type IntentSpec, type ReviewReport, type UnexpectedChange } from "../types.ts";
 import { VERSION } from "../version.ts";
 
 const HELP = `Usage: jev-intent-review [options]
@@ -42,32 +43,27 @@ Change:
   --head <rev>          the commit after the change (default: HEAD; with --pr outside a
                         pull_request workflow, the pull request's head commit)
 
-Experimental:
+What a run does: for each requirement, take the Rust functions the change touched and their
+callers one hop out, and ask Jev two things about each call, as the requirement's "form" says.
+The default, failure_propagation: whether the requirement requires that a failure of the call
+not reach the caller as a success, and what the function returns when it does. The other,
+check_before_action (set "form" in --intent-spec): whether the requirement requires a check to
+pass before the call, and whether the function still makes the call when the check does not
+pass. One rule reads each call as holding, worth checking, not settled, or not required of. A
+call worth checking is listed with the requirement's words, the code, the assumption and both
+answers. Then every change the pull request made is asked about once: is it asked for by any
+requirement? No file, function or expected answer is named on the command line. No requirement
+verdict is stated. A call worth checking leaves the exit code at 0 unless .jev-intent-review.yml
+says policy.fail_on: [finding]. Nothing listed means no call met the conditions -- including
+calls left undetermined -- and exit 0 does not establish that the requirement holds.
+
+Run:
+  --candidates-only     build the set and stop. Prints which calls fit the budget and which do
+                        not, with a reason each, and asks nothing -- no credentials needed
+  --skip-change-check   do not ask whether each change was asked for; only the calls are read
   --experimental-local-check
-                        the v0.1 path. For each requirement, take the Rust functions the
-                        change touched and their callers one hop out, and ask Jev two
-                        things about each call, as the requirement's "form" says. The
-                        default, failure_propagation: whether the requirement requires
-                        that a failure of the call not reach the caller as a success,
-                        and what the function returns when it does. The other,
-                        check_before_action (set "form" in --intent-spec): whether the
-                        requirement requires a check to pass before the call, and whether
-                        the function still makes the call when the check does not pass.
-                        One rule reads each call as holding, worth checking, not settled,
-                        or not required of. A call worth checking is listed with the
-                        requirement's words, the code, the assumption and both answers.
-                        Requirements come from --intent-spec or, as written, from the
-                        issue and pull request as under Intent below; no file, function
-                        or expected answer is named on the command line. No requirement
-                        verdict is stated. Findings do not cause a nonzero exit code;
-                        configuration, intent, repository and provider failures can.
-                        Nothing listed means no call met the conditions -- including
-                        calls left undetermined -- and exit 0 does not establish that the
-                        requirement holds.
-  --experimental-candidates-only
-                        with the above: build the set and stop. Prints which calls fit the
-                        budget and which do not, with a reason each, and asks nothing --
-                        no credentials needed.
+                        accepted: this is the run now. The report and the exit code are the
+                        same without it; one line on stderr says so
 
 Output:
   --json                print the report as JSON instead of Markdown
@@ -97,9 +93,10 @@ for an endpoint that serves a Workers AI run request, else the Cloudflare pair; 
 or AI_GATEWAY_API_KEY alone is not used. GITHUB_TOKEN or GH_TOKEN (or a logged-in gh) for --pr
 and --issue.
 
-Exit codes: 0 no confident violation, 1 violation, 2 analysis incomplete,
-10 configuration error, 11 intent could not be resolved, 12 judgment provider failed
-(including an endpoint that answered no judgment at all), 13 repository could not be read.
+Exit codes: 0 the run finished (or was skipped), 1 a call worth checking with
+policy.fail_on: [finding], 2 the run did not finish, 10 configuration error, 11 intent could
+not be resolved, 12 judgment provider failed (including an endpoint that answered no judgment
+at all), 13 repository could not be read.
 `;
 
 export interface Io {
@@ -142,6 +139,9 @@ function parse(argv: string[]) {
         repo: { type: "string" },
         base: { type: "string" },
         head: { type: "string" },
+        "candidates-only": { type: "boolean", default: false },
+        "skip-change-check": { type: "boolean", default: false },
+        // Accepted from 0.1, when they selected the local check; the run is the local check now.
         "experimental-local-check": { type: "boolean", default: false },
         "experimental-candidates-only": { type: "boolean", default: false },
         json: { type: "boolean", default: false },
@@ -222,30 +222,34 @@ async function baseOf(git: Git, pr: PullRequest, head: string): Promise<string> 
 
 const NO_INTENT: IntentSpec = { version: 1, title: "", summary: "", requirements: [], nonGoals: [], ambiguities: [] };
 
-function skippedReport(
-  reason: string,
-  revisions: Revisions,
-  repository: string,
-  configSource: string,
-  sources: IntentSource[],
-  model: string,
-  read: { intent?: IntentSpec; notes: string[]; prAuthor?: string | undefined },
-): ReviewReport {
-  const intent = read.intent ?? NO_INTENT;
+interface ReportParts {
+  exitCode: number;
+  skipReason?: string;
+  intent?: IntentSpec;
+  sources: readonly IntentSource[];
+  requirements?: LocalCheckResult[];
+  unexpectedChanges?: UnexpectedChange[];
+  sent?: ReviewReport["sent"];
+  notes: string[];
+  prAuthor?: string | undefined;
+}
+
+/**
+ * The one report shape, whichever way the run ended (ADR 0007). A skipped or stopped run still says
+ * what would have been checked and what could not be read.
+ */
+function reportOf(revisions: Revisions, repository: string, configSource: string, model: string, parts: ReportParts): ReviewReport {
   return {
-    version: 1,
+    version: 2,
     tool: { name: "jev-intent-review", version: VERSION },
-    verdict: "skipped",
-    exitCode: EXIT.ok,
-    skipReason: reason,
-    // What would have been checked, and what could not be read: a skipped run still says both.
-    intent,
-    sources: sources.map(({ text: _text, ...source }) => source),
-    requirements: [],
-    unexpectedChanges: [],
-    discovery: { candidateCount: 0, changedCandidates: 0, unchangedCandidates: 0, incompleteReasons: [], searches: [] },
-    sent: { requests: 0, bytes: 0, locations: [] },
-    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: read.notes, ...(read.prAuthor ? { pullRequestAuthor: read.prAuthor } : {}) },
+    exitCode: parts.exitCode,
+    ...(parts.skipReason === undefined ? {} : { skipReason: parts.skipReason }),
+    intent: parts.intent ?? NO_INTENT,
+    sources: parts.sources.map(({ text: _text, ...source }) => source),
+    requirements: parts.requirements ?? [],
+    unexpectedChanges: parts.unexpectedChanges ?? [],
+    sent: parts.sent ?? { requests: 0, bytes: 0, answered: 0 },
+    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: parts.notes, ...(parts.prAuthor ? { pullRequestAuthor: parts.prAuthor } : {}) },
   };
 }
 
@@ -325,6 +329,8 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const loaded = await loadConfig(git, revisions.before, revisions.after);
     const config = loaded.config;
     trace(`config: ${loaded.source}`);
+    const report = (parts: ReportParts) => reportOf(revisions, repository, loaded.source, model, parts);
+    if (args["experimental-local-check"]) io.stderr("jev-intent-review: --experimental-local-check is the run now; the report and the exit code are the same without it\n");
 
     const resolved = await resolveIntent(
       {
@@ -344,18 +350,15 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const prAuthor = resolved.pullRequest?.author;
     // A run that stops for want of intent still prints what was read: stdout carries the same Intent
     // section a finished run does, stderr the one line.
-    const stop = (headline: string, intent: IntentSpec, sources: Omit<IntentSource, "text">[], message: string): never => {
-      io.stdout(
-        args.json
-          ? `${JSON.stringify({ revisions, sources, intent, notes }, null, 2)}\n`
-          : `${["# jev-intent-review", "", `**Result: nothing was checked.** ${headline}`, "", ...intentSection(intent, sources, { prAuthor, notes })].join("\n")}\n`,
-      );
+    const stop = (headline: string, intent: IntentSpec, sources: readonly IntentSource[], message: string): never => {
+      // The same shape as every other way the run ends, with the exit code it ends with.
+      io.stdout(args.json ? renderJson(report({ exitCode: EXIT.intent, intent, sources, notes: [headline, ...notes], prAuthor })) : renderMarkdown(report({ exitCode: EXIT.intent, intent, sources, notes: [headline, ...notes], prAuthor })));
       throw new ToolError(message, EXIT.intent);
     };
     if (resolved.sources.length === 0) {
       const none = "nothing was read from an issue, the pull request's description or --intent";
       if (config.policy.no_intent === "fail") stop("No statement of intent was found.", NO_INTENT, [], `no intent was found: ${none}${notes.length > 0 ? ` (${notes.join(" ")})` : ""}`);
-      return output(skippedReport(`No statement of intent was found: ${none}.`, revisions, repository, loaded.source, [], model, { notes, prAuthor }));
+      return output(report({ exitCode: EXIT.ok, skipReason: `No statement of intent was found: ${none}.`, sources: [], notes, prAuthor }));
     }
 
     // No model writes or chooses the requirements (ADR 0004): the documented forms are read as
@@ -383,35 +386,49 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       stop(
         intent.requirements.length === 0 ? "No requirement could be read as written." : "The intent given on the command line could not be read as written.",
         intent,
-        shownSources,
+        resolved.sources,
         `${unreadable}: ${howToWrite}`,
       );
-    const localCheckOutput = (results: unknown[]) =>
-      io.stdout(
-        args.json
-          ? `${JSON.stringify({ revisions, sources: shownSources, intent, notes, requirements: results }, null, 2)}\n`
-          : `${renderLocalCheck(results as Parameters<typeof renderLocalCheck>[0], { intent, sources: shownSources, notes, ...(prAuthor ? { prAuthor } : {}) })}\n`,
-      );
 
-    if (args["experimental-candidates-only"]) {
+    // Everything the run has to say beside the calls it read (ADR 0004, 0007): intent that exists
+    // and was not checked — a source as high as anything read and itself unread, requirements past
+    // the first twenty, issues the pull request closes beyond what GitHub listed — and what the
+    // change did to this tool's own footing. Said in the notes; nothing withholds a verdict, as
+    // there is none.
+    notes.push(...readingBlockers(reading, resolved.sources));
+    if (resolved.pullRequest?.issuesNotListed) notes.push(issuesNotListed(resolved.pullRequest.issuesNotListed));
+    notes.push(...loaded.notes);
+    if (loaded.changedInPullRequest) notes.push("The change edits .jev-intent-review.yml; the version before the change was used.");
+    const prBodyOnly = onlyFromPullRequest(intent, resolved.sources);
+    if (prBodyOnly) {
+      const author = resolved.sources.find((s) => s.type === "pr_description")?.author;
+      notes.push(`The requirements come only from the pull request's own description${author ? `, written by its author ${author}` : ""}.`);
+    }
+    // A path this tool must never read is not part of the change either: the pass over the changes
+    // sends the lines as they were before, so a pull request that removes a hardcoded key would
+    // hand it over. The change pass and the discoverer each refuse such a path on their own; this
+    // keeps it out of the change from the start as well.
+    const configured = pathFilter(config.repository.include, config.repository.ignore);
+    const include = (path: string) => configured(path) && !isSensitivePath(path);
+    const localOptions = { ...DEFAULT_LOCAL_CHECK, maxPrimaryChars: config.evidence.max_primary_chars };
+    // What the change did to this tool's own footing, said whichever way the run ends after reading it.
+    const footing = (changedPaths: readonly string[]) => {
+      if (changedPaths.some((p) => p.startsWith(".github/workflows/"))) notes.push("The change edits a GitHub Actions workflow, which may run this tool differently.");
+    };
+    // A call worth checking is a candidate, not a verdict: only a repository that asks for it fails on one.
+    const exitCodeFor = (requirements: LocalCheckResult[]) => (config.policy.fail_on.includes("finding") && requirements.some((r) => r.findings.length > 0) ? EXIT.finding : EXIT.ok);
+
+    if (args["candidates-only"] || args["experimental-candidates-only"]) {
       // Before the credentials gate on purpose: this asks nothing, so it must not need an account
-      // to run. The planner and the judge are stubs that throw — if the path ever reaches one, the
-      // run fails loudly rather than quietly making the request this flag promises not to make.
-      if (!args["experimental-local-check"]) throw new ToolError("--experimental-candidates-only only applies with --experimental-local-check", EXIT.config);
+      // to run. The judge is a stub that throws — if the path ever reaches it, the run fails loudly
+      // rather than quietly making the request this flag promises not to make.
       if (unreadable) stopUnread();
       const asksNothing = () => {
-        throw new Error("--experimental-candidates-only reached a model");
+        throw new Error("--candidates-only reached a model");
       };
-      const results = await runLocalCheck(
-        git,
-        revisions,
-        intent.requirements,
-        { model: "none", judge: asksNothing } as unknown as JudgmentProvider,
-        pathFilter(config.repository.include, config.repository.ignore),
-        { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true },
-      );
-      localCheckOutput(results);
-      return EXIT.ok;
+      const run = await runLocalCheck(git, revisions, intent.requirements, { model: "none", judge: asksNothing } as unknown as JudgmentProvider, include, { ...localOptions, candidatesOnly: true });
+      footing(run.change.changedPaths);
+      return output(report({ exitCode: EXIT.ok, intent, sources: resolved.sources, requirements: run.requirements, notes, prAuthor }));
     }
 
     if (!endpoint) {
@@ -419,45 +436,50 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // Skipped, not failed, even when nothing could be read: a fork's pull request has no
       // credentials and must not turn red for being written in prose. The report still says what
       // would have been checked and what was not read.
-      return output(skippedReport(`No credentials for the judgments (${needed}) were available, so nothing was judged.`, revisions, repository, loaded.source, resolved.sources, model, { intent, notes, prAuthor }));
+      return output(report({ exitCode: EXIT.ok, skipReason: `No credentials for the judgments (${needed}) were available, so nothing was judged.`, intent, sources: resolved.sources, notes, prAuthor }));
     }
     if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;
     const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, deps.fetch);
 
-    if (args["experimental-local-check"]) {
-      // The experimental path (docs/local-check-cli.md): from each requirement to observations
-      // about particular calls. It reports observations and what it did not check, never a
-      // violation, and it does not go through `runReview`.
-      const include = pathFilter(config.repository.include, config.repository.ignore);
-      // One provider, two questions. Both go to Jev; there is nothing else to send to.
-      // `--experimental-candidates-only` returned above, before the credentials gate.
-      localCheckOutput(await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, DEFAULT_LOCAL_CHECK));
-      return EXIT.ok;
+    // The calls first, then the changes. One provider for both; there is nothing else to send to.
+    const run = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, localOptions);
+    footing(run.change.changedPaths);
+    trace(`changed files: ${run.change.changedPaths.length}`);
+    for (const s of run.change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
+    for (const r of run.requirements) trace(`${r.requirementId} -> ${r.findings.length} worth checking of ${r.counts.asked} read`);
+
+    // The other direction: every change the pull request made, against the requirements it names.
+    // Not with the pull request's own description, though: a requirement its author wrote after the
+    // change could justify any line of it (ADR 0004). An issue the same person wrote still counts.
+    const typeOf = new Map(resolved.sources.map((s) => [s.id, s.type]));
+    const justifying = intent.requirements.filter((r) => r.sourceRefs.length === 0 || !r.sourceRefs.every((ref) => typeOf.get(ref.sourceId) === "pr_description"));
+    let changes = { unexpected: [] as UnexpectedChange[], reached: 0, answered: 0, notes: [] as string[] };
+    if (args["skip-change-check"]) notes.push("The changes were not checked against the requirements (--skip-change-check).");
+    else if (justifying.length === 0) notes.push("The changes were not checked against the requirements: every requirement came from the pull request's own description, which cannot justify the change it describes.");
+    else changes = await reviewChanges({ change: run.change, requirements: justifying, provider: judges.provider, maxChars: config.evidence.max_primary_chars, threshold: config.judgment.violation_probability, trace });
+    notes.push(...changes.notes);
+    trace(`changes no requirement asked for: ${changes.unexpected.length}`);
+    // Reached the host and could not read one answer from it, over both passes: the host is wrong
+    // or not answering, and a report of nothing settled would pass for a run that judged. The local
+    // check stops on its own when it asked; this covers a run whose only questions were the changes'.
+    if (run.reached + changes.reached > 0 && run.answered + changes.answered === 0) {
+      throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached} request(s) were sent and none was answered`, EXIT.provider);
     }
 
-    // Intent this run did not check against, which no verdict can overcome (ADR 0004): a source as
-    // high as anything read and itself unread, requirements past the first twenty, and issues the
-    // pull request closes beyond what GitHub listed.
-    const intentBlockers = [...readingBlockers(reading, resolved.sources), ...(resolved.pullRequest?.issuesNotListed ? [issuesNotListed(resolved.pullRequest.issuesNotListed)] : [])];
-    const report = await runReview({
-      git,
-      revisions,
-      loaded,
-      intent,
-      sources: resolved.sources,
-      prBodyOnly: onlyFromPullRequest(intent, resolved.sources),
-      provider: judges.provider,
-      sent: judges.sent,
-      repository,
-      trace,
-      notes,
-      endpoint: judges.origin,
-      host: endpoint.host,
-      intentBlockers,
-      ...(prAuthor ? { pullRequestAuthor: prAuthor } : {}),
-    });
-    return output(report);
+    const sent = judges.sent();
+    return output(
+      report({
+        exitCode: exitCodeFor(run.requirements),
+        intent,
+        sources: resolved.sources,
+        requirements: run.requirements,
+        unexpectedChanges: changes.unexpected,
+        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + changes.answered, endpoint: judges.origin, host: endpoint.host },
+        notes,
+        prAuthor,
+      }),
+    );
   } catch (error) {
     if (error instanceof ToolError) {
       io.stderr(`jev-intent-review: ${flat(error.message)}\n`);

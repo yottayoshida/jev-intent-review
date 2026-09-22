@@ -76,12 +76,12 @@ async function callMain(d: Dist, clone: string, args: string[], env: NodeJS.Proc
   return { code, stdout, stderr };
 }
 
-const specArgs = (id: string, base: string, head: string) => ["--experimental-local-check", "--base", base, "--head", head, "--intent-spec", join(caseDir(id), "spec.json"), "--json"];
+const specArgs = (id: string, base: string, head: string) => ["--skip-change-check", "--base", base, "--head", head, "--intent-spec", join(caseDir(id), "spec.json"), "--json"];
 
 /** The enumeration of one branch. It depends on the commits alone, so it is taken once. */
 async function enumerationOf(d: Dist, id: string, clone: string, base: string, head: string): Promise<Enumeration & { counts: unknown }> {
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !(d.client.JUDGMENT_ENV as readonly string[]).includes(k)));
-  const { code, stdout, stderr } = await callMain(d, clone, [...specArgs(id, base, head), "--experimental-candidates-only"], env);
+  const { code, stdout, stderr } = await callMain(d, clone, [...specArgs(id, base, head), "--candidates-only"], env);
   if (code !== 0) throw new Error(`candidates-only exited ${code}: ${stderr.trim()}`);
   const r = (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements[0]!;
   const rows = <T extends { file: string; function: string; call: string }>(xs: T[]) => xs.map(({ file, function: fn, call, ...rest }) => ({ file, function: fn, call, ...rest }));

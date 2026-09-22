@@ -15,5 +15,5 @@
     "skipLibCheck": true
   },
   "include": ["src", "test", "bench"],
-  "exclude": ["test/fixtures"]
+  "exclude": ["test/fixtures", "bench/generic"]
 }

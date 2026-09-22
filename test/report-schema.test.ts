@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { parseIntentSpec, validateIntentSpec } from "../src/intent/schema.ts";
 import { codeBlock, codeSpan, renderJson, renderMarkdown } from "../src/report/markdown.ts";
+import type { LocalCheckResult } from "../src/review/local-check-run.ts";
 import { EXIT, ToolError, type ReviewReport } from "../src/types.ts";
 import { VERSION } from "../src/version.ts";
 import { FIXTURES } from "./helpers/repo.ts";
@@ -31,12 +32,63 @@ test("code spans and blocks survive text with 200,000 backtick runs", () => {
   assert.ok(codeBlock(text).startsWith("```\n"));
 });
 
+/** One requirement as the local check reports it: one call worth checking, one holding, one held. */
+function localCheckResult(): LocalCheckResult {
+  const mapping = (callId: string, verdict: "applies" | "does_not_apply", probability: number) => ({
+    requirementId: "R1",
+    callId,
+    file: "src/auth.rs",
+    function: "open_session",
+    call: callId,
+    verdict,
+    probability,
+    probabilities: { [verdict]: probability },
+    governs: verdict === "applies" && probability >= 0.6,
+    why: verdict === "applies" ? `the requirement is read as requiring this of the call (${probability.toFixed(2)})` : `read as \`${verdict}\` (${probability.toFixed(2)}), which is below the bar of 0.6 or not a requirement of this call`,
+  });
+  const observed = (callId: string, observation: string, probability: number, outcome: "violates" | "satisfies") => ({
+    file: "src/auth.rs",
+    function: "open_session",
+    call: callId,
+    origin: "changed" as const,
+    callId,
+    result: { observation, probability, probabilities: { [observation]: probability }, why: observation === "returns_success" ? "the failed call is returned to the caller as a success" : "the failed call is not returned as a success" },
+    outcome,
+  });
+  return {
+    requirementId: "R1",
+    requirementText: "Disabled users cannot authenticate.",
+    form: "failure_propagation",
+    wouldAsk: [],
+    observed: [observed("create_session(store, &record)", "returns_success", 0.61, "violates"), observed("load_key(store, key)", "returns_error", 0.99, "satisfies")],
+    unchecked: [{ file: "src/auth.rs", function: "open_session", call: "audit(store)", origin: "changed", why: "audit has no definition in this repository, so what it returns is not established here" }],
+    mappings: [mapping("create_session(store, &record)", "applies", 0.9), mapping("load_key(store, key)", "applies", 0.8)],
+    findings: [
+      {
+        requirementId: "R1",
+        file: "src/auth.rs",
+        lines: "16-23",
+        function: "open_session",
+        call: "create_session(store, &record)",
+        quote: "Disabled users cannot authenticate.",
+        condition: "Execution reaches the call `create_session(store, &record)` inside `open_session`. There, `create_session(store, &record)` returns an error. Every other operation the function reaches succeeds.",
+        property: "call_failure_not_returned_as_success",
+        mapping: { verdict: "applies", probability: 0.9, probabilities: { applies: 0.9 }, governs: true },
+        observation: "returns_success",
+        probability: 0.61,
+        why: "Jev answered `applies` (0.90) when asked whether the requirement requires this call's failure not to reach the caller as a success, and `returns_success` (0.61) when asked what `open_session` returns under that failure. Both are Jev's readings and neither checks the other.",
+      },
+    ],
+    counts: { budget: 20, functions: { changed: 1, calls_changed: 0 }, calls: 3, applicable: 2, asked: 2, mapped: 2, governed: 2, overBudget: 0, notApplicable: 1, outcomes: { violates: 1, satisfies: 1, unknown: 0, aside: 0 } },
+    notes: ["src/auth.rs: 2 calls were left out of the listing by its cap <img src=x>"],
+  };
+}
+
 function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
   return {
-    version: 1,
+    version: 2,
     tool: { name: "jev-intent-review", version: VERSION },
-    verdict: "violation",
-    exitCode: 1,
+    exitCode: 0,
     intent: {
       version: 1,
       title: "t",
@@ -49,72 +101,44 @@ function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
       ambiguities: [],
     },
     sources: [{ id: "issue#1", type: "github_issue", authority: 100, author: "alice" }],
-    requirements: [
-      {
-        requirementId: "R1",
-        status: "violation",
-        coverage: "full",
-        scope: { found: 3, judged: 3, paths: 2, setAside: 1, notFollowed: [], unjudged: [], blocking: [] },
-        notes: [],
-        candidates: [
-          {
-            candidate: { path: "src/auth/password.ts", startLine: 6, endLine: 13, symbol: "loginWithPassword", changed: true, reasons: [] },
-            outcome: "satisfies",
-            satisfaction: { choice: "satisfies", probability: 0.99, confidence: 0.99, probabilities: {} },
-            truncated: false,
-            cut: { own: false, context: false, ambiguous: false },
-            evidence: [],
-            notes: [],
-          },
-          {
-            candidate: { path: "src/auth/oauth.ts", startLine: 16, endLine: 23, changed: false, reasons: [] },
-            outcome: "violates",
-            satisfaction: { choice: "violates", probability: 0.61, confidence: 0.47, probabilities: { violates: 0.61 } },
-            truncated: false,
-            cut: { own: false, context: false, ambiguous: false },
-            evidence: [{ path: "src/auth/oauth.ts", startLine: 22, endLine: 22 }],
-            notes: ["probability 0.61 <img src=x>"],
-          },
-          {
-            candidate: { path: "src/ui/button.ts", startLine: 1, endLine: 9, changed: false, reasons: [] },
-            outcome: "aside",
-            aside: "not_a_path",
-            truncated: false,
-            cut: { own: false, context: false, ambiguous: false },
-            evidence: [],
-            notes: [],
-          },
-        ],
-      },
-      { requirementId: "R2", status: "verified", coverage: "full", scope: { found: 0, judged: 0, paths: 0, setAside: 0, notFollowed: [], unjudged: [], blocking: [] }, notes: [], candidates: [] },
-    ],
+    requirements: [localCheckResult()],
     unexpectedChanges: [],
-    discovery: { candidateCount: 3, changedCandidates: 1, unchangedCandidates: 2, incompleteReasons: [], searches: [] },
-    sent: { requests: 3, bytes: 12345, locations: [{ path: "src/auth/oauth.ts", startLine: 16, endLine: 23 }] },
+    sent: { requests: 4, bytes: 12345, answered: 4 },
     metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", questionsHash: "abc", configSource: "defaults", notes: [] },
     ...overrides,
   };
 }
 
-test("the Markdown report leads with a result line drawn from the verdict alone", () => {
-  assert.match(renderMarkdown(report()), /^# jev-intent-review\n\n\*\*Result: VIOLATION\.\*\* 1 of 2 requirements has a violation\./);
-  assert.match(renderMarkdown(report({ verdict: "no_violation_found" })), /\*\*Result: no violation found\*\* in 2 discovered paths\. This is not proof that the change is correct\./);
-  assert.match(renderMarkdown(report({ verdict: "skipped", skipReason: "No credentials." })), /\*\*Result: skipped\.\*\* No credentials\./);
+test("the Markdown report leads with a result line drawn from the counts alone, and states no verdict", () => {
+  const text = renderMarkdown(report());
+  assert.match(text, /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* No requirement verdict is stated\./);
+  assert.match(renderMarkdown(report({ skipReason: "No credentials." })), /\*\*Result: skipped\.\*\* No credentials\./);
+  assert.match(renderMarkdown(report({ requirements: [] })), /\*\*Result: nothing was checked\.\*\*/);
+  const unread = { ...localCheckResult(), observed: [], findings: [], mappings: [], counts: { ...localCheckResult().counts, asked: 0, mapped: 0, governed: 0, outcomes: { violates: 0, satisfies: 0, unknown: 0, aside: 0 } } };
+  assert.match(renderMarkdown(report({ requirements: [unread] })), /\*\*Result: no call was read\.\*\* 1 call not checked/);
+  // The set built and nothing sent: the budgeted calls are not under "Not checked", and the report
+  // says the run stopped. A finished run whose budgeted call was held before its question (a body
+  // that did not fit) has that call under "Not checked", and is not read as a run that stopped.
+  const inBudget = { file: "src/auth.rs", function: "open_session", call: "create_session(store, &record)", origin: "changed" as const };
+  const stopped = { ...unread, wouldAsk: [inBudget] };
+  assert.match(renderMarkdown(report({ requirements: [stopped], sent: { requests: 0, bytes: 0, answered: 0 } })), /\*\*Result: the set was built and nothing was asked\.\*\* 1 call inside the budget, 1 call not checked/);
+  const heldLate = { ...stopped, unchecked: [...unread.unchecked, { ...inBudget, why: "the body of open_session did not fit the evidence limit, so an answer would be about part of it" }] };
+  assert.match(renderMarkdown(report({ requirements: [heldLate], sent: { requests: 0, bytes: 0, answered: 0 } })), /\*\*Result: no call was read\.\*\* 2 calls not checked/);
+  for (const word of ["VERIFIED", "VIOLATION", "UNKNOWN", "verdict:"]) assert.ok(!text.includes(word), `${word} is not in the report`);
+  assert.ok(!/violat/i.test(text.replace(/`[^`]*`/g, "")), "no verdict word of the tool's own outside a code span");
 });
 
-test("the Markdown report shows each path, whether the change touched it, and the evidence lines", () => {
+test("the Markdown report shows each requirement's calls: worth checking with everything to disagree with, holding, and not checked", () => {
   const text = renderMarkdown(report());
-  assert.match(text, /### R1 · VIOLATION/);
-  assert.match(text, /- ✓ satisfies · `src\/auth\/password\.ts:6-13` · `loginWithPassword` · changed in this pull request · p 0\.99/);
-  // The probability the policy used (0.61), not Jev's `confidence` field (0.47).
-  assert.match(text, /- ✗ violates · `src\/auth\/oauth\.ts:16-23` · p 0\.61\n  - evidence: `src\/auth\/oauth\.ts:22`/);
-  assert.match(text, /1 other place set aside: not a path this requirement holds or fails on/);
-  // The headline is a claim over the paths, and the line under it says what that covers.
-  assert.match(text, /### R2 · VERIFIED over 0 discovered paths/);
-  assert.match(text, /Coverage: full — 3 of 3 place\(s\) judged, 2 path\(s\), 1 set aside/);
-  assert.match(text, /Repository candidates examined: 3 \(in changed files 1, in unchanged files 2\)/);
+  assert.match(text, /## R1\n\n> `Disabled users cannot authenticate\.`\n\nForm: `failure_propagation`\./);
+  assert.match(text, /Of the 2 read: 1 worth checking, 1 holding, 0 not settled, 0 not required of\./);
+  assert.match(text, /### Worth checking\n\n#### src\/auth\.rs:16-23 · open_session — `create_session\(store, &record\)`/);
+  assert.match(text, /\*\*Jev, on what the function returns\*\*: returns_success \(0\.61\)/);
+  assert.match(text, /### Read as holding\n\n[^\n]*\n\n- src\/auth\.rs · open_session — `load_key\(store, key\)`/);
+  assert.match(text, /### Not checked\n\n- src\/auth\.rs · open_session — `audit\(store\)`/);
   assert.ok(!text.includes("<img"), "notes cannot carry HTML");
   assert.match(text, /&lt;img src=x&gt;/);
+  assert.match(text, /- 4 requests, 4 answers, 12,345 bytes/);
 });
 
 test("the report names the endpoint and its host, and says so at the top when it was set by JEV_API_URL", () => {

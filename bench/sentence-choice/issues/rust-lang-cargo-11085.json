@@ -1,0 +1,9 @@
+{
+ "issue": "rust-lang/cargo#11085",
+ "url": "https://github.com/rust-lang/cargo/issues/11085",
+ "title": "SourceId serialization is ambiguous due to lack of escaping",
+ "author": "g2p",
+ "createdAt": "2022-09-14T07:36:42Z",
+ "closedBy": "rust-lang/cargo#12280",
+ "body": "### Problem\r\n\r\nI noticed this when `cargo update` (in `compare_dependency_graphs`) kept notifying me of spurious changes when referring to a branch name with a `'+'` character.  Due to poor serialisation, deserializing a branch name from Cargo.lock gives a branch that doesn't match the one in Cargo.toml.\r\n\r\nIt's also possible to give a branch name that will spill into the 'precise' commit hash when deserializing.\r\n\r\n### Steps\r\n\r\n_No response_\r\n\r\n### Possible Solution(s)\r\n\r\nWill send a PR that fixes serialization to use the expected encoding, which is unambiguous.\r\n\r\n### Notes\r\n\r\n_No response_\r\n\r\n### Version\r\n\r\n```text\r\ncargo 1.65.0 (bd99c043c 2022-09-09)\r\nrelease: 1.65.0\r\ncommit-hash: bd99c043ceeaa0318f1ce4633f796110ae182002\r\ncommit-date: 2022-09-09\r\nhost: x86_64-unknown-linux-gnu\r\nlibgit2: 1.5.0 (sys:0.15.0 vendored)\r\nlibcurl: 7.81.0 (sys:0.4.56+curl-7.83.1 system ssl:NSS/3.68.2)\r\nos: Ubuntu 22.04 (jammy) [64-bit]\r\n```\r\n"
+}

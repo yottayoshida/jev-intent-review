@@ -6,7 +6,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { DEFAULT_LOCAL_CHECK, runLocalCheck, renderLocalCheck, type LocalCheckOptions } from "../src/review/local-check-run.ts";
+import { DEFAULT_LOCAL_CHECK, runLocalCheck, type LocalCheckOptions, type LocalCheckResult } from "../src/review/local-check-run.ts";
+import { LOCAL_CHECK_INTRO, requirementSection } from "../src/report/markdown.ts";
+
+/** The requirements as the report prints them, without the report around them. */
+const renderRequirements = (results: readonly LocalCheckResult[]) => [...LOCAL_CHECK_INTRO, ...results.flatMap((r) => requirementSection(r))].join("\n");
 import type { Git } from "../src/repository/git.ts";
 import { ProviderError } from "../src/judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
@@ -132,8 +136,8 @@ function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choi
 
 async function run(options?: Partial<LocalCheckOptions>, integrity?: string, mapping?: (a: Asked) => ChoiceAnswer | undefined) {
   const { judge, asked } = jev(mapping);
-  const results = await runLocalCheck(repo(integrity), REVISIONS, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
-  return { r: results[0]!, results, asked, text: renderLocalCheck(results) };
+  const { requirements: results } = await runLocalCheck(repo(integrity), REVISIONS, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
+  return { r: results[0]!, results, asked, text: renderRequirements(results) };
 }
 
 test("the change reaches the call it introduced, and its caller one hop out", async () => {
@@ -249,14 +253,14 @@ test("an observation that failed leaves its call not settled, says why, and the 
       return judge.judge(state, questions);
     },
   };
-  const [r] = await runLocalCheck(repo(), REVISIONS, [requirement], failing, () => true, DEFAULT_LOCAL_CHECK);
+  const [r] = (await runLocalCheck(repo(), REVISIONS, [requirement], failing, () => true, DEFAULT_LOCAL_CHECK)).requirements;
   const show = r!.observed.find((o) => o.function === "show");
   assert.ok(show, JSON.stringify(r!.observed));
   assert.equal(show.outcome, "unknown");
   assert.equal(show.result.observation, "withheld");
   assert.equal(show.result.why, `the observation question was not answered (bad_response from ${where})`);
   assert.equal(r!.observed.find((o) => o.function === "read_baseline")?.outcome, "satisfies", "the other call is read as before");
-  const text = renderLocalCheck([r!]);
+  const text = renderRequirements([r!]);
   assert.match(text, /### Not settled/);
   assert.ok(!text.includes("the host's own words"));
 });
@@ -276,7 +280,7 @@ test("a host that answered nothing at all fails the run and is named; a run stop
     return true;
   });
   // The run's own budget reached nothing: the calls are not settled, and the report stands.
-  const [r] = await runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("budget", "the run's request budget ran out")), () => true, DEFAULT_LOCAL_CHECK);
+  const [r] = (await runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("budget", "the run's request budget ran out")), () => true, DEFAULT_LOCAL_CHECK)).requirements;
   assert.ok(r!.observed.length > 0 && r!.observed.every((o) => o.outcome === "unknown"));
 });
 

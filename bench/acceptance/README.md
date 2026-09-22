@@ -17,7 +17,7 @@ A case is kept only if all four hold:
 
 - **(a)** the requirement can be written as "a failure must reach the caller as an error, not as a
   success, an empty value or an absence" — the only property v0.1's two questions can express;
-- **(b)** on the pull request's base..head, `--experimental-candidates-only` puts the fixed call on
+- **(b)** on the pull request's base..head, `--candidates-only` puts the fixed call on
   the side a question can be put to;
 - **(c)** the behaviour difference of a defect can be observed in a throwaway clone, with no network
   and no credentials, through one crate's test or example;
@@ -69,7 +69,7 @@ Defects sit in one of three kinds of place:
 Every version must change the same set of functions — compared as `(path, name)`, since function
 ids are positional — as the shipped version. That is checked from the diff before the branch SHAs
 are fixed; a version that fails the check later is dropped and counted, not rebuilt. B and C
-targets are fixed from call relations found with `grep`, before `--experimental-candidates-only`
+targets are fixed from call relations found with `grep`, before `--candidates-only`
 is run, so a target cannot be chosen from what the tool already reaches.
 
 ## Scoring

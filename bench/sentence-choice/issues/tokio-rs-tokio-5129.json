@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5129",
+ "url": "https://github.com/tokio-rs/tokio/issues/5129",
+ "title": "Expose semaphore's MAX_PERMITS as a public constant.",
+ "author": "vi",
+ "createdAt": "2022-10-26T21:20:10Z",
+ "closedBy": "tokio-rs/tokio#5144",
+ "body": "**Is your feature request related to a problem? Please describe.**\r\n\r\nSometimes semaphore needs to be disabled at runtime by adjusting it's configuration. But obvious `usize::MAX` fails with `a semaphore may not have more than MAX_PERMITS permits (2305843009213693951)` panic.\r\n\r\nBut `MAX_PERMITS` mentioned in the panic message is not available in API. Apart from serving as \"effective infinity\", it may be used to filter user input, preventing causing panics by setting deliberately invalid value. How are apps supposed to check user-configurable concurrency limit without panicking?\r\n\r\n**Describe the solution you'd like**\r\n\r\n`pub const  tokio::sync::Semaphore::MAX_PERMITS: usize = ...;`\r\n\r\n**Describe alternatives you've considered**\r\n\r\n* A fallible function for creating a semaphore, with Tower handling those errors.\r\n* Documenting `2305843009213693951` explicitly as a limit and never shrinking it, so apps can safely embed it.\r\n* Documenting that semaphores should not be operated close to the cap, if there are indeed valid reasons for that."
+}

@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5041",
+ "url": "https://github.com/tokio-rs/tokio/issues/5041",
+ "title": "ABA in local queue",
+ "author": "sbarral",
+ "createdAt": "2022-09-21T16:59:20Z",
+ "closedBy": "tokio-rs/tokio#5042",
+ "body": "\r\nWhen I first noticed that the local tokio queue is prone to ABA, I thought that this was the prime reason for the use of `u16` indices. This mitigation seems very weak though, so I thought I would file an issue in case this was in fact overlooked.\r\n\r\nSay that a stealer thread is pre-empted in the below code section of `Steal::steal_into2` after the tail is loaded but before the CAS is performed, with the intent to steal half of the N tasks initially available. Say that in the meantime the worker thread pops exactly `2^16` tasks but pushes less than `2^16 - N/2` tasks. Since the head has wrapped around, the CAS will wrongly succeed and the stealer will steal more items than are actually in the queue, hence UB.\r\n \r\nhttps://github.com/tokio-rs/tokio/blob/7096a8007502526b23ee1707a6cb37c68c4f0a84/tokio/src/runtime/scheduler/multi_thread/queue.rs#L369-L397\r\n\r\nI am not sure this is a purely theoretical concern. The time to push and pop `2^16` tasks is less than 1ms on my oldish laptop, so probably not entirely outside the realm of the possible for worse-case thread suspension. Admittedly this doesn't take into account the time needed to actually process the tasks, but this still looks concerning to me.\r\n\r\nOn 64-bit platforms a very good ABA mitigation would come at no cost by using `u32` in place of `u16` and `u64` in place of `u32`. According to my benchmarks, this may even be very slightly faster. On 32-bit platforms, what to do is less obvious: keep the status quo and accept the risk, or use `u32` and `u64` when `AtomicU64` exists and accept a possible degradation in performance."
+}

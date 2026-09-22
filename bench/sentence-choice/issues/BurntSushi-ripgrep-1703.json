@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1703",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1703",
+ "title": "Short Alias for --no-ignore",
+ "author": "ghost",
+ "createdAt": "2020-10-15T07:54:17Z",
+ "closedBy": "BurntSushi/ripgrep#1706",
+ "body": "`--no-ignore` is, in my experience, one of the most common flags one would want to pass to ripgrep, but unfortunately it doesn't have a single character alias for its option. Obviously you can just add it by creating an alias under a different name, but it's annoying to do that on every system. It would be great if ripgrep supported such an option out of the box."
+}

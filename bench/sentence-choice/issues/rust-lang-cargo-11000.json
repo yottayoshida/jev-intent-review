@@ -1,0 +1,9 @@
+{
+ "issue": "rust-lang/cargo#11000",
+ "url": "https://github.com/rust-lang/cargo/issues/11000",
+ "title": "`cargo vendor` doesn't generate `.cargo_vcs_info.json`",
+ "author": "yshui",
+ "createdAt": "2022-08-17T19:17:22Z",
+ "closedBy": "rust-lang/cargo#15514",
+ "body": "### Problem\n\nI am not sure if this really is a bug. But rust-skia/skia-bindings' build script expects that there is either a `.cargo_vcs_info.json` in the crate directory, or the crate directory is a git repo. Because `cargo vendor` doesn't create a `.cargo_vcs_info.json`, `skia-bindings` fails to build.\r\n\r\nhttps://github.com/rust-skia/rust-skia/issues/682\n\n### Steps\n\n_No response_\n\n### Possible Solution(s)\n\n_No response_\n\n### Notes\n\n_No response_\n\n### Version\n\n_No response_"
+}

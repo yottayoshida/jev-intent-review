@@ -1,0 +1,9 @@
+{
+ "issue": "tokio-rs/tokio#5088",
+ "url": "https://github.com/tokio-rs/tokio/issues/5088",
+ "title": "Introspect runtime flavor/configuration on Handle",
+ "author": "mooso",
+ "createdAt": "2022-10-10T16:08:21Z",
+ "closedBy": "tokio-rs/tokio#5138",
+ "body": "Some functions in tokio, such as [block_in_place()](https://docs.rs/tokio/1.21.2/tokio/task/fn.block_in_place.html), only work in a multi-threaded runtime. It would be great to be able to inspect the current configuration/flavor of the runtime so that we can conditionally call such functions, e.g.:\r\n\r\n```\r\nif Handle::current().is_multi_threaded() {\r\n    block_in_place(move || { long_running_code(...) })\r\n} else {\r\n    long_running_code(...)\r\n}\r\n```"
+}

@@ -105,7 +105,8 @@ test("loadConfig: no file on either side gives the defaults; a file added by the
     repo.write({ [CONFIG_PATH]: "policy:\n  fail_on: []\n" });
     const after = repo.commit("add a config");
     const added = await loadConfig(git, before, after);
-    assert.deepEqual(added.config.policy.fail_on, ["violation"]);
+    // The default is an empty list (ADR 0007), so an empty list in the file reads back the same.
+    assert.deepEqual(added.config.policy.fail_on, []);
     assert.equal(added.changedInPullRequest, true);
   } finally {
     repo.remove();
