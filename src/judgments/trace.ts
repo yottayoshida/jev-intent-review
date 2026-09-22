@@ -31,7 +31,9 @@ function secrets(env: Environment): string[] {
 
 // macOS exposes these two fixed system aliases as symlinks. Normalize only those aliases before
 // inspecting components; every caller-controlled component is still checked with lstat.
-function canonicalSystemAlias(path: string): string {
+/** @internal Normalizes only macOS's documented fixed aliases before their components are checked. */
+export function canonicalSystemAlias(path: string, platform: NodeJS.Platform = process.platform): string {
+  if (platform !== "darwin") return path;
   for (const [alias, canonical] of [["/var", "/private/var"], ["/tmp", "/private/tmp"]] as const) {
     if (path === alias || path.startsWith(`${alias}/`)) return `${canonical}${path.slice(alias.length)}`;
   }

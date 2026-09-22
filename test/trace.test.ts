@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { JevClient } from "../src/judgments/client.ts";
 import { JevProvider } from "../src/judgments/jev.ts";
 import type { Questions } from "../src/judgments/provider.ts";
-import { TraceWriter, traceFromEnv } from "../src/judgments/trace.ts";
+import { canonicalSystemAlias, TraceWriter, traceFromEnv } from "../src/judgments/trace.ts";
 import { main, type Io } from "../src/cli/main.ts";
 import { fixtureRepo } from "./helpers/repo.ts";
 
@@ -23,6 +23,13 @@ function entry(index = 0) {
     response: { answers: {} },
   };
 }
+
+test("only macOS normalizes its fixed /tmp and /var aliases", () => {
+  assert.equal(canonicalSystemAlias("/tmp/trace.jsonl", "linux"), "/tmp/trace.jsonl");
+  assert.equal(canonicalSystemAlias("/var/log/trace.jsonl", "linux"), "/var/log/trace.jsonl");
+  assert.equal(canonicalSystemAlias("/tmp/trace.jsonl", "darwin"), "/private/tmp/trace.jsonl");
+  assert.equal(canonicalSystemAlias("/var/log/trace.jsonl", "darwin"), "/private/var/log/trace.jsonl");
+});
 
 test("traceFromEnv is opt-in, creates private output, and keeps the observed model only when supplied", async () => {
   assert.equal(traceFromEnv({}), null);
