@@ -1,0 +1,28 @@
+{
+  "_what": "a pull request from a branch of the repository itself: the run gets the secrets",
+  "_copied_from": "https://api.github.com/repos/yottayoshida/jev-intent-review/pulls/54",
+  "_copied_on": "2026-09-22",
+  "action": "opened",
+  "number": 54,
+  "pull_request": {
+    "number": 54,
+    "user": {
+      "login": "yottayoshida"
+    },
+    "head": {
+      "repo": {
+        "full_name": "yottayoshida/jev-intent-review",
+        "fork": false
+      }
+    },
+    "base": {
+      "repo": {
+        "full_name": "yottayoshida/jev-intent-review",
+        "fork": false
+      }
+    }
+  },
+  "repository": {
+    "full_name": "yottayoshida/jev-intent-review"
+  }
+}

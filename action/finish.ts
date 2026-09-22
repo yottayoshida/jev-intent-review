@@ -22,7 +22,7 @@ import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFile
 import { join } from "node:path";
 import { JUDGMENT_ENV } from "../src/judgments/client.ts";
 import { codeBlock, counts, plural, renderMarkdown, resultKind, type ResultKind } from "../src/report/markdown.ts";
-import { EXIT, type ReviewReport } from "../src/types.ts";
+import { EXIT, type ReviewReport, type SkipKind } from "../src/types.ts";
 
 export const CHECK_NAME = "jev-intent-review result";
 /** The job summary's limit is 1 MiB, and a check run's summary 65,535; both are counted in bytes here. */
@@ -49,19 +49,36 @@ export function withoutAnswer(report: ReviewReport): number {
   return n;
 }
 
-function skipped(reason: string | undefined): string {
-  if (reason?.startsWith("No credentials")) return "no credentials";
-  if (reason?.startsWith("No statement of intent")) return "no requirements";
-  return "see the job summary";
+/**
+ * Why the run asked nothing, in the title's words. Read from `skipKind`, never from the wording of
+ * `skipReason` (ADR 0010): three of these sentences begin the same way, and a title decided by their
+ * first words would say "no credentials" for a pull request no key can help. A kind this does not
+ * know — an older report, a newer command — falls through to the summary rather than guessing.
+ */
+function skipped(kind: SkipKind | undefined): string {
+  switch (kind) {
+    case "fork":
+      return "this pull request is from another repository, which gets no secrets";
+    case "dependabot":
+      return "Dependabot pull requests get no secrets";
+    case "no_credentials":
+      return "no credentials";
+    case "no_intent":
+      return "no source of requirements";
+    default:
+      return "see the job summary";
+  }
 }
 
 function titleOf(report: ReviewReport, kind: ResultKind, exitCode: number): string {
   if (exitCode === EXIT.intent) return "Requirements could not be read";
   switch (kind.kind) {
     case "skipped":
-      return `Nothing was checked: skipped (${skipped(report.skipReason)})`;
+      return `Nothing was checked: skipped (${skipped(report.skipKind)})`;
+    // Told apart from the skip above: there the sources were not there at all, here they were read
+    // and hold no requirement in either documented form.
     case "no_requirement":
-      return "Nothing was checked: no requirement";
+      return "Nothing was checked: no requirement in the sources";
     case "nothing_asked":
       return `Nothing was asked: ${plural(kind.inBudget, "call")} in the budget, ${kind.notChecked} not checked`;
     case "none_read":
