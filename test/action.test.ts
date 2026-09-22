@@ -36,8 +36,13 @@ const clean = () => {
 const KINDS: Record<string, ReviewReport> = {
   finished: report(),
   clean: report({ requirements: [clean()] }),
-  skipped: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
-  noIntent: report({ skipReason: "No statement of intent was found: no issue, no description.", requirements: [], sources: [] }),
+  skipped: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", skipKind: "no_credentials", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  fromFork: report({ skipReason: "This pull request comes from another repository, and GitHub gives such a run no secrets, so nothing was judged.", skipKind: "fork", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  fromDependabot: report({ skipReason: "Dependabot's pull requests are given no secrets, so nothing was judged.", skipKind: "dependabot", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  // A report from a command that knew a kind this Action does not, or from one that knew none.
+  skippedUnknownKind: report({ skipReason: "Something else entirely.", skipKind: "a_kind_from_later" as never, requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  skippedNoKind: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  noIntent: report({ skipReason: "No statement of intent was found: no issue, no description.", skipKind: "no_intent", requirements: [], sources: [] }),
   stopped: report({ exitCode: 11, requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
   noRequirement: report({ requirements: [] }),
   // Only the change question answered: the J4-only run of a repository in another language.
@@ -60,9 +65,15 @@ test("the check run concludes from the report's first line: success only when ca
   is("finished", 0, "neutral", /^1 call worth checking of 2 read, 1 not checked$/, true);
   is("finished", 1, "failure", /^1 call worth checking of 2 read/, true);
   is("skipped", 0, "neutral", /^Nothing was checked: skipped \(no credentials\)$/, false);
-  is("noIntent", 0, "neutral", /^Nothing was checked: skipped \(no requirements\)$/, false);
+  is("noIntent", 0, "neutral", /^Nothing was checked: skipped \(no source of requirements\)$/, false);
+  // A key cannot be the fix for either of these, and the title says so instead of naming credentials.
+  is("fromFork", 0, "neutral", /^Nothing was checked: skipped \(this pull request is from another repository, which gets no secrets\)$/, false);
+  is("fromDependabot", 0, "neutral", /^Nothing was checked: skipped \(Dependabot pull requests get no secrets\)$/, false);
+  // A kind this Action does not know, and a report from before there were kinds: neither may borrow
+  // another reason's words.
+  for (const name of ["skippedUnknownKind", "skippedNoKind"]) is(name, 0, "neutral", /^Nothing was checked: skipped \(see the job summary\)$/, false);
   is("stopped", 11, "failure", /^Requirements could not be read$/, false);
-  is("noRequirement", 0, "neutral", /^Nothing was checked: no requirement$/, false);
+  is("noRequirement", 0, "neutral", /^Nothing was checked: no requirement in the sources$/, false);
   // Jev answered — the change question — and no call was read: not a pass.
   is("noneRead", 0, "neutral", /^No call was read: 1 not checked$/, false);
   // `counts.read` is 1 here, and nothing was sent: not a pass either.
