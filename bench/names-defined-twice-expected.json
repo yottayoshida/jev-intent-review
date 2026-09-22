@@ -1,0 +1,1756 @@
+{
+ "what": "What each call reaches, and whether that returns a `Result`, labelled by three fresh subagents reading the calling code — the `use` lines, the aliases and the re-exports — with the narrowing rules of `src/plan/applicability.ts` withheld from them. The majority of three is the label; every vote is kept. The calls are those the second part of #45 changed the decision on: all 33 it makes askable, and a sample of 5 per reason of those it still holds.",
+ "written": "2026-09-22",
+ "how": "bench/names-defined-twice.ts was run first to list the calls whose decision changed; the labellers were given the list (case, clone, commit, file, line, function, call) and nothing else.",
+ "labels": [
+  {
+   "id": "A1",
+   "part": "askable",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+   "line": 114,
+   "function": "dispatch_command",
+   "call": "control_handlers::handle_sandbox(state, session_metadata, &session_key, args)",
+   "reaches": "crates/gateway/src/channel_events/commands/control_handlers.rs:462",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "crates/gateway/src/channel_events/commands/control_handlers.rs:462",
+     "returns": "result",
+     "note": "control_handlers::handle_sandbox is a plain path call; returns ChannelResult<String>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "crates/gateway/src/channel_events/commands/control_handlers.rs:462",
+     "returns": "result",
+     "note": "sibling module control_handlers; returns ChannelResult<String>, alias of moltis_channels Result"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "crates/gateway/src/channel_events/commands/control_handlers.rs:462",
+     "returns": "result",
+     "note": "sibling module fn, returns ChannelResult<String> alias of Result"
+    }
+   ]
+  },
+  {
+   "id": "A2",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/batches.rs",
+   "line": 415,
+   "function": "initiate_rollback",
+   "call": "replay_blocks_from(from_anchor)",
+   "reaches": "trait:core/indexer/src/reactor/executor.rs:58",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:core/indexer/src/reactor/executor.rs:58",
+     "returns": "result",
+     "note": "self.executor is generic E: Executor; NoopExecutor and RuntimeExecutor both implement it"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:core/indexer/src/reactor/executor.rs:58",
+     "returns": "result",
+     "note": "self.executor is generic E: Executor; three impls (Noop/Runtime/Lite), returns anyhow Result<()>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:core/indexer/src/reactor/executor.rs:33",
+     "returns": "result",
+     "note": "self.executor is generic E: Executor; NoopExecutor and RuntimeExecutor both impl it"
+    }
+   ]
+  },
+  {
+   "id": "A3",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/blocks.rs",
+   "line": 136,
+   "function": "simulate",
+   "call": "rollback()",
+   "reaches": "core/indexer/src/runtime/storage.rs:243",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.runtime.storage is Storage (runtime/mod.rs:109); Storage::rollback returns Result<()>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.runtime.storage is Storage; inherent rollback returns anyhow Result<()>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.runtime.storage is Storage; Storage::rollback returns anyhow Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "A4",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/mod.rs",
+   "line": 213,
+   "function": "process_block_event",
+   "call": "rollback(to_height)",
+   "reaches": "core/indexer/src/reactor/blocks.rs:24",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/reactor/blocks.rs:24",
+     "returns": "result",
+     "note": "self is Reactor<E>; inherent rollback(&mut self, height) in blocks.rs returns Result<()>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/reactor/blocks.rs:24",
+     "returns": "result",
+     "note": "inherent Reactor::rollback in impl<E: Executor>, returns anyhow Result<()>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/reactor/blocks.rs:24",
+     "returns": "result",
+     "note": "self.rollback on Reactor<E>, defined in blocks.rs, Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "A5",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/runtime/call.rs",
+   "line": 264,
+   "function": "handle_call",
+   "call": "rollback()",
+   "reaches": "core/indexer/src/runtime/storage.rs:243",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "call.rs is impl Runtime; self.storage is Storage, rollback returns Result<()>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.storage on Runtime is Storage; Storage::rollback returns Result<()>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.storage on Runtime is Storage; rollback returns Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "A6",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/runtime/mod.rs",
+   "line": 302,
+   "function": "publish",
+   "call": "insert_contract(name, bytes)",
+   "reaches": "core/indexer/src/runtime/storage.rs:148",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/runtime/storage.rs:148",
+     "returns": "result",
+     "note": "Storage::insert_contract(&self, name, bytes) returns Result<i64>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/runtime/storage.rs:148",
+     "returns": "result",
+     "note": "Storage::insert_contract returns anyhow Result<i64>, not the queries.rs free function"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/runtime/storage.rs:148",
+     "returns": "result",
+     "note": "Storage::insert_contract returns Result<i64>"
+    }
+   ]
+  },
+  {
+   "id": "A7",
+   "part": "askable",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/runtime/mod.rs",
+   "line": 307,
+   "function": "publish",
+   "call": "rollback()",
+   "reaches": "core/indexer/src/runtime/storage.rs:243",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "same Storage::rollback as A5, called in publish on the error path"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "Storage::rollback returns anyhow Result<()>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/runtime/storage.rs:243",
+     "returns": "result",
+     "note": "self.storage.rollback, same Storage method as A5"
+    }
+   ]
+  },
+  {
+   "id": "A8",
+   "part": "askable",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/commands.rs",
+   "line": 26,
+   "function": "create_annotation",
+   "call": "create_annotation(data)",
+   "reaches": "src/store.rs:124",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/store.rs:124",
+     "returns": "result",
+     "note": "state.store is Arc<Mutex<Store>>; Store::create_annotation returns Result<Annotation>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/store.rs:124",
+     "returns": "result",
+     "note": "store is a MutexGuard<Store> from Arc<Mutex<Store>>; returns crate error Result<Annotation>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/store.rs:124",
+     "returns": "result",
+     "note": "store is a MutexGuard<Store>; Store::create_annotation returns crate error Result"
+    }
+   ]
+  },
+  {
+   "id": "A9",
+   "part": "askable",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/commands.rs",
+   "line": 41,
+   "function": "update_annotation",
+   "call": "update_annotation(&id, data)",
+   "reaches": "src/store.rs:175",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "Store::update_annotation(&self, id, data) returns Result<Annotation>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "Store::update_annotation returns crate::error::Result<Annotation>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "Store::update_annotation returns crate::error::Result<Annotation>"
+    }
+   ]
+  },
+  {
+   "id": "A10",
+   "part": "askable",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 122,
+   "function": "resolve",
+   "call": "update_annotation(&params.annotation_id, data)",
+   "reaches": "src/store.rs:175",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "InstrucktMcpServer.store is Arc<Mutex<Store>>; same Store::update_annotation, map_err follows"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "mcp server holds Arc<Mutex<Store>>; same Store::update_annotation, mapped via map_err"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/store.rs:175",
+     "returns": "result",
+     "note": "self.store is Arc<Mutex<Store>>; same Store::update_annotation, map_err applied"
+    }
+   ]
+  },
+  {
+   "id": "A11",
+   "part": "askable",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/python.rs",
+   "line": 143,
+   "function": "python_which",
+   "call": "Cache::new()",
+   "reaches": "src/cache.rs:54",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "use crate::cache::Cache; Cache::new() returns Result<Self>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "crate::cache::Cache::new returns Result<Self, CacheError> via a local alias"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "crate::cache::Cache::new returns Result<Self> with CacheError"
+    }
+   ]
+  },
+  {
+   "id": "A12",
+   "part": "askable",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/mod.rs",
+   "line": 201,
+   "function": "execute",
+   "call": "install::add_package(args)",
+   "reaches": "src/commands/install.rs:1063",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/commands/install.rs:1063",
+     "returns": "result",
+     "note": "install::add_package(args) returns Result<AddOutcome>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/commands/install.rs:1063",
+     "returns": "result",
+     "note": "install::add_package returns color_eyre Result<AddOutcome>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/commands/install.rs:1063",
+     "returns": "result",
+     "note": "install module fn add_package returns Result<AddOutcome>"
+    }
+   ]
+  },
+  {
+   "id": "A13",
+   "part": "askable",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/run.rs",
+   "line": 208,
+   "function": "run_script",
+   "call": "Cache::new()",
+   "reaches": "src/cache.rs:54",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "run.rs imports crate::cache::Cache; same Cache::new returning Result<Self>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "same crate::cache::Cache imported in run.rs; returns Result<Self>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/cache.rs:54",
+     "returns": "result",
+     "note": "same Cache::new via use crate::cache::Cache in run.rs"
+    }
+   ]
+  },
+  {
+   "id": "A14",
+   "part": "askable",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/resolver.rs",
+   "line": 883,
+   "function": "resolve_with_options",
+   "call": "all(&name)",
+   "reaches": "trait:src/resolver.rs:809",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:src/resolver.rs:809",
+     "returns": "result",
+     "note": "index is &impl PackageIndex; pypi.rs:106 and a test mock at resolver.rs:1291 both implement all"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:src/resolver.rs:809",
+     "returns": "result",
+     "note": "index is &impl PackageIndex; PyPiIndex/InMemoryIndex/test impls, Result<Vec<_>, ResolveError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:src/resolver.rs:803",
+     "returns": "result",
+     "note": "index is &impl PackageIndex; impls in pypi.rs and a resolver test mock"
+    }
+   ]
+  },
+  {
+   "id": "A15",
+   "part": "askable",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/config.rs",
+   "line": 172,
+   "function": "load_config",
+   "call": "permissions_are_safe(&path)",
+   "reaches": "src/config.rs:1156",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/config.rs:1156",
+     "returns": "result",
+     "note": "cfg(unix) variant selected on macOS; returns Result<bool, AppError>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/config.rs:1156",
+     "returns": "result",
+     "note": "cfg(unix) arm taken on macOS; returns Result<bool, AppError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/config.rs:1156",
+     "returns": "result",
+     "note": "cfg(unix) variant on macOS; Result<bool, AppError>"
+    }
+   ]
+  },
+  {
+   "id": "A16",
+   "part": "askable",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/mod.rs",
+   "line": 271,
+   "function": "append",
+   "call": "flock_exclusive(&file)",
+   "reaches": "src/audit/secret.rs:77",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/audit/secret.rs:77",
+     "returns": "result",
+     "note": "imported from super::secret; cfg(unix) variant returns Result<(), io::Error>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/audit/secret.rs:77",
+     "returns": "result",
+     "note": "cfg(unix) flock_exclusive, pub(super) in the audit module; Result<(), io::Error>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/audit/secret.rs:77",
+     "returns": "result",
+     "note": "cfg(unix) flock_exclusive, Result<(), std::io::Error>"
+    }
+   ]
+  },
+  {
+   "id": "A17",
+   "part": "askable",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/verify.rs",
+   "line": 354,
+   "function": "verify_chain",
+   "call": "flock_shared(&file)",
+   "reaches": "src/audit/secret.rs:87",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/audit/secret.rs:87",
+     "returns": "result",
+     "note": "verify.rs imports flock_shared from super::secret; cfg(unix) variant returns Result"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/audit/secret.rs:87",
+     "returns": "result",
+     "note": "cfg(unix) flock_shared; returns Result<(), io::Error>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/audit/secret.rs:87",
+     "returns": "result",
+     "note": "cfg(unix) flock_shared, Result<(), std::io::Error>"
+    }
+   ]
+  },
+  {
+   "id": "A18",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/doctor.rs",
+   "line": 117,
+   "function": "cmd_doctor",
+   "call": "Manifest::load(&root)",
+   "reaches": "src/workspace.rs:407",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "Manifest::load(&Path) in workspace.rs returns Result<Manifest, String>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "Manifest::load returns Result<Manifest, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "use crate::workspace::Manifest; load returns Result<Manifest, String>"
+    }
+   ]
+  },
+  {
+   "id": "A19",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 500,
+   "function": "install_artifact",
+   "call": "Artifact::from_bytes(bytes)",
+   "reaches": "src/sync/artifact.rs:348",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/sync/artifact.rs:348",
+     "returns": "result",
+     "note": "use crate::sync::artifact::Artifact; from_bytes returns Result<Artifact, String>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/sync/artifact.rs:348",
+     "returns": "result",
+     "note": "Artifact::from_bytes returns Result<Artifact, String>, not the knowledge_artifact twin"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/sync/artifact.rs:348",
+     "returns": "result",
+     "note": "Artifact::from_bytes returns Result<Artifact, String>"
+    }
+   ]
+  },
+  {
+   "id": "A20",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 614,
+   "function": "cmd_pull",
+   "call": "SyncState::load_strict(root)",
+   "reaches": "src/sync/commands.rs:87",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "SyncState is defined in this same file; load_strict returns Result<Option<SyncState>, String>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "SyncState::load_strict returns Result<Option<SyncState>, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "SyncState::load_strict returns Result<Option<SyncState>, String>"
+    }
+   ]
+  },
+  {
+   "id": "A21",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 626,
+   "function": "cmd_pull",
+   "call": "get(&key)",
+   "reaches": "src/sync/remote.rs:554",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/sync/remote.rs:554",
+     "returns": "result",
+     "note": "remote from open_remote is a concrete GitRemote, so the impl block resolves statically"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/sync/remote.rs:554",
+     "returns": "result",
+     "note": "remote is a concrete GitRemote from open_remote, not dyn; Result<Vec<u8>, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:src/sync/remote.rs:40",
+     "returns": "result",
+     "note": "remote is &dyn SyncRemote; GitRemote and a test remote both impl get"
+    }
+   ]
+  },
+  {
+   "id": "A22",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 713,
+   "function": "pull_workspace",
+   "call": "Manifest::load(root)",
+   "reaches": "src/workspace.rs:407",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "same Manifest::load; matched on Ok/Err in pull_workspace"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "same Manifest::load, Result<Manifest, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "same Manifest::load, matched on Ok and Err arms"
+    }
+   ]
+  },
+  {
+   "id": "A23",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 746,
+   "function": "pull_workspace",
+   "call": "SyncState::load_strict(&member_dir)",
+   "reaches": "src/sync/commands.rs:87",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "same SyncState::load_strict, applied to member_dir"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "SyncState::load_strict on member_dir; Result<Option<SyncState>, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/sync/commands.rs:87",
+     "returns": "result",
+     "note": "same SyncState::load_strict, per-member call"
+    }
+   ]
+  },
+  {
+   "id": "A24",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 757,
+   "function": "pull_workspace",
+   "call": "get(&key)",
+   "reaches": "trait:src/sync/remote.rs:44",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:src/sync/remote.rs:44",
+     "returns": "result",
+     "note": "remote param is &dyn SyncRemote; GitRemote and a test remote both implement get"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:src/sync/remote.rs:44",
+     "returns": "result",
+     "note": "pull_workspace takes remote: &dyn SyncRemote; GitRemote plus a test impl"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:src/sync/remote.rs:40",
+     "returns": "result",
+     "note": "same &dyn SyncRemote get, Result<Vec<u8>, String>"
+    }
+   ]
+  },
+  {
+   "id": "A25",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 1247,
+   "function": "cmd_pull_all",
+   "call": "Manifest::load(into)",
+   "reaches": "src/workspace.rs:407",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "same Manifest::load, .ok() discards the error in cmd_pull_all"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "Manifest::load(into).ok() drops the error but the callee still returns Result"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/workspace.rs:407",
+     "returns": "result",
+     "note": "same Manifest::load, .ok() applied so it is a Result"
+    }
+   ]
+  },
+  {
+   "id": "A26",
+   "part": "askable",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/knowledge_commands.rs",
+   "line": 669,
+   "function": "cmd_knowledge_pull",
+   "call": "KnowledgeSyncState::load_strict(root)",
+   "reaches": "src/sync/knowledge_commands.rs:91",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "src/sync/knowledge_commands.rs:91",
+     "returns": "result",
+     "note": "KnowledgeSyncState::load_strict returns Result<Option<KnowledgeSyncState>, String>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "src/sync/knowledge_commands.rs:91",
+     "returns": "result",
+     "note": "KnowledgeSyncState::load_strict returns Result<Option<_>, String>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "src/sync/knowledge_commands.rs:91",
+     "returns": "result",
+     "note": "KnowledgeSyncState::load_strict returns Result<Option<..>, String>"
+    }
+   ]
+  },
+  {
+   "id": "A27",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-db/src/lib.rs",
+   "line": 172,
+   "function": "analyze_database",
+   "call": "connect()",
+   "reaches": "trait:crates/dataprof-db/src/lib.rs:58",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:58",
+     "returns": "result",
+     "note": "create_connector returns Box<dyn DatabaseConnector>; mysql/postgres/sqlite all implement connect"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:58",
+     "returns": "result",
+     "note": "connector is Box<dyn DatabaseConnector>; mysql/postgres/sqlite impls, Result<(), DataProfilerError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:56",
+     "returns": "result",
+     "note": "connector is Box<dyn DatabaseConnector>; postgres, mysql and sqlite impls"
+    }
+   ]
+  },
+  {
+   "id": "A28",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-db/src/lib.rs",
+   "line": 188,
+   "function": "analyze_database",
+   "call": "count_table_rows(query)",
+   "reaches": "trait:crates/dataprof-db/src/lib.rs:83",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:83",
+     "returns": "result",
+     "note": "same dyn connector; count_table_rows returns Result<u64, DataProfilerError>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:83",
+     "returns": "result",
+     "note": "dyn DatabaseConnector::count_table_rows returns Result<u64, DataProfilerError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:56",
+     "returns": "result",
+     "note": "same trait object; count_table_rows returns Result<u64, DataProfilerError>"
+    }
+   ]
+  },
+  {
+   "id": "A29",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-db/src/lib.rs",
+   "line": 220,
+   "function": "analyze_database",
+   "call": "profile_query_streaming(&final_query, config.batch_size)",
+   "reaches": "trait:crates/dataprof-db/src/lib.rs:70",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:70",
+     "returns": "result",
+     "note": "same dyn connector; profile_query_streaming returns Result<HashMap, DataProfilerError>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:70",
+     "returns": "result",
+     "note": "dyn DatabaseConnector::profile_query_streaming returns Result<HashMap, DataProfilerError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:56",
+     "returns": "result",
+     "note": "same trait object; profile_query_streaming returns Result<HashMap, _>"
+    }
+   ]
+  },
+  {
+   "id": "A30",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-db/src/lib.rs",
+   "line": 223,
+   "function": "analyze_database",
+   "call": "disconnect()",
+   "reaches": "trait:crates/dataprof-db/src/lib.rs:61",
+   "returns": "result",
+   "agreed": 2,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:61",
+     "returns": "result",
+     "note": "same dyn connector; disconnect returns Result<(), DataProfilerError>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:61",
+     "returns": "result",
+     "note": "dyn DatabaseConnector::disconnect returns Result<(), DataProfilerError>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "trait:crates/dataprof-db/src/lib.rs:56",
+     "returns": "result",
+     "note": "same trait object; disconnect returns Result<(), DataProfilerError>"
+    }
+   ]
+  },
+  {
+   "id": "A31",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-csv/src/lib.rs",
+   "line": 159,
+   "function": "detect_delimiter_from_path",
+   "call": "detect_delimiter(std::io::BufReader::new(file))",
+   "reaches": "crates/dataprof-csv/src/lib.rs:107",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "crates/dataprof-csv/src/lib.rs:107",
+     "returns": "result",
+     "note": "free fn detect_delimiter<R: Read> in the same file; returns std::io::Result<u8>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "crates/dataprof-csv/src/lib.rs:107",
+     "returns": "result",
+     "note": "free generic detect_delimiter<R: Read> in the same file; std::io::Result<u8>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "crates/dataprof-csv/src/lib.rs:107",
+     "returns": "result",
+     "note": "free fn detect_delimiter<R: Read> in the same file, std::io::Result<u8>"
+    }
+   ]
+  },
+  {
+   "id": "A32",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-csv/src/robust_csv.rs",
+   "line": 200,
+   "function": "parse_with_override",
+   "call": "detect_delimiter(file_path)",
+   "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "self.detect_delimiter is the inherent method taking &Path; returns anyhow Result<u8>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "self.detect_delimiter inherent method, not the lib.rs free fn; anyhow Result<u8>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "self.detect_delimiter inherent method, anyhow Result<u8>"
+    }
+   ]
+  },
+  {
+   "id": "A33",
+   "part": "askable",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-csv/src/robust_csv.rs",
+   "line": 367,
+   "function": "parse_csv",
+   "call": "detect_delimiter(file_path)",
+   "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "same inherent method, called from parse_csv with .context()"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "same inherent self.detect_delimiter; anyhow Result<u8>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "crates/dataprof-csv/src/robust_csv.rs:263",
+     "returns": "result",
+     "note": "same inherent method, .context applied to it"
+    }
+   ]
+  },
+  {
+   "id": "R1",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 47,
+   "function": "send_impl",
+   "call": "get(\"content\")",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "params is serde_json::Value; inherent Value::get returns Option<&Value>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "params is serde_json::Value; Value::get returns Option<&Value>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "params is serde_json::Value; Value::get returns Option<&Value>"
+    }
+   ]
+  },
+  {
+   "id": "R2",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 53,
+   "function": "send_impl",
+   "call": "get(\"type\")",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "block is &Value inside the find closure; serde_json Value::get, Option"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "block is &serde_json::Value from arr.iter(); Value::get returns Option"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "block is a &serde_json::Value from arr.iter; Value::get returns Option"
+    }
+   ]
+  },
+  {
+   "id": "R3",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 54,
+   "function": "send_impl",
+   "call": "get(\"text\")",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "same serde_json Value::get on a JSON block, Option<&Value>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "serde_json Value::get on the same &Value; Option<&Value>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "serde_json Value::get on the same block, Option"
+    }
+   ]
+  },
+  {
+   "id": "R4",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 72,
+   "function": "send_impl",
+   "call": "get(\"image_url\")",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "get on a serde_json Value block inside filter_map; Option<&Value>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "serde_json Value::get inside filter_map; Option<&Value>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "serde_json Value::get for image_url, Option<&Value>"
+    }
+   ]
+  },
+  {
+   "id": "R5",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 72,
+   "function": "send_impl",
+   "call": "get(\"url\")",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "chained on the &Value from the previous get; serde_json Value::get, Option"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "chained on the &Value from get(image_url)?; still serde_json Value::get"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "chained serde_json Value::get for url on that &Value, Option"
+    }
+   ]
+  },
+  {
+   "id": "R6",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 772,
+   "function": "prod_reactor_missing_tx_invalidation",
+   "call": "crate::logging::setup()",
+   "reaches": "core/indexer/src/logging.rs:19",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "crate::logging::setup() is a free fn returning unit"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "crate::logging::setup is pub fn setup() with no return value"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "crate logging::setup is pub fn setup() with no return type"
+    }
+   ]
+  },
+  {
+   "id": "R7",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 836,
+   "function": "prod_reactor_missing_tx_invalidation",
+   "call": "shutdown()",
+   "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "ReactorCluster::shutdown(mut self) is async with no return type"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "cluster is ReactorCluster; async fn shutdown(mut self) returns unit"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "ReactorCluster::shutdown(mut self) returns unit"
+    }
+   ]
+  },
+  {
+   "id": "R8",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 842,
+   "function": "prod_reactor_cascade_invalidation",
+   "call": "crate::logging::setup()",
+   "reaches": "core/indexer/src/logging.rs:19",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same crate::logging::setup(), unit"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same crate::logging::setup, returns unit"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same logging::setup, unit"
+    }
+   ]
+  },
+  {
+   "id": "R9",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 893,
+   "function": "prod_reactor_cascade_invalidation",
+   "call": "shutdown()",
+   "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "same ReactorCluster::shutdown, unit"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "ReactorCluster::shutdown returns unit"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:678",
+     "returns": "not",
+     "note": "same ReactorCluster::shutdown, unit"
+    }
+   ]
+  },
+  {
+   "id": "R10",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 899,
+   "function": "prod_reactor_cross_block_cascade_invalidation",
+   "call": "crate::logging::setup()",
+   "reaches": "core/indexer/src/logging.rs:19",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same crate::logging::setup(), unit"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same crate::logging::setup, returns unit"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/logging.rs:19",
+     "returns": "not",
+     "note": "same logging::setup, unit"
+    }
+   ]
+  },
+  {
+   "id": "R11",
+   "part": "reason-sample",
+   "case": "moltis-1064",
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "file": "crates/chat/src/service/chat_impl/send.rs",
+   "line": 69,
+   "function": "send_impl",
+   "call": "ContentBlock::text(text)",
+   "reaches": "crates/sessions/src/message.rs:388",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "crates/sessions/src/message.rs:388",
+     "returns": "not",
+     "note": "ContentBlock comes from moltis_sessions::message; ContentBlock::text returns Self"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "crates/sessions/src/message.rs:388",
+     "returns": "not",
+     "note": "ContentBlock comes from moltis_sessions via the types glob; ContentBlock::text returns Self"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "crates/sessions/src/message.rs:388",
+     "returns": "not",
+     "note": "ContentBlock::text in the sessions crate of this repo returns Self"
+    }
+   ]
+  },
+  {
+   "id": "R12",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/batches.rs",
+   "line": 176,
+   "function": "make_value",
+   "call": "Value::new_block(height, block.hash)",
+   "reaches": "core/indexer/src/consensus/value.rs:103",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "consensus/mod.rs re-exports Value from value.rs; new_block returns Self"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "crate::consensus re-exports value::Value; new_block returns Self, not proposal_part's"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "consensus mod re-exports Value from value.rs; new_block returns Self"
+    }
+   ]
+  },
+  {
+   "id": "R13",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/batches.rs",
+   "line": 183,
+   "function": "make_value",
+   "call": "keys()",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "pending_transactions is a std HashMap; keys() returns the Keys iterator"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "pending_transactions is a std HashMap<Txid, _>; keys() returns a Keys iterator"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "pending_transactions is a std HashMap; keys() returns a Keys iterator"
+    }
+   ]
+  },
+  {
+   "id": "R14",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/batches.rs",
+   "line": 275,
+   "function": "validate_and_accept_proposal",
+   "call": "Value::new_block(*bh, *hash)",
+   "reaches": "core/indexer/src/consensus/value.rs:103",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "same Value::new_block, returns Self::Block"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "same Value::new_block returning Self"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "same Value::new_block, returns Self"
+    }
+   ]
+  },
+  {
+   "id": "R15",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/consensus_state.rs",
+   "line": 387,
+   "function": "get_decided_from_anchor",
+   "call": "Value::new_block(b.anchor_height as u64, anchor_hash)",
+   "reaches": "core/indexer/src/consensus/value.rs:103",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "consensus_state.rs imports Value from crate::consensus; new_block returns Self"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "same Value::new_block returning Self"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/consensus/value.rs:103",
+     "returns": "not",
+     "note": "same Value::new_block, returns Self"
+    }
+   ]
+  },
+  {
+   "id": "R16",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/batches.rs",
+   "line": 133,
+   "function": "process_decided_batch",
+   "call": "height(anchor_height as i64)",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "TransactionRow derives Builder, so .height is a macro-generated setter returning the builder"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "bon Builder derive on TransactionRow generates height(); the setter returns the builder"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "bon derive Builder generates the height setter; it returns the builder"
+    }
+   ]
+  },
+  {
+   "id": "R17",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/handlers.rs",
+   "line": 94,
+   "function": "handle_get_decided_values",
+   "call": "start()",
+   "reaches": "outside",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "range is std RangeInclusive<Height>; start() returns &Height"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "range is a std RangeInclusive<Height>; start() returns &Height"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "not",
+     "note": "range is a std RangeInclusive<Height>; start() returns &Height"
+    }
+   ]
+  },
+  {
+   "id": "R18",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 1239,
+   "function": "prod_reactor_simulate_transaction",
+   "call": "simulate(0, tx)",
+   "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:637",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:637",
+     "returns": "result",
+     "note": "ReactorCluster::simulate over a channel, not Reactor::simulate; returns Result<Vec<OpWithResult>>"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:637",
+     "returns": "result",
+     "note": "ReactorCluster::simulate returns anyhow Result<Vec<OpWithResult>>"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:637",
+     "returns": "result",
+     "note": "ReactorCluster::simulate returns Result<Vec<OpWithResult>>"
+    }
+   ]
+  },
+  {
+   "id": "R19",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/reactor/reactor_cluster_tests.rs",
+   "line": 1249,
+   "function": "prod_reactor_simulate_transaction",
+   "call": "ReactorCluster::assert_checkpoints_match(&block2, 2, cluster.node_count)",
+   "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:653",
+   "returns": "not",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:653",
+     "returns": "not",
+     "note": "assert_checkpoints_match is an associated fn returning unit"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:653",
+     "returns": "not",
+     "note": "associated fn assert_checkpoints_match returns unit, asserts internally"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "core/indexer/src/reactor/reactor_cluster_tests.rs:653",
+     "returns": "not",
+     "note": "assert_checkpoints_match is an assertion helper returning unit"
+    }
+   ]
+  },
+  {
+   "id": "R20",
+   "part": "reason-sample",
+   "case": "kontor-385",
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "file": "core/indexer/src/runtime/file_ledger.rs",
+   "line": 119,
+   "function": "add_file",
+   "call": "add_file(metadata)",
+   "reaches": "outside",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-1",
+     "reaches": "outside",
+     "returns": "result",
+     "note": "inner.ledger is kontor_crypto::FileLedger, an external crate at 0.1.6; map_err shows a Result"
+    },
+    {
+     "by": "labeller-2",
+     "reaches": "outside",
+     "returns": "result",
+     "note": "inner.ledger is kontor_crypto::FileLedger, an external crate; call site map_err so it is a Result"
+    },
+    {
+     "by": "labeller-3",
+     "reaches": "outside",
+     "returns": "result",
+     "note": "inner.ledger is kontor-crypto 0.1.6 FileLedger; map_err shows a Result"
+    }
+   ]
+  }
+ ]
+}
