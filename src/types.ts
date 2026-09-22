@@ -48,7 +48,8 @@ export interface SourceRef {
 /**
  * What the local check asks of a call for this requirement (docs/adr/0006-question-forms-as-data.md).
  *
- * Experimental, and named in the spec only: nothing chooses it from the requirement's words yet.
+ * Experimental. A spec names it; a requirement read from an issue, a pull request or the command
+ * line is asked of Jev, which form its sentence says, before its calls (docs/adr/0008).
  */
 export const REQUIREMENT_FORMS = ["failure_propagation", "check_before_action"] as const;
 export type RequirementForm = (typeof REQUIREMENT_FORMS)[number];
@@ -60,7 +61,7 @@ export interface Requirement {
   priority: Priority;
   sourceRefs: SourceRef[];
   searchHints: string[];
-  /** Absent means `failure_propagation`. Only a spec sets it. */
+  /** Only a spec sets it. Absent: a spec's requirement is `failure_propagation`; one read from text is asked of Jev. */
   form?: RequirementForm;
 }
 

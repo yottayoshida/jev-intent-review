@@ -35,13 +35,19 @@ export class ScriptedProvider implements JudgmentProvider {
  * a call is made unless a check named `guard` comes before it in the body; and every change is
  * `justification`. The two readings never agree by construction: one is scripted, one is read.
  */
-export function formsProvider(options: { mapping?: ChoiceAnswer; guard?: string; justification?: string } = {}): ScriptedProvider {
+export function formsProvider(options: { mapping?: ChoiceAnswer; guard?: string; justification?: string; form?: ChoiceAnswer } = {}): ScriptedProvider {
   const mapping = options.mapping ?? answer("applies");
   return new ScriptedProvider((state, questions): Record<string, ChoiceAnswer> => {
     const body = state.evidence?.code ?? "";
     const flat = body.replace(/\s+/g, " ");
     const out: Record<string, ChoiceAnswer> = {};
     for (const key of Object.keys(questions)) {
+      // The one question about the sentence alone: it names no call, and a scripted `neither` keeps
+      // every other test on the default form, as before.
+      if (key === "requirement_form") {
+        out[key] = options.form ?? answer("neither");
+        continue;
+      }
       const instructions = (questions[key] as { instructions: string }).instructions;
       // The call the question names. A template that stops naming it would make every reading below
       // trivially true, so this stops instead.

@@ -59,6 +59,7 @@ function localCheckResult(): LocalCheckResult {
     requirementId: "R1",
     requirementText: "Disabled users cannot authenticate.",
     form: "failure_propagation",
+    formBy: "spec",
     wouldAsk: [],
     observed: [observed("create_session(store, &record)", "returns_success", 0.61, "violates"), observed("load_key(store, key)", "returns_error", 0.99, "satisfies")],
     unchecked: [{ file: "src/auth.rs", function: "open_session", call: "audit(store)", origin: "changed", why: "audit has no definition in this repository, so what it returns is not established here" }],
@@ -130,7 +131,7 @@ test("the Markdown report leads with a result line drawn from the counts alone, 
 
 test("the Markdown report shows each requirement's calls: worth checking with everything to disagree with, holding, and not checked", () => {
   const text = renderMarkdown(report());
-  assert.match(text, /## R1\n\n> `Disabled users cannot authenticate\.`\n\nForm: `failure_propagation`\./);
+  assert.match(text, /## R1\n\n> `Disabled users cannot authenticate\.`\n\nForm: `failure_propagation` \(named in the spec\)\./);
   assert.match(text, /Of the 2 read: 1 worth checking, 1 holding, 0 not settled, 0 not required of\./);
   assert.match(text, /### Worth checking\n\n#### src\/auth\.rs:16-23 · open_session — `create_session\(store, &record\)`/);
   assert.match(text, /\*\*Jev, on what the function returns\*\*: returns_success \(0\.61\)/);

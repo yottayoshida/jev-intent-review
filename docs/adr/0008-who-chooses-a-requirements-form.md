@@ -6,8 +6,9 @@ Status: Accepted
 
 ADR 0006 made what the local check asks of a call a form, and left one thing open: a requirement
 names its form in the spec (`form`, defaulting to `failure_propagation`), Jev does not choose one,
-and "whether it should is to be measured first, and that decision also settles whether this field
-stays". Every requirement read from an issue or a pull request (ADR 0004) is `failure_propagation`,
+and whether it should was to be measured first — a measurement that would also settle whether the
+field stays (0006's Decision, the bullet on `form`, now rewritten to point here). Every
+requirement read from an issue or a pull request (ADR 0004) is `failure_propagation`,
 so a sentence such as "A disabled API key must never create a session." written in an issue is
 asked the failure questions and reaches nothing — the case #35 opens with.
 
@@ -105,13 +106,24 @@ log to its counts.
   numbers say how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
 
 **Ruling: Jev chooses.** For a requirement read from an issue, a pull request, `--intent` or
-`--intent-file`, the run will put this question once, before the calls, and read the answer by
-the rule above; a spec's `form` stays its author's and is not asked; `--candidates-only` asks
-nothing and says so. That change is its own pull request (with the report's form line, `formBy`
-in `--json`, and the notes in the plan that measured this: the question is put only on the full
-run's path, `neither` is never a form, the fake provider's tripwire is loosened for this key
-only, and requirements read from text carry no `searchHints`). Until it lands, every requirement
-read from text is `failure_propagation`. The `form` field stays.
+`--intent-file`, the run puts this question once, before the calls, and reads the answer by the
+rule above; a spec's `form` stays its author's and is not asked; `--candidates-only` asks nothing
+and says so. The `form` field stays.
+
+**Landed** (2026-09-22, the pull request after #53). Each form carries what its sentence says
+(`says`), and `src/plan/forms.ts` assembles the question from the forms in the measured order;
+`test/forms.test.ts` holds the question's serialisation to this log's hash. `runLocalCheck` asks
+it once per requirement that names no form, before the calls, on a run that reads at least one
+function and is not building the set only — a run that read no function would otherwise send
+requests where it sent none, and could fail on the host where it used to print a report. A
+requirement that names a form is never asked, by the run's own guard; one that names none is asked
+only when the caller says so, and the command line says so for every source but a spec
+(`askForm: !resolved.spec`), so a spec's requirement without `form` is not asked either. The
+requirement's own id is sent where the measurement sent `R1`; the question does not read it. `formBy`,
+`formReading` and `formNotAsked` are in `--json`, and the report's form line says who chose. A
+requirement Jev reads as `check_before_action` whose sentence shares a word with no call is checked
+under that form and reads no call — the report says so for each call it held — rather than falling
+back to the failure questions, which would send questions Jev did not read the sentence as asking.
 
 ## Alternatives considered
 

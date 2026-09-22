@@ -3,6 +3,7 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { readOption } from "../../../src/plan/forms.ts";
 import { BAR } from "../../../src/plan/local-check.ts";
 import type { ChoiceAnswer } from "../../../src/types.ts";
 import { keywordForm, type Label } from "./question.ts";
@@ -106,13 +107,13 @@ export const KINDS: readonly Kind[] = ["tool", "model", "text", "written"];
 
 /**
  * Jev's reading of one answer at the bar: the option chosen, when its probability clears the bar,
- * else `under`; no answer, or an option the question did not offer, is `none`. The same line as
- * `chooseForm`, kept as a label so that `neither` counts as a reading here.
+ * else `under`; no answer, or an option the question did not offer, is `none`. The run's own
+ * `readOption` does the reading, so the scorer and `chooseForm` cannot drift apart; here `neither`
+ * is one of the options read.
  */
 export function readAtBar(answer: ChoiceAnswer | undefined, bar = BAR): Label | "under" | "none" {
-  if (!answer || !LABELS.includes(answer.choice as Label)) return "none";
-  if (answer.probability < bar) return "under";
-  return answer.choice as Label;
+  const read = readOption(answer, LABELS, bar);
+  return read.kind === "option" ? (read.option as Label) : read.kind;
 }
 
 export interface Row {
