@@ -73,7 +73,8 @@ export function hostName(host: Host): string {
  * so that selecting a host, keeping these out of git's environment, and (later) a GitHub Action
  * discarding what it inherited all agree on what they are.
  */
-export const JUDGMENT_ENV = ["JEV_PROVIDER", "JEV_API_URL", "JEV_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "TYPESAFE_API_KEY", "AI_GATEWAY_API_KEY"] as const;
+export const JUDGMENT_SECRET_ENV = ["JEV_API_TOKEN", "CLOUDFLARE_API_TOKEN", "TYPESAFE_API_KEY", "AI_GATEWAY_API_KEY"] as const;
+export const JUDGMENT_ENV = ["JEV_PROVIDER", "JEV_API_URL", "CLOUDFLARE_ACCOUNT_ID", ...JUDGMENT_SECRET_ENV] as const;
 
 /** The kinds that make every later request pointless: the run ends rather than asking again. */
 export const FATAL_KINDS: ReadonlySet<ProviderErrorKind> = new Set<ProviderErrorKind>(["auth", "payment", "endpoint"]);

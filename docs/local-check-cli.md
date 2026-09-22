@@ -67,7 +67,7 @@ an assumption.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
-| a call can be asked about when | its callee has one `fn` definition in the repository and returns a `Result`, and so does the function (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| a call can be asked about when | its callee settles to a definition in the repository that returns a `Result` — one `fn` of its name, or the one the call's path or form picks out of several, or a trait's method whose versions all return one — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
 | the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
@@ -93,9 +93,11 @@ the order they appear. When a function gets fewer questions than it has askable 
 which calls they go to; when more functions hold an askable call than the budget, the functions late
 in the order get none, and each of the others gets one, for its first call.
 
-Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name
-the repository defines (below). A name defined twice resolves to neither, and such a call is not
-asked about. The `check_before_action` form resolves no callee for a call it asks
+Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name the
+repository defines, or, when it defines several, the one the call's path or form picks out — and for
+a trait's method read as one thing, the trait's declaration, which is not where any implementation
+is (*Which definition a call reaches*). A name nothing settles is not asked about and resolves to
+nowhere. The `check_before_action` form resolves no callee for a call it asks
 about — a call whose callee is a function this run reads is not askable there — so its calls keep
 the order they appear in. A changed function the listing's caps left out (see *Notes*) is not
 counted as one.
@@ -105,10 +107,12 @@ counted as one.
 For `failure_propagation`, both the function and its callee must return a `Result`, and that is
 read from each one's signature — never from how the call's line looks:
 
-- The callee is the one `fn <name>` the repository defines outside tests, found by searching for
-  `fn <name>`. A name with no such line, or with more than one, is not asked about, and a search
+- The callee is a `fn <name>` the repository defines outside tests, found by searching for
+  `fn <name>`; a definition in a file some module declares `#[cfg(test)] mod x;` does not count,
+  because no shipped code reaches it. A name with no such line is not asked about, and a search
   stopped at its cap of 200 hits settles nothing. A JavaScript function, a `let` line or a snippet
-  in a Markdown file is not a definition.
+  in a Markdown file is not a definition. When the name has more than one definition,
+  *Which definition a call reaches* below says when one of them is settled.
 - The return type is the signature's own, read past its generics and parameters up to the body, a
   `;` or `where` (at most 30 lines). No `->` is `()`.
 - A name in it is followed: a rename in the same file's `use` (`Result as ChannelResult`), and an
@@ -137,7 +141,46 @@ meet a repository's `fn to_string(accessor, value)`. These checks can only rule 
 never show that a call reaches it: a method call with the right number of arguments still meets the
 one definition of its name, whatever type it is made on — grovedb's `x.value.map_err(…)`, a method
 of the standard library's `Result`, meets `CostContext::map_err`. Calls whose callee is not defined
-here, or is defined more than once, are the next part of `#45`.
+here at all are the next part of `#45`.
+
+#### Which definition a call reaches
+
+A name this repository defines more than once used to end the reading there. Three things narrow
+it, in this order, and what none of them settles is held as before. A name defined **once** is
+unchanged: the path is not read at all, and that one definition is the callee as it always was.
+
+- **The path the call writes.** `SyncState::load_strict(root)` keeps the definitions inside an
+  `impl SyncState`, `impl Trait for SyncState` or `trait SyncState`; `Self::path(root)` keeps those
+  inside the `impl` the call itself is written in; `install::add_package(args)` keeps those written
+  in `install.rs` or `install/mod.rs` **inside the crate the call is in** — a workspace has a
+  `util.rs` in every crate. `crate::`, `super::` and `self::` are passed over. The item a
+  definition sits in is read from indentation — the first line above it that is less indented and
+  begins an item — so a `fn` written above it inside the same `impl` is not its header. A header
+  spread over several lines (`impl<T>` / `Trait for` / `Q` / `{`) cannot be read, and then the call
+  is held: nothing further may settle it, or the form below would pick the very definition the path
+  was about to rule out.
+- **The form of the call.** A method call reaches no definition that takes no `self`, and none that
+  takes a different number of arguments (counted as above). When that leaves one, it is the one.
+  Past 20 definitions after the path, their signatures are not read and the call is held.
+- **Definitions that are versions of one thing.** A trait's method — the declaration
+  `trait X { fn name(…); }` in *this* repository and the implementations of that same trait — or a
+  function written once per platform (`#[cfg(unix)]` and `#[cfg(not(unix))]`, at the top of one
+  file). Which version runs is not settled, so all of them must return a `Result`; one that does
+  not holds the call, and the reason names it. The declaration must be here: two
+  `impl TryFrom<A> for B` blocks do not make `try_from` this repository's method.
+
+**A path that matches none of the definitions is held, never reported as "no definition here".** A
+type brought in under another name (`use moltis_channels::Error as ChannelError`) and a function
+re-exported from another file (`model::values_to_chat_messages`, written in `model/convert.rs`) are
+both real definitions this does not follow; saying they are not defined would be false. For the
+same reason, a name whose only definitions are in files declared `#[cfg(test)] mod x;` is held with
+that as its reason. A module declared `#[cfg(test)]` in one file and plainly in another — a crate
+whose `main.rs` declares it for tests and whose `lib.rs` declares it outright — is code.
+
+When several versions are read together, the definition the report names — and the one the order
+inside a function compares against (*The order inside a function*) — is the trait's declaration, or
+the first of the platform versions. A pull request that changes an implementation rather than the
+declaration is therefore not sorted first by that order.
 
 ## Reading the output
 
@@ -385,13 +428,67 @@ branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`
   only the rules and the list), 808 decisions agree and none disagree for an unknown reason. 72
   disagree for a reason settled and recorded there, and none of them is about what a function
   returns: 49 are about which code counts as test code (a file declared under
-  `#[cfg(test)] mod x;`, which the tool reads as code; an item marked `#[cfg(test)]` on its own),
+  `#[cfg(test)] mod x;`, which the tool read as code at the time — a callee's definitions there no
+  longer count, see *Names defined more than once*; an item marked `#[cfg(test)]` on its own),
   and 23 are calls the labels, which find a callee by name alone, matched to a definition the call
   cannot reach (a method call to a function that takes no `self`, or the wrong number of
   arguments). Nine callees outside the labelled items were labelled afterwards and are marked so.
 - Before this reading, 436 of those decisions said "does not return a Result" of a call whose label
   says it returns one or is not settled.
 - Deciding took 92 seconds in all, against 99 before (one run of each).
+
+### Names defined more than once
+
+Which definition a call reaches, when its name has several (see *Which definition a call reaches*).
+It was built on two pull requests whose fix was held by this — cce-rust#168, where
+`SyncState::load_strict(root)` is one of two `load_strict`, and dataprof#370, where
+`count_table_rows(query)` is a trait's method with three implementations — so those two are
+regression cases from here on, and they are in the acceptance set's record as cases used to tune.
+Measured without a request, before and after, on the acceptance pre-check's eight cases, omamori
+`#468`'s five branches and those two pull requests, 15 runs (`bench/logs/names-defined-twice-v1.json`,
+`node bench/names-defined-twice.ts`):
+
+- Both pull requests' fixed calls can be asked about now, inside the budget of 20: cce-rust#168's
+  `SyncState::load_strict` in `cmd_pull` and in `pull_workspace`, and dataprof#370's
+  `count_table_rows`. cce-rust#168's third, `KnowledgeSyncState::load_strict` in
+  `cmd_knowledge_pull`, is askable and outside the budget.
+- 45 calls can be asked about that could not before (33 distinct calls; omamori's three repeat on
+  its five branches). **None that could before can no longer** — the definitions that stopped
+  counting, in files declared `#[cfg(test)] mod x;`, had settled no call that was asked about.
+- 6 calls fell out of the budget of 20 and 20 entered it. **No call the acceptance set names moved
+  across the budget**: those inside it stay inside, and Kontor#385's `get_decided_from_anchor` is
+  outside it before and after, as *Reading whole signatures* already recorded. Four of the six that
+  fell out are in a function where another call entered; the other two — cce-rust#168's `cmd_sync`
+  and `ensure_index` — lost their function's turn to a function that became askable, so a function
+  can lose its question to another function, not only to a call beside it.
+- 349 calls that are held before and after are held for a different reason. 133 of them are held
+  under a different kind: 63 are now "every definition here is in a file declared
+  `#[cfg(test)] mod x;`" (55 of those used to be "does not return a Result" about a definition in
+  such a file, 8 "not settled"), 42 moved from "defined N times" to what could not be read, 21 to
+  "does not return a Result" with the definition named, and 7 to "this call does not reach any of
+  them". The other 216 keep their kind and say what the narrowing found — which definitions the
+  path left, or that none of them is written under it.
+- Scored against what three fresh subagents said each call reaches, reading the calling code, its
+  `use` lines and its re-exports with the narrowing rules withheld from them
+  (`bench/names-defined-twice-expected.json`, the majority of three, 45 of 53 unanimous): **all 45
+  calls that became askable reach a definition in the repository that returns a `Result`, and none
+  disagrees.** Where a trait's method was settled, the labellers named the implementation and the
+  tool names the declaration; that is the choice above, not a disagreement about what runs.
+- Deciding took 110 seconds over the 15 runs, against 100 before (one run of each); an earlier pair
+  measured 101 and 97, so the difference is not larger than what one run to the next varies by. The
+  extra work is reading the module file above each definition's file, once per file.
+- **There is no held-out repository here.** The rules were shaped by what the counts over these
+  same 15 runs showed, and the two candidates of the acceptance set that nothing has used
+  (`iotaledger/iota#10136`, `getappz/agentflare#229`) cannot serve as one: the first was dropped at
+  the probe condition as a 470 MB monorepo, and every call the second fixes goes to the standard
+  library, which this change does not touch. The labels are what stands in for a held-out set —
+  they were written without the rules.
+- Of 20 calls still held, sampled five per reason and labelled the same way: 9 reach something
+  outside the repository and 6 reach a definition here that returns no `Result` — held rightly; 4
+  are held as "not settled" where the labels say "not a `Result`", which holds them either way; and
+  one — Kontor#385's `simulate(0, tx)` — reaches a definition that does return one, in a file
+  declared `#[cfg(test)] mod x;`. That last one is what this deliberately stops asking about.
+
 ### How Jev reads the form of a sentence
 
 Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it
