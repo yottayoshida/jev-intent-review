@@ -177,7 +177,9 @@ async function measure(id: string, clone: string, limit: number) {
   const c = readCase(id);
   const log: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
   const toolCommit = (await self.text(["rev-parse", "HEAD"])).trim();
-  const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
+  // Every file a question's words come from. `plan/forms.js` joined when questions became forms; a log
+  // started before it names a different set, and is not appended to.
+  const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "plan/forms.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
   const conditions = { tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
   if (Object.keys(log.conditions).length > 0 && JSON.stringify(log.conditions) !== JSON.stringify(conditions)) {
     throw new Error(`the log was started under other conditions:\n${JSON.stringify(log.conditions)}\nnow:\n${JSON.stringify(conditions)}`);

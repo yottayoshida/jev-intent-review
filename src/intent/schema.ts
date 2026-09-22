@@ -4,6 +4,7 @@
 import {
   EXIT,
   PRIORITIES,
+  REQUIREMENT_FORMS,
   REQUIREMENT_KINDS,
   ToolError,
   type Ambiguity,
@@ -71,7 +72,7 @@ export function validateIntentSpec(value: unknown, source: string): IntentSpec {
 
   const requirements: Requirement[] = list(source, "requirements", spec.requirements).map((item, i) => {
     const where = `requirements[${i}]`;
-    const r = object(source, where, item, ["id", "text", "kind", "priority", "sourceRefs", "searchHints"]);
+    const r = object(source, where, item, ["id", "text", "kind", "priority", "sourceRefs", "searchHints", "form"]);
     return {
       id: text(source, `${where}.id`, r.id, 32, true),
       text: text(source, `${where}.text`, r.text, MAX_REQUIREMENT_CHARS, true),
@@ -79,6 +80,8 @@ export function validateIntentSpec(value: unknown, source: string): IntentSpec {
       priority: oneOf(source, `${where}.priority`, r.priority, PRIORITIES, "required"),
       sourceRefs: sourceRefs(source, `${where}.sourceRefs`, r.sourceRefs),
       searchHints: list(source, `${where}.searchHints`, r.searchHints).map((h, j) => text(source, `${where}.searchHints[${j}]`, h, 100, true)),
+      // Kept absent when absent, so a spec without it reads back exactly as it did.
+      ...(r.form === undefined ? {} : { form: oneOf(source, `${where}.form`, r.form, REQUIREMENT_FORMS, "failure_propagation") }),
     };
   });
 

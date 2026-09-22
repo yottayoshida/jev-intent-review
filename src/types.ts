@@ -44,6 +44,14 @@ export interface SourceRef {
   quote: string;
 }
 
+/**
+ * What the local check asks of a call for this requirement (docs/adr/0006-question-forms-as-data.md).
+ *
+ * Experimental, and named in the spec only: nothing chooses it from the requirement's words yet.
+ */
+export const REQUIREMENT_FORMS = ["failure_propagation", "check_before_action"] as const;
+export type RequirementForm = (typeof REQUIREMENT_FORMS)[number];
+
 export interface Requirement {
   id: string;
   text: string;
@@ -51,6 +59,8 @@ export interface Requirement {
   priority: Priority;
   sourceRefs: SourceRef[];
   searchHints: string[];
+  /** Absent means `failure_propagation`. Only a spec sets it. */
+  form?: RequirementForm;
 }
 
 export interface NonGoal {
