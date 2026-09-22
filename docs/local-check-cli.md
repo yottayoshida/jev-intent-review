@@ -35,11 +35,14 @@ the sentence has to say depends on its **form** — what the check asks of each 
 ```
 
 `form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
-from the sentence, and whether Jev could is not measured yet. For `check_before_action` the words
-of the sentence and of `searchHints` decide which calls are asked about (below), so a requirement
-that names no action — "every session-creation path must enforce the same guard" — reaches no
-call, and one whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln`
-(never listed as a call) reaches nothing either. The report says why for each call it holds.
+from the sentence. Whether Jev could is measured — [below](#how-jev-reads-the-form-of-a-sentence),
+on every requirement sentence this repository holds in a spec, fixture or golden file (a spec's
+`ambiguities`, which record what was not read, are not requirements) — and ADR 0008 records what
+was decided on it. For `check_before_action` the words of the sentence and
+of `searchHints` decide which calls are asked about (below), so a requirement that names no
+action — "every session-creation path must enforce the same guard" — reaches no call, and one
+whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as
+a call) reaches nothing either. The report says why for each call it holds.
 
 The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
@@ -64,7 +67,7 @@ an assumption.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
-| a call can be asked about when | its callee is defined once in the repository and returns a `Result`, and so does the function | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| a call can be asked about when | its callee has one `fn` definition in the repository and returns a `Result`, and so does the function (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
 | the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
@@ -82,6 +85,59 @@ A request that fails without ending the run leaves its call unanswered and the r
 that reached the host and got no answer at all fails (exit 12). `--candidates-only`
 stops before the first question and prints which calls are inside the budget and which are not,
 with a reason each; it needs no credentials.
+
+The budget is dealt one call per function at a time — the functions the change touched first, then
+their callers — so no single body takes it. Inside a function, the askable calls whose callee
+resolved to a function the change touched are asked before its other calls, and the rest follow in
+the order they appear. When a function gets fewer questions than it has askable calls, that decides
+which calls they go to; when more functions hold an askable call than the budget, the functions late
+in the order get none, and each of the others gets one, for its first call.
+
+Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name
+the repository defines (below). A name defined twice resolves to neither, and such a call is not
+asked about. The `check_before_action` form resolves no callee for a call it asks
+about — a call whose callee is a function this run reads is not askable there — so its calls keep
+the order they appear in. A changed function the listing's caps left out (see *Notes*) is not
+counted as one.
+
+### Whether a function returns a `Result`
+
+For `failure_propagation`, both the function and its callee must return a `Result`, and that is
+read from each one's signature — never from how the call's line looks:
+
+- The callee is the one `fn <name>` the repository defines outside tests, found by searching for
+  `fn <name>`. A name with no such line, or with more than one, is not asked about, and a search
+  stopped at its cap of 200 hits settles nothing. A JavaScript function, a `let` line or a snippet
+  in a Markdown file is not a definition.
+- The return type is the signature's own, read past its generics and parameters up to the body, a
+  `;` or `where` (at most 30 lines). No `->` is `()`.
+- A name in it is followed: a rename in the same file's `use` (`Result as ChannelResult`), and an
+  alias the repository defines (`type CostResult<T, E> = CostContext<Result<T, E>>`), three deep.
+- It returns a `Result` when one appears anywhere in the type once its names are followed:
+  `io::Result<T>`, `fmt::Result`, `Option<Result<T>>` and `CostContext<Result<T, E>>` all do.
+- It is said **not** to return one only when every name in it is known not to be one: a primitive,
+  `()`, a short list from the standard library (`Option`, `Vec`, `String`, `Box`, `HashMap`, …),
+  or a struct, enum or union the repository defines under that name. Names are matched, not
+  paths: `use dep::Response` beside a `struct Response` elsewhere in the repository reads as that
+  struct. One capital letter that no rename or alias explains reads as a type parameter of the
+  enclosing `impl` and settles nothing; a longer parameter name of an enclosing `impl` (`Ctx`) is
+  matched like any other name, and meets a `struct Ctx` if the repository has one.
+- Anything else is not settled, and the reason says what could not be read: a type from a
+  dependency, `Self`, a type parameter, a trait of the repository after `impl`, aliases that
+  disagree, a signature that did not end. Such a call is not asked about either.
+
+A reason that says a function "does not return a Result" names the definition it read and quotes
+its return type. The callee is still found by its name: `File::open(p)?` in a repository that
+defines one `fn open(&self) -> bool` is held with "the one function named open in this repository
+(…) returns `bool`" — true of that function, and the call is not asked about. A call that cannot
+reach that one definition is held as having no definition here: a method call (`x.name(…)`) to a
+function that takes no `self`, or a number of arguments the function does not take — counted only
+where no closure, comparison, turbofish or character literal is among the arguments. So `"".to_string()` does not
+meet a repository's `fn to_string(accessor, value)`. These checks can only rule a definition out,
+never show that a call reaches it: a method call with the right number of arguments still meets the
+one definition of its name, whatever type it is made on — grovedb's `x.value.map_err(…)`, a method
+of the standard library's `Result`, meets `CostContext::map_err`. Calls whose callee is not defined
+here, or is defined more than once, are the next part of `#45`.
 
 ## Reading the output
 
@@ -108,7 +164,7 @@ form's.
 | **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
 | **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
 | **Read, but not required of by the requirement** | `does_not_apply` over the bar |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, or the budget was spent |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, or the budget was spent |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
 None of the four is a requirement verdict: each is what two answers about one call came to. A
@@ -136,8 +192,8 @@ the enumeration's own caps are counted in the notes.
 
 ## What has been measured
 
-Everything below is about `failure_propagation` except the last part, which is the one measurement
-of `check_before_action`.
+Everything below is about `failure_propagation` except two parts: the one measurement of
+`check_before_action`, and, last, how Jev reads which form a sentence has.
 
 ### Cases that were not used to tune anything
 
@@ -196,8 +252,9 @@ What it shows, and no more than that:
   three runs of three, and neither the shipped code nor the rewrite listed it, or anything else.
   That is two requirements from two repositories.
 - **No question reached a defect placed outside the diff.** The unchanged caller in moltis was held
-  before any question: its return type is `ChannelResult<String>`, a `Result` alias the check does
-  not recognise, and the report says it does not return a `Result`. The other function is outside
+  before any question: its return type is `ChannelResult<String>`, a `Result` alias the check did
+  not recognise then, and the report said it did not return a `Result` (aliases are read since
+  `#45`'s first part — *Reading whole signatures*). The other function is outside
   what v0.1 enumerates by construction; the table says "cap or structure" because the rule fixed
   beforehand gives that label whenever a cap fired in the run. Among the three candidates whose
   fixed call could be asked, the call from the unchanged caller to the changed function reached no
@@ -270,6 +327,140 @@ check-before-action sentence written for the changed function of each acceptance
 guarded call inside the budget on both — grovedb#500's `rewrite_heights` 10th of 17 askable calls
 among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Whether Jev reads
 those right is not measured.
+
+### The order inside a function
+
+The calls into a function the change touched go first in their function (see *What it asks*). What
+this rests on is one case, and it is the case the order was chosen from: in Kontor#385 the call the
+pull request fixed, `batch_to_decided(b)`, sits six lines below a query into a file the pull
+request never touched, and once more calls can be asked about (`#45`), that query takes the
+function's only turn and the fixed call falls outside the budget. Kontor#385 is therefore a
+regression case from here on. The opposite shape — a defect in a call to an unchanged function,
+beside a call into a changed one — is not in any case measured, so whether this order is better
+than line order in general is not known.
+
+Measured without a request, on the eight cases of the acceptance set's pre-check (with every
+version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`, 20 runs
+(`bench/logs/order-first-pass-v1.json`, `node bench/order-first-pass.ts`):
+
+- how many calls each function gets, and in what order the functions take their turns, is the same
+  as in line order in every run;
+- with today's check (the `failure_propagation` form's), the order changes which call is asked in
+  Kontor#385 (three functions) and in omamori `#468` (one function, `run_override_disable`, on every
+  branch); in the other seven cases nothing changes, since every askable call fits in the budget;
+- with a wider check standing in for `#45` (any type whose name ends in `Result` taken as one, and a
+  callee's definition found by `fn <name>` and held when that search is cut — which holds one call
+  today's check asks about, `verify(...)` in grovedb#500's `finalize`), every
+  defect inside the diff stays inside the budget — omamori's two targets, moltis#1064's and
+  grovedb#500's in every version, Kontor#385's — and without the order Kontor#385's falls out.
+  Kontor#385's unchanged caller is outside the budget either way.
+
+The two calls the order swaps on omamori `#468` were asked of Jev three times on every branch under
+both requirements (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in
+any run. On that case the order adds no finding and loses none.
+
+### Reading whole signatures
+
+Whether a function returns a `Result` is read from its whole signature and the repository's aliases
+(see *What it asks*). It was built on the walls `#45` names — moltis#1064, Kontor#385 and
+grovedb#501 — so those three are regression cases from here on. Measured without a request, before
+and after this reading, on the acceptance pre-check's eight cases and omamori `#468`'s five
+branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`):
+
+- The calls `#45` names can be asked about now: moltis#1064's unchanged caller
+  (`dispatch_command` → `handle_title`), grovedb#501's fixed call (`set_base_root_key`) and the
+  caller one hop out from it, all three inside the budget; Kontor#385's unchanged caller
+  (`initiate_rollback` → `get_decided_from_anchor`), outside the budget of 20. Every defect inside
+  the diff stays inside the budget.
+- 98 calls can be asked about that could not before. Nine that could can no longer: grovedb#500's
+  `verify(…)`, whose name has seven definitions that the bare-name search, stopped at 200 hits,
+  used to hide; three `.parse()` calls in Kontor#385 that had been taken for a repository function
+  taking no `self`; and, on each of omamori's five branches, text inside a string literal that the
+  listing reads as a call.
+- The runs said "does not return a Result" 2,794 times before and 2,316 times after. 284 decisions
+  are now not settled, each with what could not be read: 265 of them said "does not return a
+  Result" before, and 19 said there was no definition here.
+- Scored against answers labelled by hand before this reading was written
+  (`bench/result-type-expected.json`: 57 functions and 220 callees, by three fresh subagents given
+  only the rules and the list), 808 decisions agree and none disagree for an unknown reason. 72
+  disagree for a reason settled and recorded there, and none of them is about what a function
+  returns: 49 are about which code counts as test code (a file declared under
+  `#[cfg(test)] mod x;`, which the tool reads as code; an item marked `#[cfg(test)]` on its own),
+  and 23 are calls the labels, which find a callee by name alone, matched to a definition the call
+  cannot reach (a method call to a function that takes no `self`, or the wrong number of
+  arguments). Nine callees outside the labelled items were labelled afterwards and are marked so.
+- Before this reading, 436 of those decisions said "does not return a Result" of a call whose label
+  says it returns one or is not settled.
+- Deciding took 92 seconds in all, against 99 before (one run of each).
+### How Jev reads the form of a sentence
+
+Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it
+choose one (ADR 0008; `bench/forms/choice/`, log `bench/logs/form-choice-v1.json`; 216 requests,
+every one to Cloudflare). Every requirement sentence this repository holds in a spec, fixture or
+golden file — `run.ts verify` enumerates them and a test fails when one is not in the set — the
+four examples in issue #35, and three written from omamori issues whose fix was a check before an
+action: 72 sentences, each labelled `failure_propagation`, `check_before_action` or `neither`
+before the first request, with who wrote it — `tool` (this project, for its fixtures and benches),
+`model` (the requirement-writing model's first output, repaired; fourteen are fragments cut
+mid-sentence, sent as they are), `text` (read by hand from a real issue or pull request, and
+issue #35's examples), `written` (the three). Jev was sent the sentence alone, three times each,
+and asked which of the two forms its sentence says, or neither; an answer counts at the bar of
+0.6. A fixed keyword rule (`must not` / `never` / `unless` → check, tried first; `fail` /
+`error` → failure) is scored beside it for scale and used by nothing.
+`node bench/forms/choice/run.ts score` recomputes this table from the log, and
+`test/form-choice.test.ts` holds the log to these counts.
+
+| label | who wrote it | sentences | fragments | read as its label in 3/3 | read as check in any run | neither / under the bar in any run | keyword rule right |
+|---|---|---|---|---|---|---|---|
+| failure_propagation | all | 18 | 2 | 16/18 | 0/18 | 2/18 | 3/18 |
+| | tool | 15 | 0 | 14/15 | 0/15 | 1/15 | 0/15 |
+| | model | 2 | 2 | 2/2 | 0/2 | 0/2 | 2/2 |
+| | text + written | 1 | 0 | 0/1 | 0/1 | 1/1 | 1/1 |
+| check_before_action | all | 11 | 1 | 10/11 | 10/11 | 1/11 | 8/11 |
+| | tool | 5 | 0 | 5/5 | 5/5 | 0/5 | 4/5 |
+| | model | 1 | 1 | 1/1 | 1/1 | 0/1 | 0/1 |
+| | text + written | 5 | 0 | 4/5 | 4/5 | 1/5 | 4/5 |
+| neither | all | 43 | 11 | 39/43 | 4/43 | 40/43 | 33/43 |
+| | tool | 2 | 0 | 2/2 | 0/2 | 2/2 | 1/2 |
+| | model | 29 | 11 | 26/29 | 3/29 | 26/29 | 24/29 |
+| | text + written | 12 | 0 | 11/12 | 1/12 | 12/12 | 8/12 |
+
+Read against what ADR 0008 said beforehand the numbers would have to show: no failure sentence
+read as check at the bar in any run (0 of 18); at least 80% of the check sentences read as check
+in every run, and no fewer than the keyword rule gets right (10 of 11; the rule 8); at most 10% of
+the neither sentences read as check in any run (4 of 43, exactly the cap). All three met. What the
+rows by author add:
+
+- The two failure sentences not read as failure in every run are the fixture's "A baseline that
+  cannot be read is not reported as no baseline at all." (0.55, 0.57 and 0.60 — under the bar
+  twice, at it once) and the one read by hand from omamori #553, which says `"error"` only as a
+  JSON value (0.51–0.54). Under the bar they fall to the default, which is what they are asked
+  today. The fourteen template sentences and the two model fragments — the other two sentences not
+  in the template, which do say "fail" and "error" — read at 0.95–1.00.
+- The check sentence under the bar is issue #35's "every session-creation path must enforce the
+  same guard;" (0.52–0.55), which names no operation. Its other example, "disabled API keys must
+  never authenticate;", 0.99–1.00; the three written from issues, 1.00; the fixtures' "Disabled
+  users cannot authenticate.", 0.95–0.97; the model's fragment, 0.98.
+- The four neither sentences read as check are of one shape — "voiding the run if a match is
+  found" (sideeye #594, two sentences, 0.88–0.94), "refuses rather than judging if …" (sideeye
+  #602's second sentence, 0.72–0.73, and the one read by hand from it, 0.65 in one run of three
+  and 0.56 and 0.59 in the others): sentences that say what is refused when a condition holds,
+  which the one reader labelled neither. The cap of four is met by that last sentence, which
+  straddles the bar — in the first measurement it was over it in two runs of three. Once Jev
+  chooses, each is asked the check questions about the calls sharing its words instead of the
+  failure questions it is asked today.
+- No sentence of any class was read as `failure_propagation` that was not labelled so.
+
+Fourteen of the eighteen failure sentences are this tool's own template; the other four are one
+fixture sentence, two model fragments and one from a real pull request. Of the eleven check
+sentences, five are this project's bench and fixture sentences, three were written from real
+issues for this measurement, two are issue #35's as written and one is a model's fragment. The
+table says how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
+
+The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
+read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its
+author's. That wiring is a change of its own and is not in this version — until it lands, every
+requirement read from text is `failure_propagation`, as above.
 
 ## Only Jev
 

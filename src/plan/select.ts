@@ -14,7 +14,8 @@
 // in three and the right call once).
 //
 // Then applicability, then one budget for the whole requirement — round-robin over functions, so a
-// single busy body cannot take the run and so the file a function is in cannot either.
+// single busy body cannot take the run and so the file a function is in cannot either. Inside a
+// function, the calls into a function the change touched take its turns first.
 //
 // Nothing here knows a function name, a helper name or an expected answer.
 
@@ -26,7 +27,16 @@ import type { CallCandidate, Candidates, FunctionCandidate } from "./candidates.
  * What decides it differs by form (docs/adr/0006-question-forms-as-data.md); what this module
  * needs is only the answer, and the reason when it is no.
  */
-export type Askability = { ok: true } | { ok: false; kind: string; reason: string };
+export type Askability =
+  | {
+      ok: true;
+      /**
+       * Where the callee resolved to, as `path:line`, when the form resolves one. The failure
+       * form does; the order inside a function reads it (`callsIntoChangedFirst`).
+       */
+      calleeDefinedAt?: string;
+    }
+  | { ok: false; kind: string; reason: string };
 
 /**
  * Why this call is in the set: its function holds a changed line, or its function calls one that
@@ -101,6 +111,52 @@ export function roundRobin(sites: readonly Site[], budget: number): { taken: Sit
 }
 
 /**
+ * Where an askable call's callee resolved to, as `path:line`, when the form that decided it says.
+ *
+ * The failure form's answer carries it; the check-before-action form's does not — a call whose
+ * callee resolves to a function this run reads is not askable there at all — and those calls are
+ * not moved.
+ */
+export function resolvedTo(verdict: Askability | undefined): string | undefined {
+  return verdict?.ok ? verdict.calleeDefinedAt : undefined;
+}
+
+/**
+ * Within each function, the calls into a function the change touched first; the rest keep the
+ * order they were found in. Functions keep theirs.
+ *
+ * When a function gets fewer turns than it has askable calls, this decides which calls they go
+ * to; with more functions holding an askable call than the budget, a function reached at all gets
+ * one, its first. In line order that is whatever comes first in the body. On Kontor#385, once more
+ * calls can be asked about (#45), a query into a file the pull request never touched comes first
+ * and takes the turn of `batch_to_decided(b)`, the decode the pull request changed, six lines
+ * further down. A call into a changed function is where the change reaches the body, and it is
+ * also why a caller one hop out is in the set at all.
+ *
+ * "Into a changed function" is decided by where the callee resolved to — the one `fn` of its name
+ * the repository defines, as the check that decides whether it can be asked about finds it. A name
+ * defined twice resolves to neither, and a search cut at its cap settles nothing.
+ *
+ * ponytail: the evidence that this order is better than line order is that one case, and it is
+ * the case the order was chosen from. The opposite shape — a defect in a call to an unchanged
+ * function, beside a call into a changed one — is untested. Measuring orders against each other
+ * is #38.
+ */
+export function callsIntoChangedFirst(sites: readonly Site[], changedAt: ReadonlySet<string>): Site[] {
+  const intoChanged = (s: Site) => {
+    const at = resolvedTo(s.applicability);
+    return at !== undefined && changedAt.has(at);
+  };
+  const byFunction = new Map<string, Site[]>();
+  for (const s of sites) {
+    const list = byFunction.get(s.fn.id) ?? [];
+    list.push(s);
+    byFunction.set(s.fn.id, list);
+  }
+  return [...byFunction.values()].flatMap((list) => [...list.filter(intoChanged), ...list.filter((s) => !intoChanged(s))]);
+}
+
+/**
  * The selection over every source, under one budget.
  *
  * The budget is per requirement and not per file. Spending it once per file meant a requirement
@@ -149,6 +205,10 @@ export async function selectSites(
     (verdict.ok ? applicable : held).push(withVerdict);
   }
 
-  const { taken, left } = roundRobin(applicable, budget);
+  // Where each changed function is defined, in the form a resolved callee carries.
+  const changedAt = new Set<string>();
+  for (const { fn } of seeds.values()) if (origins.get(fn.id) === "changed") changedAt.add(`${fn.path}:${fn.startLine}`);
+
+  const { taken, left } = roundRobin(callsIntoChangedFirst(applicable, changedAt), budget);
   return { widened, applicable, budgeted: taken, overBudget: left, held, functions };
 }
