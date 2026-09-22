@@ -39,7 +39,8 @@ import { redact } from "../evidence/redact.ts";
 import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
-import type { Candidate, Requirement } from "../types.ts";
+import { codeSpan, intentSection } from "../report/markdown.ts";
+import type { Candidate, IntentSource, IntentSpec, Requirement } from "../types.ts";
 import { applicabilityOf, type Applicability } from "../plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
@@ -356,7 +357,7 @@ const ORIGIN_WORDS: Record<Site["origin"], string> = {
  * answers appear as a choice and a number, named as Jev's, and the reasoning between them is
  * assembled from the parts. No requirement-level verdict appears anywhere.
  */
-export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
+export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { intent: IntentSpec; sources: readonly Omit<IntentSource, "text">[]; prAuthor?: string; notes?: readonly string[] }): string {
   const lines: string[] = [
     "# Local check (experimental)",
     "",
@@ -364,10 +365,13 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
     "",
     "**Nothing here is a requirement verdict.** A call is listed when both answers clear the bar and disagree; the two answers do not check each other, and everything either of them rests on is printed.",
     "",
+    ...(read ? intentSection(read.intent, read.sources, read) : []),
   ];
   for (const r of results) {
     const c = r.counts;
-    lines.push(`## ${r.requirementId}`, "", `> ${r.requirementText}`, "");
+    // The requirement is the author's text: a code span, so no line of it can become a heading, a
+    // comment that hides the rest of the report, or a workflow command; and redacted for display.
+    lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
     lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
     lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`, "");
 
@@ -375,7 +379,7 @@ export function renderLocalCheck(results: readonly LocalCheckResult[]): string {
       lines.push("### Worth checking", "");
       for (const f of r.findings) {
         lines.push(`#### ${f.file}:${f.lines} · ${f.function} — \`${f.call}\``);
-        lines.push(`- **Requirement ${f.requirementId}**: "${f.quote}"`);
+        lines.push(`- **Requirement ${f.requirementId}**: ${codeSpan(f.quote)}`);
         lines.push(`- **Assumed**: ${f.condition}`);
         lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
         lines.push(`- **Jev, on what the function returns**: ${f.observation} (${f.probability.toFixed(2)})`);

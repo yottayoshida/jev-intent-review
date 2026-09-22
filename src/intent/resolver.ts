@@ -20,13 +20,17 @@ export interface ResolvedIntent {
   sources: IntentSource[];
   spec?: IntentSpec; // given directly with --intent-spec: no compiling
   pullRequest?: PullRequest;
-  prBodyOnly: boolean; // the only words describing the change are its author's own
   notes: string[]; // for the report: what was looked for and not found
 }
 
 // Spec §28. The pull request's description is written after the change exists and can describe
 // accidental changes as intended, so it ranks below the issue it answers.
 const AUTHORITY = { spec: 100, cli: 100, file: 100, acceptance_criteria: 100, github_issue: 90, pr_description: 50 } as const;
+
+/** Said in the notes of every run, and as a blocker of a review: intent that exists and was not read. */
+export function issuesNotListed(count: number): string {
+  return `The pull request closes ${count} more issue(s) than GitHub listed (the first 10); they were not read.`;
+}
 
 export async function resolveIntent(
   args: IntentArgs,
@@ -80,7 +84,12 @@ export async function resolveIntent(
   }
 
   const withText = sources.filter((s) => s.type === "spec" || s.text.trim() !== "");
-  const prBodyOnly = withText.length > 0 && withText.every((s) => s.type === "pr_description");
-  const notes = (pullRequest?.missingIssues ?? []).map((n) => `The pull request's text closes #${n}, which is not an issue in this repository; it was not read.`);
-  return { sources: withText, ...(spec ? { spec } : {}), ...(pullRequest ? { pullRequest } : {}), prBodyOnly, notes };
+  // Whether the requirements are the pull request author's own words is decided from where the
+  // requirements were read (`onlyFromPullRequest`), not from which sources had text.
+  const notes = [
+    ...(pullRequest?.missingIssues ?? []).map((n) => `The pull request's text closes #${n}, which is not an issue in this repository; it was not read.`),
+    ...(pullRequest?.foreignIssues ?? []).map((ref) => `The pull request closes ${ref}, an issue in another repository; it was not read.`),
+    ...(pullRequest?.issuesNotListed ? [issuesNotListed(pullRequest.issuesNotListed)] : []),
+  ];
+  return { sources: withText, ...(spec ? { spec } : {}), ...(pullRequest ? { pullRequest } : {}), notes };
 }

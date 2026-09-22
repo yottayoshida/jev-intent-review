@@ -117,7 +117,7 @@ test("over a whole run of the experimental path, every request that is sent asks
     // And the run really did both halves, so this is not a count of zero dressed as agreement.
     const text = out.join("");
     assert.match(text, /### Worth checking/);
-    assert.match(text, /\*\*Requirement R1\*\*: "A baseline that cannot be read/);
+    assert.match(text, /\*\*Requirement R1\*\*: `A baseline that cannot be read/);
     assert.match(text, /\*\*Jev, on what the function returns\*\*: returns_success/);
     assert.equal(code, 0, "a listed call does not change the exit code");
     assert.ok(!/VERIFIED/.test(text), "and no requirement-level status is introduced");

@@ -3,9 +3,10 @@
 // requirement text, code, author names) is put inside a code span or code block, where GitHub
 // renders neither Markdown nor HTML. The result line is drawn from the verdict enum only.
 
+import { redact } from "../evidence/redact.ts";
 import { hostName } from "../judgments/client.ts";
 import { probabilityOf } from "../review/requirement.ts";
-import type { CandidateOutcome, CandidateResult, Location, ReviewReport, RequirementResult, Status } from "../types.ts";
+import type { CandidateOutcome, CandidateResult, IntentSource, IntentSpec, Location, ReviewReport, RequirementResult, Status } from "../types.ts";
 
 /** The longest run of backticks. A loop: spreading every run into Math.max overflows on long text. */
 function longestBacktickRun(text: string): number {
@@ -30,18 +31,24 @@ export function codeBlock(text: string): string {
 }
 
 /** Notes are this tool's own sentences; `<`, `>` and `&` are still escaped so no HTML can form. */
-function note(text: string): string {
+export function note(text: string): string {
   // Brackets too: a note can carry text an endpoint chose, and `[click](http://…)` in a pull
   // request's summary is a link the reader did not ask for.
-  return text
-    .replace(/[\r\n]+/g, " ")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/[[\]]/g, (b) => `\\${b}`)
-    // A bare address is a link on GitHub without any brackets at all. As a code span it reads the
-    // same wherever the report is shown, and links nowhere.
-    .replace(/[a-z][a-z0-9+.-]*:\/\/[^\s`]+/gi, (address) => `\`${address}\``);
+  return (
+    text
+      .replace(/[\r\n]+/g, " ")
+      // The backslash first: `\[x\](//host)` would otherwise become `\\[x\\](//host)`, an escaped
+      // backslash followed by a bracket that still opens a link.
+      .replace(/\\/g, "\\\\")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/[[\]]/g, (b) => `\\${b}`)
+      // A bare address is a link on GitHub without any brackets at all, `www.` ones included. As a
+      // code span it reads the same wherever the report is shown, and links nowhere.
+      // Not `\b`: GitHub links `_www.host` and `_http://host` too, and `_` is a word character.
+      .replace(/(?:(?<![a-z0-9+.-])[a-z][a-z0-9+.-]{0,31}:\/\/|(?<![a-z0-9])www\.)[^\s`]+/gi, (address) => `\`${address}\``)
+  );
 }
 
 export function where(location: Location): string {
@@ -132,6 +139,46 @@ function requirementSection(report: ReviewReport, result: RequirementResult): st
   return lines;
 }
 
+const SOURCE_WORDS: Record<IntentSource["type"], string> = {
+  spec: "the spec file",
+  cli: "--intent",
+  file: "--intent-file",
+  acceptance_criteria: "an acceptance-criteria list",
+  github_issue: "an issue",
+  issue_comment: "an issue comment",
+  pr_description: "the pull request's own description",
+  commit_message: "a commit message",
+};
+
+/**
+ * What was read as requirements, word for word and from where, and every source that was not read
+ * with the reason (ADR 0004). Requirement text, source ids and authors are code spans; the reasons,
+ * what was left out and `notes` (issues the pull request closes that were not read) go through
+ * `note`, since a left-out item quotes the source. A requirement whose source was written by the pull
+ * request's author says so: it is the author's own claim about their own change.
+ */
+export function intentSection(intent: IntentSpec, sources: readonly Omit<IntentSource, "text">[], context: { prAuthor?: string; notes?: readonly string[] } = {}): string[] {
+  const notes = context.notes ?? [];
+  if (intent.requirements.length === 0 && intent.ambiguities.length === 0 && notes.length === 0) return [];
+  const byId = new Map(sources.map((s) => [s.id, s]));
+  const prAuthor = context.prAuthor ?? sources.find((s) => s.type === "pr_description")?.author;
+  const lines = ["## Intent", ""];
+  for (const r of intent.requirements.slice(0, 20)) {
+    const from = r.sourceRefs.map((ref) => {
+      const s = byId.get(ref.sourceId);
+      const own = s?.author !== undefined && s.author === prAuthor;
+      return `${codeSpan(ref.sourceId)}${s ? ` (${SOURCE_WORDS[s.type]}${s.author ? `, by ${codeSpan(s.author)}` : ""}${own ? ", the pull request's author" : ""})` : ""}`;
+    });
+    lines.push(`- ${r.id} read from ${from.join(", ") || "the spec file"}: ${codeSpan(redact(r.text).text)}`);
+  }
+  if (intent.requirements.length > 20) lines.push(`- and ${intent.requirements.length - 20} more`);
+  for (const a of intent.ambiguities.slice(0, 20)) lines.push(`- ${note(a.text)}`);
+  if (intent.ambiguities.length > 20) lines.push(`- and ${intent.ambiguities.length - 20} more not read or left out`);
+  for (const text of notes) lines.push(`- ${note(text)}`);
+  lines.push("");
+  return lines;
+}
+
 export function renderMarkdown(report: ReviewReport): string {
   const out: string[] = ["# jev-intent-review", "", resultLine(report), ""];
 
@@ -148,6 +195,8 @@ export function renderMarkdown(report: ReviewReport): string {
     out.push(`Judged by ${codeSpan(report.sent.endpoint)}, an endpoint set by JEV_API_URL`);
   }
   out.push("");
+  // The notes stay in Coverage, where every run has always put them.
+  out.push(...intentSection(report.intent, report.sources, m.pullRequestAuthor === undefined ? {} : { prAuthor: m.pullRequestAuthor }));
 
   if (report.requirements.length > 0) {
     out.push("## Requirements", "");

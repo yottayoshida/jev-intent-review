@@ -21,10 +21,16 @@ name, no function name, no expected answer.
 }
 ```
 
-An acceptance-criteria list in the issue or the pull request works too — a heading such as
-`## Acceptance criteria` and one item per line, read as written. Ordinary prose is not turned into
-requirements: no model writes them, so a description that is neither a spec file nor such a list
-stops the run and names those two forms.
+The issue and the pull request work too, in two forms read as written (ADR 0004,
+[writing-requirements.md](writing-requirements.md)): the items of a requirements section
+(`## Acceptance criteria`, `## Acceptance`, …), one requirement per item, and a paragraph that begins
+`Property:`. Each source is read on its own. Ordinary prose is not turned into requirements — no
+model writes or picks them — so a source in neither form is named in the report's Intent section
+with the reason, and a run that could read nothing stops (exit 11) and prints that section too. The
+report and `--json` (its `intent`, `sources` and `notes`) say where each requirement came from,
+whether that source's author is the pull request's, and which issues the pull request closes were
+not read. Here that is shown, not acted on: the local check's exit code does not change for it (the
+review withholds VERIFIED instead; whether the GitHub Action should act on it is #41's).
 
 ## What it asks
 
