@@ -60,7 +60,8 @@ export function where(location: Location): string {
   return codeSpan(`${location.path}:${lines}`);
 }
 
-function plural(n: number, word: string): string {
+/** Exported for the Action, whose check-run titles count the same things in the same words. */
+export function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
@@ -225,13 +226,40 @@ function nothingSent(report: ReviewReport): boolean {
   });
 }
 
-function resultLine(report: ReviewReport): string {
-  if (report.skipReason !== undefined) return `**Result: skipped.** ${note(report.skipReason)}`;
+/**
+ * How a run ended, as the report's first line says it. The GitHub Action decides its check run
+ * from this too (ADR 0009), so the two cannot disagree about whether anything was read.
+ */
+export type ResultKind =
+  | { kind: "skipped" }
+  | { kind: "no_requirement" }
+  | { kind: "nothing_asked"; inBudget: number; notChecked: number }
+  | { kind: "none_read"; notChecked: number }
+  | { kind: "read"; read: number; worthChecking: number };
+
+export function resultKind(report: ReviewReport): ResultKind {
+  if (report.skipReason !== undefined) return { kind: "skipped" };
   const n = counts(report);
-  if (report.requirements.length === 0) return "**Result: nothing was checked.**";
-  if (nothingSent(report)) return `**Result: the set was built and nothing was asked.** ${plural(n.inBudget, "call")} inside the budget, ${plural(n.notChecked, "call")} not checked, for the reasons under each requirement.`;
-  if (n.read === 0) return `**Result: no call was read.** ${plural(n.notChecked, "call")} not checked, for the reasons under each requirement. No requirement verdict is stated.`;
-  return `**Result: ${plural(n.worthChecking, "call")} worth checking of ${n.read} read.** No requirement verdict is stated.`;
+  if (report.requirements.length === 0) return { kind: "no_requirement" };
+  if (nothingSent(report)) return { kind: "nothing_asked", inBudget: n.inBudget, notChecked: n.notChecked };
+  if (n.read === 0) return { kind: "none_read", notChecked: n.notChecked };
+  return { kind: "read", read: n.read, worthChecking: n.worthChecking };
+}
+
+function resultLine(report: ReviewReport): string {
+  const r = resultKind(report);
+  switch (r.kind) {
+    case "skipped":
+      return `**Result: skipped.** ${note(report.skipReason ?? "")}`;
+    case "no_requirement":
+      return "**Result: nothing was checked.**";
+    case "nothing_asked":
+      return `**Result: the set was built and nothing was asked.** ${plural(r.inBudget, "call")} inside the budget, ${plural(r.notChecked, "call")} not checked, for the reasons under each requirement.`;
+    case "none_read":
+      return `**Result: no call was read.** ${plural(r.notChecked, "call")} not checked, for the reasons under each requirement. No requirement verdict is stated.`;
+    case "read":
+      return `**Result: ${plural(r.worthChecking, "call")} worth checking of ${r.read} read.** No requirement verdict is stated.`;
+  }
 }
 
 export function renderMarkdown(report: ReviewReport): string {
