@@ -49,7 +49,8 @@ export function isFragment(text: string): boolean {
 
 /** The requirements a spec or fixture file holds, at its top or under `spec`. */
 export function requirementsIn(doc: Record<string, unknown>): { id: string; text: string }[] {
-  const list = Array.isArray(doc.requirements) ? doc.requirements : Array.isArray((doc.spec as Record<string, unknown> | undefined)?.requirements) ? (doc.spec as { requirements: unknown[] }).requirements : [];
+  const list = doc.requirements ?? (doc.spec as Record<string, unknown> | undefined)?.requirements;
+  if (!Array.isArray(list)) return [];
   return list.filter((r): r is { id: string; text: string } => !!r && typeof (r as { text?: unknown }).text === "string");
 }
 
@@ -130,8 +131,9 @@ export interface Row {
 
 export function rows(set: SentenceSet, log: Log): Row[] {
   return set.sentences.map((s) => {
-    const readings = (log.runs[s.id] ?? []).map((r) => readAtBar(r.answer, log.conditions.bar));
-    const probabilities = (log.runs[s.id] ?? []).map((r) => r.answer.probability);
+    const runs = log.runs[s.id] ?? [];
+    const readings = runs.map((r) => readAtBar(r.answer, log.conditions.bar));
+    const probabilities = runs.map((r) => r.answer.probability);
     return {
       id: s.id,
       label: s.label,
@@ -211,10 +213,11 @@ export function renderTables(set: SentenceSet, log: Log): string {
   const missing = all.filter((r) => r.readings.length < log.conditions.runsPerSentence);
   if (missing.length > 0) out.push(`- not fully measured: ${missing.map((r) => r.id).join(", ")}`);
   out.push("");
-  out.push("| sentence | label | who wrote it | fragment | run 1 | run 2 | run 3 | keyword |");
-  out.push("|---|---|---|---|---|---|---|---|");
+  const runColumns = Array.from({ length: log.conditions.runsPerSentence }, (_, i) => i);
+  out.push(`| sentence | label | who wrote it | fragment | ${runColumns.map((i) => `run ${i + 1}`).join(" | ")} | keyword |`);
+  out.push(`|---|---|---|---|${runColumns.map(() => "---|").join("")}---|`);
   for (const r of all) {
-    const cells = [0, 1, 2].map((i) => (r.readings[i] === undefined ? "–" : `${r.readings[i]} ${r.probabilities[i]!.toFixed(2)}`));
+    const cells = runColumns.map((i) => (r.readings[i] === undefined ? "–" : `${r.readings[i]} ${r.probabilities[i]!.toFixed(2)}`));
     out.push(`| ${r.id} | ${r.label} | ${r.kind} | ${r.fragment ? "yes" : ""} | ${cells.join(" | ")} | ${r.keyword} |`);
   }
   return `${out.join("\n")}\n`;

@@ -36,8 +36,9 @@ the sentence has to say depends on its **form** — what the check asks of each 
 
 `form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
 from the sentence. Whether Jev could is measured — [below](#how-jev-reads-the-form-of-a-sentence),
-on every requirement sentence this repository holds in a spec, fixture or golden file — and
-ADR 0008 records what was decided on it. For `check_before_action` the words of the sentence and
+on every requirement sentence this repository holds in a spec, fixture or golden file (a spec's
+`ambiguities`, which record what was not read, are not requirements) — and ADR 0008 records what
+was decided on it. For `check_before_action` the words of the sentence and
 of `searchHints` decide which calls are asked about (below), so a requirement that names no
 action — "every session-creation path must enforce the same guard" — reaches no call, and one
 whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as
@@ -312,22 +313,24 @@ in every run, and no fewer than the keyword rule gets right (10 of 11; the rule 
 the neither sentences read as check in any run (4 of 43, exactly the cap). All three met. What the
 rows by author add:
 
-- The two failure sentences not read as failure in every run are the two not written in the
-  template: the fixture's "A baseline that cannot be read is not reported as no baseline at all."
-  (0.55, 0.57 and 0.60 — under the bar twice, at it once) and the one read by hand from omamori
-  #553, which says `"error"` only as a JSON value (0.51–0.54). Under the bar they fall to the
-  default, which is what they are asked today. The fourteen template sentences and the two model
-  fragments read at 0.95–1.00.
+- The two failure sentences not read as failure in every run are the fixture's "A baseline that
+  cannot be read is not reported as no baseline at all." (0.55, 0.57 and 0.60 — under the bar
+  twice, at it once) and the one read by hand from omamori #553, which says `"error"` only as a
+  JSON value (0.51–0.54). Under the bar they fall to the default, which is what they are asked
+  today. The fourteen template sentences and the two model fragments — the other two sentences not
+  in the template, which do say "fail" and "error" — read at 0.95–1.00.
 - The check sentence under the bar is issue #35's "every session-creation path must enforce the
   same guard;" (0.52–0.55), which names no operation. Its other example, "disabled API keys must
   never authenticate;", 0.99–1.00; the three written from issues, 1.00; the fixtures' "Disabled
   users cannot authenticate.", 0.95–0.97; the model's fragment, 0.98.
 - The four neither sentences read as check are of one shape — "voiding the run if a match is
   found" (sideeye #594, two sentences, 0.88–0.94), "refuses rather than judging if …" (sideeye
-  #602's second sentence, 0.72–0.73, and the one read by hand from it, 0.65 in one run of three):
-  sentences that say what is refused when a condition holds, which the one reader labelled neither.
-  Once Jev chooses, each is asked the check questions about the calls sharing its words instead of
-  the failure questions it is asked today.
+  #602's second sentence, 0.72–0.73, and the one read by hand from it, 0.65 in one run of three
+  and 0.56 and 0.59 in the others): sentences that say what is refused when a condition holds,
+  which the one reader labelled neither. The cap of four is met by that last sentence, which
+  straddles the bar — in the first measurement it was over it in two runs of three. Once Jev
+  chooses, each is asked the check questions about the calls sharing its words instead of the
+  failure questions it is asked today.
 - No sentence of any class was read as `failure_propagation` that was not labelled so.
 
 Fourteen of the eighteen failure sentences are this tool's own template; the other four are one

@@ -79,21 +79,25 @@ fragments), three runs each, 216 requests to Cloudflare, log `bench/logs/form-ch
 set committed at e8d0406 before the first request. A first set of 69, committed at e04ff98, had
 left out the requirements of three test fixtures; its measurement (207 requests, 38ee6ac in the
 pull request's history) was set aside and the whole measurement taken again on the completed
-set — the shared sentences read the same at the bar except the fixture's baseline sentence,
-under the bar three times there and twice here. `verify` now enumerates every requirement sentence
+set — the shared sentences read the same at the bar except two: the fixture's baseline sentence,
+under the bar three times there and twice here, and the sentence read by hand from sideeye #602,
+read as check in two runs of three there and one here. `verify` now enumerates every requirement sentence
 in the repository's spec, fixture and golden files and a test fails when one is not in the set.
 The table is in `docs/local-check-cli.md` ("How Jev reads the form of a sentence"),
 `node bench/forms/choice/run.ts score` recomputes it, and `test/form-choice.test.ts` holds the
 log to its counts.
 
 - Failure sentences read as check at the bar in any run: **0 of 18** (bar 0 — met). Two are not
-  read as failure in every run — the two not written in the template — and fall to the default
-  when under the bar.
+  read as failure in every run — the fixture's baseline sentence and the one read by hand from a
+  real pull request, neither of which says "fails" the way the template does — and fall to the
+  default when under the bar.
 - Check sentences read as check at the bar in every run: **10 of 11** (91%; bar 80%, and the
   keyword rule's 8 — met). The one under the bar names no operation ("every session-creation path
   must enforce the same guard;", 0.52–0.55).
 - Neither sentences read as check at the bar in any run: **4 of 43** (bar at most 4 — met, exactly).
-  All four say what is refused or voided when a condition holds.
+  All four say what is refused or voided when a condition holds, and the fourth straddles the bar
+  (0.65 in one run, 0.56 and 0.59 in the others; over it twice in the first measurement) — the
+  cap is met by one reading at the edge, not with room to spare.
 - Nothing was read as failure that was not labelled so.
 - Of the eleven check sentences, five are this project's bench and fixture sentences, three were
   written from real issues for this measurement, two are issue #35's as written and one is a

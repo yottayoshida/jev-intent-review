@@ -33,7 +33,10 @@ const SET = join(HERE, "sentences.json");
 const LOG = join(ROOT, "bench/logs/form-choice-v1.json");
 
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
-const readSet = () => ({ raw: readFileSync(SET, "utf8"), set: JSON.parse(readFileSync(SET, "utf8")) as SentenceSet });
+const readSet = () => {
+  const raw = readFileSync(SET, "utf8");
+  return { raw, set: JSON.parse(raw) as SentenceSet };
+};
 
 /** The text at the place a sentence says it came from, or why it could not be looked up. */
 function textAt(s: Sentence): { text: string } | { byHand: true } | { missing: string } {
@@ -56,7 +59,7 @@ function textAt(s: Sentence): { text: string } | { byHand: true } | { missing: s
 }
 
 function verify(): number {
-  const { set } = readSet();
+  const { raw, set } = readSet();
   let bad = 0;
   let byHand = 0;
   for (const s of set.sentences) {
@@ -92,7 +95,7 @@ function verify(): number {
   console.log(`${set.sentences.length} sentences: ${LABELS.map((l) => `${l} ${count((s) => s.label === l)}`).join(", ")}`);
   console.log(`by author: ${KINDS.map((k) => `${k} ${count((s) => s.origin.kind === k)}`).join(", ")}; fragments ${count((s) => isFragment(s.text))}`);
   console.log(`${set.sentences.length - byHand} checked against their files, ${byHand} from an issue (checked by hand, see README); ${bad} problem(s)`);
-  console.log(`set sha256 ${sha256(readSet().raw)}, question sha256 ${QUESTION_HASH}`);
+  console.log(`set sha256 ${sha256(raw)}, question sha256 ${QUESTION_HASH}`);
   return bad === 0 ? 0 : 1;
 }
 

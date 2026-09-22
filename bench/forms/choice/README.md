@@ -34,7 +34,8 @@ sentences: the constructed case's "A disabled API key must never create a sessio
 "Every sentence" means every `requirements[]` (at the top or under `spec`) of a JSON file under
 `bench/` or `test/fixtures/`, the golden's `cases`, and the candidates' `requirement` — which
 `verify` enumerates and a test checks against the set, so a sentence added to the repository
-without a label fails the build. Left out, and only these: `bench/logs/`, whose files are records
+without a label fails the build. A spec's `ambiguities` and `nonGoals` are not requirements and
+are not enumerated. Left out, and only these: `bench/logs/`, whose files are records
 of runs and copy the specs those runs were given (one, `jev-only-v1.json`, holds the sentence of
 omamori pull request #476, which no spec file keeps), and `bench/sentence-choice/`, whose units
 are prose to choose sentences from, not requirement specs.
@@ -45,7 +46,9 @@ does not match …", a fragment) is labelled check, its sibling `-R2` neither, s
 is the refusal and R2's is where the outputs are read from; `golden-sideeye-602-1`, which ends in
 the same refusal after a longer claim, is neither for the same reason; issue #35's "every
 session-creation path must enforce the same guard;" is check, as `docs/local-check-cli.md` already
-treats it (a check sentence that names no call).
+treats it (a check sentence that names no call); the `scope-creep` fixture's "A failed OAuth token
+exchange is retried once before the login fails." is neither — it says what is retried, not that
+the failure must reach the caller rather than a success.
 
 The seven sentences from issues (`origin.url`) were compared with the issue text by hand on
 2026-09-22; the other 62 are checked by `verify` against their files.
