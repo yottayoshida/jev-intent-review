@@ -1,0 +1,4752 @@
+{
+  "what": "Answers labelled by hand for #45's first part: whether each target and callee returns a `Result`, from the source at each case's commit. Written before the change's code existed, by three fresh subagents given only the rules below and the list of items; copied here as they wrote them.",
+  "items": "Every target and callee the tool before the change called \"does not return a Result\" on the 13 pre-check runs (bench/acceptance/precheck-shipped.json's eight cases and omamori #468's five branches), and every callee a rough stand-in for the change expected to be judged for the first time. A call outside these is not labelled.",
+  "rules": [
+    "The callee's definitions: `git grep -w -F \"fn <name>\"` in `.rs` files outside tests, keeping a line where `fn <name>` is followed by `(` or `<` and the line defines the function. More than 200 lines: cut. None: no_def. More than one: ambiguous.",
+    "The return type: after `fn <name>`, skip the generics `<…>` (a `->` inside is one token) and the parameters `(…)`; from a following `->` to the `{`, `;` or `where` at depth 0. No `->`: `()`. Comments ignored. Not ended within 30 lines: not readable.",
+    "Names in it are followed three deep: a `X as Name` in the file's `use` statements (multi-line, nested) becomes X; a `type Name<…> = rhs;` in the repository (`.rs`, outside tests) becomes rhs — definitions that disagree once followed settle nothing; the function's own type parameters settle nothing.",
+    "returns: a path segment `Result` anywhere in the followed type (`Result<…>`, `io::Result<…>`, `anyhow::Result<…>`, `fmt::Result`, `Option<Result<…>>`, `CostContext<Result<…>>`, `impl Future<Output = Result<…>>`).",
+    "not: no `Result`, and every name known not to be one — a primitive, `()`, `!`, the standard names Option Vec String Box Arc Rc HashMap HashSet BTreeMap BTreeSet VecDeque PathBuf Path Duration Instant Cow Pin Iterator Fn FnMut FnOnce (`&`, `mut`, lifetimes, `dyn` and `impl` skipped), or a struct, enum or union the repository defines with no `type` of the same name.",
+    "unknown: anything else — a dependency's type, `Self`, a type parameter, a trait of the repository after `impl`/`dyn`, not readable, an alias that could not be followed. A standard name is followed as an alias when the repository defines a `type` of that name.",
+    "Tests: a path with a `tests/`, `test/`, `spec/`, `__tests__/`, `testdata/` or `fixtures/` directory, a file ending `.test.`, `-test.`, `_test.`, `.spec.` and the like, and code inside a `#[cfg(test)]` module."
+  ],
+  "targets": [
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/chat/src/service/chat_impl.rs",
+      "function": "send",
+      "label": "returns",
+      "returnType": "ServiceResult",
+      "expandedTo": "Result<Value, ServiceError>",
+      "via": [
+        "crates/service-traits/src/error.rs:52 pub type ServiceResult<T = Value> = Result<T, ServiceError>;"
+      ],
+      "why": "ServiceResult は repo 内の type 別名（定義は 1 つ）で Result<T, ServiceError> に展開され、T の既定値は Value"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/chat/src/service/chat_impl/send.rs",
+      "function": "send_impl",
+      "label": "returns",
+      "returnType": "ServiceResult",
+      "expandedTo": "Result<Value, ServiceError>",
+      "via": [
+        "crates/service-traits/src/error.rs:52 pub type ServiceResult<T = Value> = Result<T, ServiceError>;"
+      ],
+      "why": "ServiceResult は repo 内の type 別名（定義は 1 つ）で Result<T, ServiceError> に展開され、T の既定値は Value"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/gateway/src/channel_events/commands/dispatch.rs",
+      "function": "dispatch_command",
+      "label": "returns",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>",
+      "via": [
+        "crates/gateway/src/channel_events/commands/dispatch.rs:3 use moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult};"
+      ],
+      "why": "同じファイルの use に Result as ChannelResult があり、Result に展開される"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+      "function": "handle_title",
+      "label": "returns",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:6 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, moltis_sessions::metadata::SqliteSessionMetadata, };"
+      ],
+      "why": "同じファイルの use（5-8 行の入れ子の {…}）に Result as ChannelResult があり、Result に展開される"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/gateway/src/chat.rs",
+      "function": "trigger_auto_title",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "async fn で -> が無いので ()"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/gateway/src/methods/services/sessions.rs",
+      "function": "register",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "path": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_if_needed",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "async fn で -> が無いので ()"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+      "function": "compute_state_root",
+      "label": "not",
+      "returnType": "[u8; 32]",
+      "expandedTo": "[u8; 32]",
+      "via": [],
+      "why": "u8 は組み込みで、長さはリテラル 32。repo に type u8 は無い"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-commitment-tree/src/lib.rs",
+      "function": "compute_commitment_tree_state_root",
+      "label": "not",
+      "returnType": "[u8; 32]",
+      "expandedTo": "[u8; 32]",
+      "via": [],
+      "why": "u8 は組み込みで、長さはリテラル 32。repo に type u8 は無い"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+      "function": "node_hash",
+      "label": "not",
+      "returnType": "[u8; 32]",
+      "expandedTo": "[u8; 32]",
+      "via": [],
+      "why": "u8 は組み込みで、長さはリテラル 32。repo に type u8 は無い"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+      "function": "test_single_insert",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()（#[test] 関数）"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+      "function": "test_sequential_fill_height_2",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()（#[test] 関数）"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "grovedb-merkle-mountain-range/src/node.rs",
+      "function": "leaf_hash",
+      "label": "not",
+      "returnType": "[u8; 32]",
+      "expandedTo": "[u8; 32]",
+      "via": [],
+      "why": "u8 は組み込みで、長さはリテラル 32。repo に type u8 は無い"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "path": "merk/benches/merk.rs",
+      "function": "restore_500_1",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()（bench 関数）"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "node_hash",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "combine_hash",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "node_hash_with_count",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "value_hash",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "kv_hash",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "path": "merk/src/tree/hash.rs",
+      "function": "kv_digest_to_kv_hash",
+      "label": "unknown",
+      "returnType": "CostContext<CryptoHash>",
+      "expandedTo": "CostContext<[u8; HASH_LENGTH]> または CostContext<[u8; 32]>（CryptoHash の定義が 2 つ）",
+      "via": [
+        "grovedb-query/src/proofs/mod.rs:22 pub type CryptoHash = [u8; HASH_LENGTH];",
+        "grovedbg-types/src/lib.rs:274 pub type CryptoHash = [u8; 32];"
+      ],
+      "why": "CryptoHash の type 定義が 2 つあり展開後が食い違う（[u8; HASH_LENGTH] と [u8; 32]）ので決められない。また HASH_LENGTH は一覧にも struct/enum にも無い名前。CostContext は costs/src/context.rs:34 の struct。意味上は HASH_LENGTH = 32（grovedb-query/src/proofs/mod.rs:16）で両者は同じ [u8; 32]、Result は含まない"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "path": "native-contracts/staking/src/lib.rs",
+      "function": "set_genesis_set",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/atomic_file.rs",
+      "function": "describe_file_type",
+      "label": "not",
+      "returnType": "&'static str",
+      "expandedTo": "&'static str",
+      "via": [],
+      "why": "& とライフタイムを読み飛ばすと str だけで、組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/mod.rs",
+      "function": "read_hwm",
+      "label": "not",
+      "returnType": "HwmState",
+      "expandedTo": "HwmState",
+      "via": [],
+      "why": "HwmState は src/audit/mod.rs:459 の enum で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/report.rs",
+      "function": "aggregate_events",
+      "label": "not",
+      "returnType": "Option<EventStats>",
+      "expandedTo": "Option<EventStats>",
+      "via": [],
+      "why": "EventStats は src/audit/report.rs:253 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/secret.rs",
+      "function": "with_key_store_lock",
+      "label": "unknown",
+      "returnType": "T",
+      "expandedTo": "T",
+      "via": [],
+      "why": "T は with_key_store_lock 自身のジェネリクスで宣言された型引数なので決められない"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/secret.rs",
+      "function": "load_signing_key_locked",
+      "label": "not",
+      "returnType": "SigningKey",
+      "expandedTo": "SigningKey",
+      "via": [],
+      "why": "SigningKey は src/audit/secret.rs:138 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/secret.rs",
+      "function": "load_keyring_locked",
+      "label": "not",
+      "returnType": "Keyring",
+      "expandedTo": "Keyring",
+      "via": [],
+      "why": "Keyring は src/audit/secret.rs:568 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/secret.rs",
+      "function": "load_or_create_secret",
+      "label": "not",
+      "returnType": "Option<[u8; 32]>",
+      "expandedTo": "Option<[u8; 32]>",
+      "via": [],
+      "why": "Option は標準の名前、u8 は組み込みで、長さはリテラル 32"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/verify.rs",
+      "function": "audit_summary",
+      "label": "not",
+      "returnType": "AuditSummary",
+      "expandedTo": "AuditSummary",
+      "via": [],
+      "why": "AuditSummary は src/audit/verify.rs:213 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/audit/verify.rs",
+      "function": "count_unknown_tool_fail_opens_within",
+      "label": "not",
+      "returnType": "u64",
+      "expandedTo": "u64",
+      "via": [],
+      "why": "u64 は組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/break_glass.rs",
+      "function": "is_bypassed",
+      "label": "not",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool は組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/break_glass.rs",
+      "function": "is_bypassed_inner",
+      "label": "not",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool は組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/break_glass.rs",
+      "function": "bypass_info",
+      "label": "not",
+      "returnType": "Option<BreakGlassEntry>",
+      "expandedTo": "Option<BreakGlassEntry>",
+      "via": [],
+      "why": "BreakGlassEntry は src/break_glass.rs:41 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/break_glass.rs",
+      "function": "read_state",
+      "label": "not",
+      "returnType": "Option<BreakGlassState>",
+      "expandedTo": "Option<BreakGlassState>",
+      "via": [],
+      "why": "BreakGlassState は src/break_glass.rs:35 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/break_glass.rs",
+      "function": "read_active_entries",
+      "label": "not",
+      "returnType": "Vec<BreakGlassEntry>",
+      "expandedTo": "Vec<BreakGlassEntry>",
+      "via": [],
+      "why": "BreakGlassEntry は src/break_glass.rs:41 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/drift.rs",
+      "function": "analyze",
+      "label": "not",
+      "returnType": "DriftResult",
+      "expandedTo": "DriftResult",
+      "via": [],
+      "why": "DriftResult は src/drift.rs:48 の struct で、同名の type は無い（名前に Result を含むがパスの部分としての Result ではない）"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/engine/shim.rs",
+      "function": "ensure_hooks_current_at_with_verifier_and_exe",
+      "label": "not",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool は組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/engine/shim.rs",
+      "function": "ensure_settings_current_for",
+      "label": "not",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool は組み込み"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "read_config_entry",
+      "label": "not",
+      "returnType": "Option<ConfigEntry>",
+      "expandedTo": "Option<ConfigEntry>",
+      "via": [],
+      "why": "ConfigEntry は src/integrity.rs:53 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "read_config_entry",
+      "label": "not",
+      "returnType": "Option<ConfigEntry>",
+      "expandedTo": "Option<ConfigEntry>",
+      "via": [],
+      "why": "key の行 1279 は定義行ではない（1278 行目の fn read_config_entry の本体の let 行。ファイル内に fn read_config_entry は 1 つだけなので、その定義で判定）。ConfigEntry は src/integrity.rs:53 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "read_config_entry",
+      "label": "not",
+      "returnType": "Option<ConfigEntry>",
+      "expandedTo": "Option<ConfigEntry>",
+      "via": [],
+      "why": "key の行 1281 は定義行ではない（1278 行目の fn read_config_entry の本体の return None 行。ファイル内に fn read_config_entry は 1 つだけなので、その定義で判定）。ConfigEntry は src/integrity.rs:53 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_cursor_snippet",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_cursor_snippet",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 408 は定義行ではない（407 行目の fn check_cursor_snippet の本体の let 行。ファイル内に fn check_cursor_snippet は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_cursor_snippet",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 410 は定義行ではない（407 行目の fn check_cursor_snippet の本体の空行。ファイル内に fn check_cursor_snippet は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_claude_settings_integration_with_verifier",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "定義は 532-536 行で、-> CheckItem は 536 行。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_claude_settings_integration_with_verifier",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 533 は定義行ではない（532 行目の fn check_claude_settings_integration_with_verifier の引数 base_dir: &Path の行。ファイル内に fn check_claude_settings_integration_with_verifier は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_claude_settings_integration_with_verifier",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 535 は定義行ではない（532 行目の fn check_claude_settings_integration_with_verifier の引数 resolved_exe: &ResolvedExe の行。ファイル内に fn check_claude_settings_integration_with_verifier は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い。この行の ResolvedExe（797 行 type ResolvedExe = std::io::Result<PathBuf>）は引数の型で戻り値ではない"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_hook_hash",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "定義は 867-872 行で、引数 render: fn(&Path) -> String の -> は引数の括弧の中なので飛ばす。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_hook_hash",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 868 は定義行ではない（867 行目の fn check_hook_hash の引数 hooks_dir: &Path の行。ファイル内に fn check_hook_hash は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "path": "src/integrity.rs",
+      "function": "check_hook_hash",
+      "label": "not",
+      "returnType": "CheckItem",
+      "expandedTo": "CheckItem",
+      "via": [],
+      "why": "key の行 870 は定義行ではない（867 行目の fn check_hook_hash の引数 render: fn(&Path) -> String の行。この -> String は引数の fn 型のもので戻り値ではない。ファイル内に fn check_hook_hash は 1 つだけなので、その定義で判定）。CheckItem は src/integrity.rs:66 の struct で、同名の type は無い"
+    },
+    {
+      "repo": "instruckt-tauri",
+      "commits": [
+        "a808734a5b264a433e74f96126b9a8159c19e641"
+      ],
+      "path": "src/lib.rs",
+      "function": "init",
+      "label": "unknown",
+      "returnType": "TauriPlugin<R>",
+      "expandedTo": "TauriPlugin<R>",
+      "via": [],
+      "why": "TauriPlugin は依存クレート tauri の型（src/lib.rs:10 の use tauri::plugin::{Builder, TauriPlugin}、repo に定義なし）、R は init 自身の型引数"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/mcp/schema.rs",
+      "function": "build_tools_list",
+      "label": "not",
+      "returnType": "Vec<Tool>",
+      "expandedTo": "Vec<Tool>",
+      "via": [],
+      "why": "Tool は repo 内の struct（src/mcp/mod.rs:76 と src/sbom.rs:17。このファイルは use super::Tool）で、同名の type は無い"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/progress.rs",
+      "function": "listener",
+      "label": "not",
+      "returnType": "Option<EventListener>",
+      "expandedTo": "Option<Box<dyn FnMut(&Event) + 'static>>",
+      "via": [
+        "src/schema.rs:29 pub type EventListener = Box<dyn FnMut(&Event) + 'static>;"
+      ],
+      "why": "EventListener は repo 内の type 別名（定義は 1 つ）で Box<dyn FnMut(&Event) + 'static> に展開され、Event は src/schema.rs:290 の struct。Option・Box・FnMut は標準の名前"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/progress.rs",
+      "function": "finish",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/schema.rs",
+      "function": "notify_listener",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "path": "src/schema.rs",
+      "function": "fmt",
+      "label": "returns",
+      "returnType": "std::fmt::Result",
+      "expandedTo": "std::fmt::Result",
+      "via": [],
+      "why": "std::fmt::Result はパスの部分として Result を含む"
+    },
+    {
+      "repo": "instruckt-tauri",
+      "commits": [
+        "a808734a5b264a433e74f96126b9a8159c19e641"
+      ],
+      "path": "src/screenshot.rs",
+      "function": "delete_screenshot",
+      "label": "not",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無いので ()"
+    }
+  ],
+  "callees": [
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "analyze",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:56",
+      "returnType": "DriftResult",
+      "expandedTo": "DriftResult",
+      "via": [],
+      "why": "DriftResult は src/drift.rs:48 の struct で同名の type は無い（名前に Result を含むが Result 型ではない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "anomalies",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:586",
+      "returnType": "&[KeyringAnomaly]",
+      "expandedTo": "&[KeyringAnomaly]",
+      "via": [],
+      "why": "KeyringAnomaly は src/audit/secret.rs:525 の enum で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "apply_inner_chunk",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "grovedb/src/replication/state_sync_session.rs:94",
+      "returnType": "Result<Vec<Vec<u8>>, Error>",
+      "expandedTo": "Result<Vec<Vec<u8>>, Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T>〔grovedb-merkle-mountain-range/src/error.rs:2〕は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "as_ref",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/stdlib/src/dot_path_buf.rs:59",
+      "returnType": "&str",
+      "expandedTo": "&str",
+      "via": [],
+      "why": "&str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "as_slice",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "grovedb/src/batch/key_info.rs:122",
+      "returnType": "&[u8]",
+      "expandedTo": "&[u8]",
+      "via": [],
+      "why": "u8 だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "baseline_path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/integrity.rs:125",
+      "returnType": "PathBuf",
+      "expandedTo": "PathBuf",
+      "via": [],
+      "why": "PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "build",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/build.rs:4",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "build_merged_config",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/config.rs:337",
+      "returnType": "Config",
+      "expandedTo": "Config",
+      "via": [],
+      "why": "Config は src/config.rs:56 の struct で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "clear_on_rollback",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:169",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "collect",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn collect の定義は .rs に 0 件（key は Python の scripts/benchmark/bench.py）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "collect",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/audit/provenance.rs:70",
+      "returnType": "Self",
+      "expandedTo": "Self",
+      "via": [],
+      "why": "戻り値が Self",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "collect_inputs_recursive",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/build.rs:202",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<(), E>（E は 11 定義で異なる）",
+      "via": [
+        "src/build.rs:108 pub type Result<T> = std::result::Result<T, BuildCacheError>;",
+        "src/cache.rs:40 pub type Result<T> = std::result::Result<T, CacheError>;",
+        "src/index.rs:44 pub type Result<T> = std::result::Result<T, IndexError>;",
+        "src/installer.rs:38 pub type Result<T> = std::result::Result<T, InstallError>;",
+        "src/lockfile.rs:22 pub type Result<T> = std::result::Result<T, LockfileError>;",
+        "src/paths.rs:38 pub type Result<T> = std::result::Result<T, PathError>;",
+        "src/pep723.rs:30 pub type Result<T> = std::result::Result<T, Pep723Error>;",
+        "src/pep723_cache.rs:45 pub type Result<T> = std::result::Result<T, Pep723CacheError>;",
+        "src/project.rs:35 pub type Result<T> = std::result::Result<T, ProjectError>;",
+        "src/wheel_cache.rs:25 pub type Result<T> = std::result::Result<T, WheelCacheError>;",
+        "src/workspace.rs:16 pub type Result<T> = std::result::Result<T, WorkspaceError>;"
+      ],
+      "why": "Result がそのまま現れる。リポジトリに type Result<T> が 11 定義あり誤差型が食い違うが、どれに展開しても std::result::Result なので returns",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "compute_entry_hash_for_write",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/chain.rs:243",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）（引数が 4 行にわたる）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "contains",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "grovedb-query/src/query_item/mod.rs:514",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "contains",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn contains の定義は .rs に 0 件（key は JS の kontor-ts/src/component/kontor-ts.js）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "contains",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/snapshot.rs:123",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "core_rule_names",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/config.rs:979",
+      "returnType": "Vec<&'static str>",
+      "expandedTo": "Vec<&'static str>",
+      "via": [],
+      "why": "Vec と str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "core_rule_names_owned",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cli/config_cmd.rs:182",
+      "returnType": "Vec<String>",
+      "expandedTo": "Vec<String>",
+      "via": [],
+      "why": "Vec と String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "current_prefixes",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "grovedb/src/replication/state_sync_session.rs:317",
+      "returnType": "&mut BTreeMap<SubtreePrefix, SubtreeStateSyncInfo<'db>>",
+      "expandedTo": "決められない（SubtreePrefix の展開が [u8; blake3::OUT_LEN] と [u8; 32] に分かれる）",
+      "via": [
+        "grovedb/src/lib.rs:272 pub(crate) type SubtreePrefix = [u8; blake3::OUT_LEN];",
+        "grovedb/src/replication/state_sync_session.rs:35 pub(crate) type SubtreePrefix = [u8; 32];",
+        "storage/src/rocksdb_storage/storage.rs:57 pub type SubtreePrefix = [u8; 32];",
+        "storage/src/storage.rs:45 pub type SubtreePrefix = [u8; 32];"
+      ],
+      "why": "SubtreePrefix の type が 4 定義あり展開後が食い違う（lib.rs:272 だけ [u8; blake3::OUT_LEN]）ので別名が解けない。どの展開にも Result は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "db_conn",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/mod.rs:113",
+      "returnType": "libsql::Connection",
+      "expandedTo": "libsql::Connection",
+      "via": [],
+      "why": "Connection は依存クレート libsql の型で、リポジトリに定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "default",
+      "label": "ambiguous",
+      "definitions": 7,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn default がテスト外に 7 個（src/audit/mod.rs:61, src/audit/report.rs:151, src/config.rs:43, src/config.rs:72, src/context.rs:30, src/context.rs:48, src/installer.rs:63）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "instruckt-tauri",
+      "commits": [
+        "a808734a5b264a433e74f96126b9a8159c19e641"
+      ],
+      "name": "delete_screenshot",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/screenshot.rs:23",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "describe",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:544",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "describe_file_type",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/atomic_file.rs:184",
+      "returnType": "&'static str",
+      "expandedTo": "&'static str",
+      "via": [],
+      "why": "str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "diagnostic",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/schema.rs:488",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "display_timestamp",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/verify.rs:877",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "eloop_message",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:871",
+      "returnType": "std::io::Error",
+      "expandedTo": "std::io::Error",
+      "via": [],
+      "why": "Error は標準一覧に無く、リポジトリに struct/enum/type Error の定義も無い（std の型）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "emit_config_warnings",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/engine/shim.rs:529",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "emit_rejected_allow_env_diagnostics",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/commands/mod.rs:1494",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "emit_state_event",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:348",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "emit_unsupported_resource_limit_diagnostics",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/commands/mod.rs:1480",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()（引数が 4 行にわたる）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "enforcement",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/sandbox.rs:199",
+      "returnType": "&str",
+      "expandedTo": "&str",
+      "via": [],
+      "why": "&str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "env",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn env の定義は .rs に 0 件（key はシェルスクリプト scripts/install.sh）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "error_diagnostic_count",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/schema.rs:503",
+      "returnType": "usize",
+      "expandedTo": "usize",
+      "via": [],
+      "why": "usize だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "error_with_code",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/schema.rs:518",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()（引数が 6 行にわたる）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "event",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/schema.rs:463",
+      "returnType": "&mut Event",
+      "expandedTo": "&mut Event",
+      "via": [],
+      "why": "Event は src/schema.rs:290 の struct で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "fatal_anomaly",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:615",
+      "returnType": "Option<&KeyringAnomaly>",
+      "expandedTo": "Option<&KeyringAnomaly>",
+      "via": [],
+      "why": "Option と enum KeyringAnomaly（src/audit/secret.rs:525）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "filter_map",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/block.rs:54",
+      "returnType": "Option<Transaction>",
+      "expandedTo": "Option<Transaction>",
+      "via": [],
+      "why": "Transaction はリポジトリに struct が 2 つ（core/indexer-types/src/lib.rs:204, core/indexer/src/runtime/wit/resources.rs:83）あり同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "flag_value_str",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/util.rs:134",
+      "returnType": "Result<(&str, usize), AppError>",
+      "expandedTo": "Result<(&str, usize), AppError>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリに type Result は無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "for_profile",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/profiles.rs:124",
+      "returnType": "Self",
+      "expandedTo": "Self",
+      "via": [],
+      "why": "戻り値が Self",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "format_verify_success_message",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cli/audit_cmd.rs:37",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "generate_lazy_import_python_code",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/lazy_import.rs:457",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "generate_mempool_txs",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/mock_bitcoin.rs:68",
+      "returnType": "Vec<MempoolEvent>",
+      "expandedTo": "Vec<MempoolEvent>",
+      "via": [],
+      "why": "Vec と enum MempoolEvent（core/indexer/src/bitcoin_follower/event.rs:11）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "get",
+      "label": "ambiguous",
+      "definitions": 36,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn get がテスト外に 36 個（crates/ 配下 20 ファイル。#[cfg(test)] mod の中の 3 個と crates/graphql/tests/ の 4 個は除外）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "get",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:574",
+      "returnType": "Option<&[u8; 32]>",
+      "expandedTo": "Option<&[u8; 32]>",
+      "via": [],
+      "why": "Option と u8 だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "get_active_set",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "native-contracts/staking/src/lib.rs:285",
+      "returnType": "Vec<ActiveValidatorInfo>",
+      "expandedTo": "Vec<ActiveValidatorInfo>",
+      "via": [],
+      "why": "ActiveValidatorInfo は .rs に struct/enum/type の定義が無い（WIT 由来の生成型とみられる）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "get_checkpoint",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:354",
+      "returnType": "Option<[u8; 32]>",
+      "expandedTo": "Option<[u8; 32]>",
+      "via": [],
+      "why": "Option と u8 だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "get_decided_from_anchor",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:370",
+      "returnType": "Result<Vec<DeferredDecision>>",
+      "expandedTo": "std::result::Result<Response<Vec<DeferredDecision>>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "get_decided_range",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:477",
+      "returnType": "Result<Vec<(Value, crate::consensus::CommitCertificate<Ctx>)>>",
+      "expandedTo": "std::result::Result<Response<Vec<(Value, crate::consensus::CommitCertificate<Ctx>)>>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "halted",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/verify.rs:173",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_block_with_decision",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/blocks.rs:182",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_finalized",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/batches.rs:550",
+      "returnType": "Result<consensus_state::ConsensusResult>",
+      "expandedTo": "std::result::Result<Response<consensus_state::ConsensusResult>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_get_decided_values",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/handlers.rs:86",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_get_value",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/batches.rs:506",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_process_synced_value",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/handlers.rs:114",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_received_proposal_part",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/handlers.rs:56",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_restream_proposal",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/handlers.rs:146",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "handle_started_round",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/handlers.rs:19",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "hard_deadline",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:63",
+      "returnType": "Instant",
+      "expandedTo": "Instant",
+      "via": [],
+      "why": "Instant だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "height_params",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:180",
+      "returnType": "HeightParams<Ctx>",
+      "expandedTo": "HeightParams<Ctx>",
+      "via": [],
+      "why": "HeightParams は依存クレート malachitebft_core_types の型で、リポジトリに定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "hwm_path_for",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:447",
+      "returnType": "PathBuf",
+      "expandedTo": "PathBuf",
+      "via": [],
+      "why": "PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "ignored_dirs",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/build.rs:240",
+      "returnType": "BTreeSet<&'static str>",
+      "expandedTo": "BTreeSet<&'static str>",
+      "via": [],
+      "why": "BTreeSet と str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "info",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn info がテスト外に 2 個（src/schema.rs:165 と src/schema.rs:537）。key は Rust でない scripts/dev:19",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "insert",
+      "label": "ambiguous",
+      "definitions": 9,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn insert がテスト外に 9 個（grovedb-dense-fixed-sized-merkle-tree/src/tree.rs:109, grovedb/src/batch/estimated_costs/average_case_costs.rs:315, .../worst_case_costs.rs:322, grovedb/src/batch/mod.rs:972, grovedb/src/batch/mod.rs:1565, grovedb/src/operations/insert/mod.rs:57, merk/src/element/insert.rs:28, merk/src/element/insert.rs:155, merk/src/proofs/query/map.rs:35）。key は Rust でない docs/crates/grovedb.md:110",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "insert_batch",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/database/queries.rs:509",
+      "returnType": "Result<(), Error>",
+      "expandedTo": "Result<(), Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T> は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "insert_unconfirmed_batch_tx",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/database/queries.rs:643",
+      "returnType": "Result<(), Error>",
+      "expandedTo": "Result<(), Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T> は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "install",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/commands/install.rs:267",
+      "returnType": "Result<InstallOutcome>",
+      "expandedTo": "std::result::Result<InstallOutcome, E>（E は 11 定義で異なる）",
+      "via": [
+        "src/build.rs:108 pub type Result<T> = std::result::Result<T, BuildCacheError>;",
+        "src/cache.rs:40 pub type Result<T> = std::result::Result<T, CacheError>;",
+        "src/index.rs:44 pub type Result<T> = std::result::Result<T, IndexError>;",
+        "src/installer.rs:38 pub type Result<T> = std::result::Result<T, InstallError>;",
+        "src/lockfile.rs:22 pub type Result<T> = std::result::Result<T, LockfileError>;",
+        "src/paths.rs:38 pub type Result<T> = std::result::Result<T, PathError>;",
+        "src/pep723.rs:30 pub type Result<T> = std::result::Result<T, Pep723Error>;",
+        "src/pep723_cache.rs:45 pub type Result<T> = std::result::Result<T, Pep723CacheError>;",
+        "src/project.rs:35 pub type Result<T> = std::result::Result<T, ProjectError>;",
+        "src/wheel_cache.rs:25 pub type Result<T> = std::result::Result<T, WheelCacheError>;",
+        "src/workspace.rs:16 pub type Result<T> = std::result::Result<T, WorkspaceError>;"
+      ],
+      "why": "key は Formula/pybun.rb:33 だが .rs の定義は src/commands/install.rs:267 の 1 個。Result がそのまま現れる。リポジトリに type Result<T> が 11 定義あり誤差型が食い違うが、どれに展開しても std::result::Result なので returns",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "is_block",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/value.rs:185",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_broken_pipe",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cli/audit_cmd.rs:356",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_core_rule",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cli/config_cmd.rs:214",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_empty",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:578",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_expired",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/break_glass.rs:50",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "is_installed",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/runtime.rs:516",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_non_bypassable",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/break_glass.rs:90",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_prune_point",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/retention.rs:210",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "is_satisfied_by",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/resolver.rs:139",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_supported_chain_version",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/chain.rs:53",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "is_symlink",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/atomic_file.rs:117",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "iter",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/validator_set.rs:75",
+      "returnType": "slice::Iter<'_, Validator>",
+      "expandedTo": "slice::Iter<'_, Validator>",
+      "via": [],
+      "why": "Iter（core::slice::Iter）は標準一覧に無く、リポジトリにも定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "iter",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:582",
+      "returnType": "impl Iterator<Item = (&String, &[u8; 32])>",
+      "expandedTo": "impl Iterator<Item = (&String, &[u8; 32])>",
+      "via": [],
+      "why": "impl を読み飛ばすと Iterator・String・u8 だけ（Item は関連型の束縛名で型の名前に数えない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "join_python_path",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/commands/run.rs:1066",
+      "returnType": "std::ffi::OsString",
+      "expandedTo": "std::ffi::OsString",
+      "via": [],
+      "why": "OsString は標準一覧に無く、リポジトリにも struct/enum/type の定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "key_id",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:193",
+      "returnType": "&str",
+      "expandedTo": "&str",
+      "via": [],
+      "why": "&str だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "len",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/validator_set.rs:67",
+      "returnType": "usize",
+      "expandedTo": "usize",
+      "via": [],
+      "why": "usize だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "let",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "let はキーワードで、fn let は .rs に 0 件",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "let",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "let はキーワードで、fn let は .rs に 0 件",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "list_models",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "crates/providers/src/registry/registration.rs:1281",
+      "returnType": "&[ModelInfo]",
+      "expandedTo": "&[ModelInfo]",
+      "via": [],
+      "why": "ModelInfo はリポジトリに struct が 2 つ（crates/graphql/src/types/definitions.rs:441, crates/providers/src/model_capabilities.rs:308）あり同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "listener",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/progress.rs:38",
+      "returnType": "Option<EventListener>",
+      "expandedTo": "Option<Box<dyn FnMut(&Event) + 'static>>",
+      "via": [
+        "src/schema.rs:29 pub type EventListener = Box<dyn FnMut(&Event) + 'static>;"
+      ],
+      "why": "EventListener を展開すると Option・Box・FnMut と struct Event（src/schema.rs:290）だけで Result は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "load_base_root",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/mod.rs:577",
+      "returnType": "CostResult<(), Error>",
+      "expandedTo": "CostContext<Result<(), Error>>",
+      "via": [
+        "costs/src/context.rs:86 pub type CostResult<T, E> = CostContext<Result<T, E>>;"
+      ],
+      "why": "CostResult を costs/src/context.rs:86 で展開すると CostContext<Result<…>> で Result を含む",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "load_keyring",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:627",
+      "returnType": "Keyring",
+      "expandedTo": "Keyring",
+      "via": [],
+      "why": "Keyring は src/audit/secret.rs:568 の struct で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "load_raw_txs_if_unfinalized",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:416",
+      "returnType": "Result<Option<Vec<bitcoin::Transaction>>>",
+      "expandedTo": "std::result::Result<Response<Option<Vec<bitcoin::Transaction>>>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "map",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "costs/src/context.rs:65",
+      "returnType": "CostContext<B>",
+      "expandedTo": "CostContext<B>",
+      "via": [],
+      "why": "CostContext は costs/src/context.rs:34 の struct だが、B はこの関数自身のジェネリクス <B> で決められない（型引数）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "map_err",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "costs/src/context.rs:98",
+      "returnType": "CostResult<T, B>",
+      "expandedTo": "CostContext<Result<T, B>>",
+      "via": [
+        "costs/src/context.rs:86 pub type CostResult<T, E> = CostContext<Result<T, E>>;"
+      ],
+      "why": "CostResult を costs/src/context.rs:86 で展開すると CostContext<Result<…>> で Result を含む（B は型引数だが Result の有無には影響しない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "mark_unverifiable_tail",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/verify.rs:238",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "marker_applies",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/resolver.rs:154",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "bool だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "max_index",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:395",
+      "returnType": "u32",
+      "expandedTo": "u32",
+      "via": [],
+      "why": "u32 だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "mine_and_send",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:420 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "mine_empty_and_send",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:434 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "mock_bitcoin",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:416 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "new_batch_raw",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/value.rs:91",
+      "returnType": "Self",
+      "expandedTo": "Self",
+      "via": [],
+      "why": "戻り値が Self",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "new_mock_block_hash",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/test_utils.rs:405",
+      "returnType": "BlockHash",
+      "expandedTo": "BlockHash",
+      "via": [],
+      "why": "BlockHash は依存クレート bitcoin の型で、リポジトリに定義が無い（test_utils.rs は lib.rs で pub mod として宣言されテストの場所ではない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "normalize_pkg_name",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/mcp/tools/maintenance.rs:727",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "process_chunk",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/restore.rs:88",
+      "returnType": "Result<Vec<Vec<u8>>, Error>",
+      "expandedTo": "Result<Vec<Vec<u8>>, Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T>〔grovedb-merkle-mountain-range/src/error.rs:2〕は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "process_decided_batch",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/batches.rs:29",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "prune_expired_entries",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/break_glass.rs:235",
+      "returnType": "Vec<BreakGlassEntry>",
+      "expandedTo": "Vec<BreakGlassEntry>",
+      "via": [],
+      "why": "Vec と struct BreakGlassEntry（src/break_glass.rs:41）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "read_chain_state",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/chain.rs:321",
+      "returnType": "ChainTailState",
+      "expandedTo": "ChainTailState",
+      "via": [],
+      "why": "ChainTailState は src/audit/chain.rs:294 の enum で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "read_config_entry",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/integrity.rs:1278",
+      "returnType": "Option<ConfigEntry>",
+      "expandedTo": "Option<ConfigEntry>",
+      "via": [],
+      "why": "Option と struct ConfigEntry（src/integrity.rs:53）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "read_hwm",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:470",
+      "returnType": "HwmState",
+      "expandedTo": "HwmState",
+      "via": [],
+      "why": "HwmState は src/audit/mod.rs:459 の enum で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "read_state",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/break_glass.rs:173",
+      "returnType": "Option<BreakGlassState>",
+      "expandedTo": "Option<BreakGlassState>",
+      "via": [],
+      "why": "Option と struct BreakGlassState（src/break_glass.rs:35）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "remove",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "fn remove の定義は .rs に 0 件（key は JS の kontor-ts/src/component/kontor-ts.js）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "resolve_batch_txs",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/mod.rs:158",
+      "returnType": "Vec<bitcoin::Transaction>",
+      "expandedTo": "Vec<bitcoin::Transaction>",
+      "via": [],
+      "why": "パスの最後の Transaction はリポジトリに struct が 2 つあり同名の type は無い（書かれたパスは bitcoin:: だが手順は名前で引く）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "resolve_stable_exe_path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/installer.rs:882",
+      "returnType": "PathBuf",
+      "expandedTo": "PathBuf",
+      "via": [],
+      "why": "PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "resolved_audit_path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:151",
+      "returnType": "Option<PathBuf>",
+      "expandedTo": "Option<PathBuf>",
+      "via": [],
+      "why": "Option と PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "rewrite_parent_link",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/restore.rs:352",
+      "returnType": "Result<(), Error>",
+      "expandedTo": "Result<(), Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T>〔grovedb-merkle-mountain-range/src/error.rs:2〕は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "run_python_code",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/commands/run.rs:1152",
+      "returnType": "Result<RunOutcome>",
+      "expandedTo": "std::result::Result<RunOutcome, E>（E は 11 定義で異なる）",
+      "via": [
+        "src/build.rs:108 pub type Result<T> = std::result::Result<T, BuildCacheError>;",
+        "src/cache.rs:40 pub type Result<T> = std::result::Result<T, CacheError>;",
+        "src/index.rs:44 pub type Result<T> = std::result::Result<T, IndexError>;",
+        "src/installer.rs:38 pub type Result<T> = std::result::Result<T, InstallError>;",
+        "src/lockfile.rs:22 pub type Result<T> = std::result::Result<T, LockfileError>;",
+        "src/paths.rs:38 pub type Result<T> = std::result::Result<T, PathError>;",
+        "src/pep723.rs:30 pub type Result<T> = std::result::Result<T, Pep723Error>;",
+        "src/pep723_cache.rs:45 pub type Result<T> = std::result::Result<T, Pep723CacheError>;",
+        "src/project.rs:35 pub type Result<T> = std::result::Result<T, ProjectError>;",
+        "src/wheel_cache.rs:25 pub type Result<T> = std::result::Result<T, WheelCacheError>;",
+        "src/workspace.rs:16 pub type Result<T> = std::result::Result<T, WorkspaceError>;"
+      ],
+      "why": "Result がそのまま現れる。リポジトリに type Result<T> が 11 定義あり誤差型が食い違うが、どれに展開しても std::result::Result なので returns",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "scan_key_dir",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:400",
+      "returnType": "KeyDirScan",
+      "expandedTo": "KeyDirScan",
+      "via": [],
+      "why": "KeyDirScan は src/audit/secret.rs:376 の struct で同名の type は無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "secret_path_for",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:329",
+      "returnType": "PathBuf",
+      "expandedTo": "PathBuf",
+      "via": [],
+      "why": "PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "select_batches_in_range",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/database/queries.rs:575",
+      "returnType": "Result<Vec<BatchQueryResult>, Error>",
+      "expandedTo": "Result<Vec<BatchQueryResult>, Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T> は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "send_mempool_event",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:412 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "send_proposal_parts",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/mod.rs:142",
+      "returnType": "Result<()>",
+      "expandedTo": "std::result::Result<Response<()>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "set_base_root_key",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/mod.rs:560",
+      "returnType": "CostResult<(), Error>",
+      "expandedTo": "CostContext<Result<(), Error>>",
+      "via": [
+        "costs/src/context.rs:86 pub type CostResult<T, E> = CostContext<Result<T, E>>;"
+      ],
+      "why": "CostResult を costs/src/context.rs:86 で展開すると CostContext<Result<…>> で Result を含む",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "set_event_listener",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/schema.rs:452",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "set_raw_txs",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/value.rs:197",
+      "returnType": "()",
+      "expandedTo": "()",
+      "via": [],
+      "why": "-> が無く ()",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "sha256_hex",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/integrity.rs:1272",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "tests/poc_integrity.rs:204 はテストの場所なので除外。String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "show_entries",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/audit/verify.rs:655",
+      "returnType": "Result<(), AuditError>",
+      "expandedTo": "Result<(), AuditError>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリに type Result は無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "state_file_path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/break_glass.rs:169",
+      "returnType": "Option<PathBuf>",
+      "expandedTo": "Option<PathBuf>",
+      "via": [],
+      "why": "Option と PathBuf だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "symlink_attack_error",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:352",
+      "returnType": "std::io::Error",
+      "expandedTo": "std::io::Error",
+      "via": [],
+      "why": "Error は標準一覧に無く、リポジトリに struct/enum/type Error の定義も無い（std の型）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "to_wave_expr",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/stdlib/src/wave_interfaces.rs:158",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "String だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）（型引数 T は戻り値に現れない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "traversal_instruction_as_vec_bytes",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "merk/src/proofs/chunk/util.rs:318",
+      "returnType": "Vec<u8>",
+      "expandedTo": "Vec<u8>",
+      "via": [],
+      "why": "Vec と u8 だけで、すべて組み込み・標準一覧の名前（同名の type はリポジトリに無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "try_prune",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "src/audit/retention.rs:26",
+      "returnType": "Result<u64, std::io::Error>",
+      "expandedTo": "Result<u64, std::io::Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリに type Result は無い）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "tx_context",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/runtime/mod.rs:211",
+      "returnType": "Option<&TransactionContext>",
+      "expandedTo": "Option<&TransactionContext>",
+      "via": [],
+      "why": "Option と struct TransactionContext（core/indexer/src/runtime/storage.rs:25）だけ",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "txid",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/value.rs:20",
+      "returnType": "Txid",
+      "expandedTo": "Txid",
+      "via": [],
+      "why": "Txid は依存クレート bitcoin の型で、リポジトリに定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "txids",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/consensus/proposal_part.rs:45",
+      "returnType": "Vec<Txid>",
+      "expandedTo": "Vec<Txid>",
+      "via": [],
+      "why": "Txid は依存クレート bitcoin の型で、リポジトリに定義が無い",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "validate_and_accept_proposal",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/batches.rs:246",
+      "returnType": "Result<Option<ProposedValue<Ctx>>>",
+      "expandedTo": "std::result::Result<Response<Option<ProposedValue<Ctx>>>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "validate_batch",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/reactor/consensus_state.rs:539",
+      "returnType": "Result<Option<&'static str>>",
+      "expandedTo": "std::result::Result<Response<Option<&'static str>>, Error>",
+      "via": [
+        "core/indexer/src/api/result.rs:23 pub type Result<T> = std::result::Result<Response<T>, Error>;"
+      ],
+      "why": "Result がそのまま現れ、リポジトリ唯一の type Result<T>（core/indexer/src/api/result.rs:23）に展開しても std::result::Result",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "verify_chunk",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/restore.rs:170",
+      "returnType": "Result<ProofTree, Error>",
+      "expandedTo": "Result<Tree, Error>",
+      "via": [
+        "merk/src/merk/restore.rs:37 use crate::{… proofs::{… tree::{execute, Child, Tree as ProofTree} …} …};（as は 47 行）"
+      ],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T>〔grovedb-merkle-mountain-range/src/error.rs:2〕は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "wait_for_batch",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:447 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "wait_for_block",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:511 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "wait_for_finality_event_matching",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:597 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "wait_for_ready",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:400 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "wait_for_state_event_matching",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": null,
+      "expandedTo": null,
+      "via": [],
+      "why": "唯一の候補 core/indexer/src/reactor/reactor_cluster_tests.rs:617 は core/indexer/src/reactor/mod.rs:10-11 の #[cfg(test)] mod reactor_cluster_tests; の中（テストの場所）なので定義は 0 個",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "with_json",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "src/commands/mod.rs:49",
+      "returnType": "Self",
+      "expandedTo": "Self",
+      "via": [],
+      "why": "戻り値が Self",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "grovedb",
+      "commits": [
+        "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
+      ],
+      "name": "write_chunk",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "merk/src/merk/restore.rs:229",
+      "returnType": "Result<Vec<Vec<u8>>, Error>",
+      "expandedTo": "Result<Vec<Vec<u8>>, Error>",
+      "via": [],
+      "why": "Result がそのまま現れる（リポジトリの type Result<T>〔grovedb-merkle-mountain-range/src/error.rs:2〕は 1 引数で、この 2 引数の Result には当てない）",
+      "from": "said not a Result by the tool before this change"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "and_then",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn and_then` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "as_array",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn as_array` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "as_ref",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn as_ref` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "as_str",
+      "label": "ambiguous",
+      "definitions": 16,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 16 個（crates/browser/src/types.rs:102, crates/channels/src/plugin.rs:32, crates/config/src/schema.rs:77 ほか）。戻り値は全部 &'static str。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "as_str",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 2 個（src/build.rs:20, src/cli.rs:626）。戻り値は全部 &'static str。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "clone",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn clone` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "collect",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn collect` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "collect_py_files",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:257",
+      "returnType": "Vec<PathBuf>",
+      "expandedTo": "Vec<PathBuf>",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "debug_struct",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn debug_struct` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "entry",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn entry` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "extend",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn extend` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "field",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn field` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "filter_map",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn filter_map` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "find",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn find` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "finish",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 2 個（src/progress.rs:57, src/progress.rs:125）。戻り値は全部 ()。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "generate_title_for_session",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/session/title.rs:61",
+      "returnType": "Result<Option<String>>",
+      "expandedTo": "Result<Option<String>>（use は crates/gateway/src/session/title.rs:9 `anyhow::{Context, Result}` で as なし。repo 内 `type Result` 44 件は右辺が食い違うが全件 std::result::Result<T, …>）",
+      "via": [],
+      "why": "戻り値の型にパス部分 Result がそのまま書かれている（別名展開の成否に関わらず Result が残る）。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "get",
+      "label": "ambiguous",
+      "definitions": 5,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 5 個（src/env_cache.rs:46, src/pypi.rs:69, src/resolver.rs:804 ほか）、grep 7 行のうち 2 行はテストの場所。戻り値は 4 通り。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_agent",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:138",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_approvals",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:44",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_approve_deny",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:64",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_attach",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:413",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_btw",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:15",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_clear",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:250",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_compact",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:262",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_context",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:274",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_fast",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:85",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_fork",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:201",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_insights",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:325",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_mode",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:233",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_model",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:345",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_new",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:22",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_peek",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:765",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_queue",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:544",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_rollback",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:168",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_sandbox",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 2 個（crates/cli/src/sandbox_commands.rs:59, crates/gateway/src/channel_events/commands/control_handlers.rs:462）。戻り値は 2 通り。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_sessions",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:343",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_sh",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:630",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_steer",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/quick_actions.rs:493",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/quick_actions.rs:3 use { moltis_channels::{Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_stop",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:674",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_title",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/session_handlers.rs:181",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/session_handlers.rs:5 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_tts",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:802",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "handle_update",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/channel_events/commands/control_handlers.rs:696",
+      "returnType": "ChannelResult<String>",
+      "expandedTo": "moltis_channels::Result<String>（→ std::result::Result<String, moltis_channels::Error>）",
+      "via": [
+        "crates/gateway/src/channel_events/commands/control_handlers.rs:3 use { moltis_channels::{ChannelReplyTarget, Error as ChannelError, Result as ChannelResult}, … };",
+        "crates/channels/src/error.rs:4 pub type Result<T> = std::result::Result<T, Error>;（moltis_channels 自身の別名。repo 内の `type Result` は計 44 件で右辺のエラー型が食い違うが、全件が std::result::Result<T, …>）"
+      ],
+      "why": "ChannelResult は同ファイルの use で moltis_channels::Result の別名で、展開後にパス部分 Result がある。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "import_aliases",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:462",
+      "returnType": "HashMap<&'static str, &'static str>",
+      "expandedTo": "HashMap<&'static str, &'static str>",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "into_iter",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn into_iter` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "invalid_input",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 2 個（crates/channels/src/error.rs:50, crates/media/src/error.rs:28）。戻り値は全部 Self。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "is_empty",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/snapshot.rs:133",
+      "returnType": "bool",
+      "expandedTo": "bool",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "iter",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn iter` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "iter",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "crates/gateway/src/state.rs:48",
+      "returnType": "impl Iterator<Item = &MetricsHistoryPoint>",
+      "expandedTo": "impl Iterator<Item = &MetricsHistoryPoint>",
+      "via": [],
+      "why": "Iterator は標準の名前、MetricsHistoryPoint は crates/metrics/src/store.rs:28 の struct（同名 type なし）で、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "join",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn join` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "len",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "crates/nostr/src/seen.rs:87",
+      "returnType": "usize",
+      "expandedTo": "usize",
+      "via": [],
+      "why": "組み込み整数 usize で Result が無い（この fn 自体に #[cfg(test)] が付くが、規則のテストの場所は cfg(test) の mod の中だけなので定義に数えた）。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "len",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/snapshot.rs:128",
+      "returnType": "usize",
+      "expandedTo": "usize",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "let",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn let` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "logical_import_lines",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:333",
+      "returnType": "Vec<(usize, String)>",
+      "expandedTo": "Vec<(usize, String)>",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "map",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn map` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "map_err",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn map_err` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "Multimodal",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn Multimodal` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "new",
+      "label": "ambiguous",
+      "definitions": 36,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 36 個（src/build.rs:116, src/cache.rs:54, src/downloader.rs:143 ほか）。戻り値は 3 通り。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "next",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn next` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "normalize_package_name",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:445",
+      "returnType": "String",
+      "expandedTo": "String",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "ok_or_else",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn ok_or_else` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "or_default",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn or_default` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "or_else",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn or_else` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "parse_import_packages",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:400",
+      "returnType": "Vec<String>",
+      "expandedTo": "Vec<String>",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "push",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn push` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "read_to_string",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn read_to_string` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "resolve_channel_session",
+      "label": "ambiguous",
+      "definitions": 2,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 2 個（crates/gateway/src/channel_events.rs:43, crates/gateway/src/channel_events/helpers.rs:46）。戻り値は全部 String。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "send_impl",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/chat/src/service/chat_impl/send.rs:39",
+      "returnType": "ServiceResult",
+      "expandedTo": "Result<Value, ServiceError>",
+      "via": [
+        "crates/service-traits/src/error.rs:52 pub type ServiceResult<T = Value> = Result<T, ServiceError>;（repo 内で唯一。send.rs:11 の `use moltis_service_traits::ServiceResult` は as なし）"
+      ],
+      "why": "ServiceResult は repo 内に 1 つだけある type 別名で、右辺が Result<T, ServiceError>。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "split_whitespace",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn split_whitespace` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "stdlib_modules",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/drift.rs:503",
+      "returnType": "HashSet<&'static str>",
+      "expandedTo": "HashSet<&'static str>",
+      "via": [],
+      "why": "組み込みと標準の名前だけで、ファイル内に `as` の use も repo 内に同名の type も無く、Result が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "strip_prefix",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn strip_prefix` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "text",
+      "label": "ambiguous",
+      "definitions": 6,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "テストの外に定義が 6 個（crates/agents/src/model/chat.rs:40, crates/agents/src/multimodal.rs:53, crates/agents/src/multimodal.rs:119 ほか）。戻り値は 2 通り。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "to_string",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn to_string` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "to_string_lossy",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn to_string_lossy` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "trim",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn trim` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "unavailable",
+      "label": "unknown",
+      "definitions": 1,
+      "definedAt": "crates/channels/src/error.rs:57",
+      "returnType": "Self",
+      "expandedTo": "Self",
+      "via": [],
+      "why": "戻り値が Self なので規則により unknown。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "unwrap_or",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn unwrap_or` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "unwrap_or_default",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn unwrap_or_default` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86",
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "unwrap_or_else",
+      "label": "no_def",
+      "definitions": 0,
+      "definedAt": null,
+      "returnType": "",
+      "expandedTo": "",
+      "via": [],
+      "why": "`fn unwrap_or_else` の grep が 0 行で、repo 内に定義が無い。",
+      "from": "judged for the first time once targets are read in full (the stand-in's guess)"
+    }
+  ],
+  "conflicts": [],
+  "adjudicated": [
+    {
+      "repo": "Kontor",
+      "about": "callee",
+      "names": [
+        "mine_and_send",
+        "mine_empty_and_send",
+        "mock_bitcoin",
+        "send_mempool_event",
+        "wait_for_batch",
+        "wait_for_block",
+        "wait_for_finality_event_matching",
+        "wait_for_ready",
+        "wait_for_state_event_matching"
+      ],
+      "got": [
+        "callee_not_result",
+        "callee_return_unknown",
+        "askable"
+      ],
+      "callerFiles": [
+        "core/indexer/src/reactor/reactor_cluster_tests.rs"
+      ],
+      "decided": "after the first measurement",
+      "reason": "The labeller counted core/indexer/src/reactor/reactor_cluster_tests.rs as test code, since core/indexer/src/reactor/mod.rs declares it with `#[cfg(test)] mod reactor_cluster_tests;`. The tool reads test regions file by file and does not follow a `mod x;` declaration, so it reads that file as code: its test functions are candidates, and these helpers, defined in the same file, are the callees those calls reach. The reason printed names that definition. The disagreement is about which files are test code, not about what a function returns; it is not changed here.",
+      "labels": [
+        "no_def"
+      ],
+      "reasonMatches": "reactor_cluster_tests\\.rs|^$"
+    },
+    {
+      "repo": "moltis",
+      "about": "callee",
+      "names": [
+        "len"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first measurement",
+      "reason": "The only `fn len` outside a test path, crates/nostr/src/seen.rs:87, carries `#[cfg(test)]` itself. The labelling rule named `#[cfg(test)]` modules only; the tool's test regions cover any item under it, as before this change, so that definition is not counted and a call to `len` from code outside tests reads as having no definition here.",
+      "labels": [
+        "not"
+      ],
+      "reasonMatches": "^len has no definition in this repository"
+    },
+    {
+      "repo": "Kontor",
+      "about": "callee",
+      "names": [
+        "build",
+        "filter_map",
+        "txid"
+      ],
+      "labels": [
+        "not",
+        "unknown"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first diff review",
+      "reason": "The labelling rules find a callee by its name alone. After the first diff review, the tool also rules out the one definition of a name when the call cannot reach it: a method call (`x.name(…)`) to a function that takes no `self`, or a number of arguments the function does not take. Each of these was checked in the source: `.build()` and `.filter_map(…)` are method calls, and core/indexer/build.rs:4 and core/indexer/src/block.rs:54 take no `self`; `.txid(t.txid.to_string())` passes one argument, and core/indexer/src/consensus/value.rs:20 `fn txid(&self) -> Txid` takes none.",
+      "reasonMatches": "so this call does not reach it"
+    },
+    {
+      "repo": "omamori",
+      "about": "callee",
+      "names": [
+        "collect",
+        "is_symlink"
+      ],
+      "labels": [
+        "unknown",
+        "not"
+      ],
+      "got": [
+        "callee_unresolved"
+      ],
+      "decided": "after the first diff review",
+      "reason": "The labelling rules find a callee by its name alone. After the first diff review, the tool also rules out the one definition of a name when the call cannot reach it: a method call (`x.name(…)`) to a function that takes no `self`, or a number of arguments the function does not take. Each of these was checked in the source: `.collect()` and `.is_symlink()` are method calls, and src/audit/provenance.rs:70 and src/atomic_file.rs:117 take no `self`.",
+      "reasonMatches": "so this call does not reach it"
+    }
+  ],
+  "labelledAfter": [
+    {
+      "repo": "grovedb",
+      "commits": [
+        "c0e02819ac99a545e70a858208f2095c5fb461c7"
+      ],
+      "name": "verify",
+      "label": "ambiguous",
+      "definitions": 7,
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Asked about before this change and held after it, so not among the items labelled beforehand. `git grep -w -F \"fn verify\"` finds seven definitions outside test paths; the tool before this change found one because its search for the bare name stopped at 200 hits."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "insert",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/bitcoin_follower/poller.rs:69",
+      "returnType": "()",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "clear",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "core/indexer/src/runtime/stack.rs:26",
+      "returnType": "()",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "path",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/project.rs:133",
+      "returnType": "&Path",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "pybun",
+      "commits": [
+        "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
+      ],
+      "name": "packages_dir",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/cache.rs:75",
+      "returnType": "PathBuf",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "secret",
+      "label": "not",
+      "definitions": 1,
+      "definedAt": "src/audit/secret.rs:144",
+      "returnType": "Option<&[u8; 32]>",
+      "labelledBy": "the change's author, after the first measurement",
+      "why": "Said not to return a Result after the change and not among the items labelled beforehand (its function was read in full for the first time). One `fn` of this name outside test paths, by `git grep -w -F`; its return type read from the line."
+    },
+    {
+      "repo": "Kontor",
+      "commits": [
+        "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
+      ],
+      "name": "parse",
+      "label": "no_def",
+      "definitions": 1,
+      "definedAt": "core/macros/src/regtest.rs:10",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Asked about before and held after: `.parse()` is a method call (the standard library's `str::parse`), and the one `fn parse` here takes no `self`, so the call reaches no definition in this repository."
+    },
+    {
+      "repo": "omamori",
+      "commits": [
+        "e58c04f6df082146969320b91f09aa7a0123ac1f",
+        "46cd434299a05ff8c6d2664f720f0606d7e11579",
+        "a3dae0a134cc70952fe467bad860a714e4c45792",
+        "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea",
+        "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+      ],
+      "name": "append",
+      "label": "no_def",
+      "definitions": 1,
+      "definedAt": "src/audit/mod.rs:262",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Asked about before and held after. Not a call: `refusing to append (this event was not recorded; …)` is text inside a string literal that starts on an earlier line (src/audit/mod.rs:288-293), which the listing reads line by line."
+    },
+    {
+      "repo": "moltis",
+      "commits": [
+        "4106d46dad04481a932597141739e42a5452cc86"
+      ],
+      "name": "read",
+      "label": "returns",
+      "definitions": 1,
+      "definedAt": "crates/sessions/src/store.rs:113",
+      "returnType": "Result<Vec<serde_json::Value>>",
+      "labelledBy": "the change's author, after the first diff review",
+      "why": "Held before and askable after: `session_store.read(session_key)` passes one argument to `pub async fn read(&self, key: &str) -> Result<Vec<serde_json::Value>>`, the one `fn read` outside tests."
+    }
+  ]
+}
