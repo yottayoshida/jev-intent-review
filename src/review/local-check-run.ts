@@ -46,7 +46,7 @@ import { codeSpan, intentSection } from "../report/markdown.ts";
 import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type IntentSource, type IntentSpec, type Requirement, type RequirementForm } from "../types.ts";
 import { applicabilityOf, definitionsOfName } from "../plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
-import { formOf, FORMS } from "../plan/forms.ts";
+import { DEFAULT_FORM, formOf, FORMS } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
@@ -454,7 +454,8 @@ export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { 
   ];
   for (const r of results) {
     const c = r.counts;
-    const form = FORMS[r.form];
+    // A result built without a form — a record from before forms, a test's — reads as the default.
+    const form = FORMS[r.form ?? DEFAULT_FORM];
     // The requirement is the author's text: a code span, so no line of it can become a heading, a
     // comment that hides the rest of the report, or a workflow command; and redacted for display.
     lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
