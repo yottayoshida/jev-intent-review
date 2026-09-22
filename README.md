@@ -183,7 +183,9 @@ ran and a hash of its `src`), and `report.json` when the command printed one. Th
 is cut at about 64 KB and the summary's at about 1 MiB, each at a line, with a pointer to the
 artifact, which always holds the whole report. **Nothing the command prints goes
 to the job log**: requirements and code excerpts carry text that a log would read as a workflow
-command or as a compiler error, so the log gets only this Action's own sentences.
+command or as a compiler error, so what this Action adds to the log is a handful of fixed sentences.
+Around them the runner writes its own lines — the step headers and each step's `env:`, where a key
+that came from `secrets` shows as `***` and one written into the workflow file does not.
 
 **How a run reads at a glance.** The check run is green only when at least one call was read and
 nothing is left to look at; red when the command did not exit 0; and neutral — grey — for everything
