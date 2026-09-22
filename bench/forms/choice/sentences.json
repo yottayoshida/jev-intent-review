@@ -1,0 +1,706 @@
+{
+  "about": "Every requirement sentence this repository and issue #35 held on 2026-09-22, plus three written from omamori issues, each labelled with the form its sentence says (or neither) before the first request, and with who wrote it: tool (this project, for its fixtures and benches), model (the requirement-writing model's first output, repaired — bench/corpus), text (read by hand from a real issue or pull request), written (from an issue's text, for this measurement). `run.ts verify` checks each sentence against the file it names.",
+  "sentences": [
+    {
+      "id": "acceptance-moltis-1064",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/moltis-1064/spec.json",
+        "id": "R1"
+      },
+      "text": "If generating a session's automatic title fails, the failure must reach the caller as an error. It must not return a successful result with no label."
+    },
+    {
+      "id": "acceptance-grovedb-500",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/grovedb-500/spec.json",
+        "id": "R1"
+      },
+      "text": "If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished."
+    },
+    {
+      "id": "acceptance-grovedb-501",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/grovedb-501/spec.json",
+        "id": "R1"
+      },
+      "text": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded."
+    },
+    {
+      "id": "acceptance-instruckt-tauri-9",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/instruckt-tauri-9/spec.json",
+        "id": "R1"
+      },
+      "text": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content."
+    },
+    {
+      "id": "acceptance-kontor-385",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/kontor-385/spec.json",
+        "id": "R1"
+      },
+      "text": "If parsing a transaction, querying the database, or encoding a value or a certificate fails, the failure must reach the caller as an error. It must not skip the item that failed and return a successful result."
+    },
+    {
+      "id": "acceptance-pybun-428",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/pybun-428/spec.json",
+        "id": "R1"
+      },
+      "text": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result."
+    },
+    {
+      "id": "acceptance-quebec-136",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/quebec-136/spec.json",
+        "id": "R1"
+      },
+      "text": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success."
+    },
+    {
+      "id": "acceptance-whatsapp-rust-759",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/cases/whatsapp-rust-759/spec.json",
+        "id": "R1"
+      },
+      "text": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty."
+    },
+    {
+      "id": "candidate-iota-10136",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/candidates.json",
+        "ref": "iotaledger/iota#10136"
+      },
+      "text": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent."
+    },
+    {
+      "id": "candidate-agentflare-229",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/candidates.json",
+        "ref": "getappz/agentflare#229"
+      },
+      "text": "If flushing, syncing or setting the permissions of a credential file fails during an atomic write, the failure must reach the caller as an error. It must not return a successful result."
+    },
+    {
+      "id": "candidate-cce-rust-168",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/candidates.json",
+        "ref": "Davidslv/cce-rust#168"
+      },
+      "text": "If the sync marker exists but cannot be read, the failure must reach the caller as an error. It must not be treated as a missing marker and the pull allowed to overwrite the index."
+    },
+    {
+      "id": "candidate-dataprof-370",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/acceptance/candidates.json",
+        "ref": "AndreaBozzo/dataprof#370"
+      },
+      "text": "If decoding a value fails, the failure must reach the caller as an error. It must not be folded into a default value that is reported as the profile."
+    },
+    {
+      "id": "stated-omamori-468-R1",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/fixtures/omamori-468/stated-failure-handling.spec.json",
+        "id": "R1"
+      },
+      "text": "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists."
+    },
+    {
+      "id": "stated-omamori-468-R2",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/fixtures/omamori-468/stated-failure-handling.spec.json",
+        "id": "R2"
+      },
+      "text": "If reading an existing configuration file fails while checking whether a rule override disables a rule, that check must return an error to its caller. It must not return a successful result saying that the rule is not disabled."
+    },
+    {
+      "id": "fixture-integrity-rust-R1",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "tool",
+        "file": "test/fixtures/integrity-rust/spec.json",
+        "id": "R1"
+      },
+      "text": "A baseline that cannot be read is not reported as no baseline at all."
+    },
+    {
+      "id": "constructed-R1",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/forms/check-before-action/spec.json",
+        "id": "R1"
+      },
+      "text": "A disabled API key must never create a session."
+    },
+    {
+      "id": "reach-grovedb-500",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/forms/reach/grovedb-500.spec.json",
+        "id": "R1"
+      },
+      "text": "While a restore is being finalized, the tree heights must not be rewritten unless verifying the heights has failed."
+    },
+    {
+      "id": "reach-moltis-1064",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "tool",
+        "file": "bench/forms/reach/moltis-1064.spec.json",
+        "id": "R1"
+      },
+      "text": "A title must not be generated for a session that has fewer messages than the minimum."
+    },
+    {
+      "id": "fixture-both-forms-R2",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "tool",
+        "file": "test/fixtures/integrity-rust/spec-both-forms.json",
+        "id": "R2"
+      },
+      "text": "A baseline file must not be read unless it exists."
+    },
+    {
+      "id": "corpus-omamori-551-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-551.spec.json",
+        "id": "R1"
+      },
+      "text": "The test-isolation-canary fails on a host with omamori installed."
+    },
+    {
+      "id": "corpus-omamori-553-R1",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-553.spec.json",
+        "id": "R1"
+      },
+      "text": "The function should fail the whole listing on the first per-entry error when reading a directory, and not silently drop entries after the error and report the directory as empty or with a truncated count, even if some entries were successfully read before the error occurred, and instead report an '未"
+    },
+    {
+      "id": "corpus-omamori-553-R2",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-553.spec.json",
+        "id": "R2"
+      },
+      "text": "The doctor should report a staging directory as empty or with a file count only if it was read in full, otherwise it should report an error and provide a reason for the error, and the --json output should include a summary with a staging status of error and null counts and a path-free reason, and a"
+    },
+    {
+      "id": "corpus-omamori-554-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R1"
+      },
+      "text": "Keep stderr output as a single JSON object when a command is blocked in --json-error mode."
+    },
+    {
+      "id": "corpus-omamori-554-R2",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R2"
+      },
+      "text": "Modify SigningKey to carry warnings and change AuditLogger::from_config to return them, letting callers decide where to print warnings."
+    },
+    {
+      "id": "corpus-omamori-554-R3",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R3"
+      },
+      "text": "Allow each caller of AuditLogger::from_config to decide where to print warnings."
+    },
+    {
+      "id": "corpus-omamori-554-R4",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R4"
+      },
+      "text": "Ensure blocked commands are recorded in the audit chain in the same way as in text mode."
+    },
+    {
+      "id": "corpus-omamori-554-R5",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R5"
+      },
+      "text": "Prevent any text output from preceding the JSON object on stderr, to maintain the single JSON object contract."
+    },
+    {
+      "id": "corpus-omamori-554-R6",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R6"
+      },
+      "text": "Change the audit layer to return warnings instead of printing them."
+    },
+    {
+      "id": "corpus-omamori-554-R7",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-554.spec.json",
+        "id": "R7"
+      },
+      "text": "Implement a core that returns warnings and a wrapper that prints them, following the detector::repair_gate shape."
+    },
+    {
+      "id": "corpus-omamori-557-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-557.spec.json",
+        "id": "R1"
+      },
+      "text": "The refusal is a property of the current tail, not a permanent latch on the file."
+    },
+    {
+      "id": "corpus-omamori-557-R2",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-557.spec.json",
+        "id": "R2"
+      },
+      "text": "It now walks backwards from the end of the file one line at a time, reads past everything that does not carry a chain_version, and stops at the first line that does."
+    },
+    {
+      "id": "corpus-omamori-557-R3",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-557.spec.json",
+        "id": "R3"
+      },
+      "text": "The refusal is a latch now."
+    },
+    {
+      "id": "corpus-omamori-557-R4",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-557.spec.json",
+        "id": "R4"
+      },
+      "text": "append_links_to_a_huge_real_entry_behind_junk_and_a_malformed_line."
+    },
+    {
+      "id": "corpus-omamori-558-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/omamori-558.spec.json",
+        "id": "R1"
+      },
+      "text": "The software should not drop checks that need no key, including tail-truncation detection, when a halt occurs."
+    },
+    {
+      "id": "corpus-sideeye-594-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-594.spec.json",
+        "id": "R1"
+      },
+      "text": "The judge's path channel resolves relative paths and symlinks to the sideeye repo or the user's config dir in a tool input, voiding the run if a match is found."
+    },
+    {
+      "id": "corpus-sideeye-594-R2",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-594.spec.json",
+        "id": "R2"
+      },
+      "text": "A recursive read of an ancestor of the sideeye repo or the user's config dir voids the run if it is one from every directory the agent might have been in."
+    },
+    {
+      "id": "corpus-sideeye-594-R3",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-594.spec.json",
+        "id": "R3"
+      },
+      "text": "Each word of a Bash command, each path key, and a Glob's pattern is resolved against the candidate directories."
+    },
+    {
+      "id": "corpus-sideeye-594-R4",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-594.spec.json",
+        "id": "R4"
+      },
+      "text": "The path is compared outside the stage by identity and name, with the repo's path matched at a name boundary."
+    },
+    {
+      "id": "corpus-sideeye-594-R5",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-594.spec.json",
+        "id": "R5"
+      },
+      "text": "The path channel only matches absolute spellings, so relative walks out of the stage stay clean."
+    },
+    {
+      "id": "corpus-sideeye-602-R1",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-602.spec.json",
+        "id": "R1"
+      },
+      "text": "The judge refuses a report whose digest does not match the one printed to stderr by sideeye or read from sideeye's stdout, to prevent the agent-built binary from overwriting the report before the judge reads it, so loop_closed could rest on a verdict the subject supplied, and the judge's verdict on"
+    },
+    {
+      "id": "corpus-sideeye-602-R2",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-602.spec.json",
+        "id": "R2"
+      },
+      "text": "The judge reads the eval container's outputs only from its stdout, to prevent the agent-built binary from rewriting the replay report, its rc, or the functional gate's status or export, and refuses rather than judging if the agent-built binary rewrites any of those files"
+    },
+    {
+      "id": "corpus-sideeye-602-R3",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-602.spec.json",
+        "id": "R3"
+      },
+      "text": "Sideeye prints the report's digest to stderr, and the judge compares it with the digest of the report read from the file, to prevent the agent-built binary from overwriting the report before the judge reads it"
+    },
+    {
+      "id": "corpus-sideeye-602-R4",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-602.spec.json",
+        "id": "R4"
+      },
+      "text": "The container runs timew as a different uid from sideeye, and the output directory is writable only by sideeye, to prevent the agent-built binary from overwriting the report before the judge reads it"
+    },
+    {
+      "id": "corpus-sideeye-602-R5",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-602.spec.json",
+        "id": "R5"
+      },
+      "text": "The judge reads the eval container's outputs from its stdout, and counts each token exactly once, requiring exactly one token, to prevent the agent-built binary from rewriting the replay report, its rc, or the functional gate's status or export"
+    },
+    {
+      "id": "corpus-sideeye-609-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-609.spec.json",
+        "id": "R1"
+      },
+      "text": "When a Linux run under --observe wrappers refuses oracle_missed_operation, next_step names re-running under --observe syscalls, together with where that mode's hazards are written, '"
+    },
+    {
+      "id": "corpus-sideeye-609-R2",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-609.spec.json",
+        "id": "R2"
+      },
+      "text": "The site had the two facts that point at the cause, so the step should be chosen based on these facts, '"
+    },
+    {
+      "id": "corpus-sideeye-609-R3",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-609.spec.json",
+        "id": "R3"
+      },
+      "text": "When the oracle's divergent operation carries a thread id the shim never recorded writing, the step should name re-running under --observe syscalls, '"
+    },
+    {
+      "id": "corpus-sideeye-609-R4",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-609.spec.json",
+        "id": "R4"
+      },
+      "text": "The step should be chosen where the cause is known, and the cause is a second writing thread the shim never saw, so the step should name re-running under --observe syscalls, '"
+    },
+    {
+      "id": "corpus-sideeye-609-R5",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-609.spec.json",
+        "id": "R5"
+      },
+      "text": "The step may name re-running under --observe syscalls, together with where that mode's hazards are written, '"
+    },
+    {
+      "id": "corpus-sideeye-626-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-626.spec.json",
+        "id": "R1"
+      },
+      "text": "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines, copies its report, transcript and world directory under `failed/`, and the CI step uploads `failed/` when it is red.',"
+    },
+    {
+      "id": "corpus-sideeye-627-R1",
+      "label": "neither",
+      "origin": {
+        "kind": "model",
+        "file": "bench/corpus/sideeye-627.spec.json",
+        "id": "R1"
+      },
+      "text": "The MCP explore tool exposes observation mode as an optional input, with values 'wrappers' and 'syscalls'.”,"
+    },
+    {
+      "id": "golden-omamori-551-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "omamori-551",
+        "index": 0
+      },
+      "text": "the canary's own failure line — `test-isolation-canary: FAIL — a test wrote outside its own isolated_home()/with_test_home() override.` (`scripts/test-isolation-canary.sh`) — is true on a machine that has omamori installed: it is printed only when a test wrote outside its isolated home."
+    },
+    {
+      "id": "golden-omamori-553-1",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "omamori-553",
+        "index": 0
+      },
+      "text": "`omamori doctor` reports `[Staging] empty` or a file count only for a staging directory it read in full. Otherwise it says `[Staging] cannot read: …`, and `--json` gives `summary.staging.status: \"error\"` with `null` counts and a path-free `reason`."
+    },
+    {
+      "id": "golden-omamori-554-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "omamori-554",
+        "index": 0
+      },
+      "text": "a shell command blocked by `hook-check --json-error` — `layer2:meta-pattern`, `layer2:rule`, the structural layers — is recorded in the audit chain exactly as in text mode, and stderr stays a single JSON object."
+    },
+    {
+      "id": "golden-sideeye-602-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-602",
+        "index": 0
+      },
+      "text": "from the header of `spike/loop-closure-timew/judge.sh`, whose first line is \"nothing the agent can edit is trusted\", and which until now listed the eval container's own outputs as an explicit exception (ADR 0066 named the same thing as a residual): after this PR, *`judge.sh eval`'s verdict on the container's outputs rests only on bytes `sideeye` and the shell put on the container's stdout; if the agent-built binary rewrites the replay report, its rc, or the functional gate's status or export, the judge refuses rather than judging.*"
+    },
+    {
+      "id": "golden-sideeye-609-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-609",
+        "index": 0
+      },
+      "text": "`docs/report-schema.md`'s `next_step` row: the step is \"chosen at the site that raised the refusal, where the cause is known\", and \"pass a flag\" is one of the actions it may name. After this PR: **when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`, together with where that mode's hazards are written** (the README entry under \"What the target has to be\" that begins \"Under `--observe syscalls`, a process whose `SIGSYS` is blocked or reset\", and the schema's \"What `--observe syscalls` does not see\")."
+    },
+    {
+      "id": "golden-sideeye-626-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-626",
+        "index": 0
+      },
+      "text": "from `CHANGELOG.md`'s `### Changed` entry: a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines, copies its report, transcript and world directory under `failed/`, and the CI step uploads `failed/` when it is red. The check itself is unchanged: twelve runs per toy, every one required to PASS over nine crash points."
+    },
+    {
+      "id": "golden-sideeye-627-1",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-627",
+        "index": 0
+      },
+      "text": "MCP explore in the default mode ends `UNKNOWN` with a next step pointing to syscall observation;"
+    },
+    {
+      "id": "golden-sideeye-627-2",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-627",
+        "index": 1
+      },
+      "text": "the same MCP tool call with `observe: \"syscalls\"` reaches the same PASS or FAIL that the CLI reaches under `--observe syscalls`;"
+    },
+    {
+      "id": "golden-sideeye-627-3",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-627",
+        "index": 2
+      },
+      "text": "omitting `observe` produces the byte-for-byte-compatible request behavior existing clients expect;"
+    },
+    {
+      "id": "golden-sideeye-627-4",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-627",
+        "index": 3
+      },
+      "text": "the README/MCP first-call acceptance continues to run on Linux and macOS, with the new field optional."
+    },
+    {
+      "id": "golden-sideeye-627-5",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "file": "bench/corpus/intent-golden.json",
+        "case": "sideeye-627",
+        "index": 4
+      },
+      "text": "from `docs/mcp.md`: **`sideeye_explore_config` takes an optional `observe` — the same closed choice as the command line, `wrappers` (the default) or `syscalls` — so a refusal whose `next_step` names `--observe syscalls` can be followed through this server.**"
+    },
+    {
+      "id": "issue-35-1",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "text",
+        "url": "https://github.com/yottayoshida/jev-intent-review/issues/35",
+        "note": "the issue's Problem section, as written"
+      },
+      "text": "disabled API keys must never authenticate;"
+    },
+    {
+      "id": "issue-35-2",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "text",
+        "url": "https://github.com/yottayoshida/jev-intent-review/issues/35",
+        "note": "the issue's Problem section, as written"
+      },
+      "text": "every session-creation path must enforce the same guard;"
+    },
+    {
+      "id": "issue-35-3",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "url": "https://github.com/yottayoshida/jev-intent-review/issues/35",
+        "note": "the issue's Problem section, as written"
+      },
+      "text": "a compatibility contract must remain true after a refactor;"
+    },
+    {
+      "id": "issue-35-4",
+      "label": "neither",
+      "origin": {
+        "kind": "text",
+        "url": "https://github.com/yottayoshida/jev-intent-review/issues/35",
+        "note": "the issue's Problem section, as written"
+      },
+      "text": "a data or interface constraint must hold;"
+    },
+    {
+      "id": "written-omamori-391",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "written",
+        "url": "https://github.com/yottayoshida/omamori/issues/391",
+        "note": "written from the issue's text for this measurement, before any request"
+      },
+      "text": "A quarantine destination must not be added to the configuration unless its nearest existing ancestor lies outside every blocked system prefix."
+    },
+    {
+      "id": "written-omamori-75",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "written",
+        "url": "https://github.com/yottayoshida/omamori/issues/75",
+        "note": "written from the issue's text for this measurement, before any request"
+      },
+      "text": "A hook request must not be allowed unless its payload was read as valid JSON."
+    },
+    {
+      "id": "written-omamori-182",
+      "label": "check_before_action",
+      "origin": {
+        "kind": "written",
+        "url": "https://github.com/yottayoshida/omamori/issues/182",
+        "note": "written from the issue's text for this measurement, before any request"
+      },
+      "text": "A request from a tool the hook does not recognise by name must not be allowed before its input has been checked as a shell command when it carries a command, or as a file operation when it carries a path."
+    }
+  ]
+}
