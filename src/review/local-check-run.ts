@@ -35,18 +35,17 @@
 // does not make the run exit nonzero — a configuration, repository or provider failure still does.
 // A finding is two readings that disagree, printed with everything needed to disagree with them.
 
-import { analyzeChange } from "../change/seeds.ts";
+import { analyzeChange, type ChangeAnalysis } from "../change/seeds.ts";
 import { Discoverer } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
 import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
-import { codeSpan, intentSection } from "../report/markdown.ts";
-import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type IntentSource, type IntentSpec, type Requirement, type RequirementForm } from "../types.ts";
+import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import { applicabilityOf, definitionsOfName } from "../plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
-import { DEFAULT_FORM, formOf, FORMS } from "../plan/forms.ts";
+import { formOf } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
@@ -196,6 +195,16 @@ export interface LocalCheckRevisions {
   after: string;
 }
 
+/** A run over every requirement, with what it read and what it sent. */
+export interface LocalCheckRun {
+  requirements: LocalCheckResult[];
+  /** The change as read once for the run, so the pass over the changes can read the same one. */
+  change: ChangeAnalysis;
+  /** Requests the host answered its own way, right or wrong, and requests it answered. */
+  reached: number;
+  answered: number;
+}
+
 export async function runLocalCheck(
   git: Git,
   revisions: LocalCheckRevisions,
@@ -203,8 +212,8 @@ export async function runLocalCheck(
   judge: JudgmentProvider,
   include: (path: string) => boolean,
   options: LocalCheckOptions = DEFAULT_LOCAL_CHECK,
-): Promise<LocalCheckResult[]> {
-  const discoverer = new Discoverer(git, revisions.after, { include, maxCandidates: 20, lexicalSearch: true, referenceSearch: true });
+): Promise<LocalCheckRun> {
+  const discoverer = new Discoverer(git, revisions.after, { include });
   const files = new CandidateFiles(discoverer);
 
   // The change is read once: it does not depend on which requirement is being checked, and the
@@ -416,7 +425,7 @@ export async function runLocalCheck(
   if (hostReached > 0 && answered === 0) {
     throw new ToolError(`no judgment came back from ${failedAt ?? "the judgment provider"}: ${hostReached} request(s) were sent and none was answered`, EXIT.provider);
   }
-  return out;
+  return { requirements: out, change, reached: hostReached, answered };
 }
 
 /**
@@ -426,95 +435,4 @@ export async function runLocalCheck(
 function callsOwn(error: unknown): string {
   if (!(error instanceof ProviderError) || FATAL_KINDS.has(error.kind)) throw error;
   return `${error.kind}${error.where === undefined ? "" : ` from ${error.where}`}`;
-}
-
-const ORIGIN_WORDS: Record<Site["origin"], string> = {
-  changed: "in a function the change touched",
-  calls_changed: "in a function that calls one the change touched",
-};
-
-/**
- * The report: what is worth checking, then what was read and how each call came out, then what was
- * not checked and why.
- *
- * Every sentence in it is this file's, a form's or the input's. Nothing is a model's prose — the two
- * model answers appear as a choice and a number, named as Jev's, and the reasoning between them is
- * assembled from the parts. No requirement-level verdict appears anywhere, and neither does the
- * name of any outcome: the sections say what each call was read as.
- */
-export function renderLocalCheck(results: readonly LocalCheckResult[], read?: { intent: IntentSpec; sources: readonly Omit<IntentSource, "text">[]; prAuthor?: string; notes?: readonly string[] }): string {
-  const lines: string[] = [
-    "# Local check (experimental)",
-    "",
-    `Two questions are put to Jev about each call, separately: what the requirement requires of the call, and what the function does under an assumption. Which two is the requirement's form, named with it. The bar for each is ${BAR}.`,
-    "",
-    "**Nothing here is a requirement verdict.** One rule, the same for every form, reads each call as worth checking, holding, not settled, or not required of by the requirement. The two answers do not check each other, and everything either of them rests on is printed.",
-    "",
-    ...(read ? intentSection(read.intent, read.sources, read) : []),
-  ];
-  for (const r of results) {
-    const c = r.counts;
-    // A result built without a form — a record from before forms, a test's — reads as the default.
-    const form = FORMS[r.form ?? DEFAULT_FORM];
-    // The requirement is the author's text: a code span, so no line of it can become a heading, a
-    // comment that hides the rest of the report, or a workflow command; and redacted for display.
-    lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
-    lines.push(`Form: \`${r.form}\`. ${form.words.intro}`, "");
-    lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
-    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
-    if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
-    lines.push("");
-
-    if (r.findings.length > 0) {
-      lines.push("### Worth checking", "");
-      for (const f of r.findings) {
-        lines.push(`#### ${f.file}:${f.lines} · ${f.function} — \`${f.call}\``);
-        lines.push(`- **Requirement ${f.requirementId}**: ${codeSpan(f.quote)}`);
-        lines.push(`- **Assumed**: ${f.condition}`);
-        lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
-        lines.push(`- **${form.words.asks}**: ${f.observation} (${f.probability.toFixed(2)})`);
-        lines.push(`- **Why it is listed**: ${f.why}`, "");
-      }
-    }
-
-    if (r.observed.length === 0) {
-      lines.push("_Nothing was read._", "");
-      // Only the ones that are not already below with a reason of their own. A budgeted call every
-      // one of which was held reads, otherwise, as a list of calls nothing was asked about for no
-      // stated reason — while the real reasons sit in the next section.
-      const withReason = new Set(r.unchecked.map((u) => `${u.function}\u0000${u.call}`));
-      const silent = r.wouldAsk.filter((w) => !withReason.has(`${w.function}\u0000${w.call}`));
-      if (silent.length > 0) {
-        lines.push("### Inside the budget", "", "The calls the budget selected. Nothing was asked about them here.", "");
-        for (const w of silent) lines.push(`- ${w.file} · ${w.function} — \`${w.call}\` _(${ORIGIN_WORDS[w.origin]})_`);
-        lines.push("");
-      }
-    }
-    for (const o of r.observed) {
-      lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
-      lines.push(`  - ${form.words.observed}: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
-    }
-    // Every call read is in exactly one of these, or under "Worth checking" above: all come off the
-    // outcome the rule gave it, so a call cannot be in two readings or in none.
-    const mappingOf = new Map(r.mappings.map((m) => [m.callId, m]));
-    const section = (outcome: Outcome, heading: string, note: string | undefined, why: (o: Observed, m: MappingRecord | undefined) => string) => {
-      const these = r.observed.filter((o) => o.outcome === outcome);
-      if (these.length === 0) return;
-      lines.push("", `### ${heading}`, "", ...(note ? [note, ""] : []));
-      for (const o of these) lines.push(`- ${o.file} · ${o.function} — \`${o.call}\`: ${why(o, mappingOf.get(o.callId))}`);
-    };
-    section("satisfies", "Read as holding", "Two readings that agree. Where what decides it is in code that was not sent, they can agree and be wrong.", (o, m) => `${m?.why ?? "the mapping was not recorded"}; ${o.result.why} (${o.result.probability.toFixed(2)})`);
-    section("unknown", "Not settled", "A call read, and not settled either way by the two answers.", (o, m) => (m?.governs ? `${m.why}, but ${o.result.why}` : (m?.why ?? "the mapping was not recorded")));
-    section("aside", "Read, but not required of by the requirement", undefined, (_o, m) => (m ? `read as \`${m.verdict}\` (${m.probability.toFixed(2)}): not a requirement of this call` : "the mapping was not recorded"));
-    if (r.unchecked.length > 0) {
-      lines.push("", "### Not checked", "");
-      for (const u of r.unchecked) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\` _(${ORIGIN_WORDS[u.origin]})_: ${u.why}`);
-    }
-    if (r.notes.length > 0) {
-      lines.push("", "### Notes", "");
-      for (const n of r.notes) lines.push(`- ${n}`);
-    }
-    lines.push("");
-  }
-  return lines.join("\n");
 }

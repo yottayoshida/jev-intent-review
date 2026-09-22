@@ -269,15 +269,15 @@ test("without the named host's key, or with a setting to fix, nothing is sent at
     await main([...args, "--json"], { stdout: (t) => void out.push(t), stderr: () => {}, cwd: repo.dir, env: { JEV_PROVIDER: "vercel", AI_GATEWAY_API_KEYS: "a typo" } });
     assert.match(out.join(""), /AI_GATEWAY_API_KEY, which JEV_PROVIDER=vercel needs/);
     // And the skipped report names the model the named host would have been asked for.
-    const skipped = JSON.parse(out.join("")) as { verdict: string; metadata: { model: string } };
-    assert.equal(skipped.verdict, "skipped");
+    const skipped = JSON.parse(out.join("")) as { skipReason?: string; metadata: { model: string } };
+    assert.match(skipped.skipReason ?? "", /No credentials/);
     assert.equal(skipped.metadata.model, "typesafe-ai/jev");
   } finally {
     repo.remove();
   }
 });
 
-test("the review path, too: JEV_PROVIDER decides where it goes, and the report says which host judged", async () => {
+test("with no flag at all, too: JEV_PROVIDER decides where it goes, and the report says which host judged", async () => {
   const realFetch = globalThis.fetch;
   globalThis.fetch = (async () => {
     throw new Error("the real network was reached");
@@ -287,11 +287,13 @@ test("the review path, too: JEV_PROVIDER decides where it goes, and the report s
     const { fetch, seen } = standIn("typesafe", documentedAnswers);
     const out: string[] = [];
     const err: string[] = [];
-    const reviewArgs = args.filter((a) => a !== "--experimental-local-check");
-    const code = await main([...reviewArgs, "--json"], { stdout: (t) => void out.push(t), stderr: (t) => void err.push(t), cwd: repo.dir, env: { JEV_PROVIDER: "typesafe", ...EVERY_KEY } }, { fetch });
-    const report = JSON.parse(out.join("")) as { verdict: string; sent: { requests: number; endpoint?: string; host?: string }; metadata: { model: string } };
-    assert.ok(code === 0 || code === 1 || code === 2, `a review result, not a failure: ${code} ${err.join("")}`);
-    assert.notEqual(report.verdict, "skipped");
+    const plainArgs = args.filter((a) => a !== "--experimental-local-check");
+    const code = await main([...plainArgs, "--json"], { stdout: (t) => void out.push(t), stderr: (t) => void err.push(t), cwd: repo.dir, env: { JEV_PROVIDER: "typesafe", ...EVERY_KEY } }, { fetch });
+    const report = JSON.parse(out.join("")) as { version: number; skipReason?: string; sent: { requests: number; answered: number; endpoint?: string; host?: string }; metadata: { model: string } };
+    assert.equal(code, 0, `a finished run: ${code} ${err.join("")}`);
+    assert.equal(report.version, 2);
+    assert.equal(report.skipReason, undefined);
+    assert.equal(report.sent.answered, seen.length, "every request was answered");
     assert.ok(seen.length > 0 && seen.every((s) => !s.refused && s.url === DOCUMENTED.typesafe.url && s.authorization === `Bearer ${KEYS.typesafe}`), JSON.stringify(seen.slice(0, 2)));
     assert.equal(report.sent.requests, seen.length);
     assert.equal(report.sent.endpoint, "https://api.typesafe.ai");
@@ -329,7 +331,9 @@ test("JEV_PROVIDER and that host's key: every request goes to that host only, in
       assert.ok(!/skipped|No credentials/i.test(text), `${host}: not skipped`);
       assert.match(text, /### Worth checking/, host);
       assert.match(text, /\*\*Jev, on what the function returns\*\*: returns_success/, host);
-      outputs.push(text);
+      // The report names the host and Jev's name there, which differ by design; everything above
+      // that line — every call and every reading — has to be the same.
+      outputs.push(text.split("## Sent to the judgment model")[0]!);
     }
     assert.equal(outputs[1], outputs[0], "TypeSafe reaches the result Cloudflare does");
     assert.equal(outputs[2], outputs[0], "Vercel AI Gateway reaches the result Cloudflare does");

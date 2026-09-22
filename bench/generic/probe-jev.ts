@@ -9,11 +9,11 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { enclosingBlock } from "../src/change/blocks.ts";
-import { JevClient, endpointFromEnv } from "../src/judgments/client.ts";
-import { JevProvider } from "../src/judgments/jev.ts";
-import { CANDIDATE_QUESTIONS } from "../src/judgments/questions.ts";
-import { FIXTURES } from "../test/helpers/repo.ts";
+import { enclosingBlock } from "../../src/change/blocks.ts";
+import { JevClient, endpointFromEnv } from "../../src/judgments/client.ts";
+import { JevProvider } from "../../src/judgments/jev.ts";
+import { CANDIDATE_QUESTIONS } from "./questions.ts";
+import { FIXTURES } from "../../test/helpers/repo.ts";
 
 const fixture = join(FIXTURES, "missed-path");
 const read = (path: string) => readFileSync(existsSync(join(fixture, "head", path)) ? join(fixture, "head", path) : join(fixture, "base", path), "utf8");

@@ -24,15 +24,30 @@ export interface Config {
   judgment: { violation_probability: number; satisfaction_probability: number; relevance_probability: number };
   limits: { max_requests: number; max_sent_bytes: number; max_seconds: number };
   policy: {
-    fail_on: "violation"[];
+    /** `finding`: exit 1 when a call is worth checking. `violation` in a file is read as `finding`. */
+    fail_on: "finding"[];
     unknown: "warn" | "fail";
     missing_credentials: "skip" | "fail";
     no_intent: "skip" | "fail";
   };
 }
 
-// `policy.missing_credentials` and `intent.pr_body_only` are provisional defaults, to be settled
-// before v0.1.0.
+/**
+ * Keys that governed the generic run and no longer apply (ADR 0007). A file that sets one is not
+ * refused — a repository must not stop on upgrade — but the run says so in its notes. Gone in the
+ * next minor version.
+ */
+const NO_LONGER_APPLIES: Record<string, string> = {
+  "discovery.max_candidates_per_requirement": "the run reads the functions the change touched and their callers, not a repository-wide search",
+  "discovery.lexical_search": "the run reads the functions the change touched and their callers, not a repository-wide search",
+  "discovery.reference_search": "the run reads the functions the change touched and their callers, not a repository-wide search",
+  "judgment.satisfaction_probability": "no satisfaction question is asked; each call is read at the bar of its form",
+  "judgment.relevance_probability": "no relevance question is asked; each call is read at the bar of its form",
+  "evidence.max_related_chars": "the local check sends a function's own body and nothing around it",
+  "policy.unknown": "no requirement-level UNKNOWN is stated",
+};
+
+// `policy.missing_credentials` is a provisional default, to be settled before 1.0.
 export function defaultConfig(): Config {
   return {
     version: 1,
@@ -54,7 +69,8 @@ export function defaultConfig(): Config {
     // happen, so 0.6.
     judgment: { violation_probability: 0.7, satisfaction_probability: 0.5, relevance_probability: 0.6 },
     limits: { max_requests: 400, max_sent_bytes: 4_000_000, max_seconds: 600 },
-    policy: { fail_on: ["violation"], unknown: "warn", missing_credentials: "skip", no_intent: "skip" },
+    // A listed call is a candidate, not a verdict: nothing fails on it unless the repository says so.
+    policy: { fail_on: [], unknown: "warn", missing_credentials: "skip", no_intent: "skip" },
   };
 }
 
@@ -92,7 +108,7 @@ const RULES: Record<string, Record<string, Rule>> = {
     max_seconds: { kind: "number", min: 10, max: 86_400 },
   },
   policy: {
-    fail_on: { kind: "enums", values: ["violation"] },
+    fail_on: { kind: "enums", values: ["finding", "violation"] },
     unknown: { kind: "enum", values: ["warn", "fail"] },
     missing_credentials: { kind: "enum", values: ["skip", "fail"] },
     no_intent: { kind: "enum", values: ["skip", "fail"] },
@@ -131,8 +147,12 @@ function check(source: string, key: string, rule: Rule, value: unknown): unknown
   }
 }
 
-/** Parses a config file. Unknown keys are an error: a misspelt key would otherwise do nothing. */
-export function parseConfig(text: string, source: string): Config {
+/**
+ * Parses a config file. Unknown keys are an error: a misspelt key would otherwise do nothing. A key
+ * that no longer applies is kept and reported in `notes`, and `violation` under `policy.fail_on` is
+ * read as `finding`.
+ */
+export function readConfig(text: string, source: string): { config: Config; notes: string[] } {
   let raw: unknown;
   try {
     raw = parse(text);
@@ -140,7 +160,8 @@ export function parseConfig(text: string, source: string): Config {
     fail(source, `not valid YAML (${error instanceof Error ? error.message.split("\n")[0] : String(error)})`);
   }
   const config = defaultConfig();
-  if (raw === null || raw === undefined) return config;
+  const notes: string[] = [];
+  if (raw === null || raw === undefined) return { config, notes };
   if (typeof raw !== "object" || Array.isArray(raw)) fail(source, "must be a mapping");
   for (const [section, value] of Object.entries(raw as Record<string, unknown>)) {
     if (section === "version") {
@@ -156,16 +177,31 @@ export function parseConfig(text: string, source: string): Config {
     for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
       const rule = Object.hasOwn(rules, key) ? rules[key] : undefined;
       if (!rule) fail(source, `unknown key '${section}.${key}'`);
-      target[key] = check(source, `${section}.${key}`, rule, item);
+      const name = `${section}.${key}`;
+      let checked = check(source, name, rule, item);
+      if (name === "policy.fail_on" && (checked as string[]).includes("violation")) {
+        notes.push(`${name} in ${source} says \`violation\`, which is read as \`finding\`: exit 1 when a call is worth checking (ADR 0007)`);
+        checked = [...new Set((checked as string[]).map((v) => (v === "violation" ? "finding" : v)))];
+      }
+      if (Object.hasOwn(NO_LONGER_APPLIES, name)) notes.push(`${name} in ${source} no longer applies: ${NO_LONGER_APPLIES[name]} (ADR 0007)`);
+      if (name === "intent.pr_body_only" && checked === "unknown") notes.push(`${name} in ${source} no longer applies: no requirement-level verdict is stated for it to withhold; that the requirements come only from the pull request's own description is still said (ADR 0007)`);
+      target[key] = checked;
     }
   }
-  return config;
+  return { config, notes };
+}
+
+/** Parses a config file (see `readConfig`); the notes are dropped. */
+export function parseConfig(text: string, source: string): Config {
+  return readConfig(text, source).config;
 }
 
 export interface LoadedConfig {
   config: Config;
   source: string; // where the config came from, for the report
   changedInPullRequest: boolean;
+  /** Settings in the file that the run no longer reads, said once each. */
+  notes: string[];
 }
 
 /**
@@ -175,6 +211,7 @@ export interface LoadedConfig {
 export async function loadConfig(git: Git, before: string, after: string): Promise<LoadedConfig> {
   const [old, next] = await Promise.all([git.readText(before, CONFIG_PATH), git.readText(after, CONFIG_PATH)]);
   const changedInPullRequest = old !== next;
-  if (old === null) return { config: defaultConfig(), source: "defaults", changedInPullRequest };
-  return { config: parseConfig(old, `${CONFIG_PATH} at ${before.slice(0, 12)}`), source: `${CONFIG_PATH}@${before.slice(0, 12)}`, changedInPullRequest };
+  if (old === null) return { config: defaultConfig(), source: "defaults", changedInPullRequest, notes: [] };
+  const read = readConfig(old, `${CONFIG_PATH} at ${before.slice(0, 12)}`);
+  return { config: read.config, source: `${CONFIG_PATH}@${before.slice(0, 12)}`, changedInPullRequest, notes: read.notes };
 }

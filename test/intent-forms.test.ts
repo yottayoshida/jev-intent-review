@@ -11,9 +11,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { readRequirements } from "../src/intent/compiler.ts";
-import { intentSection, note } from "../src/report/markdown.ts";
-import { renderLocalCheck, type LocalCheckResult } from "../src/review/local-check-run.ts";
-import type { IntentSource } from "../src/types.ts";
+import { intentSection, note, renderMarkdown } from "../src/report/markdown.ts";
+import type { LocalCheckResult } from "../src/review/local-check-run.ts";
+import type { IntentSource, ReviewReport } from "../src/types.ts";
 
 const CORPUS = join(import.meta.dirname, "..", "bench", "corpus");
 const golden = JSON.parse(readFileSync(join(CORPUS, "intent-golden.json"), "utf8")) as { cases: Record<string, { source: string; text: string }[]> };
@@ -94,11 +94,22 @@ test("text from an issue or a pull request cannot start a line of its own in the
     counts: { budget: 20, functions: { changed: 0, calls_changed: 0 }, calls: 0, applicable: 0, asked: 0, mapped: 0, governed: 0, overBudget: 0, notApplicable: 0 },
     notes: [],
   } as unknown as LocalCheckResult;
-  for (const text of [renderLocalCheck([result], { intent: reading.spec, sources }), intentSection(reading.spec, sources).join("\n")]) {
+  const report: ReviewReport = {
+    version: 2,
+    tool: { name: "jev-intent-review", version: "0" },
+    exitCode: 0,
+    intent: reading.spec,
+    sources,
+    requirements: [result],
+    unexpectedChanges: [],
+    sent: { requests: 0, bytes: 0, answered: 0 },
+    metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", questionsHash: "abc", configSource: "defaults", notes: [] },
+  };
+  for (const text of [renderMarkdown(report), intentSection(reading.spec, sources).join("\n")]) {
     const lines = text.split("\n");
     assert.deepEqual(lines.filter((l) => l.trimStart().startsWith("::")), [], "no workflow command");
     const headings = lines.filter((l) => /^#{1,6}\s/.test(l));
-    assert.ok(headings.every((h) => /^(# Local check|## Intent|## R1)/.test(h)), `only the tool's own headings: ${headings.join(" | ")}`);
+    assert.ok(headings.every((h) => /^(# jev-intent-review|## Intent|## R1|## Sent to the judgment model)/.test(h)), `only the tool's own headings: ${headings.join(" | ")}`);
     // A code span closes at the next run of the same number of backticks, as GitHub reads it.
     const outside = text.replace(/(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)/g, "");
     assert.ok(!/<details>/.test(outside), "no HTML outside a code span");

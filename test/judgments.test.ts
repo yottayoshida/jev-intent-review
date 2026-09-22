@@ -4,7 +4,7 @@ import { inspect } from "node:util";
 import { JevClient, EndpointError, endpointFromEnv, fromEndpoint, JUDGMENT_ENV, PROVIDERS, ProviderError, type Endpoint, type Host, type Provider } from "../src/judgments/client.ts";
 import { JevProvider, readChoice, unwrapAnswers } from "../src/judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider, type Questions } from "../src/judgments/provider.ts";
-import { CANDIDATE_QUESTIONS, QUESTIONS_HASH } from "../src/judgments/questions.ts";
+import { CHANGE_QUESTIONS, QUESTIONS_HASH } from "../src/judgments/questions.ts";
 
 /** Every request the transport lets through asks for this model; the guard is tested in `only-jev`. */
 const JEV = { model: "typesafe/jev" };
@@ -430,18 +430,17 @@ test("readChoice accepts only an offered choice, with the probability every deci
 
 test("JevProvider sends state and the constant questions, and returns one checked answer per question", async () => {
   const answer = (choice: string) => ({ type: "choice", choice, confidence: 0.9, probabilities: { [choice]: 0.9 } });
-  const { c, calls } = client([json({ result: { result: { answers: { relevance: answer("may_violate"), satisfaction: answer("violates") } } } })]);
+  const { c, calls } = client([json({ result: { result: { answers: { justification: answer("unrelated") } } } })]);
   const jev = new JevProvider(c);
-  const result = await jev.judge({ requirement: "r" }, CANDIDATE_QUESTIONS);
-  assert.equal(result.relevance?.choice, "may_violate");
-  assert.equal(result.satisfaction?.choice, "violates");
+  const result = await jev.judge({ requirement: "r" }, CHANGE_QUESTIONS);
+  assert.equal(result.justification?.choice, "unrelated");
   const body = JSON.parse(String(calls[0]?.init.body));
   assert.equal(body.model, "typesafe/jev");
-  assert.deepEqual(body.input.questions, CANDIDATE_QUESTIONS);
+  assert.deepEqual(body.input.questions, CHANGE_QUESTIONS);
   assert.deepEqual(body.input.state, { requirement: "r" });
 
-  const missing = client([json({ answers: { relevance: answer("unrelated") } })]);
-  assert.equal((await providerError(new JevProvider(missing.c).judge({}, CANDIDATE_QUESTIONS))).kind, "bad_response");
+  const missing = client([json({ answers: { something_else: answer("unrelated") } })]);
+  assert.equal((await providerError(new JevProvider(missing.c).judge({}, CHANGE_QUESTIONS))).kind, "bad_response");
 });
 
 test("QUESTIONS_HASH is stable and short", () => {
@@ -464,11 +463,11 @@ class SlowFake implements JudgmentProvider {
 test("LimitedProvider never runs more than `concurrency` calls at once", async () => {
   const inner = new SlowFake();
   const limited = new LimitedProvider(inner, { concurrency: 3, deadline: Date.now() + 60_000 });
-  await Promise.all(Array.from({ length: 20 }, () => limited.judge({}, CANDIDATE_QUESTIONS)));
+  await Promise.all(Array.from({ length: 20 }, () => limited.judge({}, CHANGE_QUESTIONS)));
   assert.equal(inner.maxInFlight, 3);
 
   const late = new LimitedProvider(inner, { concurrency: 1, deadline: 0 });
-  assert.equal((await providerError(late.judge({}, CANDIDATE_QUESTIONS))).kind, "budget");
+  assert.equal((await providerError(late.judge({}, CHANGE_QUESTIONS))).kind, "budget");
 });
 
 test("the request and byte budget counts what is actually sent, retries included", async () => {
@@ -498,7 +497,7 @@ test("LimitedProvider checks the deadline again after waiting for a slot", async
     },
   };
   const limited = new LimitedProvider(stepping, { concurrency: 1, deadline: 150 }, () => clock);
-  const results = await Promise.allSettled(Array.from({ length: 10 }, () => limited.judge({}, CANDIDATE_QUESTIONS)));
+  const results = await Promise.allSettled(Array.from({ length: 10 }, () => limited.judge({}, CHANGE_QUESTIONS)));
   assert.deepEqual(sent, [0, 100], "calls queued behind the deadline are not sent");
   assert.equal(results.filter((r) => r.status === "rejected").length, 8);
 });

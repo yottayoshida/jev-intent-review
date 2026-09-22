@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { main, type Deps } from "../src/cli/main.ts";
+import { CHANGE_QUESTIONS } from "../src/judgments/questions.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { ChoiceAnswer } from "../src/types.ts";
 import { FIXTURES, fixtureRepo } from "./helpers/repo.ts";
@@ -49,20 +50,30 @@ function recording(): { deps: Deps; sent: Sent[] } {
   return { deps: { judges: () => ({ provider, sent: () => ({ requests: sent.length, bytes: 0 }), origin: "https://api.cloudflare.com" }) }, sent };
 }
 
-test("the local check's requests through the command line are what they were before the default run became the local check", async () => {
+test("the default run sends, for the calls, exactly what the flagged path sent before it became the default — and the changes' questions only after", async () => {
   const repo = fixtureRepo("integrity-rust");
   try {
     const { deps, sent } = recording();
     const out: string[] = [];
-    const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", join(FIXTURES, "integrity-rust", "spec.json"), "--experimental-local-check", "--json"], { stdout: (t) => void out.push(t), stderr: () => {}, cwd: repo.dir, env: CREDENTIALS }, deps);
+    // No flag: this is the run now. The record was taken with the flag, before that was so.
+    const code = await main(["--base", repo.base, "--head", repo.head, "--intent-spec", join(FIXTURES, "integrity-rust", "spec.json"), "--json"], { stdout: (t) => void out.push(t), stderr: () => {}, cwd: repo.dir, env: CREDENTIALS }, deps);
     assert.equal(code, 0);
     // JSON round trip: what is compared is what a host would have received.
-    const now = JSON.parse(JSON.stringify(sent)) as Sent[];
+    const all = JSON.parse(JSON.stringify(sent)) as Sent[];
+    // A request is the change question's when its questions are exactly that question's, so a form
+    // that took the same name would not drop out of the comparison unseen.
+    const changeKeys = Object.keys(CHANGE_QUESTIONS).sort().join(",");
+    const isChange = (s: Sent) => Object.keys(s.questions).sort().join(",") === changeKeys;
+    const now = all.filter((s) => !isChange(s));
     if (process.env.WRITE_GOLDEN === "1") writeFileSync(GOLDEN, `${JSON.stringify(now, null, 2)}\n`);
     const golden = JSON.parse(readFileSync(GOLDEN, "utf8")) as Sent[];
     assert.ok(golden.length > 0, "the record holds requests");
-    assert.equal(now.length, golden.length, "how many requests");
+    assert.equal(now.length, golden.length, "how many requests for the calls");
     for (let i = 0; i < golden.length; i++) assert.equal(JSON.stringify(now[i]), JSON.stringify(golden[i]), `request ${i + 1}`);
+    // The changes are asked about after every call has been, never in between.
+    const firstChange = all.findIndex(isChange);
+    assert.ok(firstChange >= golden.length, `the changes' questions come after the calls' (first at ${firstChange + 1} of ${all.length})`);
+    assert.ok(all.slice(firstChange).every(isChange), "and nothing about a call comes after them");
   } finally {
     repo.remove();
   }

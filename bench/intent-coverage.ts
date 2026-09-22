@@ -49,7 +49,7 @@ for (const file of readdirSync(join(HERE, "corpus")).filter((f) => f.endsWith(".
     const [before, after] = readFileSync(revsFile, "utf8").trim().split(/\s+/);
     if (reading.spec.requirements.length > 0 && before && after) {
       const results = await runLocalCheck(new Git(clones[repo] as string), { before, after }, reading.spec.requirements, asksNothing, () => true, { ...DEFAULT_LOCAL_CHECK, candidatesOnly: true });
-      candidates = Math.max(0, ...results.map((r) => r.wouldAsk.length));
+      candidates = Math.max(0, ...results.requirements.map((r) => r.wouldAsk.length));
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
