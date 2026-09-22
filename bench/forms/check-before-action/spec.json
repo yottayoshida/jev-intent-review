@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "title": "A disabled key and the session it opens",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A disabled API key must never create a session.",
+      "form": "check_before_action"
+    }
+  ]
+}

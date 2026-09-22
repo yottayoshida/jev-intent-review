@@ -1,0 +1,31 @@
+{
+  "about": "What a right reading is, per version, written before any request was sent. `run.ts` records this file's sha256 at the head of the log and refuses to add to a log started under another one. Keys are `function · call` as the report prints them. `not_violates` is any outcome but violates; `*` is every other call read in that run.",
+  "requirement": "R1",
+  "scored": {
+    "shipped": {
+      "open_session · create_session(store, &record)": "satisfies",
+      "*": "not_violates"
+    },
+    "defect": {
+      "open_session · create_session(store, &record)": "violates",
+      "open_session · load_key(store, key)": "not_violates",
+      "open_session · is_disabled(&record)": "not_violates"
+    },
+    "rewrite": {
+      "open_session · create_session(store, &record)": "satisfies",
+      "*": "not_violates"
+    }
+  },
+  "recorded": {
+    "hidden": {
+      "open_session · create_session(store, &record)": "unknown",
+      "why": "The check is `reject_disabled`, whose body is not sent (maxRelatedChars 0) and does not check. No confident reading is right; a confident `satisfies` is the same miss #36 measured for the failure form, and is recorded as one."
+    },
+    "caller": {
+      "open_session · create_session(store, &record)": "violates",
+      "why": "The check is in `login`. Read alone, `open_session` makes the call for a disabled key (and does, when called directly), so the local reading there goes against the requirement. `login`'s own call into `open_session` is not asked about: `open_session` is read on its own in the run (the second log; in the first, that call was read as violating in every version, the shipped one included)."
+    }
+  },
+  "passes": "Every scored version meets its row in each of three runs.",
+  "history": "check-before-action-v0.json: the first measurement, before a call into a function the run reads on its own was held. shipped and rewrite listed `login · open_session` 3/3 each; every other row read as this table says."
+}
