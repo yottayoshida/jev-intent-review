@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "title": "The integrity baseline, read from disk",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A baseline that cannot be read is not reported as no baseline at all.",
+      "searchHints": ["baseline"]
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 // Scripted stand-ins for the judgment provider. They decide from the evidence packet (what the real
 // model sees), so a test states which paths it treats as violating and nothing else.
 
-import { isTestPath } from "../../src/discovery/discover.ts";
 import type { JudgmentProvider, Questions } from "../../src/judgments/provider.ts";
 import type { ChoiceAnswer } from "../../src/types.ts";
 
@@ -12,7 +11,6 @@ export function answer(choice: string, p = 0.9): ChoiceAnswer {
 export interface PacketLike {
   candidate?: { path?: string; symbol?: string };
   evidence?: { code?: string; related?: { path: string; code: string }[]; truncated?: boolean };
-  found?: unknown[];
 }
 
 export class ScriptedProvider implements JudgmentProvider {
@@ -31,19 +29,33 @@ export class ScriptedProvider implements JudgmentProvider {
 }
 
 /**
- * Violations where the candidate's code reaches `governed` without `guard` in it or in its related
- * context; satisfied where the guard is there; unrelated elsewhere. `complete` answers the
- * completeness question.
+ * One Jev for the run's questions, reading the packet the way the measured model did on the
+ * fixtures: the requirement governs every call it is asked about (`mapping`); under an assumed
+ * failure a call followed by `?` propagates and any other returns a success; in the forbidden case
+ * a call is made unless a check named `guard` comes before it in the body; and every change is
+ * `justification`. The two readings never agree by construction: one is scripted, one is read.
  */
-export function guardProvider(governed: string, guard: string, complete = "likely_complete"): ScriptedProvider {
+export function formsProvider(options: { mapping?: ChoiceAnswer; guard?: string; justification?: string } = {}): ScriptedProvider {
+  const mapping = options.mapping ?? answer("applies");
   return new ScriptedProvider((state, questions): Record<string, ChoiceAnswer> => {
-    if ("completeness" in questions) return { completeness: answer(complete) };
-    const code = state.evidence?.code ?? "";
-    const context = [code, ...(state.evidence?.related ?? []).map((r) => r.code)].join("\n");
-    // As the real model answered for the fixture's test file (unrelated, 0.83).
-    if (isTestPath(state.candidate?.path ?? "")) return { relevance: answer("unrelated"), satisfaction: answer("not_applicable") };
-    if (!code.includes(`${governed}(`)) return { relevance: answer("unrelated"), satisfaction: answer("not_applicable") };
-    if (context.includes(guard)) return { relevance: answer("directly_enforces"), satisfaction: answer("satisfies") };
-    return { relevance: answer("may_violate"), satisfaction: answer("violates") };
+    const body = state.evidence?.code ?? "";
+    const flat = body.replace(/\s+/g, " ");
+    const out: Record<string, ChoiceAnswer> = {};
+    for (const key of Object.keys(questions)) {
+      const instructions = (questions[key] as { instructions: string }).instructions;
+      // The call the question names. A template that stops naming it would make every reading below
+      // trivially true, so this stops instead.
+      const named = /the call `([^`]+)`/.exec(instructions)?.[1];
+      if (named === undefined && key !== "justification") throw new Error(`the ${key} question does not name its call: ${instructions.slice(0, 80)}`);
+      if (key === "requirement_governs") out[key] = mapping;
+      else if (key === "on_error_result") out[key] = answer(flat.includes(`${named!}?`) ? "returns_error" : "returns_success");
+      else if (key === "on_error_control") out[key] = answer("stops_there");
+      else if (key === "in_forbidden_case") {
+        const guarded = options.guard !== undefined && body.indexOf(`${options.guard}(`) >= 0 && body.indexOf(`${options.guard}(`) < body.indexOf(named!);
+        out[key] = answer(guarded ? "does_not_reach" : "reaches_it");
+      } else if (key === "justification") out[key] = answer(options.justification ?? "clearly_required");
+      else out[key] = answer("cannot_tell");
+    }
+    return out;
   });
 }

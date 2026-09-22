@@ -2,6 +2,10 @@
 
 Status: Accepted
 
+Amended by [0007](0007-the-run-is-the-local-check.md): the blockers below — intent that exists and
+was not checked — are said in the report's notes, since no requirement verdict remains for them to
+withhold. What is read, what is named, and what the change question is not given are unchanged.
+
 ## Context
 
 Since 0.1.0 no model writes requirements: they come from `--intent-spec` or from the items under an

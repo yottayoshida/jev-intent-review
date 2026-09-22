@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "title": "The integrity baseline, read from disk — both forms",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A baseline that cannot be read is not reported as no baseline at all.",
+      "searchHints": ["baseline"]
+    },
+    {
+      "id": "R2",
+      "text": "A baseline file must not be read unless it exists.",
+      "form": "check_before_action"
+    }
+  ]
+}

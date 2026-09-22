@@ -2,6 +2,7 @@
 // change to the tool's output contract.
 
 import type { Host } from "./judgments/client.ts";
+import type { LocalCheckResult } from "./review/local-check-run.ts";
 
 export const REQUIREMENT_KINDS = [
   "behavior",
@@ -84,14 +85,6 @@ export interface IntentSpec {
   ambiguities: Ambiguity[];
 }
 
-/**
- * `not_applicable` is deliberately absent: with only the places Jev calls paths deciding a
- * requirement, "the requirement does not apply here" cannot be told apart from "no place it
- * applies to was found", and a claim that cannot be told apart from ignorance is not made.
- */
-export type Status = "verified" | "violation" | "unknown";
-export type Coverage = "full" | "partial" | "weak" | "none";
-
 /** Lines are 1-based and inclusive. */
 export interface Location {
   path: string;
@@ -120,12 +113,6 @@ export interface ChoiceAnswer {
   probabilities: Record<string, number>;
 }
 
-/** `aside`: not a place the requirement holds or fails on, so it decides nothing either way. */
-export type CandidateOutcome = "satisfies" | "violates" | "unknown" | "aside";
-
-/** Why a place was set aside. Counted in the report and shown to the completeness question. */
-export type AsideReason = "not_a_path" | "unsure" | "unreadable";
-
 /**
  * How much of the evidence was cut, kept apart because the parts do not mean the same thing.
  * `own`: the place's own code. `context`: its callers and the bodies it calls. `ambiguous`: the
@@ -135,42 +122,6 @@ export interface Cut {
   own: boolean;
   context: boolean;
   ambiguous: boolean;
-}
-
-export interface CandidateResult {
-  candidate: Candidate;
-  outcome: CandidateOutcome;
-  aside?: AsideReason;
-  relevance?: ChoiceAnswer;
-  satisfaction?: ChoiceAnswer;
-  truncated: boolean; // any of `cut`, for a reader; the parts are in `cut`
-  cut: Cut;
-  evidence: Location[]; // the lines a reader should look at, e.g. the call the requirement governs
-  notes: string[]; // written by the policy, never by a model
-}
-
-/**
- * What a requirement's result is a statement about: how many places were judged of how many were
- * found, how many of those were paths, what was set aside, and what the search did not follow.
- * VERIFIED is a claim over `paths` alone, so these numbers travel with it.
- */
-export interface Scope {
-  found: number; // places discovery offered
-  judged: number; // places a judgment was asked about
-  paths: number; // places Jev called a path of this requirement
-  setAside: number;
-  notFollowed: string[]; // leads the search declined to follow, in its own words
-  unjudged: string[]; // places found and not judged (a cap, a budget)
-  blocking: string[]; // reasons VERIFIED is withheld whatever the answers say
-}
-
-export interface RequirementResult {
-  requirementId: string;
-  status: Status;
-  coverage: Coverage;
-  scope: Scope;
-  candidates: CandidateResult[];
-  notes: string[];
 }
 
 export type ChangeJudgment = "required" | "supporting" | "unrequested" | "cannot_tell";
@@ -185,40 +136,25 @@ export interface UnexpectedChange {
   notes: string[];
 }
 
-export interface SearchRecord {
-  requirementId: string;
-  layer: "A" | "B" | "C";
-  query: string;
-  hits: number;
-  rejected?: string; // why the query was not run, or its results not followed
-  skipped?: number; // hits in files this requirement's kind does not look at (prose for a behavior)
-}
-
 /**
- * The one-word outcome. `no_violation_found` is deliberately not "passed": the tool speaks only
- * about the places it found.
+ * What `--json` prints, whichever way the run ended (ADR 0007): skipped, stopped for want of
+ * readable requirements, the set built with nothing asked, or finished. No requirement verdict:
+ * `requirements` holds the local check's readings per call, and the counts are in each one.
  */
-export type Verdict = "violation" | "unknown" | "no_violation_found" | "skipped" | "incomplete";
-
 export interface ReviewReport {
-  version: 1;
+  version: 2;
   tool: { name: "jev-intent-review"; version: string };
-  verdict: Verdict;
   exitCode: number;
   skipReason?: string;
   intent: IntentSpec;
   sources: Omit<IntentSource, "text">[];
-  requirements: RequirementResult[];
+  requirements: LocalCheckResult[];
   unexpectedChanges: UnexpectedChange[];
-  discovery: {
-    candidateCount: number;
-    changedCandidates: number;
-    unchangedCandidates: number;
-    incompleteReasons: string[];
-    searches: SearchRecord[];
-  };
-  /** `host`: which host `endpoint` is — `custom` when it was set by `JEV_API_URL`. */
-  sent: { requests: number; bytes: number; locations: Location[]; endpoint?: string; host?: Host };
+  /**
+   * `answered`: the requests Jev answered, in the same unit as `requests` (an observation request
+   * carries two questions). `host`: which host `endpoint` is — `custom` when set by `JEV_API_URL`.
+   */
+  sent: { requests: number; bytes: number; answered: number; endpoint?: string; host?: Host };
   metadata: {
     repository: string;
     base: string;
@@ -235,7 +171,8 @@ export interface ReviewReport {
 /** Spec §26. */
 export const EXIT = {
   ok: 0,
-  violation: 1,
+  /** A call worth checking, when the configuration's `policy.fail_on` names `finding`. */
+  finding: 1,
   incomplete: 2,
   config: 10,
   intent: 11,

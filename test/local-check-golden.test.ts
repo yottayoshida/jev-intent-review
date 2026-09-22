@@ -127,7 +127,7 @@ async function record(): Promise<Record<string, { sent: Sent[]; listed: string[]
   const out: Record<string, { sent: Sent[]; listed: string[] }> = {};
   for (const s of SCENARIOS) {
     const { judge, sent } = recording(s.mapping);
-    const [r] = await runLocalCheck(repo(s.integrity), { before: "BEFORE", after: "AFTER" }, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...s.options });
+    const [r] = (await runLocalCheck(repo(s.integrity), { before: "BEFORE", after: "AFTER" }, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...s.options })).requirements;
     // JSON round trip: what is compared is what a host would have received.
     out[s.name] = { sent: JSON.parse(JSON.stringify(sent)), listed: r!.findings.map((f) => `${f.function} · ${f.call}`) };
   }

@@ -1,12 +1,16 @@
 // The human-readable report: printed to the terminal and, in GitHub Actions, written to the job
 // summary. Everything that comes from the repository, the pull request or a model (paths,
 // requirement text, code, author names) is put inside a code span or code block, where GitHub
-// renders neither Markdown nor HTML. The result line is drawn from the verdict enum only.
+// renders neither Markdown nor HTML. The result line is drawn from counts only: no requirement
+// verdict is stated anywhere (ADR 0007).
 
 import { redact } from "../evidence/redact.ts";
 import { hostName } from "../judgments/client.ts";
-import { probabilityOf } from "../review/requirement.ts";
-import type { CandidateOutcome, CandidateResult, IntentSource, IntentSpec, Location, ReviewReport, RequirementResult, Status } from "../types.ts";
+import { DEFAULT_FORM, FORMS } from "../plan/forms.ts";
+import { BAR } from "../plan/local-check.ts";
+import type { LocalCheckResult, MappingRecord, Observed } from "../review/local-check-run.ts";
+import type { Outcome } from "../review/outcome.ts";
+import type { IntentSource, IntentSpec, Location, ReviewReport } from "../types.ts";
 
 /** The longest run of backticks. A loop: spreading every run into Math.max overflows on long text. */
 function longestBacktickRun(text: string): number {
@@ -56,87 +60,8 @@ export function where(location: Location): string {
   return codeSpan(`${location.path}:${lines}`);
 }
 
-const MARK: Record<CandidateOutcome, string> = {
-  satisfies: "✓",
-  violates: "✗",
-  unknown: "?",
-  aside: "·",
-};
-
-// VERIFIED is not here: its headline carries the scope it is a claim over (requirementSection).
-const HEADLINE: Record<Exclude<Status, "verified">, string> = {
-  violation: "VIOLATION",
-  unknown: "UNKNOWN",
-};
-
 function plural(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
-}
-
-function resultLine(report: ReviewReport): string {
-  const total = report.requirements.length;
-  const count = (status: Status) => report.requirements.filter((r) => r.status === status).length;
-  // The paths the requirements were judged over, which is what "no violation found" covers —
-  // not every place a judgment was asked about.
-  const paths = report.requirements.reduce((n, r) => n + r.scope.paths, 0);
-  switch (report.verdict) {
-    case "violation":
-      return `**Result: VIOLATION.** ${count("violation")} of ${plural(total, "requirement")} ${count("violation") === 1 ? "has" : "have"} a violation.`;
-    case "unknown":
-      return `**Result: UNKNOWN.** No violation was found, but ${count("unknown")} of ${plural(total, "requirement")} could not be verified.`;
-    case "no_violation_found":
-      return `**Result: no violation found** in ${plural(paths, "discovered path")}. This is not proof that the change is correct.`;
-    case "skipped":
-      return `**Result: skipped.** ${note(report.skipReason ?? "")}`;
-    case "incomplete":
-      return "**Result: incomplete.** The review did not finish; see the notes below.";
-  }
-}
-
-function candidateLine(result: CandidateResult): string[] {
-  const c = result.candidate;
-  const parts = [`${MARK[result.outcome]} ${result.outcome.replace("_", " ")}`, where(c)];
-  if (c.symbol) parts.push(codeSpan(c.symbol));
-  if (c.changed) parts.push("changed in this pull request");
-  // The same number the policy used: the probability of the chosen answer, not Jev's `confidence`.
-  const answer = result.satisfaction ?? result.relevance;
-  if (answer) parts.push(`p ${probabilityOf(answer, answer.choice).toFixed(2)}`);
-  const lines = [`- ${parts.join(" · ")}`];
-  for (const location of result.evidence) lines.push(`  - evidence: ${where(location)}`);
-  for (const text of result.notes) lines.push(`  - ${note(text)}`);
-  return lines;
-}
-
-/**
- * What the result is a claim over, in the line under it. VERIFIED says how many paths it holds
- * for, and every status says how many places were judged of how many were found, how many were
- * set aside, and how many leads were not followed — a reader who takes the headline alone should
- * at least see the size of what it covers.
- */
-function scopeLine(result: RequirementResult): string {
-  const s = result.scope;
-  const aside = new Map<string, number>();
-  for (const c of result.candidates) if (c.outcome === "aside") aside.set(c.aside ?? "set aside", (aside.get(c.aside ?? "set aside") ?? 0) + 1);
-  const why = [...aside].map(([kind, n]) => `${n} ${kind.replace(/_/g, " ")}`).join(", ");
-  const parts = [`${s.judged} of ${s.found} place(s) judged`, `${s.paths} path(s)`, `${s.setAside} set aside${why ? ` (${why})` : ""}`];
-  if (s.notFollowed.length > 0) parts.push(`${s.notFollowed.length} lead(s) not followed`);
-  if (s.unjudged.length > 0) parts.push(`${s.unjudged.length} reason(s) places went unjudged`);
-  return `Coverage: ${result.coverage} — ${parts.join(", ")}`;
-}
-
-function requirementSection(report: ReviewReport, result: RequirementResult): string[] {
-  const requirement = report.intent.requirements.find((r) => r.id === result.requirementId);
-  const headline = result.status === "verified" ? `VERIFIED over ${plural(result.scope.paths, "discovered path")}` : HEADLINE[result.status];
-  const lines = [`### ${result.requirementId} · ${headline}`, "", codeSpan(requirement?.text ?? ""), "", scopeLine(result), ""];
-  const shown = result.candidates.filter((c) => c.outcome !== "aside");
-  for (const candidate of shown) lines.push(...candidateLine(candidate));
-  const hidden = result.candidates.length - shown.length;
-  if (hidden > 0) lines.push(`- ${plural(hidden, "other place")} set aside: not a path this requirement holds or fails on`);
-  for (const text of result.scope.notFollowed) lines.push(`- Not followed: ${note(text)}`);
-  for (const text of result.scope.unjudged) lines.push(`- Not judged: ${note(text)}`);
-  for (const text of result.notes) lines.push(`- ${note(text)}`);
-  lines.push("");
-  return lines;
 }
 
 const SOURCE_WORDS: Record<IntentSource["type"], string> = {
@@ -179,6 +104,136 @@ export function intentSection(intent: IntentSpec, sources: readonly Omit<IntentS
   return lines;
 }
 
+const ORIGIN_WORDS: Record<Observed["origin"], string> = {
+  changed: "in a function the change touched",
+  calls_changed: "in a function that calls one the change touched",
+};
+
+/** The two sentences every report opens the requirements with. */
+export const LOCAL_CHECK_INTRO = [
+  `Two questions are put to Jev about each call, separately: what the requirement requires of the call, and what the function does under an assumption. Which two is the requirement's form, named with it. The bar for each is ${BAR}.`,
+  "",
+  "**Nothing here is a requirement verdict.** One rule, the same for every form, reads each call as worth checking, holding, not settled, or not required of by the requirement. The two answers do not check each other, and everything either of them rests on is printed.",
+  "",
+];
+
+/**
+ * One requirement's section: what is worth checking, then what was read and how each call came out,
+ * then what was not checked and why.
+ *
+ * Every sentence in it is this file's, a form's or the input's. Nothing is a model's prose — the two
+ * model answers appear as a choice and a number, named as Jev's, and the reasoning between them is
+ * assembled from the parts. The name of no outcome appears: the sections say what each call was
+ * read as.
+ */
+export function requirementSection(r: LocalCheckResult, context: { nothingSent?: boolean } = {}): string[] {
+  const lines: string[] = [];
+  const c = r.counts;
+  // A result built without a form — a record from before forms, a test's — reads as the default.
+  const form = FORMS[r.form ?? DEFAULT_FORM];
+  // The requirement is the author's text: a code span, so no line of it can become a heading, a
+  // comment that hides the rest of the report, or a workflow command; and redacted for display.
+  lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
+  lines.push(`Form: \`${r.form ?? DEFAULT_FORM}\`. ${context.nothingSent ? `Nothing was asked; the form would ask this. ${form.words.intro}` : form.words.intro}`, "");
+  lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
+  lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
+  if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
+  lines.push("");
+
+  if (r.findings.length > 0) {
+    lines.push("### Worth checking", "");
+    for (const f of r.findings) {
+      lines.push(`#### ${f.file}:${f.lines} · ${f.function} — \`${f.call}\``);
+      lines.push(`- **Requirement ${f.requirementId}**: ${codeSpan(f.quote)}`);
+      lines.push(`- **Assumed**: ${f.condition}`);
+      lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
+      lines.push(`- **${form.words.asks}**: ${f.observation} (${f.probability.toFixed(2)})`);
+      lines.push(`- **Why it is listed**: ${f.why}`, "");
+    }
+  }
+
+  if (r.observed.length === 0) {
+    lines.push("_Nothing was read._", "");
+    // Only the ones that are not already below with a reason of their own. A budgeted call every
+    // one of which was held reads, otherwise, as a list of calls nothing was asked about for no
+    // stated reason — while the real reasons sit in the next section.
+    const withReason = new Set(r.unchecked.map((u) => `${u.function}\u0000${u.call}`));
+    const silent = r.wouldAsk.filter((w) => !withReason.has(`${w.function}\u0000${w.call}`));
+    if (silent.length > 0) {
+      lines.push("### Inside the budget", "", "The calls the budget selected. Nothing was asked about them here.", "");
+      for (const w of silent) lines.push(`- ${w.file} · ${w.function} — \`${w.call}\` _(${ORIGIN_WORDS[w.origin]})_`);
+      lines.push("");
+    }
+  }
+  for (const o of r.observed) {
+    lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
+    lines.push(`  - ${form.words.observed}: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
+  }
+  // Every call read is in exactly one of these, or under "Worth checking" above: all come off the
+  // outcome the rule gave it, so a call cannot be in two readings or in none.
+  const mappingOf = new Map(r.mappings.map((m) => [m.callId, m]));
+  const section = (outcome: Outcome, heading: string, explained: string | undefined, why: (o: Observed, m: MappingRecord | undefined) => string) => {
+    const these = r.observed.filter((o) => o.outcome === outcome);
+    if (these.length === 0) return;
+    lines.push("", `### ${heading}`, "", ...(explained ? [explained, ""] : []));
+    for (const o of these) lines.push(`- ${o.file} · ${o.function} — \`${o.call}\`: ${why(o, mappingOf.get(o.callId))}`);
+  };
+  section("satisfies", "Read as holding", "Two readings that agree. Where what decides it is in code that was not sent, they can agree and be wrong.", (o, m) => `${m?.why ?? "the mapping was not recorded"}; ${o.result.why} (${o.result.probability.toFixed(2)})`);
+  section("unknown", "Not settled", "A call read, and not settled either way by the two answers.", (o, m) => (m?.governs ? `${m.why}, but ${o.result.why}` : (m?.why ?? "the mapping was not recorded")));
+  section("aside", "Read, but not required of by the requirement", undefined, (_o, m) => (m ? `read as \`${m.verdict}\` (${m.probability.toFixed(2)}): not a requirement of this call` : "the mapping was not recorded"));
+  if (r.unchecked.length > 0) {
+    lines.push("", "### Not checked", "");
+    for (const u of r.unchecked) lines.push(`- ${u.file} · ${u.function} — \`${u.call}\` _(${ORIGIN_WORDS[u.origin]})_: ${u.why}`);
+  }
+  if (r.notes.length > 0) {
+    lines.push("", "### Notes", "");
+    for (const n of r.notes) lines.push(`- ${note(n)}`);
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
+ * The counts the result line is drawn from. Nothing else is: no verdict is stated. `worthChecking`
+ * is the list the report prints under that heading, so the two cannot disagree.
+ */
+export function counts(report: ReviewReport): { read: number; worthChecking: number; inBudget: number; notChecked: number } {
+  let read = 0;
+  let worthChecking = 0;
+  let inBudget = 0;
+  let notChecked = 0;
+  for (const r of report.requirements) {
+    read += r.counts.asked;
+    worthChecking += r.findings.length;
+    inBudget += r.wouldAsk.length;
+    notChecked += r.unchecked.length;
+  }
+  return { read, worthChecking, inBudget, notChecked };
+}
+
+/**
+ * A run that built the set and stopped (`--candidates-only`): what it has to say is which calls fit.
+ * Told apart from a finished run that sent nothing because every budgeted call was held before its
+ * question — a body that did not fit, a call it could not locate — by what such a run leaves: those
+ * calls are under *Not checked* with a reason, and a run that stopped puts none of them there.
+ */
+function nothingSent(report: ReviewReport): boolean {
+  if (report.skipReason !== undefined || report.sent.requests > 0) return false;
+  return report.requirements.some((r) => {
+    const held = new Set(r.unchecked.map((u) => `${u.function}\u0000${u.call}`));
+    return r.wouldAsk.some((w) => !held.has(`${w.function}\u0000${w.call}`));
+  });
+}
+
+function resultLine(report: ReviewReport): string {
+  if (report.skipReason !== undefined) return `**Result: skipped.** ${note(report.skipReason)}`;
+  const n = counts(report);
+  if (report.requirements.length === 0) return "**Result: nothing was checked.**";
+  if (nothingSent(report)) return `**Result: the set was built and nothing was asked.** ${plural(n.inBudget, "call")} inside the budget, ${plural(n.notChecked, "call")} not checked, for the reasons under each requirement.`;
+  if (n.read === 0) return `**Result: no call was read.** ${plural(n.notChecked, "call")} not checked, for the reasons under each requirement. No requirement verdict is stated.`;
+  return `**Result: ${plural(n.worthChecking, "call")} worth checking of ${n.read} read.** No requirement verdict is stated.`;
+}
+
 export function renderMarkdown(report: ReviewReport): string {
   const out: string[] = ["# jev-intent-review", "", resultLine(report), ""];
 
@@ -195,12 +250,13 @@ export function renderMarkdown(report: ReviewReport): string {
     out.push(`Judged by ${codeSpan(report.sent.endpoint)}, an endpoint set by JEV_API_URL`);
   }
   out.push("");
-  // The notes stay in Coverage, where every run has always put them.
   out.push(...intentSection(report.intent, report.sources, m.pullRequestAuthor === undefined ? {} : { prAuthor: m.pullRequestAuthor }));
 
   if (report.requirements.length > 0) {
-    out.push("## Requirements", "");
-    for (const result of report.requirements) out.push(...requirementSection(report, result));
+    // With nothing sent, the two questions were not put to anything: say what the run did instead.
+    const quiet = nothingSent(report);
+    out.push(...(quiet ? ["Nothing was asked: the set was built and the run stopped. Under each requirement, which calls fit the budget and which did not, with a reason each.", ""] : LOCAL_CHECK_INTRO));
+    for (const r of report.requirements) out.push(...requirementSection(r, { nothingSent: quiet }));
   }
 
   if (report.unexpectedChanges.length > 0) {
@@ -213,25 +269,17 @@ export function renderMarkdown(report: ReviewReport): string {
     out.push("");
   }
 
-  const d = report.discovery;
-  const count = (status: Status) => report.requirements.filter((r) => r.status === status).length;
-  out.push("## Coverage", "");
-  out.push(
-    `- Requirements: ${report.requirements.length} · verified ${count("verified")} · violation ${count("violation")} · unknown ${count("unknown")}`,
-  );
-  out.push(`- Repository candidates examined: ${d.candidateCount} (in changed files ${d.changedCandidates}, in unchanged files ${d.unchangedCandidates})`);
-  for (const reason of d.incompleteReasons) out.push(`- Incomplete: ${note(reason)}`);
-  for (const text of m.notes) out.push(`- ${note(text)}`);
-  out.push("");
+  // Everything the run has to say beside the calls: intent it did not check, what the change did to
+  // this tool's footing, what the pass over the changes left out or redacted.
+  if (m.notes.length > 0) {
+    out.push("## Notes", "");
+    for (const text of m.notes) out.push(`- ${note(text)}`);
+    out.push("");
+  }
 
   out.push("## Sent to the judgment model", "");
-  out.push(`- ${plural(report.sent.requests, "request")}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
+  out.push(`- ${plural(report.sent.requests, "request")}, ${plural(report.sent.answered, "answer")}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
   if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}${report.sent.host === undefined ? "" : ` (${hostName(report.sent.host)})`}`);
-  if (report.sent.locations.length > 0) {
-    out.push("", `<details><summary>${plural(report.sent.locations.length, "location")} sent</summary>`, "");
-    for (const location of report.sent.locations) out.push(`- ${where(location)}`);
-    out.push("", "</details>");
-  }
   out.push("");
   return out.join("\n");
 }

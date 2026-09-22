@@ -1,0 +1,140 @@
+[
+  {
+    "state": {
+      "requirement": {
+        "id": "R1",
+        "text": "A baseline that cannot be read is not reported as no baseline at all."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "4-11",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let Ok(content) = crate::atomic_file::read_capped(&path, MAX) else { return Ok(None) };\n    Ok(Some(content))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "questions": {
+      "requirement_governs": {
+        "type": "choice",
+        "instructions": "`code` is the body of `read_baseline`, and `requirement.text` is one requirement written for this change. Assume nothing about what happens at run time. The question is about the requirement's words only: does it require that, when the call `crate::atomic_file::read_capped(&path, MAX)` inside `read_baseline` fails, `read_baseline` does not return a success to its caller? Answer about that call. A requirement about a different operation, or one that allows this function to carry on here, does not require it.",
+        "criteria": {
+          "applies": "The requirement requires it. Its text asks that a failure of that operation not reach the caller as a success.",
+          "does_not_apply": "The requirement does not require it of this call. It is about some other operation, or it explicitly allows this function to carry on when this one fails.",
+          "unknown": "The requirement does not settle it: it neither requires that nor allows the opposite for this call."
+        }
+      }
+    }
+  },
+  {
+    "state": {
+      "requirement": {
+        "id": "R1",
+        "text": "A baseline that cannot be read is not reported as no baseline at all."
+      },
+      "candidate": {
+        "path": "src/integrity.rs",
+        "lines": "4-11",
+        "symbol": "read_baseline",
+        "changed_by_pull_request": true
+      },
+      "evidence": {
+        "code": "pub fn read_baseline(base_dir: &Path) -> Result<Option<Baseline>, AppError> {\n    let path = baseline_path(base_dir);\n    if !path.exists() {\n        return Ok(None);\n    }\n    let Ok(content) = crate::atomic_file::read_capped(&path, MAX) else { return Ok(None) };\n    Ok(Some(content))\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "questions": {
+      "on_error_result": {
+        "type": "choice",
+        "instructions": "`code` is the body of `read_baseline`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: Execution reaches the call `crate::atomic_file::read_capped(&path, MAX)` inside `read_baseline`. There, `crate::atomic_file::read_capped(&path, MAX)` returns an error. Every other operation the function reaches succeeds. Under that condition: what does `read_baseline` return to its caller? Not what any function under `evidence.related` returns — what `read_baseline` does with it.",
+        "criteria": {
+          "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+          "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+          "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+        }
+      },
+      "on_error_control": {
+        "type": "choice",
+        "instructions": "`code` is the body of `read_baseline`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: Execution reaches the call `crate::atomic_file::read_capped(&path, MAX)` inside `read_baseline`. There, `crate::atomic_file::read_capped(&path, MAX)` returns an error. Every other operation the function reaches succeeds. Under that condition: what does `read_baseline` do after that?",
+        "criteria": {
+          "stops_there": "It stops there; what comes after is not reached",
+          "keeps_going": "It goes on",
+          "cannot_determine": "The code does not say"
+        }
+      }
+    }
+  },
+  {
+    "state": {
+      "requirement": {
+        "id": "R1",
+        "text": "A baseline that cannot be read is not reported as no baseline at all."
+      },
+      "candidate": {
+        "path": "src/cli.rs",
+        "lines": "1-4",
+        "symbol": "show",
+        "changed_by_pull_request": false
+      },
+      "evidence": {
+        "code": "pub fn show(base_dir: &Path) -> Result<(), AppError> {\n    let baseline = crate::integrity::read_baseline(base_dir)?;\n    Ok(())\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "questions": {
+      "requirement_governs": {
+        "type": "choice",
+        "instructions": "`code` is the body of `show`, and `requirement.text` is one requirement written for this change. Assume nothing about what happens at run time. The question is about the requirement's words only: does it require that, when the call `crate::integrity::read_baseline(base_dir)` inside `show` fails, `show` does not return a success to its caller? Answer about that call. A requirement about a different operation, or one that allows this function to carry on here, does not require it.",
+        "criteria": {
+          "applies": "The requirement requires it. Its text asks that a failure of that operation not reach the caller as a success.",
+          "does_not_apply": "The requirement does not require it of this call. It is about some other operation, or it explicitly allows this function to carry on when this one fails.",
+          "unknown": "The requirement does not settle it: it neither requires that nor allows the opposite for this call."
+        }
+      }
+    }
+  },
+  {
+    "state": {
+      "requirement": {
+        "id": "R1",
+        "text": "A baseline that cannot be read is not reported as no baseline at all."
+      },
+      "candidate": {
+        "path": "src/cli.rs",
+        "lines": "1-4",
+        "symbol": "show",
+        "changed_by_pull_request": false
+      },
+      "evidence": {
+        "code": "pub fn show(base_dir: &Path) -> Result<(), AppError> {\n    let baseline = crate::integrity::read_baseline(base_dir)?;\n    Ok(())\n}",
+        "related": [],
+        "truncated": true
+      }
+    },
+    "questions": {
+      "on_error_result": {
+        "type": "choice",
+        "instructions": "`code` is the body of `show`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: Execution reaches the call `crate::integrity::read_baseline(base_dir)` inside `show`. There, `crate::integrity::read_baseline(base_dir)` returns an error. Every other operation the function reaches succeeds. Under that condition: what does `show` return to its caller? Not what any function under `evidence.related` returns — what `show` does with it.",
+        "criteria": {
+          "returns_error": "A failure. Whatever the caller does with it, the function did not return a success.",
+          "returns_success": "A success. Whatever that success carries — a complete result, a partial one, or nothing — it is a success and not a failure.",
+          "cannot_determine": "The code shown does not settle which of those two the function returns under that condition."
+        }
+      },
+      "on_error_control": {
+        "type": "choice",
+        "instructions": "`code` is the body of `show`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. Assume exactly this and nothing else: Execution reaches the call `crate::integrity::read_baseline(base_dir)` inside `show`. There, `crate::integrity::read_baseline(base_dir)` returns an error. Every other operation the function reaches succeeds. Under that condition: what does `show` do after that?",
+        "criteria": {
+          "stops_there": "It stops there; what comes after is not reached",
+          "keeps_going": "It goes on",
+          "cannot_determine": "The code does not say"
+        }
+      }
+    }
+  }
+]
