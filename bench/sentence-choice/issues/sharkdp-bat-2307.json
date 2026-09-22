@@ -1,0 +1,9 @@
+{
+ "issue": "sharkdp/bat#2307",
+ "url": "https://github.com/sharkdp/bat/issues/2307",
+ "title": "Broken line breaks when using it with `delta` as git-diff pager",
+ "author": "arctic-penguin",
+ "createdAt": "2022-09-08T11:44:31Z",
+ "closedBy": "sharkdp/bat#2308",
+ "body": "**What steps will reproduce the bug?**\r\n\r\n1. `export PAGER=bat`\r\n2. `git config pager.diff=delta`\r\n3. Go to any git clone that contains a long line, remove it.\r\n\r\n**What happens?**\r\nLine breaks are broken.\r\n![neu](https://user-images.githubusercontent.com/103587359/189113658-80452f4a-b274-440f-a34e-cb1dd1813b0c.png)\r\n\r\n\r\n\r\n...\r\n\r\n**What did you expect to happen instead?**\r\nLine breaks are okay.\r\n![alt](https://user-images.githubusercontent.com/103587359/189113671-8dbf81ae-913c-408c-ba5d-fbf5dc61ed3f.png)\r\n\r\n...\r\n\r\n\r\n**How did you install `bat`?**\r\n\r\n`pacman -S bat`, can also reproduce it via `cargo install`, as well as `git clone` followed by `cargo install --path .`\r\n\r\n---\r\n\r\n* Good version: `bat 0.21.0 (405e5f74)`\r\n* Bad version: `bat 0.22.0 (1f9519d8)` (release)\r\n* Bad version: `bat 0.22.0 (6680f65)` (HEAD)\r\n* `git bisect` points to 899fdbb347b6444eb06d8a26375ed10e35c612e2\r\n\r\nThe error is triggered when running `git-diff`, with `pager.diff` set to `delta`. My `$PAGER` is set to `bat`. Therefore I don't know how to apply the `--diagnostics` part.\r\n\r\nP.S.: The `gdi` command is an alias to `git diff`."
+}

@@ -6,6 +6,14 @@ Amended by [0007](0007-the-run-is-the-local-check.md): the blockers below — in
 was not checked — are said in the report's notes, since no requirement verdict remains for them to
 withhold. What is read, what is named, and what the change question is not given are unchanged.
 
+Measured in #40, part 2: Jev choosing sentences (the first alternative below) was measured on 491
+sentences of 64 issues people wrote in 2019–2022, labelled before Jev was asked by three Claude
+annotators at the maintainer's request — not by the owner, as this record first planned. Jev's
+precision neither cleared the 0.80 fixed beforehand nor fell below it (95% bounds 0.70–0.73 and
+0.89–0.92 per run), which the rule fixed before the labels takes as not adopting: the alternative
+is not adopted and prose stays unread. The table, and what
+the annotators read beyond what Jev was shown, are in `docs/writing-requirements.md`.
+
 ## Context
 
 Since 0.1.0 no model writes requirements: they come from `--intent-spec` or from the items under an
@@ -57,10 +65,10 @@ split every source into sentences and have Jev choose which ones state a require
 ## Alternatives considered
 
 - Jev chooses sentences (B in #40): reads ordinary prose, but how reliably Jev tells a required
-  behaviour from background has not been measured, it adds tens to hundreds of requests per pull
+  behaviour from background had not been measured, it adds tens to hundreds of requests per pull
   request, and a sentence naming a symptom rather than its mechanism (`#476`) can lead to a
-  confident reading of the wrong call. Deferred until a bench with owner-labelled sentences
-  measures it (#40, part 2).
+  confident reading of the wrong call. Deferred until a bench measured it; measured in #40, part 2
+  with labels from Claude annotators, and not adopted (the note at the top).
 - Requiring every source to be in a form (the previous rule): it discarded forms that were there.
 - Reading the first sentence of a pull request's summary without a label: not a form; guessing.
 - Taking only the first sentence of a `Property` paragraph: drops the half of a property that says

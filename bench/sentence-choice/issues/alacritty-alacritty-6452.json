@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6452",
+ "url": "https://github.com/alacritty/alacritty/issues/6452",
+ "title": "Mouse doesn't show up with mouse hide_on_typing set to true",
+ "author": "SheldonZhong",
+ "createdAt": "2022-10-27T04:33:29Z",
+ "closedBy": "alacritty/alacritty#6481",
+ "body": "### System\r\n\r\nOS: macOS 13.0 (22A380)\r\nVersion: lacritty 0.11.0 (8dbaa0b)\r\n\r\n\r\n### Logs\r\n\r\nFirst enable the `hide_on_typing` in the config.\r\n```\r\nmouse:\r\n  hide_when_typing: true\r\n```\r\n\r\nSteps to reproduce:\r\n\r\n1. Launch Alacritty.\r\n2. Type something in the terminal and don't move your mouse, the cursor is hidden.\r\n3. Switch to a different app using `command` + `tab`.\r\n4. Switch back to Alacritty using `command` + `tab` and don't type anything yet.\r\n5. Swipe fingers on the touchpad or move the mouse, the cursor doesn't show up.\r\n\r\nExpected behavior:\r\n- In step 5, the cursor should show up.\r\n"
+}

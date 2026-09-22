@@ -1,0 +1,9 @@
+{
+ "issue": "sharkdp/bat#2166",
+ "url": "https://github.com/sharkdp/bat/issues/2166",
+ "title": "Use strip option from Rust 1.59",
+ "author": "wcampbell0x2a",
+ "createdAt": "2022-04-25T11:21:31Z",
+ "closedBy": "sharkdp/bat#2506",
+ "body": "You could replace your strip scripts with the official strip provided in Cargo profiles if you bump MSRV to 1.59.\r\n\r\nhttps://doc.rust-lang.org/cargo/reference/profiles.html#strip\r\n\r\nI'd be happy to try this out, unless you have a MSRV policy that I couldn't find."
+}

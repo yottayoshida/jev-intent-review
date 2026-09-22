@@ -1,0 +1,9 @@
+{
+ "issue": "alacritty/alacritty#6338",
+ "url": "https://github.com/alacritty/alacritty/issues/6338",
+ "title": "Artifacts in the corners of the titlebar on maximized window",
+ "author": "rumpelsepp",
+ "createdAt": "2022-09-15T06:30:59Z",
+ "closedBy": "alacritty/alacritty#6448",
+ "body": "On alacritty master there is a new cool title bar. At least on gnome the title bar is rendered with rounded corners. This causes unpleasant artifacts when the window is maximized, since the background is visible (blue on my screenshot below).\r\n\r\n![Screenshot from 2022-09-15 08-27-40](https://user-images.githubusercontent.com/1961699/190330301-b8c2f8b1-50ee-4fc6-9ba7-c37958145eb0.png)\r\n\r\nI would suggest disabling rounded corners on Linux as it was the case with the old titlebar.\r\n\r\n### System\r\n\r\nOS: Linux\r\nVersion: `alacritty --version`: `alacritty 0.12.0-dev (bf3e8822)`\r\nLinux/BSD: Linux, Gnome, Wayland\r\n"
+}

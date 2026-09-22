@@ -1,0 +1,9 @@
+{
+ "issue": "BurntSushi/ripgrep#1550",
+ "url": "https://github.com/BurntSushi/ripgrep/issues/1550",
+ "title": "high peak memory usage with parallel breadth first directory traversal",
+ "author": "Shnatsel",
+ "createdAt": "2020-04-12T21:50:32Z",
+ "closedBy": "BurntSushi/ripgrep#1554",
+ "body": "#### What version of ripgrep are you using?\r\n\r\nripgrep 12.0.0\r\n-SIMD -AVX (compiled)\r\n+SIMD +AVX (runtime)\r\n\r\n#### How did you install ripgrep?\r\n\r\n`cargo install ripgrep` on `rustc 1.42.0 (b8cedc004 2020-03-09)`\r\n\r\n#### What operating system are you using ripgrep on?\r\n\r\nLinux, derived from Ubuntu 18.04\r\n\r\n#### Describe your question, feature request, or bug.\r\n\r\nrg seems to leak memory when searching for an expression in latest versions of all crates from crates.io. The memory usage gradually increases and peaks at around 1Gb.\r\n\r\n#### If this is a bug, what are the steps to reproduce the behavior?\r\n\r\n```bash\r\n# get all crates from crates.io\r\ngit clone https://github.com/the-lean-crate/criner && cd criner && cargo run --release -- mine\r\n# get latest version of every crate\r\nfor dir in ./criner.db/assets/*/*/*/; do echo -n \"$dir\"; ls \"$dir\" | grep '\\.crate' | sort -Vr | head -n 1; done > ./latest-versions\r\nmkdir crates\r\ncd crates\r\n# decompress the latest version of every crate\r\ncat ../latest-versions | parallel ../decompress-one-crate.sh\r\n```\r\nwhere decompress-one-crate.sh is\r\n```bash\r\n#!/bin/sh\r\ncat \"$1\" | tar --gunzip -xf -\r\n```\r\n\r\nSample `rg` invocation exhibiting the behavior is:\r\n\r\n```\r\nrg --iglob '*.rs' -iF '#[allow('\r\n```\r\n\r\n#### If this is a bug, what is the actual behavior?\r\n\r\nMemory usage increases as the search progresses, reaching as high as 1Gb. It increases gradually and accumulates.\r\n\r\n#### If this is a bug, what is the expected behavior?\r\n\r\nMemory usage should not accumulate\r\n"
+}
