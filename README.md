@@ -84,7 +84,7 @@ v0.1 is an experimental implementation of the broader intent-review model.
 It currently supports:
 
 * Rust repositories
-* requirements describing how failures must propagate
+* two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action
 * functions touched by the change and callers one hop out
 * requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](#intent))
 * Jev as the only judgment model

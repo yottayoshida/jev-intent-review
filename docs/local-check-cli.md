@@ -7,8 +7,14 @@ the working record of how v0.1 got here, in Japanese.
 
 ## Writing a requirement
 
-One checkable sentence per requirement, saying what must happen when something fails. No file
-name, no function name, no expected answer.
+One checkable sentence per requirement. No file name, no function name, no expected answer. What
+the sentence has to say depends on its **form** — what the check asks of each call
+([ADR 0006](adr/0006-question-forms-as-data.md)):
+
+| `form` | the sentence says | example |
+|---|---|---|
+| `failure_propagation` (the default) | what must happen when something fails | "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists." |
+| `check_before_action` (experimental) | which action must not happen unless a check passes, naming the action by a word its call carries | "A disabled API key must never create a session." — `create_session(…)` is asked about; `audit(…)` is not |
 
 ```json
 {
@@ -17,35 +23,62 @@ name, no function name, no expected answer.
     "id": "R1",
     "text": "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists.",
     "kind": "behavior", "priority": "required", "sourceRefs": [], "searchHints": []
+  }, {
+    "id": "R2",
+    "text": "A disabled API key must never create a session.",
+    "form": "check_before_action", "searchHints": ["open_session"]
   }]
 }
 ```
 
-The issue and the pull request work too, in two forms read as written (ADR 0004,
+`form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
+from the sentence, and whether Jev could is not measured yet. For `check_before_action` the words
+of the sentence and of `searchHints` decide which calls are asked about (below), so a requirement
+that names no action — "every session-creation path must enforce the same guard" — reaches no
+call, and one whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln`
+(never listed as a call) reaches nothing either. The report says why for each call it holds.
+
+The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
 (`## Acceptance criteria`, `## Acceptance`, …), one requirement per item, and a paragraph that begins
-`Property:`. Each source is read on its own. Ordinary prose is not turned into requirements — no
-model writes or picks them — so a source in neither form is named in the report's Intent section
-with the reason, and a run that could read nothing stops (exit 11) and prints that section too. The
-report and `--json` (its `intent`, `sources` and `notes`) say where each requirement came from,
-whether that source's author is the pull request's, and which issues the pull request closes were
-not read. Here that is shown, not acted on: the local check's exit code does not change for it (the
-review withholds VERIFIED instead; whether the GitHub Action should act on it is #41's).
+`Property:`. Every requirement read that way is `failure_propagation`. Each source is read on its
+own. Ordinary prose is not turned into requirements — no model writes or picks them — so a source in
+neither way is named in the report's Intent section with the reason, and a run that could read
+nothing stops (exit 11) and prints that section too. The report and `--json` (its `intent`,
+`sources` and `notes`) say where each requirement came from, whether that source's author is the
+pull request's, and which issues the pull request closes were not read. Here that is shown, not
+acted on: the local check's exit code does not change for it (the review withholds VERIFIED
+instead; whether the GitHub Action should act on it is #41's).
 
 ## What it asks
 
 For each requirement it takes the Rust functions the change touched and the functions that call
-them, one hop out, and every call inside those functions whose callee is defined in the repository
-and returns a `Result`. Each such call, up to a budget of 20 per requirement, gets two questions to
-Jev, in separate requests:
+them, one hop out, and every call inside those functions. Which of those calls can be asked about,
+and what is asked, is the requirement's form. Each askable call, up to a budget of 20 per
+requirement, gets two questions to Jev, in separate requests: whether the requirement requires
+something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
+an assumption.
 
-1. does the requirement require that a failure of this call not reach the caller as a success?
-   (`applies` / `does_not_apply` / `unknown`)
-2. when this call fails, what does the function return? (`returns_error` / `returns_success` /
-   `cannot_determine`)
+| | `failure_propagation` | `check_before_action` |
+|---|---|---|
+| a call can be asked about when | its callee is defined once in the repository and returns a `Result`, and so does the function | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
+| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
+| what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
+| against the requirement | `returns_success` | `reaches_it` |
 
-Both are read at 0.6. `--experimental-candidates-only` stops before the first question and prints
-which calls are inside the budget and which are not, with a reason each; it needs no credentials.
+**Every call asked about is read by one rule, the same for both forms**, into one of four:
+
+- the requirement `applies` at 0.6 or more, and the function's answer at 0.6 or more is the one
+  against the requirement → **worth checking**; the one keeping it → **holding**; anything else
+  (`cannot_determine`, under the bar, no answer) → **not settled**;
+- the requirement `does_not_apply` at 0.6 or more → **not required of**;
+- anything else from the mapping (`unknown`, under the bar, no answer) → **not settled**.
+
+A request that fails without ending the run leaves its call unanswered and the run goes on; a run
+that reached the host and got no answer at all fails (exit 12). `--experimental-candidates-only`
+stops before the first question and prints which calls are inside the budget and which are not,
+with a reason each; it needs no credentials.
 
 ## Reading the output
 
@@ -60,17 +93,25 @@ which calls are inside the budget and which are not, with a reason each; it need
 - **Why it is listed**: … Both are Jev's readings and neither checks the other.
 ```
 
+Each requirement's section names its form and, after the counts, how the calls read came out. Every
+call read is in exactly one of the first four sections; the label of the function's answer
+(`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and
+`when that call fails` / `in a case the requirement forbids it` in the list of calls read) is the
+form's.
+
 | section | what it holds |
 |---|---|
-| **Worth checking** | both answers cleared the bar and disagree |
-| **Read as required by the requirement** | Jev read the requirement as applying to this call. The behavior observation is reported separately — a call under *Worth checking* is in here too |
-| **Read, but not required of by the requirement** | `does_not_apply`, `unknown`, below the bar, or no answer — each says which |
-| **Not checked** | the callee has no definition here, the target returns no `Result`, the body did not fit, the call could not be located, or the budget was spent |
+| **Worth checking** | the requirement read as applying, and the function's answer against it, both over the bar |
+| **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
+| **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
+| **Read, but not required of by the requirement** | `does_not_apply` over the bar |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, or the budget was spent |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
-A listed call rests on two Jev readings that do not check each other. Everything either of them
-used is printed so it can be thrown out. `--json` carries every mapping, every reading and every
-option's probability.
+None of the four is a requirement verdict: each is what two answers about one call came to. A
+listed call rests on two Jev readings that do not check each other. Everything either of them used
+is printed so it can be thrown out. `--json` carries the form, every mapping, every reading with its
+`outcome` (`violates` / `satisfies` / `unknown` / `aside`), and every option's probability.
 
 ## Exit codes
 
@@ -83,6 +124,9 @@ bar, or unanswered, as well as calls that agreed. What was not reached is under 
 the enumeration's own caps are counted in the notes.
 
 ## What has been measured
+
+Everything below is about `failure_propagation` except the last part, which is the one measurement
+of `check_before_action`.
 
 ### Cases that were not used to tune anything
 
@@ -186,8 +230,35 @@ node bench/replay-scoring.ts bench/logs/stated-requirements-v1.json
 The wording of the questions was worked out on these same functions, so this case is a regression
 check and does not count as unseen. The same targets asked under PR `#476`'s own sentence did
 **not** pass — Jev read the refusal itself as the governed call, not the functions that receive it
-(`bench/logs/jev-only-v1.json`). Nothing yet measures a second language or a second kind of
-requirement.
+(`bench/logs/jev-only-v1.json`). Nothing yet measures a second language.
+
+### The one measurement of `check_before_action`
+
+A constructed case, not an unseen one: one function, `open_session`, in five versions whose names
+were chosen so the sentence "A disabled API key must never create a session." meets its calls
+(`bench/forms/check-before-action/`, log `bench/logs/check-before-action-v1.json`). The table of
+right readings was written before any request; three runs of each version against Jev on
+Cloudflare, 90 requests.
+
+| version | what it does with a disabled key (`rustc`) | `create_session` read as | the lookup and the check read as |
+|---|---|---|---|
+| shipped — refuses before creating | refused | holding 3/3 (applies 0.98, does_not_reach 0.99–1.00) | not required of, 3/3 each |
+| defect — audits, then creates anyway | session | **worth checking 3/3** (applies 0.98–0.99, reaches_it 0.99–1.00) | not required of, 3/3 each |
+| rewrite — the same refusal, other branch | refused | holding 3/3 (applies 1.00, does_not_reach 0.82–0.89) | not required of, 3/3 each |
+| hidden — the check in a helper whose body does nothing | session | holding 3/3 (applies 0.98, does_not_reach 0.96–0.97) — **wrong**, as the table said no confident reading would be right | the lookup not required of 3/3; the helper's call held, a callee the run reads on its own |
+| caller — the check in `login`, which calls it | refused through `login`, session called directly | worth checking 3/3 — `open_session` read alone does make the call | in `login`, not required of 3/3; in `open_session`, the lookup not settled 3/3 (the mapping under the bar: `does_not_apply` 0.53 and 0.56, `unknown` 0.50); `login`'s call into `open_session` held |
+
+So on code written for it the form separates the defect from the shipped code and a rewrite, and
+misses a check whose body it is not shown, exactly as the failure form does. The first run of this
+case (`-v0.json`) also listed, in every version, `login`'s call into `open_session` — from `login`,
+the call is made whatever `open_session` checks inside — which is why a call into a function the
+run reads on its own is now held and left to be asked about there.
+
+How far the words reach on real code, with no request (`bench/forms/reach/`): a
+check-before-action sentence written for the changed function of each acceptance case put the
+guarded call inside the budget on both — grovedb#500's `rewrite_heights` 10th of 17 askable calls
+among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Whether Jev reads
+those right is not measured.
 
 ## Only Jev
 
