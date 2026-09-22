@@ -25,6 +25,7 @@
 // when two same-named types disagree and only one of them is found — the hand-labelled answers in
 // `bench/result-type-expected.json` are what that is checked against. A parser is spec Phase 4.
 
+import { indentOf } from "../change/blocks.ts";
 import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 
 export type ReturnReading =
@@ -213,6 +214,100 @@ export function signatureAt(
   return unfinished;
 }
 
+/** What encloses a definition: the line of the item it sits in, the top of the file, or unread. */
+export type Enclosing = { kind: "item"; text: string } | { kind: "top" } | { kind: "unknown" };
+
+/** The item a header line begins, as far as a reader of text can tell. */
+export type ItemHead = { kind: "impl"; self?: string; trait?: string } | { kind: "trait"; name: string } | { kind: "other" };
+
+/** A line that begins an item. Read before the one below: `pub trait X: Send` is not a bound. */
+const BEGINS_ITEM = /^(?:pub\b|impl\b|trait\b|mod\b|unsafe\b|async\b|extern\b|default\b|fn\b|struct\b|enum\b|union\b|macro_rules\b)/;
+/** A line that carries a header on but names nothing: a brace, an attribute, a bound, an operator. */
+const CARRIES_NOTHING = /^(?:[{}()[\],+&|]|'\w|->|::|where\b|#\[|[\w:<>, &'+]+:\s)/;
+
+/** How many lines an item's header may be written over before it is given up on. */
+const HEADER_LINES = 10;
+
+/**
+ * The item's header from the line it starts on: everything up to the `{` that opens its body, on
+ * one line. `impl<T> Reader` / `for Store<T>` / `{` is one header, and reading only its first line
+ * would take `Reader` for the type — the trait is not the type it is implemented for.
+ */
+function headerFrom(codeLines: readonly string[], at: number): string | null {
+  const parts: string[] = [];
+  for (let i = at; i < codeLines.length && i < at + HEADER_LINES; i++) {
+    const text = codeLines[i]!.trim();
+    if (text !== "") parts.push(text);
+    if (text.includes("{")) return parts.join(" ");
+  }
+  return null;
+}
+
+/**
+ * The item a definition on `line` sits in, read from indentation: the first line above it that is
+ * less indented and begins an item, joined to the `{` that opens the item's body. Lines at the
+ * same indentation or deeper are the item's own body (the `fn` above this one inside the same
+ * `impl`), never its header. A header that never reaches a `{`, and a line that begins no item and
+ * can hold a name, are `unknown` — a caller then narrows nothing rather than narrowing by half a
+ * header.
+ */
+export function enclosingItem(codeLines: readonly string[], line: number): Enclosing {
+  const own = codeLines[line - 1];
+  if (own === undefined) return { kind: "unknown" };
+  const depth = indentOf(own);
+  for (let i = line - 2; i >= 0; i--) {
+    const text = codeLines[i]!;
+    if (text.trim() === "" || indentOf(text) >= depth) continue;
+    const trimmed = text.trim();
+    if (BEGINS_ITEM.test(trimmed)) {
+      const header = headerFrom(codeLines, i);
+      return header === null ? { kind: "unknown" } : { kind: "item", text: header };
+    }
+    if (CARRIES_NOTHING.test(trimmed)) continue;
+    return { kind: "unknown" };
+  }
+  return { kind: "top" };
+}
+
+/** The type an `impl` is for and the trait it implements, or the name a `trait` declares. */
+export function itemHead(text: string): ItemHead {
+  const head = text.replace(/^(?:pub(?:\([^)]*\))?\s+)?(?:default\s+)?(?:unsafe\s+)?/, "");
+  const declared = /^trait\s+(\w+)/.exec(head);
+  if (declared) return { kind: "trait", name: declared[1]! };
+  if (!/^impl\b/.test(head)) return { kind: "other" };
+  let rest = head.slice("impl".length).trimStart();
+  if (rest.startsWith("<")) {
+    const end = pastClosing(rest, 0, "<", ">");
+    if (end < 0) return { kind: "other" };
+    rest = rest.slice(end);
+  }
+  let depth = 0;
+  let implements_ = -1;
+  for (let i = 0; i < rest.length; i++) {
+    // `->` is one token: `impl Callback<fn() -> T> for Handler` closes no bracket at its `>`.
+    if (rest[i] === "-" && rest[i + 1] === ">") {
+      i++;
+      continue;
+    }
+    if (rest[i] === "<") depth++;
+    else if (rest[i] === ">") depth--;
+    else if (depth === 0 && /^\s+for\s+/.test(rest.slice(i))) {
+      implements_ = i;
+      break;
+    }
+  }
+  const named = (part: string) => /^([\w:]+)/.exec(part.trim().replace(/^&\s*(?:'\w+\s*)?(?:mut\s+)?/, ""))?.[1]?.split("::").pop();
+  if (implements_ < 0) return { kind: "impl", self: named(rest) };
+  return { kind: "impl", trait: named(rest.slice(0, implements_)), self: named(rest.slice(implements_).replace(/^\s+for\s+/, "")) };
+}
+
+/** The attribute lines directly above `line`, with nothing but attributes between. */
+export function attributesAbove(codeLines: readonly string[], line: number): string[] {
+  const found: string[] = [];
+  for (let i = line - 2; i >= 0 && /^\s*#\[/.test(codeLines[i]!); i--) found.unshift(codeLines[i]!.trim());
+  return found;
+}
+
 /** Every path a type names, as its segments — not associated-type bindings (`Output = …`), not lifetimes. */
 function pathsIn(type: string): string[][] {
   const paths: string[][] = [];
@@ -268,6 +363,23 @@ export class ReturnTypes {
   /** Line `line` of `path` as code, or null when the file cannot be read. */
   async codeLine(path: string, line: number): Promise<string | null> {
     return (await this.#codeLines(path))?.[line - 1] ?? null;
+  }
+
+  /** Every line of `path` as code, or null when the file cannot be read. */
+  async codeLinesOf(path: string): Promise<string[] | null> {
+    return this.#codeLines(path);
+  }
+
+  /** The item a definition on `line` of `path` sits in. */
+  async enclosing(path: string, line: number): Promise<Enclosing> {
+    const lines = await this.#codeLines(path);
+    return lines ? enclosingItem(lines, line) : { kind: "unknown" };
+  }
+
+  /** The attributes written directly above `line` of `path`. */
+  async attributes(path: string, line: number): Promise<string[]> {
+    const lines = await this.#codeLines(path);
+    return lines ? attributesAbove(lines, line) : [];
   }
 
   /** The signature of `fn name` on `line` of `path`, or why it could not be read. */

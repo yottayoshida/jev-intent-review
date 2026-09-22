@@ -133,9 +133,11 @@ export function resolvedTo(verdict: Askability | undefined): string | undefined 
  * further down. A call into a changed function is where the change reaches the body, and it is
  * also why a caller one hop out is in the set at all.
  *
- * "Into a changed function" is decided by where the callee resolved to — the one `fn` of its name
- * the repository defines, as the check that decides whether it can be asked about finds it. A name
- * defined twice resolves to neither, and a search cut at its cap settles nothing.
+ * "Into a changed function" is decided by where the callee resolved to, as the check that decides
+ * whether it can be asked about finds it: the one `fn` of its name, or the one the call's path or
+ * form picks out of several, or — for a trait's method whose versions are read together — the
+ * trait's declaration, which is not where the implementation the change touched is. A name nothing
+ * settles resolves to nowhere, and a search cut at its cap settles nothing.
  *
  * ponytail: the evidence that this order is better than line order is that one case, and it is
  * the case the order was chosen from. The opposite shape — a defect in a call to an unchanged
