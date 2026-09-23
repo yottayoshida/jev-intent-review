@@ -35,6 +35,10 @@ inputs:
     description: The token the command reads the pull request and its issues with. The check run is always created with the job's own token.
     required: false
     default: ${{ github.token }}
+  remember-answers:
+    description: Keep this pull request's answers between runs in the Actions cache, so a later push does not ask Jev again about a request byte-identical to one already answered (ADR 0013). The cache holds keys and answers only, never the code. Set to false to ask everything every time.
+    required: false
+    default: "true"
   artifact-name:
     description: The name of the artifact that holds the report, its JSON, the command's stderr and which version of the Action ran.
     required: false
@@ -69,6 +73,16 @@ runs:
         AI_GATEWAY_API_KEY: ""
       run: bash "$ACTION_PATH/action/run.sh" prepare
 
+    # The answers kept for this pull request by its earlier runs (ADR 0013). The prefix names the
+    # pull request, so another pull request's — or the default branch's — is never restored here.
+    # Only what a run with credentials opens is read; a run without them never looks at it.
+    - if: steps.prepare.outputs.ready == 'true' && inputs.remember-answers == 'true'
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ runner.temp }}/jev-intent-review-answers
+        key: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+        restore-keys: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-
+
     # The keys come from the inputs and nowhere else: a step's env wins over the job's, and an empty
     # value is read by the command as not set.
     - id: review
@@ -77,6 +91,7 @@ runs:
       env:
         ACTION_PATH: ${{ github.action_path }}
         JEV_WORK: ${{ steps.prepare.outputs.work }}
+        JEV_ANSWERS: ${{ inputs.remember-answers == 'true' && format('{0}/jev-intent-review-answers', runner.temp) || '' }}
         JEV_PROVIDER: ${{ inputs.jev-provider }}
         JEV_API_URL: ${{ inputs.jev-api-url }}
         JEV_API_TOKEN: ${{ inputs.jev-api-token }}
@@ -97,6 +112,7 @@ runs:
         ACTION_REF: ${{ github.action_ref }}
         ARTIFACT_NAME: ${{ inputs.artifact-name }}
         JEV_WORK: ${{ steps.prepare.outputs.work }}
+        JEV_ANSWERS: ${{ inputs.remember-answers == 'true' && format('{0}/jev-intent-review-answers', runner.temp) || '' }}
         CHECK_TOKEN: ${{ github.token }}
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
         JEV_PROVIDER: ${{ inputs.jev-provider }}
@@ -116,6 +132,15 @@ runs:
         name: ${{ inputs.artifact-name }}
         path: ${{ steps.prepare.outputs.work }}/artifact
         if-no-files-found: ignore
+
+    # Saved under a key of its own each run, so a save never finds its key taken; only when there is a
+    # ledger file, since saving nothing warns. A run skipped for want of credentials that restored one
+    # saves it back unchanged: the command did not open it.
+    - if: always() && steps.prepare.outputs.ready == 'true' && inputs.remember-answers == 'true' && steps.finish.outputs.answers-kept == 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ${{ runner.temp }}/jev-intent-review-answers
+        key: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
 
     - if: always()
       shell: bash

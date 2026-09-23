@@ -194,7 +194,8 @@ that found nothing.
 **Inputs.** `jev-provider`, `cloudflare-account-id`, `cloudflare-api-token`, `typesafe-api-key`,
 `ai-gateway-api-key`, `jev-api-url`, `jev-api-token` — the same choice of host as the command
 ([Jev endpoint](#jev-endpoint)), one key per host. `github-token` (default `github.token`) reads the
-pull request and its issues; `artifact-name` (default `jev-intent-review`) names the artifact.
+pull request and its issues; `artifact-name` (default `jev-intent-review`) names the artifact;
+`remember-answers` (default `true`) keeps this pull request's answers between runs, below.
 Everything else stays in `.jev-intent-review.yml`, which is read from the commit before the change,
 so a pull request cannot loosen the rules it is checked under. A key set in the job's environment is
 never used: the step that runs the command takes every key name from these inputs.
@@ -208,7 +209,22 @@ artifact, which always holds the whole report. **Nothing the command prints goes
 to the job log**: requirements and code excerpts carry text that a log would read as a workflow
 command or as a compiler error, so what this Action adds to the log is a handful of fixed sentences.
 Around them the runner writes its own lines — the step headers and each step's `env:`, where a key
-that came from `secrets` shows as `***` and one written into the workflow file does not.
+that came from `secrets` shows as `***` and one written into the workflow file does not — and
+`actions/cache`'s own lines, which name the cache key (numbers and fixed words) and whether it was
+found.
+
+**What a later push asks again.** When the Action runs again on the same pull request, a judgment
+whose evidence and questions are byte-identical to one already answered for that pull request is
+taken from that answer instead of being sent to Jev, and the report counts it as reused ([ADR
+0013](docs/adr/0013-remember-a-pull-requests-answers.md)). The answers are kept in the Actions cache
+under a key that names the pull request — never another pull request's, nor the default branch's —
+and the cache holds each request's hash and Jev's answer, never the code. A run without
+credentials, a fork's among them, is skipped, and the command never opens them. The report's *Sent
+to the judgment model* line says how many answers were reused and how many of those an earlier run
+kept, and `--json` has them in `sent.reused` and `sent.reusedFromEarlierRuns`;
+`sent.answered` is still what Jev answered in this run. What is not guaranteed, and how much it saved
+on real pull requests, is in [docs/local-check-cli.md](docs/local-check-cli.md#what-a-later-push-asks-again).
+Set `remember-answers: false` to ask everything every time.
 
 **How a run reads at a glance.** The check run is green only when at least one call was read and
 nothing is left to look at; red when the command did not exit 0; and neutral — grey — for everything

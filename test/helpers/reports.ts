@@ -76,7 +76,7 @@ export function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
     sources: [{ id: "issue#1", type: "github_issue", authority: 100, author: "alice" }],
     requirements: [localCheckResult()],
     unexpectedChanges: [],
-    sent: { requests: 4, bytes: 12345, answered: 4 },
+    sent: { requests: 4, bytes: 12345, answered: 4, reused: 0, reusedFromEarlierRuns: 0 },
     metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", questionsHash: "abc", configSource: "defaults", notes: [] },
     ...overrides,
   };

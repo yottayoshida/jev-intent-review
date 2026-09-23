@@ -40,8 +40,12 @@ export function canonicalSystemAlias(path: string, platform: NodeJS.Platform = p
   return path;
 }
 
-/** Creates missing parents one level at a time and refuses every non-system symlink on the route. */
-async function privateParent(target: string): Promise<void> {
+/**
+ * Creates missing parents one level at a time and refuses every non-system symlink on the route.
+ * `fail` makes the error; the trace's words are the default, and the answers kept for a pull
+ * request (`remembered.ts`) pass their own.
+ */
+export async function privateParent(target: string, fail: (what: "symlink" | "not_directory" | "not_private") => Error = traceFailure): Promise<void> {
   const parent = canonicalSystemAlias(resolve(dirname(target)));
   const parsed = parse(parent);
   const parts = relative(parsed.root, parent).split(sep).filter(Boolean);
@@ -59,11 +63,16 @@ async function privateParent(target: string): Promise<void> {
       }
       stats = await lstat(current);
     }
-    if (stats.isSymbolicLink()) throw traceError("Jev trace path must not contain a symlink");
-    if (!stats.isDirectory()) throw traceError("Jev trace parent must be a directory");
+    if (stats.isSymbolicLink()) throw fail("symlink");
+    if (!stats.isDirectory()) throw fail("not_directory");
   }
   const stats = await lstat(parent);
-  if ((stats.mode & 0o077) !== 0) throw traceError("Jev trace directory is not private");
+  if ((stats.mode & 0o077) !== 0) throw fail("not_private");
+}
+
+function traceFailure(what: "symlink" | "not_directory" | "not_private"): Error {
+  const words = { symlink: "Jev trace path must not contain a symlink", not_directory: "Jev trace parent must be a directory", not_private: "Jev trace directory is not private" };
+  return traceError(words[what]);
 }
 
 /** Returns no writer unless tracing was deliberately enabled. */

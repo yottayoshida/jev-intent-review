@@ -161,9 +161,13 @@ export interface ReviewReport {
   unexpectedChanges: UnexpectedChange[];
   /**
    * `answered`: the requests Jev answered, in the same unit as `requests` (an observation request
-   * carries two questions). `host`: which host `endpoint` is — `custom` when set by `JEV_API_URL`.
+   * carries two questions). `reused`: the requests answered from kept answers (`--answers`) instead
+   * of being sent, in the same unit; they are in neither `requests` nor `answered` (ADR 0013).
+   * `reusedFromEarlierRuns`: of those, the ones kept by an earlier run; the rest repeated a request
+   * of this run.
+   * `host`: which host `endpoint` is — `custom` when set by `JEV_API_URL`.
    */
-  sent: { requests: number; bytes: number; answered: number; endpoint?: string; host?: Host };
+  sent: { requests: number; bytes: number; answered: number; reused: number; reusedFromEarlierRuns: number; endpoint?: string; host?: Host };
   metadata: {
     repository: string;
     base: string;

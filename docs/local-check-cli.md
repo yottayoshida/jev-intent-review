@@ -346,6 +346,64 @@ disagreeing. It covers calls whose mapping or whose behaviour came back undeterm
 bar, or unanswered, as well as calls that agreed. What was not reached is under *Not checked*, and
 the enumeration's own caps are counted in the notes.
 
+## What a later push asks again
+
+**When the Action runs again on the same pull request, a judgment whose evidence and questions are
+byte-identical to one already answered for that pull request is taken from that answer instead of
+being sent to Jev, and the report counts it as reused** ([ADR 0013](adr/0013-remember-a-pull-requests-answers.md)).
+
+The command does it with `--answers <dir>`; the Action passes a directory it keeps in the Actions
+cache, one per pull request (`remember-answers`, default `true`).
+
+- **What counts as the same.** A request's key is the SHA-256 of the host, the endpoint's origin (its
+  port included), the model, the evidence packet and the questions' words. A tool whose questions
+  changed, another host, another endpoint and another model all ask again. The directory holds each
+  key and Jev's answer, never the packet: nothing of the repository's code is kept.
+- **When it is read.** Only once the run has decided it has credentials. A run without them — a fork's
+  pull request, Dependabot's, no keys — is skipped as before and the command never opens the
+  directory. (The Action still restores the cache for such a run and saves it back unchanged; the
+  command does not read it.)
+- **How it is read.** A directory or file that others can read, or that is reached through a symlink,
+  is not used and the notes say so; the Action makes the restored directory private again first. A
+  restored directory that is itself a symlink is not passed to the command at all, so nothing is
+  reused, no note says why, and it is not saved back. A
+  kept answer that no longer fits its question — a key missing, a choice not offered, a probability
+  outside 0 to 1 — is asked again, and the notes count it.
+- **When it is written.** Each answer as it comes back, so a run stopped by its budget, a failure or a
+  later push keeps what it was given. An answer that cannot be written is still used in the report,
+  and the notes say it was not kept.
+- **Two identical requests in one run** share one: the second waits for the first and is counted as
+  reused. If the first fails, the second fails with it and is not counted — the same request is not
+  paid for twice, where before it was.
+- **How it is counted.** `sent.requests` and `sent.answered` are what went to Jev and what Jev
+  answered in this run, as before; `sent.reused` is what was answered without being sent, and
+  `sent.reusedFromEarlierRuns` how many of those an earlier run kept — the rest repeated a request of
+  this run. The *Sent to the judgment model* line adds "N answers reused (M kept from earlier runs,
+  the rest repeats within this one)" when there are any. A run answered entirely from the directory
+  is not "Nothing was asked". A run stops with exit 12 when it sent at least one judgment (the form
+  question aside) to Jev and none came back, whatever it reused; one the run's own budget ended — its
+  time, requests or bytes, before it was sent or before a retry — does not count, as without kept
+  answers. The trace (`JEV_TRACE_FILE`) holds only what Jev answered in this run.
+
+What is not guaranteed:
+
+- **Whoever can write the pull request's cache is trusted.** A fork's cache stays in its own pull
+  request's scope, whose runs have no secrets and never read it. An author of a pull request from a
+  branch of the repository can add a workflow that saves forged answers under the pull request's
+  key and remove it in a later push: the later report uses them, and says nothing about a changed
+  workflow. Its only mark is the "kept from earlier runs" count. Signing the answers would not
+  stop it — that workflow can read the secrets a signature would use.
+- A cache GitHub has evicted (after 7 days unused) is asked again. An endpoint set by `JEV_API_URL`
+  whose port changes between runs is too.
+- A run answered entirely from the directory sends nothing, so a revoked key goes unnoticed until a
+  request is new.
+- Parallel legs of a matrix share the key; the second save only warns. Whether a run that
+  `concurrency` cancels still saves what it had is not yet measured on GitHub.
+- Runs of one pull request that overlap each restore the newest cache there is when they start and
+  save their own: what one of them adds may not reach the next, which asks it again.
+- A kept answer is the one draw Jev gave; asking again would give a fresh one. Where the reading sits
+  at the bar, the two can differ ([below](#what-another-push-would-not-have-to-ask-again)).
+
 ## What has been measured
 
 Everything below is about `failure_propagation` except two parts: the one measurement of
@@ -837,6 +895,19 @@ pull request's: 8 of the 34 are pull request heads (`shipped`), and the other 26
 for the acceptance bench (`defect`, `rewrite`, `hidden`). One of the two that differed is a
 `hidden` version, which is built so that its answer should be `cannot_determine` or below the bar
 (`bench/acceptance/README.md`).
+
+**The ledger, once built, measured the same way** (ADR 0013; `node bench/packet-reuse.ts --ledger`,
+log `bench/logs/packet-reuse-ledger-v1.json`). The same 40 candidates, the same 12 measured and the
+same 28 not; every push of each was run twice against a stand-in, once without kept answers and once
+with them (`--answers`, one directory per pull request, carried from push to push). The stand-in's
+answers follow each request's hash — choice and probability both — so an answer returned for the
+wrong request would change the report. On all **43 pushes**: the reused count equals what the trace
+of the run without them says should be covered — requests sent at any earlier push, and repeats
+within the push — and so does the part of it kept from earlier runs; the requests sent plus those reused equal the requests of the run without them,
+and the requirements and changes read are the same, probabilities included. No run failed. Of the
+31 later pushes, the median share answered from kept answers is **0.855** (1241 of 1535 pooled),
+with the tool as it is after the table of *Functions outside the repository* — against 0.852 for a
+pair's identical packets above, which counts only the push just before.
 
 What this does not measure:
 

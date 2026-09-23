@@ -12,6 +12,7 @@ import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedPro
 import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
+import { RememberedProvider } from "../judgments/remembered.ts";
 import { isSensitivePath } from "../evidence/redact.ts";
 import { renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
@@ -66,6 +67,10 @@ Run:
   --candidates-only     build the set and stop. Prints which calls fit the budget and which do
                         not, with a reason each, and asks nothing -- no credentials needed
   --skip-change-check   do not ask whether each change was asked for; only the calls are read
+  --answers <dir>       keep the answers in this private directory (0700) and use them: a request
+                        byte-identical to one answered there is not sent, and is counted as reused.
+                        Read only when the run has credentials. The GitHub Action keeps one per
+                        pull request
   --experimental-local-check
                         accepted: this is the run now. The report and the exit code are the
                         same without it; one line on stderr says so
@@ -146,6 +151,7 @@ function parse(argv: string[]) {
         head: { type: "string" },
         "candidates-only": { type: "boolean", default: false },
         "skip-change-check": { type: "boolean", default: false },
+        answers: { type: "string" },
         // Accepted from 0.1, when they selected the local check; the run is the local check now.
         "experimental-local-check": { type: "boolean", default: false },
         "experimental-candidates-only": { type: "boolean", default: false },
@@ -289,7 +295,7 @@ function reportOf(revisions: Revisions, repository: string, configSource: string
     sources: parts.sources.map(({ text: _text, ...source }) => source),
     requirements: parts.requirements ?? [],
     unexpectedChanges: parts.unexpectedChanges ?? [],
-    sent: parts.sent ?? { requests: 0, bytes: 0, answered: 0 },
+    sent: parts.sent ?? { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 },
     metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: parts.notes, ...(parts.prAuthor ? { pullRequestAuthor: parts.prAuthor } : {}) },
   };
 }
@@ -498,11 +504,18 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;
     const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, io.env, deps.fetch);
+    // The kept answers are opened here, after the run has found its credentials and not before: a
+    // run without them — another repository's pull request among them — was skipped above and never
+    // reads what was written into its cache (ADR 0013).
+    const answersDir = args.answers;
+    if (answersDir !== undefined && (answersDir.trim() === "" || answersDir.includes("\0"))) throw new ToolError("--answers needs a directory", EXIT.config);
+    const ledger = answersDir === undefined ? null : await RememberedProvider.open(answersDir, judges.provider, { host: endpoint.host, origin: judges.origin });
+    const provider: JudgmentProvider = ledger ?? judges.provider;
 
     // The calls first, then the changes. One provider for both; there is nothing else to send to.
     // A requirement read from text names no form, so Jev is asked which form its sentence says
     // (ADR 0008); a spec's requirements keep the spec's word and are not asked.
-    const run = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, { ...localOptions, askForm: !resolved.spec });
+    const run = await runLocalCheck(git, revisions, intent.requirements, provider, include, { ...localOptions, askForm: !resolved.spec });
     footing(run.change.changedPaths);
     trace(`changed files: ${run.change.changedPaths.length}`);
     for (const s of run.change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
@@ -516,7 +529,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     let changes = { unexpected: [] as UnexpectedChange[], reached: 0, answered: 0, notes: [] as string[] };
     if (args["skip-change-check"]) notes.push("The changes were not checked against the requirements (--skip-change-check).");
     else if (justifying.length === 0) notes.push("The changes were not checked against the requirements: every requirement came from the pull request's own description, which cannot justify the change it describes.");
-    else changes = await reviewChanges({ change: run.change, requirements: justifying, provider: judges.provider, maxChars: config.evidence.max_primary_chars, threshold: config.judgment.violation_probability, trace });
+    else changes = await reviewChanges({ change: run.change, requirements: justifying, provider, maxChars: config.evidence.max_primary_chars, threshold: config.judgment.violation_probability, trace });
     notes.push(...changes.notes);
     trace(`changes no requirement asked for: ${changes.unexpected.length}`);
     // Last, the siblings of the change (ADR 0005): on the run's limits after everything above, so
@@ -530,6 +543,19 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     if (run.reached + changes.reached + siblings.reached > 0 && run.answered + changes.answered + siblings.answered === 0) {
       throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached + siblings.reached} request(s) were sent and none was answered`, EXIT.provider);
     }
+    // With kept answers, the callers' counts include what the ledger answered, so a run whose new
+    // requests all failed can still read as answered. What decides it is what went to the host:
+    // judgments handed down (the form question aside, as above) and how many came back.
+    if (ledger) {
+      await ledger.settled();
+      notes.push(...ledger.notes());
+      const { judgmentsPassedDown, judgmentsAnsweredDown } = ledger.counts;
+      if (judgmentsPassedDown > 0 && judgmentsAnsweredDown === 0) {
+        throw new ToolError(`no judgment came back from ${judges.origin}: ${judgmentsPassedDown} judgment(s) were not among the kept answers and none of them was answered`, EXIT.provider);
+      }
+    }
+    const reused = ledger?.counts.reused ?? 0;
+    const reusedFromEarlierRuns = ledger?.counts.reusedFromEarlierRuns ?? 0;
 
     const sent = judges.sent();
     return output(
@@ -539,7 +565,8 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         sources: resolved.sources,
         requirements: run.requirements,
         unexpectedChanges: changes.unexpected,
-        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + siblings.answered, endpoint: judges.origin, host: endpoint.host },
+        // `answered` stays the requests Jev answered: what the ledger answered is `reused`, not both.
+        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + siblings.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
         notes,
         prAuthor,
       }),
