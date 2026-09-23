@@ -80,6 +80,12 @@ Defects sit in one of three kinds of place:
 - **C** — a function that is neither. Applied to both. v0.1 enumerates changed functions and their
   callers one hop out, so C is outside its reach by construction; its result is settled by the
   pre-check and no request is spent on it.
+- **S** — a sibling of the change (ADR 0005): a function that calls what the changed code calls and
+  nothing the change touched. Applied to both. Its place is fixed by the rule `placeS` of
+  `candidates-v2.json`, from the repository's text and `git grep`, before the tool is run on the
+  candidate — so whether the tool reaches it is measured, not chosen. Measured in
+  `acceptance-v3.json`, whose table claims one sibling's defect and no more (`replay.ts` refuses a
+  version of that log placed anywhere else, and does not hold it to two repositories).
 
 Every version must change the same set of functions — compared as `(path, name)`, since function
 ids are positional — as the shipped version. That is checked from the diff before the branch SHAs
