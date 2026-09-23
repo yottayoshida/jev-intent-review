@@ -185,10 +185,11 @@ export function barLines(all: Row[]): string[] {
   const n = summarise(all, "neither", "all");
   const cShare = c.sentences === 0 ? 0 : c.rightEveryRun / c.sentences;
   const nCap = Math.floor(n.sentences / 10);
+  const verdict = (count: number, met: boolean) => (count === 0 ? " — no sentences" : met ? " — met" : " — not met");
   return [
-    `failure sentences read as check_before_action at the bar in any run: ${f.checkInAnyRun} of ${f.sentences} (bar: 0)${f.checkInAnyRun === 0 ? " — met" : " — not met"}`,
-    `check sentences read as check_before_action at the bar in every run: ${c.rightEveryRun} of ${c.sentences} (${(cShare * 100).toFixed(0)}%; bar: 80%, and not below the keyword rule's ${c.keywordRight})${cShare >= 0.8 && c.rightEveryRun >= c.keywordRight ? " — met" : " — not met"}`,
-    `neither sentences read as check_before_action at the bar in any run: ${n.checkInAnyRun} of ${n.sentences} (bar: at most ${nCap})${n.checkInAnyRun <= nCap ? " — met" : " — not met"}`,
+    `failure sentences read as check_before_action at the bar in any run: ${f.checkInAnyRun} of ${f.sentences} (bar: 0)${verdict(f.sentences, f.checkInAnyRun === 0)}`,
+    `check sentences read as check_before_action at the bar in every run: ${c.rightEveryRun} of ${c.sentences} (${(cShare * 100).toFixed(0)}%; bar: 80%, and not below the keyword rule's ${c.keywordRight})${verdict(c.sentences, cShare >= 0.8 && c.rightEveryRun >= c.keywordRight)}`,
+    `neither sentences read as check_before_action at the bar in any run: ${n.checkInAnyRun} of ${n.sentences} (bar: at most ${nCap})${verdict(n.sentences, n.checkInAnyRun <= nCap)}`,
   ];
 }
 

@@ -85,15 +85,26 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
   // later is measured into a later log, and this check would then refuse v1's table; whoever adds
   // one decides then how v1 names what it did not measure.
   if (!recordsRoles) {
-    for (const c of cases) if (c.role === "unseen" && !log.cases[c.id]) throw new ScoringError(`${c.id} is an unseen case with no measurement in the log`);
+    for (const c of cases) if (c.role === "unseen" && c.firstMeasuredIn === undefined && !log.cases[c.id]) throw new ScoringError(`${c.id} is an unseen case with no measurement in the log`);
   }
+  // A measurement of one sibling's defect (candidates-v2.json) claims that and no more: one case, and
+  // every version is the shipped code or places its defect in a sibling.
+  const sibling = log.conditions.claim === "sibling";
   const measured = Object.keys(log.cases).map((id) => {
     const c = cases.find((x) => x.id === id);
     if (!c) throw new ScoringError(`${id} is measured in the log but has no case.json, so it would drop out of the table unseen`);
     return c;
   });
   const repos = new Set(measured.map((c) => c.repo));
-  if (repos.size < 2) throw new ScoringError(`the log covers ${repos.size} repository, and the claim needs two or more`);
+  if (!sibling && repos.size < 2) throw new ScoringError(`the log covers ${repos.size} repository, and the claim needs two or more`);
+  if (sibling && measured.length === 0) throw new ScoringError("the log measures no case");
+  if (sibling) {
+    for (const c of measured) {
+      for (const [versionId, v] of Object.entries(c.versions)) {
+        if (v.place !== undefined && v.place !== "S") throw new ScoringError(`${c.id} ${versionId} places its defect at ${v.place}, and this log's claim is about a sibling only`);
+      }
+    }
+  }
 
   const lines: string[] = [];
   const table: string[] = recordsRoles
@@ -120,7 +131,7 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
       if (isLive(version, v.enumeration) && finished < RUNS) {
         throw new ScoringError(`${c.id} ${versionId} was sent to Jev ${finished} times to completion, not ${RUNS}`);
       }
-      if ((version.place === "B" || version.place === "C") && Object.values(version.expected).includes("listed")) outside += 1;
+      if ((version.place === "B" || version.place === "C" || version.place === "S") && Object.values(version.expected).includes("listed")) outside += 1;
       const rows = scoreVersion(c, versionId, v);
       for (const row of rows) {
         table.push(`| ${c.id} |${recordsRoles ? ` ${roleOf(c.id)} |` : ""} ${versionId} | ${row.targetKey} \`${row.target.function}\` | ${EXPECTED_WORDS[row.expected]} | ${reachWords(row)} | ${readings(row)} | ${result(row)} |`);
@@ -146,7 +157,9 @@ export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidate
   const tool = (log.conditions.tool as { commit?: string } | undefined)?.commit?.slice(0, 7) ?? "unknown";
   const tuned = measured.filter((c) => roleOf(c.id) === "regression").map((c) => c.id);
   lines.push(
-    recordsRoles
+    sibling
+      ? `Measured with the tool at ${tool}: ${measured.length === 1 ? "one case" : `${measured.length} cases`}, a defect placed in a sibling of the change (ADR 0005), found by the rule of candidates-v2.json before the tool was run. Candidates examined: ${examined}.`
+      : recordsRoles
       ? `Measured again with the tool at ${tool}: ${measured.length} requirements from ${repos.size} repositories. Used to tune the tool before this measurement: ${tuned.length === 0 ? "none" : tuned.join(", ")}.`
       : `Candidates examined: ${examined} (cap ${candidates.gateResult?.cap ?? 20}). Passed condition (a): ${passed("a")}, (b): ${passed("b")}, (c): ${passed("c")}. Measured: ${measured.length} requirements from ${repos.size} repositories.`,
     "",
@@ -169,9 +182,10 @@ function isEntryPoint(): boolean {
 
 if (isEntryPoint()) {
   const path = process.argv[2] ?? join(HERE, "..", "logs", "acceptance-v1.json");
+  const candidatesPath = process.argv[3] ?? join(HERE, "candidates.json");
   try {
     const log = JSON.parse(readFileSync(path, "utf8")) as AcceptanceLog;
-    const candidates = JSON.parse(readFileSync(join(HERE, "candidates.json"), "utf8")) as Candidates;
+    const candidates = JSON.parse(readFileSync(candidatesPath, "utf8")) as Candidates;
     process.stdout.write(`${render(loadCases(), log, candidates)}\n`);
   } catch (error) {
     if (!(error instanceof ScoringError)) throw error;

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { loadCases, render, type AcceptanceLog } from "../bench/acceptance/replay.ts";
-import { occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
+import { cutShort, occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8")) as T;
 
@@ -89,7 +89,7 @@ test("(e) a mapping that got no answer is its own stage, not a reading below the
   assert.equal(weak.stage, "answered");
 });
 
-const version = (expected: CaseFile["versions"][string]["expected"], place?: "A" | "B" | "C") => ({ base: "b".repeat(40), head: "h".repeat(40), ...(place ? { place } : {}), targets: { A: T }, expected });
+const version = (expected: CaseFile["versions"][string]["expected"], place?: "A" | "B" | "C" | "S") => ({ base: "b".repeat(40), head: "h".repeat(40), ...(place ? { place } : {}), targets: { A: T }, expected });
 const oneCase = (id: string, repo: string, versions: CaseFile["versions"]): CaseFile => ({ id, repo, role: "unseen", versions, existence: Object.fromEntries(Object.keys(versions).map((v) => [v, { A: 1 }])) });
 const liveLog = (runs: RunRecord[]): VersionLog => ({ base: "b".repeat(40), head: "h".repeat(40), enumeration: { wouldAsk: [T], unchecked: [], notes: [] }, runs });
 
@@ -228,6 +228,55 @@ test("(i) a case's role is the log's, as it was when it was measured, not what i
   oneRepo.log.cases.two!.role = "regression";
   oneRepo.cases[1] = { ...oneRepo.cases[1]!, repo: oneRepo.cases[0]!.repo };
   assert.throws(() => render(oneRepo.cases, oneRepo.log, candidates), /the claim needs two or more/);
+});
+
+test("(j) a run cut short by its own limit is not finished: a request failed on the budget, or a sibling's call left unanswered", () => {
+  const sibling = { ...T, origin: "shares_call", callId: "s1", result: { observation: "withheld", probability: 0, why: "the observation question was not answered (budget)" } };
+  const near = { ...T, origin: "changed", callId: "n1", result: { observation: "withheld", probability: 0, why: "the observation question was not answered (budget)" } };
+  const reqs = (observed: unknown[], mappings: unknown[] = []) => [{ requirementId: "R1", observed, unchecked: [], mappings, findings: [] }] as unknown as RunRecord["requirements"];
+  assert.equal(cutShort(reqs([]), [{ error: "ProviderError: budget" }]), true, "a request that failed on the budget");
+  assert.equal(cutShort(reqs([sibling]), []), true, "a sibling's call without an answer");
+  assert.equal(cutShort(reqs([{ ...sibling, result: { observation: "returns_error", probability: 0.9, why: "read" } }], [{ ...T, callId: "s1", verdict: "no_answer", probability: 0, governs: false }]), []), true, "a sibling's mapping without an answer");
+  // The control: the first budget's call without an answer is a reading like any other, as before.
+  assert.equal(cutShort(reqs([near]), [{ error: "ProviderError: timeout" }]), false);
+  assert.equal(cutShort(reqs([{ ...sibling, result: { observation: "returns_error", probability: 0.9, why: "read" } }]), []), false);
+});
+
+test("(k) a log that claims one sibling's defect: one repository is enough, a version elsewhere is refused, and the line says what it is", () => {
+  const sib = good();
+  sib.cases = [oneCase("one", "https://example.com/one", { shipped: version({ A: "not_listed" }), "defect-S": version({ A: "listed" }, "S") })];
+  sib.log.cases = { one: { role: "unseen", versions: { shipped: sib.log.cases.one!.versions.shipped!, "defect-S": sib.log.cases.one!.versions["defect-B"]! } } };
+  sib.log.conditions = { claim: "sibling", tool: { commit: "0123456789abcdef" } };
+  const table = render(sib.cases, sib.log, candidates);
+  assert.match(table, /^Measured with the tool at 0123456: one case, a defect placed in a sibling of the change/);
+  assert.match(table, /\| one \| unseen \| defect-S \|/);
+  const elsewhere = structuredClone(sib);
+  elsewhere.cases[0]!.versions["defect-S"]!.place = "B";
+  assert.throws(() => render(elsewhere.cases, elsewhere.log, candidates), /places its defect at B, and this log's claim is about a sibling only/);
+  // Without the claim, the same log is held to the claim of two repositories.
+  const plain = structuredClone(sib);
+  plain.log.conditions = {};
+  assert.throws(() => render(plain.cases, plain.log, candidates), /the claim needs two or more/);
+});
+
+test("(l) a case first measured in a later log does not make an earlier table refuse to print", () => {
+  const later = good();
+  later.cases.push({ ...oneCase("later", "https://example.com/later", { shipped: version({ A: "not_listed" }) }), firstMeasuredIn: "acceptance-v3.json" });
+  assert.equal(render(later.cases, later.log, candidates), render(good().cases, good().log, candidates));
+  // The control: an unseen case with no such mark is one the earlier log left out.
+  const missing = good();
+  missing.cases.push(oneCase("missing", "https://example.com/missing", { shipped: version({ A: "not_listed" }) }));
+  assert.throws(() => render(missing.cases, missing.log, candidates), /no measurement in the log/);
+});
+
+test("a case marked as first measured in a log is in that log, once the log is committed", () => {
+  for (const c of loadCases()) {
+    if (c.firstMeasuredIn === undefined) continue;
+    const log = new URL(`../bench/logs/${c.firstMeasuredIn}`, import.meta.url);
+    if (!existsSync(log)) continue;
+    assert.ok((JSON.parse(readFileSync(log, "utf8")) as AcceptanceLog).cases[c.id], `${c.id} is in ${c.firstMeasuredIn}`);
+  }
+  assert.ok(readdirSync(new URL("../bench/acceptance/cases", import.meta.url)).length > 0);
 });
 
 // ---- 3b. The document says what the committed record says, byte for byte ------------------------

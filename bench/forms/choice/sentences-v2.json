@@ -1,0 +1,75 @@
+{
+  "about": "The requirement sentences bench/acceptance/candidates-v2.json added on 2026-09-23 (issue #37's search for a case in a sibling), each written by hand from a merged pull request's text and labelled before the first request. A second set beside sentences.json, whose log (form-choice-v1.json) records that set's sha256 and is not added to: this one has its own log, form-choice-v2.json, under the same question and bar.",
+  "sentences": [
+    {
+      "id": "candidates-v2-autonoetic-901",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "mandubian/autonoetic#901"
+      },
+      "text": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered."
+    },
+    {
+      "id": "candidates-v2-git-ai-1717",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "git-ai-project/git-ai#1717"
+      },
+      "text": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection."
+    },
+    {
+      "id": "candidates-v2-vox-346",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "vox-foundation/vox#346"
+      },
+      "text": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set."
+    },
+    {
+      "id": "candidates-v2-lipilekhika-127",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "shubhattin/lipilekhika#127"
+      },
+      "text": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null."
+    },
+    {
+      "id": "candidates-v2-oxicrab-155",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "oxicrab/oxicrab#155"
+      },
+      "text": "If an OAuth token refresh fails, the failure must reach the caller as an error, not be returned as the stale token."
+    },
+    {
+      "id": "candidates-v2-infraweave-307",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "infraweave-io/infraweave#307"
+      },
+      "text": "When every claim fails in plan or apply, the failure must reach the caller as an error, not let the command continue as if it succeeded."
+    },
+    {
+      "id": "candidates-v2-skuld-33",
+      "label": "failure_propagation",
+      "origin": {
+        "kind": "text",
+        "file": "bench/acceptance/candidates-v2.json",
+        "ref": "bindreams/skuld#33"
+      },
+      "text": "If reading a row of the running set fails, the error must reach the caller, not be dropped so that the caller sees a truncated set."
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "what": "The candidates examined for a case with a defect in a sibling of the change (issue #37, ADR 0005), in the order they were examined, with the verdict on each condition and the reason. The rules below were committed before any candidate was opened and are not changed after; a change makes a new version.",
+  "tool": {
+    "repo": "yottayoshida/jev-intent-review",
+    "commit": "722ad62",
+    "why": "The tool as shipped when these rules were written. Its selection code (src/plan, src/review, src/change, src/discovery) is the same as at f4971ff, the merge of the siblings (PR #65)."
+  },
+  "examined": "A candidate counts as examined once its issue or pull request text is read. Titles screened out by the rules below are not counted.",
+  "sources": {
+    "pool": "The two GitHub searches of #36's candidates.json, run again on 2026-09-23: `gh search prs --language rust --merged --limit 100 -- \"propagate error instead of silently\"` and `gh search prs --language rust --merged --limit 100 -- \"error treated as success\"`, merged into one list and taken newest merge first. Every candidate of candidates.json (#36's 40) is skipped. Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success.",
+    "titleScreen": "As in candidates.json: titles naming a refactor, documentation, a test harness, packaging or labels are screened out without reading."
+  },
+  "conditions": {
+    "a": "As in candidates.json: the requirement can be written as 'a failure must reach the caller as an error, not as a success, an empty value or an absence'. Judged from the issue and pull request text only, and written down before the fix's diff is opened.",
+    "s": "At the pull request's head, the place S below is found by the rule `placeS`, from the repository's text and `git grep`, without running this tool.",
+    "d": "The requirement of (a) governs S: the function S returns a failure of its call to the seed to its own caller in the sense of (a). Judged from S's text and written down, with the reason, before this tool is run on the candidate.",
+    "c": "As in candidates.json: the behaviour difference of defect-S (below) can be observed in a throwaway clone, with no network and no credentials, through one crate's test or example."
+  },
+  "placeS": {
+    "what": "The rule that fixes the place S of a sibling's defect before this tool is run, written in the terms of src/plan/siblings.ts so that 'the tool did not list S' is a finding about the tool and not about this rule. Where the tool settles a call by reading more than this rule does (which definition a call reaches), that is left to the tool, and is what the measurement tests.",
+    "outsideTests": "A path is outside tests when `isTestPath` of src/discovery/discover.ts at the tool commit does not hold of it (as written there: a tests?/, spec/, __tests__/, testdata/ or fixtures/ directory, or a name ending .test.*, -spec.*, _test.* and the like — examples/ and benches/ are outside tests), it is not under the default ignore (src/config/config.ts), and the function is not inside a `#[cfg(test)]` module.",
+    "changedFunctions": "The Rust functions `bench/acceptance/changed-functions.ts` gives for base..head, outside tests.",
+    "seeds": "Names called in the changed functions — on lines the change kept, added or removed — of at least 3 characters, with exactly one `fn` of that name outside tests, whose return type (after `->`, not a parameter's type) names `Result`, that is not a changed function, used in at most 20 Rust files outside tests. Ordered: called on a changed line first, then called from more changed functions, then used in fewer files, then by name. The first 8.",
+    "sFunction": "For each seed in that order, `git grep -w` its name; among the functions outside tests that are not changed functions, that call no changed function by name, whose return type names `Result`, that make at most 40 calls, and that call the seed as a free function or by a path (`seed(…)`, `module::seed(…)`, `Type::seed(…)` — a method call `x.seed(…)` does not count, and is recorded as such), the first by file path, then by line. If (d) does not hold of it, the next, with the reason recorded.",
+    "target": "In the function S, the first call to the seed. Its expression must occur exactly once in S's function at every version (`occurrences`).",
+    "revisions": "base is the merge base of the pull request's base and head (as precheck-shipped.json took #36's), head its head: a pull request's recorded base can predate what its head merged in from the default branch."
+  },
+  "versions": {
+    "shipped": "The pull request's head. S is expected not listed.",
+    "defect-S": "At the target, a failure turned into a success, the difference observed by running it. Applied to both the base and the head, since a defect outside the diff is one the pull request did not fix; a patch that does not apply to both drops the candidate at (c).",
+    "rewrite-S": "The target's code written differently, behaviour unchanged. S is expected not listed.",
+    "notBuilt": "No hidden version: #36 measured a helper whose body is not sent only at place A, and what it says of a sibling is not measured."
+  },
+  "limits": {
+    "examined": 30,
+    "stop": "Stop at the first candidate that passes (a), (s), (d) and (c). At 30 examined with none, stop, report what was examined and which condition each failed, and leave #37 open."
+  },
+  "runs": "Three finished runs of each version whose target is inside a budget, by bench/acceptance/run.ts. A run is finished only when it exited 0, no request it recorded failed on the run's own limit, and no call inside the siblings' budget came back without an answer.",
+  "candidates": [
+    {
+      "order": 1,
+      "ref": "risingwavelabs/risingwave#26399",
+      "a": "fail",
+      "why": "The fix makes a constructor return an Option for values it cannot represent: an absence is what the fix returns, which (a) counts as the failure's wrong shape. The requirement is an invariant at construction, not a failure reaching a caller as an error."
+    },
+    {
+      "order": 2,
+      "ref": "mandubian/autonoetic#901",
+      "a": "pass",
+      "why": "The tool reported `{\"ok\":true,\"status\":\"delivered\"}` for a message to a closed session: a failed delivery returned as a success.",
+      "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered.",
+      "revisions": {
+        "base": "d70b163b6ac30719ae8a67ae73f387870f12042c",
+        "head": "01970eea5a24656ba513c0a7c2a82fcd3b43ecd7",
+        "how": "merge base of 45f11d15e12fd41e6aebe3fda89d4f19ad8b160a and the head"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 2 changed functions (execute, guidance in runtime/tools/agent.rs); 8 seeds (workflow_approval_gate_active, try_acquire_reservation, pending_approval_requests_for_root, release_reservation, enqueue_task, validate_agent_id, save_workflow_run, save_task_run); 13 functions the rule accepts, the first agent_revision.rs:2484 execute (seed validate_agent_id), the other 12 in scheduler/workflow_store.rs (seeds save_workflow_run, save_task_run).",
+      "d": "fail",
+      "dWhy": "The requirement is about delivering a message to a closed session. None of the 13 is governed by it: the first validates an agent id in the agent-revision tool, the other 12 persist workflow and task runs. Each was read and set aside for that reason."
+    },
+    {
+      "order": 3,
+      "ref": "vybestack/llxprt-jefe#416",
+      "a": "fail",
+      "why": "Reaping orphaned worker process trees on Windows; no call's failure is returned as a success."
+    },
+    {
+      "order": 4,
+      "ref": "SG-devel/tailtriage#1097",
+      "a": "fail",
+      "why": "An API consolidation; no failure is turned into a success."
+    },
+    {
+      "order": 5,
+      "ref": "Extra-Chill/homeboy#9526",
+      "a": "fail",
+      "why": "A false positive in a static detector's rule; the fix is to the detector's matching, not to a failure's handling."
+    },
+    {
+      "order": 6,
+      "ref": "edge-toolkit/core#84",
+      "a": "fail",
+      "why": "Assorted fixes to lint alerts across the code base; no one requirement about a failure reaching its caller."
+    },
+    {
+      "order": 7,
+      "ref": "thedoublejay/gather-step#67",
+      "a": "fail",
+      "why": "A feature release (confidence bands, staleness, telemetry)."
+    },
+    {
+      "order": 8,
+      "ref": "git-ai-project/git-ai#1717",
+      "a": "pass",
+      "why": "The fix removes in-memory fallbacks: bash history now fails closed when its file-backed fallback cannot initialise, where it used to fall back silently.",
+      "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection.",
+      "revisions": {
+        "base": "95c101ecccf017f514cac970bfd1099eb6fb398b",
+        "head": "f7662258f630ffa94e78ff14567f953ad9e43e3c",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 20 changed functions — the pull request routes every SQLite open through one helper, so it changes the callers too — and one seed (ensure_derived_columns) whose other callers the rule accepts none of."
+    },
+    {
+      "order": 9,
+      "ref": "pnpm/pnpm#12506",
+      "a": "fail",
+      "why": "A new feature (an OSV index that blocks vulnerable versions); failing closed is part of the feature, not a failure that was being returned as a success."
+    },
+    {
+      "order": 10,
+      "ref": "iii-hq/workers#292",
+      "a": "fail",
+      "why": "A new feature (a Telegram bot)."
+    },
+    {
+      "order": 11,
+      "ref": "qdrant/qdrant#9429",
+      "a": "fail",
+      "why": "A refactor for batched reads, for speed."
+    },
+    {
+      "order": 12,
+      "ref": "vox-foundation/vox#346",
+      "a": "pass",
+      "why": "The pull request says `parse_registry_file()` now propagates errors instead of silently returning an empty set.",
+      "requirement": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set.",
+      "revisions": {
+        "base": "f199c9cfc512db9b043a25e335d27886f1dc5c9d",
+        "head": "f3010ffdc1713deb394e6949833c8c3a7c6f1a4c",
+        "how": "merge base of 12e4712aa96740b22797271b93029eefd1e0d636 and the head"
+      },
+      "s": "fail",
+      "sWhy": "From the merge base, the pull request changes no Rust function outside tests: its description names parse_registry_file (crates/vox-cli/src/commands/ci/config_hygiene.rs), which none of its 11 files is. There is no changed code to take a seed from."
+    },
+    {
+      "order": 13,
+      "ref": "ng/yggdrasil#103",
+      "a": "fail",
+      "why": "Raising a tool's timeout and isolating a signal; no failure returned as a success."
+    },
+    {
+      "order": 14,
+      "ref": "andrewdavidmackenzie/flow#2680",
+      "a": "fail",
+      "why": "A buffer size and a GUI layout, with a new example."
+    },
+    {
+      "order": 15,
+      "ref": "ben1009/mini-lsm#76",
+      "a": "fail",
+      "why": "A new module (a value log)."
+    },
+    {
+      "order": 16,
+      "ref": "snowflakedb/drivers#911",
+      "a": "fail",
+      "why": "State-machine correctness and input validation for an ODBC call; no failure was being returned as a success."
+    },
+    {
+      "order": 17,
+      "ref": "zeroclaw-labs/zeroclaw#6512",
+      "a": "fail",
+      "why": "Four email-channel defects (a default subject, Markdown as plain text, zero-byte attachments because a file was never read, lost threading); none is a failed call returned as a success."
+    },
+    {
+      "order": 18,
+      "ref": "AgentWorkforce/burn#426",
+      "a": "fail",
+      "why": "A new SDK function."
+    },
+    {
+      "order": 19,
+      "ref": "kennguy3n/knowledge#32",
+      "a": "fail",
+      "why": "A six-workstream implementation (encryption, CI, routing, FFI, docs); no one failure returned as a success."
+    },
+    {
+      "order": 20,
+      "ref": "shubhattin/lipilekhika#127",
+      "a": "pass",
+      "why": "The pull request introduces an error enum so that errors are surfaced across the bindings instead of being silently ignored or returned as null.",
+      "requirement": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null.",
+      "revisions": {
+        "base": "4e6969174bd5cddcfc143203160bdc1e3e0fcdf7",
+        "head": "c4b14dbf6aebe32727c0b58aa83a35649c0e0bdf",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 36 changed functions and one seed (parse_trans_options, packages/js/wasm/src/lib.rs) whose other callers the rule accepts none of."
+    },
+    {
+      "order": 21,
+      "ref": "BoundaryML/baml#3464",
+      "a": "fail",
+      "why": "A revert of a feature."
+    },
+    {
+      "order": 22,
+      "ref": "Jonathangadeaharder/pytest-linter#17",
+      "a": "fail",
+      "why": "New lint rules."
+    },
+    {
+      "order": 23,
+      "ref": "nilesh32236/vector-mcp-rust#29",
+      "a": "fail",
+      "why": "A new frontend and search features."
+    },
+    {
+      "order": 24,
+      "ref": "dobesv/harnx#353",
+      "a": "fail",
+      "why": "A new crate (git-backed history and rollback)."
+    },
+    {
+      "order": 25,
+      "ref": "oxicrab/oxicrab#155",
+      "a": "pass",
+      "why": "Among its 13 findings the pull request says OAuth refresh now returns Err on failure, with no more silent stale tokens.",
+      "requirement": "If an OAuth token refresh fails, the failure must reach the caller as an error, not be returned as the stale token.",
+      "revisions": {
+        "base": "80d2083221fe6e82b3eef0ac2bddb8316bcf9d5e",
+        "head": "1f14eff49be5348596b7d9b73aaa01ab083f6c38",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 44 changed functions; 4 seeds (invoke, redact_dispatch_params, refresh_token_internal, remove_file); 4 functions the rule accepts, all callers of remove_file, the first crates/oxicrab-memory/src/hygiene/mod.rs:7 cleanup_workspace_files; the others full_sync (obsidian/cache.rs), cleanup_old_media (agent/loop/helpers.rs), cleanup_expired (agent/workspace/mod.rs). refresh_token_internal has no other caller the rule accepts.",
+      "d": "fail",
+      "dWhy": "The requirement is about an OAuth token refresh. None of the 4 is governed by it: each removes files during a cleanup or a sync. Each was read and set aside for that reason."
+    },
+    {
+      "order": 26,
+      "ref": "infraweave-io/infraweave#307",
+      "a": "pass",
+      "why": "Beside the new destroy-from-file feature, the pull request says plan and apply now propagate errors instead of silently continuing when all claims fail.",
+      "requirement": "When every claim fails in plan or apply, the failure must reach the caller as an error, not let the command continue as if it succeeded.",
+      "revisions": {
+        "base": "511b457977055211c7518c6a34726dfd36db9c56",
+        "head": "96174bf030090f667e7f40245967df65795ef522",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 3 changed functions (handle_destroy, handle_plan in cli/src/commands/claim.rs; run_claim_file in cli/src/run.rs); 2 seeds (follow_execution, destroy_infra); 2 functions the rule accepts, both callers of destroy_infra: the first cli/src/tui/app.rs:1191 destroy_deployment, the other infraweave_py/src/deployment.rs:709 run_job.",
+      "d": "fail",
+      "dWhy": "The requirement is about plan and apply when every claim fails. Neither is governed by it: destroy_deployment destroys one deployment from the terminal UI and shows the error on screen; run_job's destroy branch already returns destroy_infra's error. Each was read and set aside for that reason."
+    },
+    {
+      "order": 27,
+      "ref": "bindreams/skuld#33",
+      "a": "pass",
+      "why": "The pull request says can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok()).",
+      "requirement": "If reading a row of the running set fails, the error must reach the caller, not be dropped so that the caller sees a truncated set.",
+      "revisions": {
+        "base": "bc3cc3493279891fb05e45d9439e08ebddfd0e1e",
+        "head": "4161eeff95440b0e230ee43752ced2e75a20c5ef",
+        "how": "merge base of 0ac14b4909ad996c782ccfdf5a2edbd1bc44d370 and the head"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 17 changed functions (src/coordination.rs and its tests) and no seed. Each name they call was refused: changed itself (clean_stale_entries, can_start, register, is_retryable), not a Result (instance_id, pid_from_instance_id, open_db), or not one definition outside tests (parse, is_pid_alive, the standard-library calls)."
+    },
+    {
+      "order": 28,
+      "ref": "ChainSafe/forest#6788",
+      "a": "fail",
+      "why": "Nonce calculation and serialisation of concurrent pushes; no failure was being returned as a success."
+    },
+    {
+      "order": 29,
+      "ref": "insight-platform/savant-rs#293",
+      "a": "fail",
+      "why": "A new RTSP backend and Python module."
+    },
+    {
+      "order": 30,
+      "ref": "navicore/anz#5",
+      "a": "fail",
+      "why": "New features (client secrets, a groups claim)."
+    }
+  ],
+  "pool": {
+    "fixedAt": "2026-09-23",
+    "size": 97,
+    "screenedByTitleOrLicense": {
+      "goldsky-io/streamling#106": "license NOASSERTION",
+      "oneiron-dev/oneiron#738": "title: move-only refactor",
+      "anchapin/fluxion#3008": "license NOASSERTION",
+      "Smicry/rosregview#5": "license GPL-2.0",
+      "0xckruger/arbiter_v2#3": "no license",
+      "beagleboard/bb-imager-rs#653": "title: tests only",
+      "openfootmanager/openfootmanager#229": "license GPL-3.0",
+      "leynos/netsuke#335": "license ISC",
+      "DawnLandTeam/dawnland-launcher#17": "title: a version bump",
+      "jrollin/cartog#80": "title: refactor",
+      "oven-sh/bun#31496": "license NOASSERTION",
+      "guacsec/trustify#2366": "title: documentation",
+      "aptos-labs/aptos-core#19649": "license NOASSERTION",
+      "aptos-labs/aptos-core#19592": "license NOASSERTION"
+    }
+  },
+  "outcome": {
+    "examined": 30,
+    "found": null,
+    "why": "The limit of 30 was reached with no candidate passing all four conditions, so no case was built and nothing was sent to Jev. 23 failed (a). Of the 7 that passed it, 4 failed (s): git-ai-project/git-ai#1717, vox-foundation/vox#346, shubhattin/lipilekhika#127, bindreams/skuld#33. 3 passed (s) and failed (d): mandubian/autonoetic#901, oxicrab/oxicrab#155, infraweave-io/infraweave#307. None reached (c).",
+    "wall": "Where (s) failed, the helpers the change called were changed themselves, or had no other caller the rule accepts. Where (d) failed, the functions the rule found called a helper the requirement is not about (validate_agent_id, save_workflow_run, remove_file, destroy_infra). In oxicrab#155 the helper the requirement is about, refresh_token_internal, is a seed, but its three other callers are a changed function (ensure_valid_token) and two that call it (chat, warmup): both also call ensure_valid_token as self.ensure_valid_token(), so neither is a sibling for the tool; warmup drops the refresh's error and returns Ok(()). The rule leaves out a method call to the seed, which the tool settles when the method takes self: that left out 4 functions (chat, warmup, action_delete, one test), all in oxicrab#155, each out on another count too. The rule did not see that count for warmup: it finds calls by name, not self.…(), so its record gives the method call as warmup's only reason, and a rule that took method calls would have chosen warmup, which the tool leaves out; here the rule's narrowness happened to match the tool."
+  }
+}

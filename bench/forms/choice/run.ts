@@ -7,6 +7,11 @@
 //   node bench/forms/choice/run.ts score           the table the documentation quotes, from the log;
 //                                                  sends nothing
 //
+// `measure` and `score` take `--set 2` for the second set (sentences-v2.json, log
+// form-choice-v2.json): sentences added after the first log was taken, which records the first
+// set's sha256 and so is not added to. `verify` checks both sets, and what the repository holds
+// against the two together.
+//
 // `measure` needs JEV_PROVIDER and that host's key in the environment, as the CLI does. It records
 // the host's origin, never a header or a key. The log's head records the sha256 of the labelled set
 // and of the question before the first request; a log started under another set or another wording
@@ -29,12 +34,15 @@ import { duplicates, isFragment, KINDS, LABELS, normalise, renderTables, require
 
 const HERE = new URL("./", import.meta.url).pathname;
 const ROOT = new URL("../../../", import.meta.url).pathname;
-const SET = join(HERE, "sentences.json");
-const LOG = join(ROOT, "bench/logs/form-choice-v1.json");
+const SETS = {
+  "1": { set: join(HERE, "sentences.json"), log: join(ROOT, "bench/logs/form-choice-v1.json") },
+  "2": { set: join(HERE, "sentences-v2.json"), log: join(ROOT, "bench/logs/form-choice-v2.json") },
+} as const;
+type SetName = keyof typeof SETS;
 
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
-const readSet = () => {
-  const raw = readFileSync(SET, "utf8");
+const readSet = (name: SetName) => {
+  const raw = readFileSync(SETS[name].set, "utf8");
   return { raw, set: JSON.parse(raw) as SentenceSet };
 };
 
@@ -59,7 +67,33 @@ function textAt(s: Sentence): { text: string } | { byHand: true } | { missing: s
 }
 
 function verify(): number {
-  const { raw, set } = readSet();
+  let bad = 0;
+  const all: Sentence[] = [];
+  for (const name of Object.keys(SETS) as SetName[]) {
+    const { raw, set } = readSet(name);
+    console.log(`set ${name}:`);
+    bad += verifySet(set);
+    console.log(`set sha256 ${sha256(raw)}, question sha256 ${QUESTION_HASH}`);
+    all.push(...set.sentences);
+  }
+  for (const ids of duplicates(all)) {
+    console.log(`the same sentence twice: ${ids.join(", ")}`);
+    bad += 1;
+  }
+  // The other direction: nothing the repository holds is left out. A set that only checks what it
+  // lists would pass with half the sentences missing.
+  const have = new Set(all.map((s) => normalise(s.text)));
+  for (const { file, text } of requirementSentencesIn(ROOT)) {
+    if (!have.has(normalise(text))) {
+      console.log(`not in either set: ${file}: ${text.slice(0, 120)}`);
+      bad += 1;
+    }
+  }
+  console.log(`${bad} problem(s)`);
+  return bad === 0 ? 0 : 1;
+}
+
+function verifySet(set: SentenceSet): number {
   let bad = 0;
   let byHand = 0;
   for (const s of set.sentences) {
@@ -78,28 +112,15 @@ function verify(): number {
       bad += 1;
     }
   }
-  for (const ids of duplicates(set.sentences)) {
-    console.log(`the same sentence twice: ${ids.join(", ")}`);
-    bad += 1;
-  }
-  // The other direction: nothing the repository holds is left out. A set that only checks what it
-  // lists would pass with half the sentences missing.
-  const have = new Set(set.sentences.map((s) => normalise(s.text)));
-  for (const { file, text } of requirementSentencesIn(ROOT)) {
-    if (!have.has(normalise(text))) {
-      console.log(`not in the set: ${file}: ${text.slice(0, 120)}`);
-      bad += 1;
-    }
-  }
   const count = (f: (s: Sentence) => boolean) => set.sentences.filter(f).length;
   console.log(`${set.sentences.length} sentences: ${LABELS.map((l) => `${l} ${count((s) => s.label === l)}`).join(", ")}`);
   console.log(`by author: ${KINDS.map((k) => `${k} ${count((s) => s.origin.kind === k)}`).join(", ")}; fragments ${count((s) => isFragment(s.text))}`);
-  console.log(`${set.sentences.length - byHand} checked against their files, ${byHand} from an issue (checked by hand, see README); ${bad} problem(s)`);
-  console.log(`set sha256 ${sha256(raw)}, question sha256 ${QUESTION_HASH}`);
-  return bad === 0 ? 0 : 1;
+  console.log(`${set.sentences.length - byHand} checked against their files, ${byHand} from an issue (checked by hand, see README)`);
+  return bad;
 }
 
-async function measure(runs: number): Promise<number> {
+async function measure(name: SetName, runs: number): Promise<number> {
+  const LOG = SETS[name].log;
   const endpoint = endpointFromEnv();
   if (!endpoint) {
     console.error("set JEV_PROVIDER and that host's key (see the README)");
@@ -107,7 +128,7 @@ async function measure(runs: number): Promise<number> {
   }
   const client = new JevClient(endpoint);
   const jev = new JevProvider(client);
-  const { raw, set } = readSet();
+  const { raw, set } = readSet(name);
   const conditions = { sentences: sha256(raw), question: QUESTION_HASH, bar: BAR, runsPerSentence: runs, provider: process.env.JEV_PROVIDER ?? endpoint.host };
   const head = execFileSync("git", ["-C", ROOT, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
   const log: Log = existsSync(LOG)
@@ -153,17 +174,21 @@ async function measure(runs: number): Promise<number> {
   return 0;
 }
 
-function score(): number {
-  const { raw, set } = readSet();
-  const log = JSON.parse(readFileSync(LOG, "utf8")) as Log;
+function score(name: SetName): number {
+  const { raw, set } = readSet(name);
+  const log = JSON.parse(readFileSync(SETS[name].log, "utf8")) as Log;
   if (log.conditions.sentences !== sha256(raw)) throw new Error(`the log was taken on another set (${log.conditions.sentences}, now ${sha256(raw)})`);
   if (log.conditions.question !== QUESTION_HASH) throw new Error(`the log was taken with another wording of the question (${log.conditions.question}, now ${QUESTION_HASH})`);
   console.log(renderTables(set, log));
   return 0;
 }
 
-const [mode, n] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const at = args.indexOf("--set");
+const name = (at >= 0 ? args.splice(at, 2)[1] : "1") as SetName;
+if (!Object.hasOwn(SETS, name)) throw new Error(`--set is one of ${Object.keys(SETS).join(", ")}`);
+const [mode, n] = args;
 if (mode === "verify") process.exitCode = verify();
-else if (mode === "measure") process.exitCode = await measure(Number(n ?? 3));
-else if (mode === "score") process.exitCode = score();
-else throw new Error("usage: node bench/forms/choice/run.ts verify | measure [runs] | score");
+else if (mode === "measure") process.exitCode = await measure(name, Number(n ?? 3));
+else if (mode === "score") process.exitCode = score(name);
+else throw new Error("usage: node bench/forms/choice/run.ts verify | measure [runs] [--set 2] | score [--set 2]");

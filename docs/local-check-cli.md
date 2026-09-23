@@ -867,6 +867,25 @@ sibling has been built (`#37` stays open for that):
   and `regenerate_hooks_with_verifier`; 9 of their calls read per requirement, every one as not
   required of by the requirement, and nothing listed — on a branch with no defect, what that shows
   is that the siblings added no false finding there, and nothing about finding one.
+- **No case with a defect in a sibling was found.** The rules for one were written before any
+  candidate was opened (`bench/acceptance/candidates-v2.json`): a merged pull request outside the
+  cases above whose text states a failure-handling requirement (a), where a grep-based rule written
+  to the tool's definition finds a sibling (s) that the requirement governs (d), and whose defect can
+  be observed by running it (c); at most 30 read. All 30 were read and none passed: 23 failed (a); of
+  the 7 left, 4 had no sibling by the rule and 3 had siblings the requirement does not govern — they
+  called a helper the requirement is not about (`remove_file`, `destroy_infra`, …). In one
+  (oxicrab `#155`) the helper the requirement is about, `refresh_token_internal`, is a seed, but its
+  other callers — `ensure_valid_token`, `chat`, `warmup` — are a changed function or call one
+  (`self.ensure_valid_token()`), so none is a sibling; `warmup` drops the refresh's error and
+  returns `Ok(())`, the defect the search was for, in a function the change reaches. The rule is
+  narrower than the tool in one way: it takes a free or path call to the seed and not a method call,
+  which the tool settles when the method takes `self`. That left out 4 functions, all in oxicrab
+  `#155` and each out on another count as well (`chat` and `warmup` above, `action_delete` deletes a
+  file, the fourth is a test). The rule did not see that count for `warmup`: it looks for calls by
+  name and not `self.…()`, so its record gives the method call as the only reason, and a rule that
+  took method calls would have chosen `warmup` — which the tool leaves out. Here the rule's
+  narrowness happened to match the tool. No request was sent to Jev for the search, and what the
+  siblings find in a defect is still not measured.
 
 ### What another push would not have to ask again
 
@@ -975,8 +994,9 @@ What this does not measure:
 
 Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it
 choose one (ADR 0008; `bench/forms/choice/`, log `bench/logs/form-choice-v1.json`; 216 requests,
-every one to Cloudflare). Every requirement sentence this repository holds in a spec, fixture or
-golden file — `run.ts verify` enumerates them and a test fails when one is not in the set — the
+every one to Cloudflare). Every requirement sentence this repository held on 2026-09-22 in a spec,
+fixture or golden file — `run.ts verify` enumerates them and a test fails when one is in neither
+this set nor the second one below — the
 four examples in issue #35, and three written from omamori issues whose fix was a check before an
 action: 72 sentences, each labelled `failure_propagation`, `check_before_action` or `neither`
 before the first request, with who wrote it — `tool` (this project, for its fixtures and benches),
@@ -1035,6 +1055,16 @@ fixture sentence, two model fragments and one from a real pull request. Of the e
 sentences, five are this project's bench and fixture sentences, three were written from real
 issues for this measurement, two are issue #35's as written and one is a model's fragment. The
 table says how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
+
+Seven sentences came into the repository after the table, the requirements written by hand from
+the pull requests `#37`'s search read (`bench/acceptance/candidates-v2.json`). The first log records
+the sha256 of the set it was taken on and is not added to, so they are a second set
+(`bench/forms/choice/sentences-v2.json`, all labelled `failure_propagation` and written `text`,
+committed before the first request), measured the same way with its own log
+(`bench/logs/form-choice-v2.json`; 21 requests to Cloudflare, `node bench/forms/choice/run.ts score
+--set 2`). Each was read as `failure_propagation` in every run, at 1.00, and none as check; with
+them, 0 of 25 failure sentences was read as check in any run. `run.ts verify` and the test check
+the repository's sentences against the two sets together.
 
 The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
 read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its

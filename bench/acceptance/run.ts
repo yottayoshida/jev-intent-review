@@ -31,13 +31,15 @@ import type * as Config from "../../src/config/config.ts";
 import type * as Glob from "../../src/config/glob.ts";
 import type * as Redact from "../../src/evidence/redact.ts";
 import type * as LocalCheck from "../../src/review/local-check-run.ts";
-import { isLive, keepForTargets, occurrences, type CaseFile, type Enumeration, type RunRecord, type Target, type VersionLog } from "./score.ts";
+import { cutShort, isLive, keepForTargets, occurrences, type CaseFile, type Enumeration, type RunRecord, type Target, type VersionLog } from "./score.ts";
+/** What the measurement this log holds is about, for `replay.ts` to state and to gate (candidates-v2.json). */
+const CLAIM = "sibling";
 import type { AcceptanceLog } from "./replay.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const DIST = new URL("../../dist/", import.meta.url);
 // v1 is the measurement of #36 and is not appended to: a later tool writes a later version.
-const LOG = join(HERE, "..", "logs", "acceptance-v2.json");
+const LOG = join(HERE, "..", "logs", "acceptance-v3.json");
 const RUNS = 3;
 const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
@@ -136,10 +138,10 @@ async function precheck(id: string, clone: string) {
   writeJson(join(caseDir(id), "case.json"), c);
 }
 
-/** Requests one run can send at most: two questions per call, the budget of calls, and room for retries. */
+/** Requests one run can send at most: two questions per call, both budgets of calls (the first and the siblings'), and room for retries. */
 function perRun(c: CaseFile, versionId: string): number {
   const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
-  return Math.ceil(requirements * 2 * 20 * 1.1);
+  return Math.ceil(requirements * 2 * (20 + 10) * 1.1);
 }
 
 /** The cases a measurement can send for: built, and pre-checked. A regression case is measured again too. */
@@ -150,9 +152,9 @@ function precheckedCases(): (CaseFile & { precheck?: Record<string, { live?: boo
     .filter((c) => c.precheck !== undefined) as (CaseFile & { precheck?: Record<string, { live?: boolean }> })[];
 }
 
-function estimate(): number {
+function estimate(only?: string): number {
   let total = 0;
-  for (const c of precheckedCases()) {
+  for (const c of precheckedCases().filter((x) => only === undefined || x.id === only)) {
     for (const versionId of Object.keys(c.versions)) {
       const live = c.precheck?.[versionId]?.live;
       if (live === undefined) throw new Error(`${c.id} ${versionId} has no pre-check; run precheck first`);
@@ -188,7 +190,7 @@ async function measure(id: string, clone: string, limit: number) {
   // Every file a question's words come from. `plan/forms.js` joined when questions became forms; a log
   // started before it names a different set, and is not appended to.
   const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "plan/forms.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
-  const conditions = { tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
+  const conditions = { claim: CLAIM, tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
   if (Object.keys(log.conditions).length > 0 && JSON.stringify(log.conditions) !== JSON.stringify(conditions)) {
     throw new Error(`the log was started under other conditions:\n${JSON.stringify(log.conditions)}\nnow:\n${JSON.stringify(conditions)}`);
   }
@@ -250,7 +252,8 @@ async function measure(id: string, clone: string, limit: number) {
       let finished = false;
       try {
         requirements = (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements.map(distil) as unknown as RunRecord["requirements"];
-        finished = code === 0;
+        // Exit 0 is not enough: the siblings are asked last, and a limit reached there cuts them alone.
+        finished = code === 0 && !cutShort(requirements, sent);
       } catch {
         finished = false;
       }
@@ -263,9 +266,9 @@ async function measure(id: string, clone: string, limit: number) {
 
 const [mode, id, clone, limit] = process.argv.slice(2);
 if (mode === "precheck" && id && clone) await precheck(id, clone);
-else if (mode === "estimate") console.log(`planned at most ${estimate()} requests across the live branches`);
+else if (mode === "estimate") console.log(`planned at most ${estimate(id)} requests across the live branches${id ? ` of ${id}` : ""}`);
 else if (mode === "measure" && id && clone && limit) await measure(id, clone, Number(limit));
 else {
-  console.error("usage: run.ts precheck <case> <clone> | estimate | measure <case> <clone> <limit>");
+  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit>");
   process.exitCode = 2;
 }

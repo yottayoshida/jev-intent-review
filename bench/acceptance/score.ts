@@ -12,7 +12,7 @@
 // Nothing here reads a repository or sends anything. The log holds the enumeration of each branch
 // and every answer of every run, and everything below is computed from it.
 
-export type Place = "A" | "B" | "C";
+export type Place = "A" | "B" | "C" | "S";
 export type Expected = "listed" | "not_listed" | "undetermined";
 
 export interface Target {
@@ -40,6 +40,11 @@ export interface CaseFile {
   versions: Record<string, CaseVersion>;
   /** How often each target occurs in the text of its own function at the version's head (`occurrences`). */
   existence?: Record<string, Record<string, number>>;
+  /**
+   * The log this case was first measured in, when that is not the first one (`acceptance-v1.json`):
+   * a table of an earlier measurement does not name a case built after it.
+   */
+  firstMeasuredIn?: string;
 }
 
 export interface CallRow {
@@ -265,4 +270,29 @@ export function occurrences(source: string, fn: string, call: string): number {
 export function keepForTargets<E extends Enumeration>(enumeration: E, targets: readonly Target[]): E {
   const fns = new Set(targets.map((t) => `${t.file}\u0000${t.function}`));
   return { ...enumeration, unchecked: enumeration.unchecked.filter((u) => fns.has(`${u.file}\u0000${u.function}`)) };
+}
+
+/** One request as `run.ts` records it: an `error` is `<name>: <kind>`. */
+export interface SentRecord {
+  error?: string;
+}
+
+/**
+ * Whether a run did not ask everything it set out to, so that it does not count as finished even
+ * though it exited 0: a request that failed on the run's own budget, or a sibling's call inside its
+ * budget that came back without an answer for any reason (a limit, a timeout, a host that failed).
+ * The siblings are asked last (ADR 0005), so a limit reached late cuts them alone, and the run would
+ * score a sibling's defect as missed when it was never asked.
+ */
+export function cutShort(requirements: readonly RequirementRun[], sent: readonly SentRecord[]): boolean {
+  if (sent.some((r) => /: budget$/.test(r.error ?? ""))) return true;
+  return requirements.some((r) =>
+    r.observed.some((o) => {
+      const origin = (o as { origin?: string }).origin;
+      if (origin !== "shares_call") return false;
+      const mapping = r.mappings.find((m) => (m as { callId?: string }).callId === (o as { callId?: string }).callId);
+      const why = (o.result as { why?: string }).why ?? "";
+      return mapping?.verdict === "no_answer" || /not answered/.test(why);
+    }),
+  );
 }
