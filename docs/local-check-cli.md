@@ -880,8 +880,11 @@ sibling has been built (`#37` stays open for that):
   returns `Ok(())`, the defect the search was for, in a function the change reaches. The rule is
   narrower than the tool in one way: it takes a free or path call to the seed and not a method call,
   which the tool settles when the method takes `self`. That left out 4 functions, all in oxicrab
-  `#155` and each failing on another count as well (`chat` and `warmup` above, `action_delete`
-  deletes a file, the fourth is a test). No request was sent to Jev for the search, and what the
+  `#155` and each out on another count as well (`chat` and `warmup` above, `action_delete` deletes a
+  file, the fourth is a test). The rule did not see that count for `warmup`: it looks for calls by
+  name and not `self.…()`, so its record gives the method call as the only reason, and a rule that
+  took method calls would have chosen `warmup` — which the tool leaves out. Here the rule's
+  narrowness happened to match the tool. No request was sent to Jev for the search, and what the
   siblings find in a defect is still not measured.
 
 ### What another push would not have to ask again
