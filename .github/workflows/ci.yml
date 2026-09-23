@@ -42,3 +42,50 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm audit --audit-level=moderate
+
+  # The answers kept for a pull request (ADR 0013), carried from one job to the next through the
+  # Actions cache under the Action's own key and directory, against a stand-in on localhost — no
+  # key, nothing billed. The first job does not restore, so it asks everything; the second restores
+  # from this run only (this workflow has no `concurrency`, so a push close behind could otherwise
+  # hand it another run's answers) and must reuse them.
+  answers-save:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      requests: ${{ steps.save.outputs.requests }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: save
+        run: |
+          mkdir -p -m 700 "$RUNNER_TEMP/jev-intent-review-answers"
+          node bench/answers-roundtrip.ts save "$RUNNER_TEMP/jev-intent-review-answers" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/jev-intent-review-answers
+          key: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+
+  answers-restore:
+    if: github.event_name == 'pull_request'
+    needs: answers-save
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/jev-intent-review-answers
+          key: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          restore-keys: jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-${{ github.run_id }}-
+          fail-on-cache-miss: true
+      - env:
+          FIRST_REQUESTS: ${{ needs.answers-save.outputs.requests }}
+        run: node bench/answers-roundtrip.ts check "$RUNNER_TEMP/jev-intent-review-answers" "$FIRST_REQUESTS"

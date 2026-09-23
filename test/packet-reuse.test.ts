@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { comparePair, judgmentsOf, median, samePackets, sharesOf, withoutLineNumbers, type Judgment } from "../bench/packet-reuse.ts";
+import { comparePair, expectedReused, judgmentsOf, median, samePackets, sharesOf, withoutLineNumbers, type Judgment } from "../bench/packet-reuse.ts";
 
 const judgment = (exact: string, loose: string, side: Judgment["side"] = "calls"): Judgment => ({ exact, loose, side });
 
@@ -100,4 +100,13 @@ test("the stand-in and the real run agree when they sent the same packets, whate
   assert.deepEqual(samePackets(["a", "b"], ["a", "b"]), { samePackets: true, sameOrder: true });
   assert.equal(samePackets(["a", "b", "b"], ["a", "a", "b"]).samePackets, false, "each packet as often, not just the same set");
   assert.equal(samePackets(["a"], ["a", "b"]).samePackets, false, "a shorter run is not a match");
+});
+
+test("what kept answers should cover: anything an earlier push sent, and every repeat within this one", () => {
+  // `a` was sent before; `b` is new and sent twice; `c` is new once.
+  assert.equal(expectedReused(new Set(["a"]), ["a", "b", "b", "c"]), 2);
+  // Nothing earlier and nothing repeated: nothing to reuse.
+  assert.equal(expectedReused(new Set(), ["a", "b"]), 0);
+  // A packet sent earlier and repeated now counts each time it is sent.
+  assert.equal(expectedReused(new Set(["a"]), ["a", "a"]), 2);
 });

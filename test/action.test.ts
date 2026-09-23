@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -36,21 +36,21 @@ const clean = () => {
 const KINDS: Record<string, ReviewReport> = {
   finished: report(),
   clean: report({ requirements: [clean()] }),
-  skipped: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", skipKind: "no_credentials", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
-  fromFork: report({ skipReason: "This pull request comes from another repository, and GitHub gives such a run no secrets, so nothing was judged.", skipKind: "fork", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
-  fromDependabot: report({ skipReason: "Dependabot's pull requests are given no secrets, so nothing was judged.", skipKind: "dependabot", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  skipped: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", skipKind: "no_credentials", requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
+  fromFork: report({ skipReason: "This pull request comes from another repository, and GitHub gives such a run no secrets, so nothing was judged.", skipKind: "fork", requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
+  fromDependabot: report({ skipReason: "Dependabot's pull requests are given no secrets, so nothing was judged.", skipKind: "dependabot", requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
   // A report from a command that knew a kind this Action does not, or from one that knew none.
-  skippedUnknownKind: report({ skipReason: "Something else entirely.", skipKind: "a_kind_from_later" as never, requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
-  skippedNoKind: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  skippedUnknownKind: report({ skipReason: "Something else entirely.", skipKind: "a_kind_from_later" as never, requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
+  skippedNoKind: report({ skipReason: "No credentials for the judgments (CLOUDFLARE_API_TOKEN) were available, so nothing was judged.", requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
   noIntent: report({ skipReason: "No statement of intent was found: no issue, no description.", skipKind: "no_intent", requirements: [], sources: [] }),
-  stopped: report({ exitCode: 11, requirements: [], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  stopped: report({ exitCode: 11, requirements: [], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
   noRequirement: report({ requirements: [] }),
   // Only the change question answered: the J4-only run of a repository in another language.
-  noneRead: report({ requirements: [unread()], sent: { requests: 1, bytes: 10, answered: 1 } }),
+  noneRead: report({ requirements: [unread()], sent: { requests: 1, bytes: 10, answered: 1, reused: 0, reusedFromEarlierRuns: 0 } }),
   // The budget refused every request before one was sent: `asked` still counts the calls tried.
-  nothingAsked: report({ requirements: [{ ...unread(), wouldAsk: [inBudget], counts: { ...unread().counts, asked: 1 } }], sent: { requests: 0, bytes: 0, answered: 0 } }),
+  nothingAsked: report({ requirements: [{ ...unread(), wouldAsk: [inBudget], counts: { ...unread().counts, asked: 1 } }], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } }),
   unexpected: report({ requirements: [clean()], unexpectedChanges: [{ id: "C1", location: { path: "src/x.rs", startLine: 1, endLine: 2 }, excerpt: "x", judgment: "unrequested", mappedRequirements: [], confidence: 0.9, notes: [] }] }),
-  hostCustom: report({ sent: { requests: 4, bytes: 1, answered: 4, endpoint: "https://jev.example", host: "custom" } }),
+  hostCustom: report({ sent: { requests: 4, bytes: 1, answered: 4, reused: 0, reusedFromEarlierRuns: 0, endpoint: "https://jev.example", host: "custom" } }),
   prAuthor: report({ metadata: { ...report().metadata, pullRequestAuthor: "alice" } }),
 };
 
@@ -448,5 +448,101 @@ test("run.sh keeps npm's and the command's output out of the log, and keeps the 
   const finished = runSh("finish", { ACTION_PATH: fake, JEV_WORK: work });
   assert.equal(finished.stdout, "jev-intent-review: finishing failed; what was written is in the job summary and the artifact.\n");
   assert.equal(finished.stderr, "");
-  assert.equal(finished.outputs, "exit-code=3\nchecked=false\n");
+  assert.equal(finished.outputs, "exit-code=3\nchecked=false\nanswers-kept=false\n");
 });
+
+// ---- the answers kept for a pull request (ADR 0013) ----------------------------------------------
+
+const ANSWERS_PATH = "${{ runner.temp }}/jev-intent-review-answers";
+const ANSWERS_PREFIX = "jev-intent-review-answers-${{ github.repository_id }}-pr${{ github.event.pull_request.number }}-";
+const ANSWERS_KEY = `${ANSWERS_PREFIX}\${{ github.run_id }}-\${{ github.run_attempt }}-\${{ github.job }}`;
+
+test("action.yml restores this pull request's answers before the command and saves them after, under a key of this run's own", () => {
+  const steps = ACTION.runs.steps;
+  const at = (pred: (s: Step) => boolean) => steps.findIndex(pred);
+  const restore = at((s) => s.uses?.startsWith("actions/cache/restore@") === true);
+  const save = at((s) => s.uses?.startsWith("actions/cache/save@") === true);
+  const review = at((s) => s.id === "review");
+  const finish = at((s) => s.id === "finish");
+  assert.ok(restore >= 0 && save >= 0, "both steps are there");
+  assert.ok(restore < review && finish < save, "restored before the command runs, saved after finish decides there is something");
+  const r = steps[restore]!;
+  const w = steps[save]!;
+  // The prefix names the pull request: never another's, nor the default branch's.
+  assert.equal(r.with?.["restore-keys"], ANSWERS_PREFIX);
+  assert.equal(r.with?.key, ANSWERS_KEY);
+  assert.equal(w.with?.key, ANSWERS_KEY, "one key per run and job, so a save never finds its key taken");
+  assert.equal(r.with?.path, ANSWERS_PATH);
+  assert.equal(w.with?.path, ANSWERS_PATH);
+  assert.match(r.if ?? "", /inputs\.remember-answers == 'true'/);
+  assert.match(r.if ?? "", /steps\.prepare\.outputs\.ready == 'true'/, "nothing is restored for a run the Action stopped");
+  assert.match(w.if ?? "", /always\(\)/);
+  assert.match(w.if ?? "", /steps\.finish\.outputs\.answers-kept == 'true'/, "nothing to save is not saved, and does not warn");
+  assert.match(w.if ?? "", /inputs\.remember-answers == 'true'/);
+  const expected = "${{ inputs.remember-answers == 'true' && format('{0}/jev-intent-review-answers', runner.temp) || '' }}";
+  assert.equal(steps[review]!.env?.JEV_ANSWERS, expected);
+  assert.equal(steps[finish]!.env?.JEV_ANSWERS, expected);
+  assert.equal((ACTION.inputs["remember-answers"] as { default?: string }).default, "true");
+});
+
+test("this repository's CI keeps its answers the way the Action does", () => {
+  const ci = readFileSync(join(ROOT, ".github", "workflows", "ci.yml"), "utf8");
+  assert.ok(ci.includes(`path: ${ANSWERS_PATH}`), "the same directory");
+  assert.ok(ci.includes(`key: ${ANSWERS_KEY}`), "the same key");
+  // Narrowed to this run: without `concurrency`, a push close behind could otherwise be restored here.
+  assert.ok(ci.includes(`restore-keys: ${ANSWERS_PREFIX}\${{ github.run_id }}-`), "restored from this run only");
+});
+
+test("run.sh hands the command the kept answers, private again, and says when there is something to save", () => {
+  const ok = stubs("succeeds");
+  const prepared = runSh("prepare", { GITHUB_EVENT_NAME: "pull_request", ACTION_PATH: ok.ACTION_PATH, PATH: ok.PATH });
+  const work = /^work=(.*)$/m.exec(prepared.outputs)?.[1] ?? "";
+  const fake = scratch();
+  mkdirSync(join(fake, "src", "cli"), { recursive: true });
+  const argv = join(fake, "argv.json");
+  writeFileSync(join(fake, "src", "cli", "main.ts"), `import { writeFileSync } from "node:fs";\nwriteFileSync(${JSON.stringify(argv)}, JSON.stringify(process.argv.slice(2)));\n`);
+
+  // As a cache restores it: readable by others, and a file inside.
+  const answers = join(scratch(), "jev-intent-review-answers");
+  mkdirSync(answers, { mode: 0o755 });
+  chmodSync(answers, 0o755);
+  writeFileSync(join(answers, "answers.jsonl"), "{}\n");
+  chmodSync(join(answers, "answers.jsonl"), 0o644);
+  runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: answers });
+  assert.deepEqual(JSON.parse(readFileSync(argv, "utf8")), ["--json", "--answers", answers]);
+  assert.equal(statSync(answers).mode & 0o777, 0o700);
+  assert.equal(statSync(join(answers, "answers.jsonl")).mode & 0o777, 0o600);
+
+  // Off: no --answers at all.
+  runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: "" });
+  assert.deepEqual(JSON.parse(readFileSync(argv, "utf8")), ["--json"]);
+
+  // A symlink is not followed by chmod: what it points to keeps its mode.
+  const target = join(scratch(), "elsewhere");
+  writeFileSync(target, "");
+  chmodSync(target, 0o644);
+  const linked = join(scratch(), "jev-intent-review-answers");
+  mkdirSync(linked);
+  symlinkSync(target, join(linked, "answers.jsonl"));
+  runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: linked });
+  assert.equal(statSync(target).mode & 0o777, 0o644);
+
+  // The directory itself a symlink: not changed, and not passed on.
+  const outside = join(scratch(), "outside");
+  mkdirSync(outside);
+  chmodSync(outside, 0o755);
+  const dirLink = join(scratch(), "jev-intent-review-answers");
+  symlinkSync(outside, dirLink);
+  runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: dirLink });
+  assert.equal(statSync(outside).mode & 0o777, 0o755);
+  assert.deepEqual(JSON.parse(readFileSync(argv, "utf8")), ["--json"]);
+
+  mkdirSync(join(fake, "action"));
+  writeFileSync(join(fake, "action", "finish.ts"), "\n");
+  assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: answers }).outputs, /answers-kept=true\n$/);
+  assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: join(scratch(), "none") }).outputs, /answers-kept=false\n$/);
+  // A directory that is itself a symlink was not passed on, so there is nothing of this run to save.
+  writeFileSync(join(outside, "answers.jsonl"), "{}\n");
+  assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: dirLink }).outputs, /answers-kept=false\n$/);
+});
+

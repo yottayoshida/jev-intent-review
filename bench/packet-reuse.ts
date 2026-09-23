@@ -6,6 +6,7 @@
 //   node bench/packet-reuse.ts --work <dir> [--refs owner/repo#n,...] [--out <file>]
 //   node bench/packet-reuse.ts --work <dir> --requirement-positions owner/repo#n
 //   node bench/packet-reuse.ts --work <dir> --fidelity owner/repo#n        # sends real requests
+//   node bench/packet-reuse.ts --work <dir> --ledger [--refs ...] [--out <file>]   # the ledger itself (ADR 0013)
 //
 // The corpus is every entry of `bench/acceptance/candidates.json`; a pull request with more than
 // one commit gives pairs, and a "push" here is a commit the author pushed, in order. Every ref is attempted; each
@@ -24,15 +25,14 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
-import { createServer, type Server } from "node:http";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { STAND_IN_TOKEN, standIn } from "./stand-in.ts";
+import type { ReviewReport } from "../src/types.ts";
 
 const REQUIREMENT = "Property: If an operation fails, the failure must be returned to its caller rather than turned into a success.";
 const SECOND_REQUIREMENT = "Property: A value read from outside this process must be checked before it is used.";
-/** Long enough that it cannot appear in a packet by accident, which would make the trace refuse every entry. */
-const STAND_IN_TOKEN = "stand-in-1d3f5a79c4b2e86097fd1a4c6b8e2d05f7a93c1b4e6d8f0a2c4e6b8d0f2a4c6e";
 /** A clone or a run that takes longer than this is kept in the record as not measured, with the reason. */
 const CLONE_TIMEOUT_MS = 10 * 60 * 1000;
 const RUN_TIMEOUT_MS = 8 * 60 * 1000;
@@ -81,44 +81,18 @@ export function judgmentsOf(tracePath: string): Judgment[] {
     });
 }
 
-/** A Jev endpoint that answers every question with its first choice. Nothing it returns steers what is sent. */
-function standIn(): Promise<{ url: string; close: () => void; requests: () => number }> {
-  let requests = 0;
-  const server: Server = createServer((req, res) => {
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", () => {
-      requests += 1;
-      let answers: Record<string, unknown> = {};
-      try {
-        const questions = (JSON.parse(body) as { input?: { questions?: Record<string, { criteria?: Record<string, string> }> } }).input?.questions ?? {};
-        answers = Object.fromEntries(
-          Object.entries(questions).map(([key, question]) => {
-            const choices = Object.keys(question.criteria ?? {});
-            const choice = choices[0] ?? "unknown";
-            const probabilities = Object.fromEntries(choices.map((c, i) => [c, i === 0 ? 0.9 : 0.1 / Math.max(1, choices.length - 1)]));
-            return [key, { choice, probabilities }];
-          }),
-        );
-      } catch {
-        // A body this cannot read is answered with nothing, and the run reports the place unanswered.
-      }
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ result: { state: "Completed", result: { answers } } }));
-    });
-  });
-  return new Promise((done) => {
-    server.listen(0, "127.0.0.1", () => {
-      const address = server.address();
-      const port = typeof address === "object" && address ? address.port : 0;
-      done({ url: `http://127.0.0.1:${port}/run`, close: () => server.close(), requests: () => requests });
-    });
-  });
-}
-
 // gh's own message goes into the error, so a skipped ref says "Not Found (HTTP 404)" and not only "Command failed".
 const gh = (path: string, jq: string) =>
   execFileSync("gh", ["api", path, "--jq", jq], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: NETWORK_TIMEOUT_MS, killSignal: "SIGKILL", stdio: ["ignore", "pipe", "pipe"] }).trim();
+
+/** Why a ref was not measured, for the record: gh's own words ("Not Found (HTTP 404)"), and a time limit told apart from a failure. */
+function whyNotMeasured(error: unknown): string {
+  const said = String((error as { stderr?: unknown }).stderr ?? "").trim().split("\n").at(-1) ?? "";
+  const first = error instanceof Error ? (error.message.split("\n")[0] ?? "failed") : "failed";
+  const timedOut = (error as { code?: unknown }).code === "ETIMEDOUT";
+  // Not the seconds: a clone and a fetch have different limits and land in the same catch.
+  return `${timedOut ? "timed out: " : ""}${first}${said && !first.includes(said) ? ` — ${said}` : ""}`.slice(0, 200);
+}
 
 function cloneOf(work: string, owner: string, repo: string, number: number): string {
   const dir = join(work, `${owner}__${repo}`);
@@ -139,19 +113,21 @@ function cloneOf(work: string, owner: string, repo: string, number: number): str
  * event loop, so the server never accepts the connection. The client then counts requests it sent
  * and the run ends with "none was answered" — which reads like a bad endpoint, not a blocked one.
  */
-function runAt(dir: string, base: string, head: string, intents: string[], endpoint: string | null, tracePath: string): Promise<{ judgments: Judgment[]; exitCode: number; stderr: string }> {
+function runAt(dir: string, base: string, head: string, intents: string[], endpoint: string | null, tracePath: string, answers?: string): Promise<{ judgments: Judgment[]; exitCode: number; stderr: string; report: ReviewReport | null }> {
   rmSync(tracePath, { force: true });
   // One `--intent`, with a paragraph per requirement: the flag is not repeatable, so passing it
   // twice keeps only the last and quietly measures something else.
-  const args = ["--base", base, "--head", head, "--json", "--intent", intents.join("\n\n")];
+  const args = ["--base", base, "--head", head, "--json", "--intent", intents.join("\n\n"), ...(answers === undefined ? [] : ["--answers", answers])];
   // A null endpoint leaves whatever the environment already names, for the run that is not a stand-in.
   const endpointEnv = endpoint === null ? {} : { JEV_API_URL: endpoint, JEV_API_TOKEN: STAND_IN_TOKEN };
   return new Promise((done) => {
     const child = spawn("node", [join(import.meta.dirname, "..", "src", "cli", "main.ts"), ...args], {
       cwd: dir,
       env: { ...process.env, ...endpointEnv, JEV_TRACE_FILE: tracePath, GITHUB_EVENT_NAME: "", GITHUB_EVENT_PATH: "" },
-      stdio: ["ignore", "ignore", "pipe"],
+      stdio: ["ignore", "pipe", "pipe"],
     });
+    let stdout = "";
+    child.stdout.on("data", (chunk) => (stdout += chunk));
     let stderr = "";
     let stopped = false;
     child.stderr.on("data", (chunk) => (stderr += chunk));
@@ -164,6 +140,13 @@ function runAt(dir: string, base: string, head: string, intents: string[], endpo
       done({
         judgments: judgmentsOf(tracePath),
         exitCode: code ?? 1,
+        report: (() => {
+          try {
+            return JSON.parse(stdout) as ReviewReport;
+          } catch {
+            return null;
+          }
+        })(),
         stderr: stopped ? `the run was stopped after ${RUN_TIMEOUT_MS / 1000}s` : stderr.split("\n").filter(Boolean).slice(-3).join(" ").slice(0, 400),
       });
     });
@@ -273,12 +256,7 @@ async function measureRefs(work: string, refs: string[], outPath: string | undef
       });
       console.log(`${ref}: ${heads.length} heads, sent ${runs.map((r) => r.judgments.length).join("/")}, identical ${pairs.map((p) => `${p.all.identical}/${p.all.sent}`).join(" ")}`);
     } catch (error) {
-      const said = String((error as { stderr?: unknown }).stderr ?? "").trim().split("\n").at(-1) ?? "";
-      const first = error instanceof Error ? (error.message.split("\n")[0] ?? "failed") : "failed";
-      // A time limit is not a failure of the pull request, and the record keeps the two apart.
-      const timedOut = (error as { code?: unknown }).code === "ETIMEDOUT";
-      // Not the seconds: a clone and a fetch have different limits and land in the same catch.
-      const why = `${timedOut ? "timed out: " : ""}${first}${said && !first.includes(said) ? ` — ${said}` : ""}`.slice(0, 200);
+      const why = whyNotMeasured(error);
       skipped.push({ ref, why });
       console.log(`${ref}: skipped — ${why}`);
     }
@@ -402,10 +380,119 @@ async function measureFidelity(work: string, ref: string, outPath: string | unde
   }
 }
 
+/**
+ * How many of a push's requests kept answers should cover, counted from the trace of a run without
+ * them: those already sent at any earlier push of the pull request, and every repeat of one sent
+ * earlier in this run. It is counted from the packets, not from the ledger's key, so the two are
+ * not the same computation.
+ */
+export function expectedReused(earlier: ReadonlySet<string>, now: readonly string[]): number {
+  const seen = new Set<string>();
+  let n = 0;
+  for (const packet of now) {
+    if (earlier.has(packet) || seen.has(packet)) n += 1;
+    seen.add(packet);
+  }
+  return n;
+}
+
+/**
+ * The ledger as it is built (ADR 0013), on the same pull requests' pushes: each head is run without
+ * kept answers and with them, against a stand-in whose answers follow each request's hash, so an
+ * answer returned for the wrong request would change the report. A push passes when the reused
+ * count equals `expectedReused` and both reports read the same.
+ */
+async function measureLedger(work: string, refs: string[], outPath: string | undefined): Promise<void> {
+  const endpoint = await standIn("hashed");
+  const measured: Record<string, unknown>[] = [];
+  const skipped: { ref: string; why: string }[] = [];
+  for (const ref of refs) {
+    const [repoPart, numberPart] = ref.split("#");
+    const [owner, repo] = (repoPart ?? "").split("/");
+    const number = Number(numberPart);
+    if (!owner || !repo || !Number.isInteger(number)) {
+      skipped.push({ ref, why: "the reference could not be read as owner/repo#number" });
+      continue;
+    }
+    try {
+      const base = gh(`/repos/${owner}/${repo}/pulls/${number}`, ".base.sha");
+      const heads = gh(`/repos/${owner}/${repo}/pulls/${number}/commits`, "[.[].sha] | join(\" \")").split(" ").filter(Boolean);
+      if (heads.length < 2) {
+        skipped.push({ ref, why: `the pull request has ${heads.length} commit(s), so it has no pair of pushes` });
+        continue;
+      }
+      const dir = cloneOf(work, owner, repo, number);
+      const answers = join(work, `answers-${owner}__${repo}-${number}`);
+      rmSync(answers, { recursive: true, force: true });
+      mkdirSync(answers, { mode: 0o700 });
+      const earlier = new Set<string>();
+      const pushes: Record<string, unknown>[] = [];
+      for (const head of heads) {
+        const plain = await runAt(dir, base, head, [REQUIREMENT], endpoint.url, join(work, "trace-plain.jsonl"));
+        const kept = await runAt(dir, base, head, [REQUIREMENT], endpoint.url, join(work, "trace-kept.jsonl"), answers);
+        const packets = plain.judgments.map((j) => j.exact);
+        const expected = expectedReused(earlier, packets);
+        // Of those, the ones an earlier push kept: every request of a packet already sent before this push.
+        const expectedFromEarlier = packets.filter((p) => earlier.has(p)).length;
+        for (const p of packets) earlier.add(p);
+        const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+        pushes.push({
+          head: head.slice(0, 12),
+          ran: plain.exitCode === 0 && kept.exitCode === 0 && plain.report !== null && kept.report !== null,
+          sent: packets.length,
+          expectedReused: expected,
+          reused: kept.report?.sent.reused ?? null,
+          expectedFromEarlierRuns: expectedFromEarlier,
+          reusedFromEarlierRuns: kept.report?.sent.reusedFromEarlierRuns ?? null,
+          requestsWithout: plain.report?.sent.requests ?? null,
+          requestsWith: kept.report?.sent.requests ?? null,
+          sameRequirements: same(plain.report?.requirements, kept.report?.requirements),
+          sameChanges: same(plain.report?.unexpectedChanges, kept.report?.unexpectedChanges),
+          notes: (kept.report?.metadata.notes ?? []).filter((n) => n.includes("kept") || n.includes("--answers")),
+        });
+      }
+      measured.push({ ref, base: base.slice(0, 12), heads: heads.length, pushes });
+      console.log(`${ref}: ${pushes.map((p) => `${p.reused}/${p.expectedReused}${p.sameRequirements && p.sameChanges ? "" : " DIFFERS"}`).join(" ")}`);
+    } catch (error) {
+      const why = whyNotMeasured(error);
+      skipped.push({ ref, why });
+      console.log(`${ref}: skipped — ${why}`);
+    }
+  }
+  endpoint.close();
+  type Push = { ran: boolean; sent: number; expectedReused: number; reused: number | null; expectedFromEarlierRuns: number; reusedFromEarlierRuns: number | null; requestsWithout: number | null; requestsWith: number | null; sameRequirements: boolean; sameChanges: boolean };
+  const all = measured.flatMap((m) => m.pushes as Push[]);
+  const ran = all.filter((p) => p.ran);
+  // The first push of each pull request has nothing earlier: its share is left out, as a pair's was.
+  const later = measured.flatMap((m) => (m.pushes as Push[]).slice(1)).filter((p) => p.ran && p.sent > 0);
+  const record = {
+    version: 1 as const,
+    what: "the ledger on consecutive pushes: requests answered from kept answers, against the count expected from the packets, and whether the report reads the same",
+    requirement: REQUIREMENT,
+    standIn: "hashed",
+    corpus: refs,
+    measured,
+    skipped,
+    pushes: all.length,
+    pushesNotRun: all.length - ran.length,
+    reusedMatchesExpected: ran.filter((p) => p.reused === p.expectedReused).length,
+    fromEarlierRunsMatchesExpected: ran.filter((p) => p.reusedFromEarlierRuns === p.expectedFromEarlierRuns).length,
+    requestsAddUp: ran.filter((p) => p.requestsWithout !== null && p.requestsWith !== null && p.reused !== null && p.requestsWith + p.reused === p.requestsWithout).length,
+    reportsSame: ran.filter((p) => p.sameRequirements && p.sameChanges).length,
+    medianReusedShareOfLaterPushes: median(later.map((p) => (p.reused ?? 0) / p.sent)),
+    reusedOfLaterPushes: { reused: later.reduce((n, p) => n + (p.reused ?? 0), 0), sent: later.reduce((n, p) => n + p.sent, 0) },
+  };
+  console.log(`\npushes ${record.pushes} (not run ${record.pushesNotRun}) · reused = expected ${record.reusedMatchesExpected}/${ran.length} · from earlier runs = expected ${record.fromEarlierRunsMatchesExpected}/${ran.length} · requests add up ${record.requestsAddUp}/${ran.length} · same report ${record.reportsSame}/${ran.length} · median share ${record.medianReusedShareOfLaterPushes?.toFixed(3) ?? "n/a"}`);
+  if (outPath) {
+    writeFileSync(outPath, `${JSON.stringify(record, null, 2)}\n`);
+    console.log(`wrote ${outPath}`);
+  }
+}
+
 async function main(argv: string[]): Promise<void> {
   const { values } = parseArgs({
     args: argv,
-    options: { work: { type: "string" }, refs: { type: "string" }, out: { type: "string" }, "requirement-positions": { type: "string" }, fidelity: { type: "string" } },
+    options: { work: { type: "string" }, refs: { type: "string" }, out: { type: "string" }, "requirement-positions": { type: "string" }, fidelity: { type: "string" }, ledger: { type: "boolean", default: false } },
   });
   const work = values.work;
   if (!work) throw new Error("--work <dir> is required: the clones and the trace files go there");
@@ -422,7 +509,8 @@ async function main(argv: string[]): Promise<void> {
   const refs = values.refs
     ? values.refs.split(",").map((r) => r.trim()).filter(Boolean)
     : (JSON.parse(readFileSync(join(import.meta.dirname, "acceptance", "candidates.json"), "utf8")) as Candidates).candidates.map((c) => c.ref);
-  await measureRefs(work, refs, values.out);
+  if (values.ledger) await measureLedger(work, refs, values.out);
+  else await measureRefs(work, refs, values.out);
 }
 
 if (import.meta.filename === process.argv[1]) await main(process.argv.slice(2));

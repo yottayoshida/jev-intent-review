@@ -237,7 +237,8 @@ export function counts(report: ReviewReport): { read: number; worthChecking: num
  * calls are under *Not checked* with a reason, and a run that stopped puts none of them there.
  */
 function nothingSent(report: ReviewReport): boolean {
-  if (report.skipReason !== undefined || report.sent.requests > 0) return false;
+  // An answer kept from an earlier run was asked, just not again (ADR 0013).
+  if (report.skipReason !== undefined || report.sent.requests + report.sent.reused > 0) return false;
   return report.requirements.some((r) => {
     const held = new Set(r.unchecked.map((u) => `${u.function}\u0000${u.call}`));
     return r.wouldAsk.some((w) => !held.has(`${w.function}\u0000${w.call}`));
@@ -324,7 +325,7 @@ export function renderMarkdown(report: ReviewReport): string {
   }
 
   out.push("## Sent to the judgment model", "");
-  out.push(`- ${plural(report.sent.requests, "request")}, ${plural(report.sent.answered, "answer")}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
+  out.push(`- ${plural(report.sent.requests, "request")}, ${plural(report.sent.answered, "answer")}${report.sent.reused > 0 ? `, ${plural(report.sent.reused, "answer")} reused (${report.sent.reusedFromEarlierRuns} kept from earlier runs, the rest repeats within this one)` : ""}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
   if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}${report.sent.host === undefined ? "" : ` (${hostName(report.sent.host)})`}`);
   out.push("");
   return out.join("\n");
