@@ -867,6 +867,16 @@ sibling has been built (`#37` stays open for that):
   and `regenerate_hooks_with_verifier`; 9 of their calls read per requirement, every one as not
   required of by the requirement, and nothing listed — on a branch with no defect, what that shows
   is that the siblings added no false finding there, and nothing about finding one.
+- **No case with a defect in a sibling was found.** The rules for one were written before any
+  candidate was opened (`bench/acceptance/candidates-v2.json`): a merged pull request outside the
+  cases above whose text states a failure-handling requirement (a), where a grep-based rule written
+  to the tool's definition finds a sibling (s) that the requirement governs (d), and whose defect can
+  be observed by running it (c); at most 30 read. All 30 were read and none passed: 23 failed (a); of
+  the 7 left, 4 had no sibling by the rule and 3 had siblings the requirement does not govern — they
+  called a helper the requirement is not about (`remove_file`, `destroy_infra`, …). In one
+  (oxicrab `#155`) the helper the requirement is about is a seed, but its other callers are a changed
+  function or call it only as a method, which siblings do not include. Nothing was sent to Jev, and
+  what the siblings find in a defect is still not measured.
 
 ### What another push would not have to ask again
 

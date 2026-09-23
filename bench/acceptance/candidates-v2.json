@@ -182,7 +182,14 @@
       "ref": "shubhattin/lipilekhika#127",
       "a": "pass",
       "why": "The pull request introduces an error enum so that errors are surfaced across the bindings instead of being silently ignored or returned as null.",
-      "requirement": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null."
+      "requirement": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null.",
+      "revisions": {
+        "base": "4e6969174bd5cddcfc143203160bdc1e3e0fcdf7",
+        "head": "c4b14dbf6aebe32727c0b58aa83a35649c0e0bdf",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 36 changed functions and one seed (parse_trans_options, packages/js/wasm/src/lib.rs) whose other callers the rule accepts none of."
     },
     {
       "order": 21,
@@ -207,6 +214,70 @@
       "ref": "dobesv/harnx#353",
       "a": "fail",
       "why": "A new crate (git-backed history and rollback)."
+    },
+    {
+      "order": 25,
+      "ref": "oxicrab/oxicrab#155",
+      "a": "pass",
+      "why": "Among its 13 findings the pull request says OAuth refresh now returns Err on failure, with no more silent stale tokens.",
+      "requirement": "If an OAuth token refresh fails, the failure must reach the caller as an error, not be returned as the stale token.",
+      "revisions": {
+        "base": "80d2083221fe6e82b3eef0ac2bddb8316bcf9d5e",
+        "head": "1f14eff49be5348596b7d9b73aaa01ab083f6c38",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 44 changed functions; 4 seeds (invoke, redact_dispatch_params, refresh_token_internal, remove_file); 4 functions the rule accepts, all callers of remove_file, the first crates/oxicrab-memory/src/hygiene/mod.rs:7 cleanup_workspace_files; the others full_sync (obsidian/cache.rs), cleanup_old_media (agent/loop/helpers.rs), cleanup_expired (agent/workspace/mod.rs). refresh_token_internal has no other caller the rule accepts.",
+      "d": "fail",
+      "dWhy": "The requirement is about an OAuth token refresh. None of the 4 is governed by it: each removes files during a cleanup or a sync. Each was read and set aside for that reason."
+    },
+    {
+      "order": 26,
+      "ref": "infraweave-io/infraweave#307",
+      "a": "pass",
+      "why": "Beside the new destroy-from-file feature, the pull request says plan and apply now propagate errors instead of silently continuing when all claims fail.",
+      "requirement": "When every claim fails in plan or apply, the failure must reach the caller as an error, not let the command continue as if it succeeded.",
+      "revisions": {
+        "base": "511b457977055211c7518c6a34726dfd36db9c56",
+        "head": "96174bf030090f667e7f40245967df65795ef522",
+        "how": "the pull request's base is the merge base"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 3 changed functions (handle_destroy, handle_plan in cli/src/commands/claim.rs; run_claim_file in cli/src/run.rs); 2 seeds (follow_execution, destroy_infra); 2 functions the rule accepts, both callers of destroy_infra: the first cli/src/tui/app.rs:1191 destroy_deployment, the other infraweave_py/src/deployment.rs:709 run_job.",
+      "d": "fail",
+      "dWhy": "The requirement is about plan and apply when every claim fails. Neither is governed by it: destroy_deployment destroys one deployment from the terminal UI and shows the error on screen; run_job's destroy branch already returns destroy_infra's error. Each was read and set aside for that reason."
+    },
+    {
+      "order": 27,
+      "ref": "bindreams/skuld#33",
+      "a": "pass",
+      "why": "The pull request says can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok()).",
+      "requirement": "If reading a row of the running set fails, the error must reach the caller, not be dropped so that the caller sees a truncated set.",
+      "revisions": {
+        "base": "bc3cc3493279891fb05e45d9439e08ebddfd0e1e",
+        "head": "4161eeff95440b0e230ee43752ced2e75a20c5ef",
+        "how": "merge base of 0ac14b4909ad996c782ccfdf5a2edbd1bc44d370 and the head"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 17 changed functions (src/coordination.rs and its tests) and no seed. Each name they call was refused: changed itself (clean_stale_entries, can_start, register, is_retryable), not a Result (instance_id, pid_from_instance_id, open_db), or not one definition outside tests (parse, is_pid_alive, the standard-library calls)."
+    },
+    {
+      "order": 28,
+      "ref": "ChainSafe/forest#6788",
+      "a": "fail",
+      "why": "Nonce calculation and serialisation of concurrent pushes; no failure was being returned as a success."
+    },
+    {
+      "order": 29,
+      "ref": "insight-platform/savant-rs#293",
+      "a": "fail",
+      "why": "A new RTSP backend and Python module."
+    },
+    {
+      "order": 30,
+      "ref": "navicore/anz#5",
+      "a": "fail",
+      "why": "New features (client secrets, a groups claim)."
     }
   ],
   "pool": {
@@ -228,5 +299,11 @@
       "aptos-labs/aptos-core#19649": "license NOASSERTION",
       "aptos-labs/aptos-core#19592": "license NOASSERTION"
     }
+  },
+  "outcome": {
+    "examined": 30,
+    "found": null,
+    "why": "The limit of 30 was reached with no candidate passing all four conditions, so no case was built and nothing was sent to Jev. 23 failed (a). Of the 7 that passed it, 4 failed (s): git-ai-project/git-ai#1717, vox-foundation/vox#346, shubhattin/lipilekhika#127, bindreams/skuld#33. 3 passed (s) and failed (d): mandubian/autonoetic#901, oxicrab/oxicrab#155, infraweave-io/infraweave#307. None reached (c).",
+    "wall": "Where (s) failed, the helpers the change called were changed themselves, or had no other caller the rule accepts. Where (d) failed, the functions the rule found called a helper the requirement is not about (validate_agent_id, save_workflow_run, remove_file, destroy_infra). In oxicrab#155 the helper the requirement is about, refresh_token_internal, is a seed, but its three other callers are a changed function (ensure_valid_token) and two that call it only as a method (chat, warmup), which the rule, like the tool, does not take."
   }
 }
