@@ -256,7 +256,7 @@ warning.
 | from another repository — a fork | The job is skipped. Nothing runs, so no runner time is spent and no request is sent. | The job's name, in the checks list. A skipped job has no summary, no check run and no log to open. |
 | from a fork that has since been deleted | The same: GitHub answers `head.repo` with nothing, which is not this repository's name. | The same. |
 | opened by Dependabot | The job runs — the branch is this repository's — and is given no secrets, so nothing is judged. | The job summary, and one warning annotation. Dependabot's token cannot write checks, so there is no check run. |
-| with no requirement in either form, or none anywhere | The job runs and judges nothing. | The check run's title, and the job summary. |
+| with no requirement in either form, or none anywhere | The job runs and judges nothing. Add a section to its description and push or re-run the job ([how](docs/writing-requirements.md#pull-requests-opened-before-a-template)). | The check run's title, and the job summary. |
 | from a first-time contributor | If the repository asks for approval of their workflow runs, GitHub waits for a maintainer. Approving changes nothing here: the pull request is still from a fork, so the job is skipped. | The job's name, as above. |
 
 Where each of those sentences can be read is above because it differs: only a run that happens, with
@@ -301,7 +301,7 @@ of the log — redirect stdout and stderr to files.
 
 ## Intent
 
-No model writes the requirements and no model picks them out of prose. They are read from two forms, as written: the items of a requirements section (`## Acceptance criteria`, `## Acceptance`, `## Requirements`, `## Definition of done`, `## Done when`), and a paragraph that begins `Property:`. [docs/writing-requirements.md](docs/writing-requirements.md) has the details and an issue template to copy.
+No model writes the requirements and no model picks them out of prose. They are read from two forms, as written: the items of a requirements section (`## Acceptance criteria`, `## Acceptance`, `## Requirements`, `## Definition of done`, `## Done when`), and a paragraph that begins `Property:`. [docs/writing-requirements.md](docs/writing-requirements.md) has the details, an issue template and a pull request template to copy, and what to do about pull requests opened before them.
 
 Which of the two things the check can ask — how a failure must propagate, or that a check passes before an action — a requirement's sentence says is Jev's one typed reading of the sentence, taken before its calls; when Jev reads neither or is not sure, the requirement is checked as failure propagation, as before, and the report says which form and who chose it ([ADR 0008](docs/adr/0008-who-chooses-a-requirements-form.md)).
 

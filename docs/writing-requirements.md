@@ -110,6 +110,36 @@ about: A change with the behaviour it must have
 
 The comments are not read, so the template's own guidance never becomes a requirement.
 
+## A pull request template
+
+A pull request that closes no issue can carry its own requirements. Copy this into
+`.github/pull_request_template.md` of your repository:
+
+```markdown
+## What changes
+
+<!-- In a sentence or two. -->
+
+## Acceptance criteria
+
+- <!-- One checkable statement per item: what must be true after this merges. -->
+```
+
+Requirements read only from the pull request's description are its author's claims about their own
+change, and the report says so (above). Where one person files the issue and another writes the
+change, the issue template is the stronger of the two.
+
+## Pull requests opened before a template
+
+A template only shapes what is written after it is added. A pull request opened before, with no
+requirement in either form and no issue it closes, is skipped as having none (`policy.no_intent`);
+the check run's title and the job summary say so. To have it read, add an *Acceptance criteria*
+section or a `Property:` paragraph to its description — or `Closes #N` for an issue that has one — and
+then push, or re-run its job: the tool reads the description from GitHub when the job runs, not from
+the event that started it. Editing the description alone starts no run, because `pull_request`
+runs on `opened`, `synchronize` and `reopened` unless the workflow also lists `edited`. Listing it
+makes every edit of the title or description a run, so the README's workflow does not.
+
 ## Choosing requirement sentences out of prose: measured
 
 Prose in neither form is not read as requirements. The other way would be to have Jev pick, sentence
