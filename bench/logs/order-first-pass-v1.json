@@ -1,8 +1,8 @@
 {
   "what": "Which calls the budget of 20 reaches, with the order inside a function (calls into a function the change touched first) and without it, under today's applicability check and a wider stand-in for #45. No request sent.",
   "tool": {
-    "commit": "b8a17ec11c0802f6ca37a88e18ce0ee0aa761554",
-    "src": "acdb065f569f6370219f96dbe61a27ddf0b8610bc71d0663380eb76325d3012d"
+    "commit": "0029a9520bfda963197c5903ae8bed6ed59708c4",
+    "src": "4fd86942ae41619300832a44707dff77a090f593ea7c23a7356fb2e870c83fd2"
   },
   "budget": 20,
   "rows": [
@@ -14,9 +14,9 @@
         "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
         "after": "4106d46dad04481a932597141739e42a5452cc86"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 2,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 5,
+      "applicable": 30,
+      "movedUp": 4,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -39,15 +39,13 @@
           "function": "dispatch_command",
           "call": "session_handlers::handle_title(state, &session_key)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "target_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 9189
+      "ms": 11242
     },
     {
       "case": "moltis-1064",
@@ -88,7 +86,7 @@
           "held": []
         }
       ],
-      "ms": 5138
+      "ms": 8909
     },
     {
       "case": "moltis-1064",
@@ -98,9 +96,9 @@
         "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
         "after": "fa45a528825734c277a84107af93b4ea9ff105d0"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 2,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 5,
+      "applicable": 30,
+      "movedUp": 4,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -123,15 +121,13 @@
           "function": "dispatch_command",
           "call": "session_handlers::handle_title(state, &session_key)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "target_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 10108
+      "ms": 14609
     },
     {
       "case": "moltis-1064",
@@ -172,7 +168,7 @@
           "held": []
         }
       ],
-      "ms": 5163
+      "ms": 4962
     },
     {
       "case": "moltis-1064",
@@ -182,9 +178,9 @@
         "before": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
         "after": "e14b5b7d1268fc583d428735086583335943e684"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 2,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 5,
+      "applicable": 30,
+      "movedUp": 4,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -207,15 +203,13 @@
           "function": "dispatch_command",
           "call": "session_handlers::handle_title(state, &session_key)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "target_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 14819
+      "ms": 10114
     },
     {
       "case": "moltis-1064",
@@ -256,7 +250,7 @@
           "held": []
         }
       ],
-      "ms": 10420
+      "ms": 4648
     },
     {
       "case": "moltis-1064",
@@ -266,9 +260,9 @@
         "before": "d2697974d470b2adde91472e85ed5c14e78174b4",
         "after": "e5f20ac177a50c402b266ba5516d9559b8938686"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 3,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 5,
+      "applicable": 31,
+      "movedUp": 4,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -291,15 +285,13 @@
           "function": "dispatch_command",
           "call": "session_handlers::handle_title(state, &session_key)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "target_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 11075
+      "ms": 10682
     },
     {
       "case": "moltis-1064",
@@ -340,7 +332,7 @@
           "held": []
         }
       ],
-      "ms": 5483
+      "ms": 4240
     },
     {
       "case": "moltis-1064",
@@ -350,9 +342,9 @@
         "before": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
         "after": "4697c3977399b015efd2ac38fd9aec6797783117"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 2,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 5,
+      "applicable": 29,
+      "movedUp": 4,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -375,15 +367,13 @@
           "function": "dispatch_command",
           "call": "session_handlers::handle_title(state, &session_key)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "target_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 10520
+      "ms": 11879
     },
     {
       "case": "moltis-1064",
@@ -424,7 +414,7 @@
           "held": []
         }
       ],
-      "ms": 5616
+      "ms": 4828
     },
     {
       "case": "grovedb-500",
@@ -435,7 +425,7 @@
         "after": "c0e02819ac99a545e70a858208f2095c5fb461c7"
       },
       "functionsWithAnAskableCall": 2,
-      "applicable": 8,
+      "applicable": 12,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
@@ -454,7 +444,7 @@
           "held": []
         }
       ],
-      "ms": 7272
+      "ms": 5154
     },
     {
       "case": "grovedb-500",
@@ -484,7 +474,7 @@
           "held": []
         }
       ],
-      "ms": 1354
+      "ms": 2110
     },
     {
       "case": "grovedb-500",
@@ -495,7 +485,7 @@
         "after": "26efc3e5a004ad96250d823e95e7ca893e13d62f"
       },
       "functionsWithAnAskableCall": 2,
-      "applicable": 8,
+      "applicable": 12,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
@@ -514,7 +504,7 @@
           "held": []
         }
       ],
-      "ms": 8198
+      "ms": 5072
     },
     {
       "case": "grovedb-500",
@@ -544,7 +534,7 @@
           "held": []
         }
       ],
-      "ms": 1490
+      "ms": 1411
     },
     {
       "case": "grovedb-500",
@@ -555,7 +545,7 @@
         "after": "87e06509bc8da68b9c815ad5799f507d81183c69"
       },
       "functionsWithAnAskableCall": 2,
-      "applicable": 8,
+      "applicable": 12,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
@@ -574,7 +564,7 @@
           "held": []
         }
       ],
-      "ms": 7429
+      "ms": 4243
     },
     {
       "case": "grovedb-500",
@@ -604,7 +594,7 @@
           "held": []
         }
       ],
-      "ms": 1398
+      "ms": 1539
     },
     {
       "case": "grovedb-500",
@@ -615,7 +605,7 @@
         "after": "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd"
       },
       "functionsWithAnAskableCall": 2,
-      "applicable": 9,
+      "applicable": 13,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
@@ -634,7 +624,7 @@
           "held": []
         }
       ],
-      "ms": 7401
+      "ms": 4275
     },
     {
       "case": "grovedb-500",
@@ -664,7 +654,7 @@
           "held": []
         }
       ],
-      "ms": 1412
+      "ms": 1643
     },
     {
       "case": "grovedb-501",
@@ -674,9 +664,9 @@
         "before": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
         "after": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"
       },
-      "functionsWithAnAskableCall": 2,
-      "applicable": 2,
-      "movedUp": 0,
+      "functionsWithAnAskableCall": 3,
+      "applicable": 8,
+      "movedUp": 2,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
@@ -688,12 +678,10 @@
           "function": "process_chunk",
           "call": "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "callee_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         },
         {
           "tag": "B",
@@ -701,15 +689,13 @@
           "function": "apply_inner_chunk",
           "call": "process_chunk(chunk_id, ops, grove_version)",
           "enumerated": 1,
-          "applicable": 0,
-          "inBudgetWithOrder": 0,
-          "inBudgetWithoutOrder": 0,
-          "held": [
-            "callee_not_result"
-          ]
+          "applicable": 1,
+          "inBudgetWithOrder": 1,
+          "inBudgetWithoutOrder": 1,
+          "held": []
         }
       ],
-      "ms": 8161
+      "ms": 8348
     },
     {
       "case": "grovedb-501",
@@ -750,7 +736,7 @@
           "held": []
         }
       ],
-      "ms": 1658
+      "ms": 3867
     },
     {
       "case": "kontor-385",
@@ -760,12 +746,33 @@
         "before": "99cfbdfd4b0bccc60c2bc6476c3636e82995af2f",
         "after": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b"
       },
-      "functionsWithAnAskableCall": 24,
-      "applicable": 47,
-      "movedUp": 9,
+      "functionsWithAnAskableCall": 28,
+      "applicable": 75,
+      "movedUp": 22,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-77",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "make_value",
+          "line": 228,
+          "call": "validate_batch( &conn, last_height, last_hash, &candidate_txids, last_height,"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-152",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "line": 522,
+          "call": "make_value()"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-176",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_finalized",
+          "line": 621,
+          "call": "process_decided_batch( *anchor_height, *anchor_hash, certificate.height, &cert_bytes, &full_txs,"
+        },
         {
           "id": "core/indexer/src/reactor/blocks.rs:call-8",
           "file": "core/indexer/src/reactor/blocks.rs",
@@ -781,14 +788,49 @@
           "call": "refresh_validator_set()"
         },
         {
-          "id": "core/indexer/src/reactor/mod.rs:call-36",
-          "file": "core/indexer/src/reactor/mod.rs",
-          "function": "process_block_event",
-          "line": 206,
-          "call": "try_fulfill_pending_proposal()"
+          "id": "core/indexer/src/reactor/consensus_state.rs:call-125",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "line": 489,
+          "call": "batch_to_decided(b)"
+        },
+        {
+          "id": "core/indexer/src/reactor/handlers.rs:call-37",
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "line": 199,
+          "call": "handle_get_value(height, round, timeout, reply)"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-136",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "line": 471,
+          "call": "process_decided_batch( anchor_height, anchor_hash, decision.consensus_height, &decision.certificate, &resolved_txs,"
         }
       ],
       "left": [
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-53",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "make_value",
+          "line": 187,
+          "call": "select_existing_txids(&conn, &txid_strs)"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-149",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "line": 518,
+          "call": "send_proposal_parts(&proposal, Round::Nil)"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-167",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_finalized",
+          "line": 585,
+          "call": "encode_commit_certificate(&certificate)"
+        },
         {
           "id": "core/indexer/src/reactor/blocks.rs:call-1",
           "file": "core/indexer/src/reactor/blocks.rs",
@@ -804,11 +846,25 @@
           "call": "savepoint()"
         },
         {
-          "id": "core/indexer/src/reactor/mod.rs:call-33",
-          "file": "core/indexer/src/reactor/mod.rs",
-          "function": "process_block_event",
-          "line": 201,
-          "call": "drain_deferred_decisions()"
+          "id": "core/indexer/src/reactor/consensus_state.rs:call-119",
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "line": 483,
+          "call": "select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)"
+        },
+        {
+          "id": "core/indexer/src/reactor/handlers.rs:call-36",
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "line": 190,
+          "call": "handle_started_round(height, round, proposer, role, reply_value)"
+        },
+        {
+          "id": "core/indexer/src/reactor/batches.rs:call-131",
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "line": 441,
+          "call": "handle_block_with_decision(block, &decision)"
         }
       ],
       "targets": [
@@ -820,7 +876,7 @@
           "enumerated": 1,
           "applicable": 1,
           "inBudgetWithOrder": 1,
-          "inBudgetWithoutOrder": 1,
+          "inBudgetWithoutOrder": 0,
           "held": []
         },
         {
@@ -829,15 +885,13 @@
           "function": "initiate_rollback",
           "call": "get_decided_from_anchor(&conn, from_anchor)",
           "enumerated": 1,
-          "applicable": 0,
+          "applicable": 1,
           "inBudgetWithOrder": 0,
           "inBudgetWithoutOrder": 0,
-          "held": [
-            "callee_not_result"
-          ]
+          "held": []
         }
       ],
-      "ms": 11616
+      "ms": 15253
     },
     {
       "case": "kontor-385",
@@ -992,7 +1046,7 @@
           "held": []
         }
       ],
-      "ms": 7237
+      "ms": 7245
     },
     {
       "case": "instruckt-tauri-9",
@@ -1002,15 +1056,15 @@
         "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
         "after": "a808734a5b264a433e74f96126b9a8159c19e641"
       },
-      "functionsWithAnAskableCall": 5,
-      "applicable": 7,
+      "functionsWithAnAskableCall": 9,
+      "applicable": 16,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 2117
+      "ms": 2799
     },
     {
       "case": "instruckt-tauri-9",
@@ -1020,15 +1074,15 @@
         "before": "2f93d665f30cb4234a2e55cca032826adf82fbaa",
         "after": "a808734a5b264a433e74f96126b9a8159c19e641"
       },
-      "functionsWithAnAskableCall": 5,
-      "applicable": 7,
+      "functionsWithAnAskableCall": 7,
+      "applicable": 13,
       "movedUp": 0,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [],
       "left": [],
       "targets": [],
-      "ms": 2146
+      "ms": 1952
     },
     {
       "case": "pybun-428",
@@ -1038,15 +1092,31 @@
         "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
         "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
       },
-      "functionsWithAnAskableCall": 5,
-      "applicable": 11,
-      "movedUp": 1,
+      "functionsWithAnAskableCall": 11,
+      "applicable": 32,
+      "movedUp": 3,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
-      "entered": [],
-      "left": [],
+      "entered": [
+        {
+          "id": "src/commands/python.rs:call-14",
+          "file": "src/commands/python.rs",
+          "function": "handle_python_command",
+          "line": 37,
+          "call": "python_which(args)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/commands/python.rs:call-7",
+          "file": "src/commands/python.rs",
+          "function": "handle_python_command",
+          "line": 27,
+          "call": "python_install(args)"
+        }
+      ],
       "targets": [],
-      "ms": 8045
+      "ms": 6336
     },
     {
       "case": "pybun-428",
@@ -1056,15 +1126,45 @@
         "before": "7190a54f41ca1d0672b8f719767fca26a20c3aa9",
         "after": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420"
       },
-      "functionsWithAnAskableCall": 10,
-      "applicable": 18,
+      "functionsWithAnAskableCall": 11,
+      "applicable": 31,
       "movedUp": 5,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
-      "entered": [],
-      "left": [],
+      "entered": [
+        {
+          "id": "src/commands/python.rs:call-14",
+          "file": "src/commands/python.rs",
+          "function": "handle_python_command",
+          "line": 37,
+          "call": "python_which(args)"
+        },
+        {
+          "id": "src/mcp/tools/maintenance.rs:call-294",
+          "file": "src/mcp/tools/maintenance.rs",
+          "function": "call_drift",
+          "line": 939,
+          "call": "drift::analyze(&cwd_path)"
+        }
+      ],
+      "left": [
+        {
+          "id": "src/commands/python.rs:call-7",
+          "file": "src/commands/python.rs",
+          "function": "handle_python_command",
+          "line": 27,
+          "call": "python_install(args)"
+        },
+        {
+          "id": "src/mcp/tools/maintenance.rs:call-292",
+          "file": "src/mcp/tools/maintenance.rs",
+          "function": "call_drift",
+          "line": 929,
+          "call": "serde_json::to_string(&json!({ \"error\": \"pyproject.toml not found\", \"undeclared_imports\": [], \"unused_declarations\": [], \"analysis_notes\": [\"pyproject.toml not found\"], \"files_scanned\": 0"
+        }
+      ],
       "targets": [],
-      "ms": 5842
+      "ms": 4814
     },
     {
       "case": "quebec-136",
@@ -1147,26 +1247,82 @@
         "after": "e58c04f6df082146969320b91f09aa7a0123ac1f"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 37,
+      "applicable": 56,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 184,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/config.rs:call-15",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 172,
+          "call": "permissions_are_safe(&path)"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1193,7 +1349,7 @@
           "held": []
         }
       ],
-      "ms": 8402
+      "ms": 8132
     },
     {
       "case": "omamori-468",
@@ -1204,26 +1360,68 @@
         "after": "e58c04f6df082146969320b91f09aa7a0123ac1f"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 43,
+      "applicable": 54,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1250,7 +1448,7 @@
           "held": []
         }
       ],
-      "ms": 6240
+      "ms": 6903
     },
     {
       "case": "omamori-468",
@@ -1261,26 +1459,82 @@
         "after": "46cd434299a05ff8c6d2664f720f0606d7e11579"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 37,
+      "applicable": 56,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 184,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/config.rs:call-15",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 172,
+          "call": "permissions_are_safe(&path)"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1307,7 +1561,7 @@
           "held": []
         }
       ],
-      "ms": 14413
+      "ms": 9653
     },
     {
       "case": "omamori-468",
@@ -1318,26 +1572,68 @@
         "after": "46cd434299a05ff8c6d2664f720f0606d7e11579"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 43,
+      "applicable": 54,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1364,7 +1660,7 @@
           "held": []
         }
       ],
-      "ms": 10446
+      "ms": 7160
     },
     {
       "case": "omamori-468",
@@ -1375,26 +1671,82 @@
         "after": "a3dae0a134cc70952fe467bad860a714e4c45792"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 37,
+      "applicable": 55,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 184,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/config.rs:call-15",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 172,
+          "call": "permissions_are_safe(&path)"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1421,7 +1773,7 @@
           "held": []
         }
       ],
-      "ms": 8051
+      "ms": 9876
     },
     {
       "case": "omamori-468",
@@ -1432,26 +1784,68 @@
         "after": "a3dae0a134cc70952fe467bad860a714e4c45792"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 43,
+      "applicable": 53,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1478,7 +1872,7 @@
           "held": []
         }
       ],
-      "ms": 6429
+      "ms": 6613
     },
     {
       "case": "omamori-468",
@@ -1489,26 +1883,82 @@
         "after": "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 37,
+      "applicable": 56,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 184,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/config.rs:call-15",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 172,
+          "call": "permissions_are_safe(&path)"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1535,7 +1985,7 @@
           "held": []
         }
       ],
-      "ms": 7740
+      "ms": 11446
     },
     {
       "case": "omamori-468",
@@ -1546,26 +1996,68 @@
         "after": "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 43,
+      "applicable": 54,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1592,7 +2084,7 @@
           "held": []
         }
       ],
-      "ms": 6679
+      "ms": 8448
     },
     {
       "case": "omamori-468",
@@ -1603,26 +2095,82 @@
         "after": "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 37,
+      "applicable": 56,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/config.rs:call-20",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 184,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_CONFIG_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/config.rs:call-15",
+          "file": "src/config.rs",
+          "function": "load_config",
+          "line": 172,
+          "call": "permissions_are_safe(&path)"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1649,7 +2197,7 @@
           "held": []
         }
       ],
-      "ms": 7837
+      "ms": 12095
     },
     {
       "case": "omamori-468",
@@ -1660,26 +2208,68 @@
         "after": "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
       },
       "functionsWithAnAskableCall": 22,
-      "applicable": 43,
+      "applicable": 54,
       "movedUp": 20,
       "perFunctionCountsUnchanged": true,
       "functionOrderUnchanged": true,
       "entered": [
+        {
+          "id": "src/audit/secret.rs:call-140",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 767,
+          "call": "open_read_nofollow(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-259",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 949,
           "call": "crate::atomic_file::read_to_string_capped(&config_path, MAX_READ_FILE_BYTES)"
+        },
+        {
+          "id": "src/integrity.rs:call-25",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 167,
+          "call": "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)"
+        },
+        {
+          "id": "src/audit/mod.rs:call-58",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 269,
+          "call": "open_audit_rw(&self.path)"
         }
       ],
       "left": [
+        {
+          "id": "src/audit/secret.rs:call-129",
+          "file": "src/audit/secret.rs",
+          "function": "read_secret",
+          "line": 732,
+          "call": "fs::symlink_metadata(path)"
+        },
         {
           "id": "src/cli/config_cmd.rs:call-251",
           "file": "src/cli/config_cmd.rs",
           "function": "run_override_disable",
           "line": 935,
           "call": "guard_ai_config_modification(\"override disable\")"
+        },
+        {
+          "id": "src/integrity.rs:call-8",
+          "file": "src/integrity.rs",
+          "function": "generate_baseline",
+          "line": 139,
+          "call": "std::env::current_exe()"
+        },
+        {
+          "id": "src/audit/mod.rs:call-56",
+          "file": "src/audit/mod.rs",
+          "function": "append",
+          "line": 264,
+          "call": "fs::create_dir_all(parent)"
         }
       ],
       "targets": [
@@ -1706,7 +2296,7 @@
           "held": []
         }
       ],
-      "ms": 7130
+      "ms": 8373
     }
   ]
 }
