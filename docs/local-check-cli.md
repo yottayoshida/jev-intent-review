@@ -489,6 +489,94 @@ Measured without a request, before and after, on the acceptance pre-check's eigh
   one — Kontor#385's `simulate(0, tx)` — reaches a definition that does return one, in a file
   declared `#[cfg(test)] mod x;`. That last one is what this deliberately stops asking about.
 
+### What another push would not have to ask again
+
+Whether keeping a pull request's answers would save anything, measured before anything keeps them
+(ADR 0012; `bench/packet-reuse.ts`, log `bench/logs/packet-reuse-v1.json`). Answers decide nothing
+about what is sent, so they came from a stand-in on localhost and no request was billed:
+`selectSites` finishes before the first request and asks no model, and the observation question is
+sent whatever the mapping question answered.
+
+The corpus is every pull request in the acceptance set's candidates (`bench/acceptance/candidates.json`,
+40 entries), each attempted. **12 were measured, over 31 pairs of consecutive pushes.** The 28 that
+were not are in the log with the reason: **17 are not pull requests at all** — those entries name
+issues of `yottayoshida/omamori`, another repository by this tool's author, and `/pulls/{n}`
+answers 404 for each — and 11 have a single commit, which is no pair. Every run that was measured
+exited 0; a pair is counted only when both of its runs did, because a run that dies leaves no trace
+and would read as one that sent nothing (none was left out). A push here is a commit the author
+pushed, in order; every run was given the same requirement, in the `Property:` form, because most of
+these pull requests state none in a form this tool reads.
+
+| pull request | heads | of each later push, the judgments already answered at the push before |
+|---|---|---|
+| `oxidezap/whatsapp-rust#759` | 2 | 9/13 |
+| `moltis-org/moltis#1064` | 2 | 52/61 |
+| `KontorProtocol/Kontor#385` | 4 | 49/52, 45/57, 54/58 |
+| `TyRoXx/NonlocalityOS#433` | 3 | 5/13, 13/14 |
+| `armaxri/termiHub#2751` | 4 | 7/25, 25/34, 34/34 |
+| `armaxri/termiHub#2732` | 2 | 20/37 |
+| `beboite/boite-legacy#187` | 12 | 10/41, 41/64, 64/64, 64/64, 64/64, 64/64, 64/78, 78/81, 81/85, 81/86, 79/89 |
+| `Diogo-Esteves/polyVocal#60` | 2 | 53/72 |
+| `TumbleOwlee/ferrowl#127` | 4 | 0/1, 1/14, 9/22 |
+| `getappz/agentflare#229` | 2 | 11/11 |
+| `Davidslv/cce-rust#168` | 3 | 4/41, 21/46 |
+| `AndreaBozzo/dataprof#370` | 3 | 49/50, 50/55 |
+
+**The median over the 31 pairs is 0.852**: in the median pair, 85% of the later push's judgments ask
+again about the same evidence, byte for byte. By side: the calls' questions, 528 of 628; the change
+question, 673 of 862.
+
+One pull request carries 11 of the 31 pairs — `beboite/boite-legacy#187`, four of them 64/64 — so
+the median of pairs leans on it. Counted other ways the share is lower, and every one is still above
+the 0.50 the decision was fixed at: the median of each pull request's own median, 0.736; the 20
+pairs without that pull request, 0.736; every judgment pooled, 1201 of 1490 (0.806); only each pull
+request's first pair, 0.616.
+
+**A packet that differs only in where its code sits is rare.** Blanking every `lines` value before
+comparing — the function's start and end line, and the change's — moves 6 of the calls' 628 and 15
+of the changes' 862, and the median from 0.852 to 0.869. The line numbers a packet carries were the
+reason to expect little reuse; they are not what decides it. A key that ignored them would buy
+about two points.
+
+**Adding a requirement moves the packets of the requirements already there, unless it goes last.**
+On `moltis-org/moltis#1064` at its head, with one requirement and then two
+(`bench/logs/requirement-positions-v1.json`): a packet holds one requirement, so appending a second
+leaves the first's packets as they were — 34 of the 68 sent were already there, which is all of the
+first requirement's. Putting the second one *first* renumbers the ids the packets carry, and none of
+the 68 was: 0. The change question's state holds every requirement at once, so its packets change
+either way: 0 of 27.
+
+**What a stored answer would change.** The acceptance bench asks every place three times with
+byte-identical input (`bench/answer-spread.ts`, log `bench/logs/answer-spread-v1.json`, over
+`bench/logs/acceptance-v1.json`). The reading differed between runs in 2 of 34 places, and 8 of the
+102 readings sit within 0.1 of the bar of 0.6; both places that differed are among them. In both,
+Jev chose `returns_success` every time; what moved was its probability, between 0.57 and 0.68, and a
+reading below the bar is reported as `cannot_determine`. So a place that differs between runs is one
+whose probability sits at the bar, by how the bar works. A stored answer would keep one of those
+draws for every later push; asking again gives a fresh one each time. These places are not a real
+pull request's: 8 of the 34 are pull request heads (`shipped`), and the other 26 are versions built
+for the acceptance bench (`defect`, `rewrite`, `hidden`). One of the two that differed is a
+`hidden` version, which is built so that its answer should be `cannot_determine` or below the bar
+(`bench/acceptance/README.md`).
+
+What this does not measure:
+
+- How a pull request's pushes are spread over time, and so whether a cache would still hold the
+  earlier push's answers when the later one runs.
+- Pushes as people make them. A push is counted here per commit; a push that carries several commits
+  changes more between runs, so a share per real push would be lower than this. Of
+  `beboite/boite-legacy#187`'s 12 commits, the first six landed within four minutes. History a
+  force-push removed is not seen at all.
+- Whether the stand-in is sent exactly what the real endpoint is, beyond one pull request. On
+  `oxidezap/whatsapp-rust#759` at its head, one run against the stand-in and one against Jev
+  (Cloudflare) sent the same 13 packets, each once (`bench/logs/fidelity-v1.json`, from
+  `node bench/packet-reuse.ts --work <dir> --fidelity owner/repo#n`). Their order differed: the
+  change questions go out together and a trace line is written when its answer comes back, so the
+  comparison is of the packets and not of their order. The other eleven pull requests rest on the
+  argument from the code above.
+- Any pull request of this tool's author's repositories: the 17 entries of `yottayoshida/omamori`
+  are issues.
+
 ### How Jev reads the form of a sentence
 
 Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it

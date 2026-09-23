@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "what": "whether a second requirement moves the packets of the first, by where it is put",
+  "ref": "moltis-org/moltis#1064",
+  "head": "4106d46dad04",
+  "alone": {
+    "sent": 61,
+    "exitCode": 0
+  },
+  "appended": {
+    "exitCode": 0,
+    "sent": 95,
+    "identical": 34,
+    "onlyLinesMoved": 0,
+    "new": 61,
+    "goneFromBefore": 27
+  },
+  "inserted": {
+    "exitCode": 0,
+    "sent": 95,
+    "identical": 0,
+    "onlyLinesMoved": 0,
+    "new": 95,
+    "goneFromBefore": 61
+  },
+  "callsAppended": {
+    "sent": 68,
+    "identical": 34,
+    "onlyLinesMoved": 0,
+    "new": 34,
+    "goneFromBefore": 0
+  },
+  "callsInserted": {
+    "sent": 68,
+    "identical": 0,
+    "onlyLinesMoved": 0,
+    "new": 68,
+    "goneFromBefore": 34
+  },
+  "changesAppended": {
+    "sent": 27,
+    "identical": 0,
+    "onlyLinesMoved": 0,
+    "new": 27,
+    "goneFromBefore": 27
+  },
+  "changesInserted": {
+    "sent": 27,
+    "identical": 0,
+    "onlyLinesMoved": 0,
+    "new": 27,
+    "goneFromBefore": 27
+  },
+  "requestsToTheStandIn": 251
+}
