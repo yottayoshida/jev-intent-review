@@ -52,7 +52,22 @@ export function localCheckResult(): LocalCheckResult {
         why: "Jev answered `applies` (0.90) when asked whether the requirement requires this call's failure not to reach the caller as a success, and `returns_success` (0.61) when asked what `open_session` returns under that failure. Both are Jev's readings and neither checks the other.",
       },
     ],
-    counts: { budget: 20, functions: { changed: 1, calls_changed: 0 }, calls: 3, applicable: 2, asked: 2, mapped: 2, governed: 2, overBudget: 0, notApplicable: 1, outcomes: { violates: 1, satisfies: 1, unknown: 0, aside: 0 } },
+    counts: {
+      budget: 30,
+      functions: { changed: 1, calls_changed: 0 },
+      calls: 3,
+      applicable: 2,
+      asked: 2,
+      mapped: 2,
+      governed: 2,
+      overBudget: 0,
+      notApplicable: 1,
+      outcomes: { violates: 1, satisfies: 1, unknown: 0, aside: 0 },
+      byOrigin: {
+        changed: { budget: 20, functions: 1, calls: 3, applicable: 2, asked: 2, mapped: 2, governed: 2, overBudget: 0, notApplicable: 1, outcomes: { violates: 1, satisfies: 1, unknown: 0, aside: 0 } },
+        calls_changed: { budget: 28, functions: 0, calls: 0, applicable: 0, asked: 0, mapped: 0, governed: 0, overBudget: 0, notApplicable: 0, outcomes: { violates: 0, satisfies: 0, unknown: 0, aside: 0 } },
+      },
+    },
     notes: ["src/auth.rs: 2 calls were left out of the listing by its cap <img src=x>"],
   };
 }

@@ -207,6 +207,8 @@ function jev(failFrom?: number): { judge: JudgmentProvider; asked: { keys: strin
 async function run(options: Partial<LocalCheckOptions> = {}, files?: Record<string, string>, failFrom?: number, before?: Record<string, string>, requirements: Requirement[] = [requirement]) {
   const { judge, asked } = jev(failFrom);
   const result = await runLocalCheck(repo(files, before), { before: "BEFORE", after: "AFTER" }, requirements, judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
+  // The callers one hop out are asked after the changed functions and before the siblings (ADR 0015).
+  await result.askCallers();
   const firstPass = asked.length;
   await result.askSiblings();
   const r = result.requirements[0]!;
@@ -400,7 +402,7 @@ test("(g) the siblings' budget is their own: the first one's calls and counts do
   assert.deepEqual(near(some.r.wouldAsk).map(key), near(none.r.wouldAsk).map(key));
   assert.ok(!none.r.wouldAsk.some((w) => w.origin === "shares_call"));
   assert.ok(some.r.wouldAsk.some((w) => w.origin === "shares_call"));
-  assert.equal(some.r.counts.budget, DEFAULT_LOCAL_CHECK.budget);
+  assert.equal(some.r.counts.budget, DEFAULT_LOCAL_CHECK.budget + DEFAULT_LOCAL_CHECK.callerBudget);
   assert.equal(some.r.counts.siblings!.budget, DEFAULT_LOCAL_CHECK.siblingBudget);
   for (const k of ["applicable", "overBudget", "notApplicable", "calls"] as const) assert.equal(some.r.counts[k], none.r.counts[k], k);
   assert.match(noteWith(some.r.notes, /do not return a Result, or what they return is not settled here, so nothing about them/) ?? "", /\bpeek\b/);
@@ -460,6 +462,35 @@ test("(g) under a request limit, every requirement's first budget and the change
   } finally {
     repoDir.remove();
   }
+});
+
+test("(h) every requirement's changed functions are asked before any requirement's callers, and the counts say which budget", async () => {
+  const two = [requirement, { ...requirement, id: "R2" }];
+  const { all, asked, firstPass } = await run({}, undefined, undefined, undefined, two);
+  const r = all[0]!;
+  const changed = new Set(r.observed.filter((o) => o.origin === "changed").map((o) => o.function));
+  const callers = new Set(r.observed.filter((o) => o.origin === "calls_changed").map((o) => o.function));
+  assert.ok(changed.size > 0 && callers.size > 0, `both budgets asked something: ${[...changed]} / ${[...callers]}`);
+  const symbols = asked.slice(0, firstPass).map((a) => a.symbol ?? "");
+  const lastChanged = symbols.findLastIndex((x) => changed.has(x));
+  const firstCaller = symbols.findIndex((x) => callers.has(x));
+  assert.ok(lastChanged < firstCaller, `both requirements' changed functions first: ${symbols.join(", ")}`);
+  for (const one of all) {
+    const c = one.counts;
+    assert.equal(c.budget, DEFAULT_LOCAL_CHECK.budget + DEFAULT_LOCAL_CHECK.callerBudget);
+    assert.equal(c.byOrigin.changed.budget, DEFAULT_LOCAL_CHECK.budget);
+    const left = DEFAULT_LOCAL_CHECK.budget - one.wouldAsk.filter((w) => w.origin === "changed").length;
+    assert.equal(c.byOrigin.calls_changed.budget, DEFAULT_LOCAL_CHECK.callerBudget + left, "the callers get their own and what the first left");
+    for (const k of ["calls", "applicable", "asked", "mapped", "governed", "overBudget", "notApplicable"] as const) {
+      assert.equal(c.byOrigin.changed[k] + c.byOrigin.calls_changed[k], c[k], k);
+    }
+    for (const o of ["violates", "satisfies", "unknown", "aside"] as const) assert.equal(c.byOrigin.changed.outcomes[o] + c.byOrigin.calls_changed.outcomes[o], c.outcomes[o], o);
+    assert.equal(c.byOrigin.calls_changed.functions, c.functions.calls_changed);
+    const callersLeft = one.unchecked.filter((u) => u.origin === "calls_changed" && /budget/.test(u.why));
+    assert.equal(callersLeft.length, c.byOrigin.calls_changed.overBudget);
+    assert.ok(callersLeft.every((u) => u.why === `the callers' budget of ${c.byOrigin.calls_changed.budget} was already spent`), callersLeft.map((u) => u.why).join("; "));
+  }
+  assert.ok(all.every((one) => one.counts.byOrigin.calls_changed.overBudget > 0), "the callers' budget was spent, so the reason above was read");
 });
 
 test("calleeOf settles a call from a function that returns no Result, and says where", async () => {

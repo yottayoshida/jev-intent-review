@@ -148,6 +148,8 @@ function jev(
 async function run(options?: Partial<LocalCheckOptions>, integrity?: string, mapping?: (a: Asked) => ChoiceAnswer | undefined, form?: () => ChoiceAnswer | undefined, requirements: Requirement[] = [requirement]) {
   const { judge, asked } = jev(mapping, form);
   const full = await runLocalCheck(repo(integrity), REVISIONS, requirements, judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
+  // The callers one hop out are asked when the run asks for them, after the changes (ADR 0015).
+  await full.askCallers();
   const results = full.requirements;
   return { r: results[0]!, results, asked, text: renderRequirements(results), full };
 }
@@ -267,7 +269,9 @@ test("an observation that failed leaves its call not settled, says why, and the 
       return judge.judge(state, questions);
     },
   };
-  const [r] = (await runLocalCheck(repo(), REVISIONS, [requirement], failing, () => true, DEFAULT_LOCAL_CHECK)).requirements;
+  const failingRun = await runLocalCheck(repo(), REVISIONS, [requirement], failing, () => true, DEFAULT_LOCAL_CHECK);
+  await failingRun.askCallers();
+  const [r] = failingRun.requirements;
   const show = r!.observed.find((o) => o.function === "show");
   assert.ok(show, JSON.stringify(r!.observed));
   assert.equal(show.outcome, "unknown");
@@ -287,14 +291,18 @@ test("a host that answered nothing at all fails the run and is named; a run stop
       throw error;
     },
   });
+  // What the run itself counts is the changed function's two requests: the caller's are asked after
+  // the changes (ADR 0015), and a host that answers none of those is the command's to name.
   await assert.rejects(runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("bad_response", "unreadable", undefined, where)), () => true, DEFAULT_LOCAL_CHECK), (e: unknown) => {
     assert.ok(e instanceof ToolError, String(e));
     assert.equal(e.exitCode, EXIT.provider);
-    assert.match(e.message, new RegExp(`no judgment came back from ${where.replace(/[.()]/g, "\\$&")}: 4 request\\(s\\) were sent and none was answered`));
+    assert.match(e.message, new RegExp(`no judgment came back from ${where.replace(/[.()]/g, "\\$&")}: 2 request\\(s\\) were sent and none was answered`));
     return true;
   });
   // The run's own budget reached nothing: the calls are not settled, and the report stands.
-  const [r] = (await runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("budget", "the run's request budget ran out")), () => true, DEFAULT_LOCAL_CHECK)).requirements;
+  const spent = await runLocalCheck(repo(), REVISIONS, [requirement], nothing(new ProviderError("budget", "the run's request budget ran out")), () => true, DEFAULT_LOCAL_CHECK);
+  await spent.askCallers();
+  const [r] = spent.requirements;
   assert.ok(r!.observed.length > 0 && r!.observed.every((o) => o.outcome === "unknown"));
 });
 
@@ -334,11 +342,24 @@ test("candidates only: the set and the budget, with nothing asked at all", async
 });
 
 test("the budget is spent once for the requirement, over every file the change reached", async () => {
-  const { r, asked } = await run({ budget: 1 });
+  // `read_baseline` is changed; `show`, in another file, calls it. With no callers' budget and the
+  // changed function's budget used up, the caller in the other file is left, not asked on a budget of its own per file.
+  const { r, asked } = await run({ budget: 1, callerBudget: 0 });
   assert.equal(r.counts.applicable, 2);
   assert.equal(r.counts.asked, 1);
   assert.equal(r.counts.overBudget, 1);
   assert.equal(asked.length, 2, "one mapping and one reading for the one call in budget");
+  assert.match(r.unchecked.find((u) => u.function === "show")?.why ?? "", /the callers' budget of 0 was already spent/);
+});
+
+test("the caller in the other file is asked on the callers' budget, after the changed function (ADR 0015)", async () => {
+  const { r, asked } = await run({ budget: 1 });
+  assert.equal(r.counts.byOrigin.changed.asked, 1);
+  assert.equal(r.counts.byOrigin.calls_changed.asked, 1);
+  assert.deepEqual(
+    asked.map((a) => a.candidate.symbol),
+    ["read_baseline", "read_baseline", "show", "show"],
+  );
 });
 
 test("the report states no verdict of its own and quotes no model prose", async () => {

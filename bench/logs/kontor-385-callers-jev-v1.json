@@ -1,0 +1,2062 @@
+{
+  "what": "Kontor#385 shipped (bench/acceptance/cases/kontor-385/spec.json), three runs against Jev on Cloudflare after the callers got a budget of their own (#38, ADR 0015). \"newlyAsked\" marks a call the tool before (29bc114, --candidates-only, same commits) did not have inside its budget. Shipped is the fixed code, so any call listed would be a false listing to read.",
+  "command": "node src/cli/main.ts --skip-change-check --base 99cfbdfd4b0bccc60c2bc6476c3636e82995af2f --head 5523cc5ad646537cce8fd160c1d7aef6b0cb897b --intent-spec bench/acceptance/cases/kontor-385/spec.json --json (JEV_PROVIDER=cloudflare)",
+  "tool": "src/ sha256 67cb2cee848cae254f48c23e395f72f922efc52ea01fe5dffd686c0f79037ea2",
+  "before": {
+    "tool": "29bc114",
+    "wouldAsk": 30
+  },
+  "summary": {
+    "runs": 3,
+    "newlyAskedPerRun": [
+      9,
+      9,
+      9
+    ],
+    "newlyAskedListed": [
+      0,
+      0,
+      0
+    ],
+    "findings": [
+      0,
+      0,
+      0
+    ],
+    "requests": [
+      68,
+      68,
+      68
+    ]
+  },
+  "runs": [
+    {
+      "exitCode": 0,
+      "sent": {
+        "requests": 68,
+        "answered": 68,
+        "bytes": 234783
+      },
+      "host": "cloudflare",
+      "model": "typesafe/jev",
+      "counts": {
+        "budget": 30,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 11
+        },
+        "calls": 633,
+        "applicable": 75,
+        "asked": 24,
+        "mapped": 24,
+        "governed": 24,
+        "overBudget": 45,
+        "notApplicable": 558,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 24,
+          "unknown": 0,
+          "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 23,
+            "calls": 433,
+            "applicable": 50,
+            "asked": 16,
+            "mapped": 16,
+            "governed": 16,
+            "overBudget": 30,
+            "notApplicable": 383,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 16,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 10,
+            "functions": 11,
+            "calls": 200,
+            "applicable": 25,
+            "asked": 8,
+            "mapped": 8,
+            "governed": 8,
+            "overBudget": 15,
+            "notApplicable": 175,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 8,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "select_existing_txids",
+            "stake_to_voting_power",
+            "decode_commit_certificate",
+            "select_batches_in_range",
+            "select_min_batch_height",
+            "select_block_latest",
+            "deserialize",
+            "insert_batch"
+          ],
+          "functions": 7,
+          "calls": 120,
+          "applicable": 14,
+          "asked": 10,
+          "mapped": 10,
+          "governed": 10,
+          "overBudget": 4,
+          "notApplicable": 106,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 10,
+            "unknown": 0,
+            "aside": 0
+          }
+        }
+      },
+      "observed": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.83,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.95,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        }
+      ],
+      "mappings": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.96
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.91
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.82
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.67
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "verdict": "applies",
+          "probability": 0.99
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "verdict": "applies",
+          "probability": 0.91
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "verdict": "applies",
+          "probability": 0.87
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "verdict": "applies",
+          "probability": 0.88
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "verdict": "applies",
+          "probability": 0.94
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "verdict": "applies",
+          "probability": 0.87
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.92
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "verdict": "applies",
+          "probability": 0.85
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "verdict": "applies",
+          "probability": 0.6799999999999999
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "verdict": "applies",
+          "probability": 0.94
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "verdict": "applies",
+          "probability": 0.89
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "verdict": "applies",
+          "probability": 0.97
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.92
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "verdict": "applies",
+          "probability": 0.7
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "verdict": "applies",
+          "probability": 0.99
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "verdict": "applies",
+          "probability": 1
+        }
+      ],
+      "findings": []
+    },
+    {
+      "exitCode": 0,
+      "sent": {
+        "requests": 68,
+        "answered": 68,
+        "bytes": 234783
+      },
+      "host": "cloudflare",
+      "model": "typesafe/jev",
+      "counts": {
+        "budget": 30,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 11
+        },
+        "calls": 633,
+        "applicable": 75,
+        "asked": 24,
+        "mapped": 24,
+        "governed": 24,
+        "overBudget": 45,
+        "notApplicable": 558,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 24,
+          "unknown": 0,
+          "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 23,
+            "calls": 433,
+            "applicable": 50,
+            "asked": 16,
+            "mapped": 16,
+            "governed": 16,
+            "overBudget": 30,
+            "notApplicable": 383,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 16,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 10,
+            "functions": 11,
+            "calls": 200,
+            "applicable": 25,
+            "asked": 8,
+            "mapped": 8,
+            "governed": 8,
+            "overBudget": 15,
+            "notApplicable": 175,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 8,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "select_existing_txids",
+            "stake_to_voting_power",
+            "decode_commit_certificate",
+            "select_batches_in_range",
+            "select_min_batch_height",
+            "select_block_latest",
+            "deserialize",
+            "insert_batch"
+          ],
+          "functions": 7,
+          "calls": 120,
+          "applicable": 14,
+          "asked": 10,
+          "mapped": 10,
+          "governed": 10,
+          "overBudget": 4,
+          "notApplicable": 106,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 10,
+            "unknown": 0,
+            "aside": 0
+          }
+        }
+      },
+      "observed": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.87,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.95,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        }
+      ],
+      "mappings": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.9299999999999999
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.87
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.84
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.73
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "verdict": "applies",
+          "probability": 0.99
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "verdict": "applies",
+          "probability": 0.93
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "verdict": "applies",
+          "probability": 0.89
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "verdict": "applies",
+          "probability": 0.88
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "verdict": "applies",
+          "probability": 0.94
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "verdict": "applies",
+          "probability": 0.87
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.9299999999999999
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "verdict": "applies",
+          "probability": 0.77
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "verdict": "applies",
+          "probability": 0.61
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "verdict": "applies",
+          "probability": 0.95
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "verdict": "applies",
+          "probability": 0.92
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "verdict": "applies",
+          "probability": 0.97
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.96
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "verdict": "applies",
+          "probability": 0.7
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "verdict": "applies",
+          "probability": 0.97
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "verdict": "applies",
+          "probability": 1
+        }
+      ],
+      "findings": []
+    },
+    {
+      "exitCode": 0,
+      "sent": {
+        "requests": 68,
+        "answered": 68,
+        "bytes": 234783
+      },
+      "host": "cloudflare",
+      "model": "typesafe/jev",
+      "counts": {
+        "budget": 30,
+        "functions": {
+          "changed": 23,
+          "calls_changed": 11
+        },
+        "calls": 633,
+        "applicable": 75,
+        "asked": 24,
+        "mapped": 24,
+        "governed": 24,
+        "overBudget": 45,
+        "notApplicable": 558,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 24,
+          "unknown": 0,
+          "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 23,
+            "calls": 433,
+            "applicable": 50,
+            "asked": 16,
+            "mapped": 16,
+            "governed": 16,
+            "overBudget": 30,
+            "notApplicable": 383,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 16,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 10,
+            "functions": 11,
+            "calls": 200,
+            "applicable": 25,
+            "asked": 8,
+            "mapped": 8,
+            "governed": 8,
+            "overBudget": 15,
+            "notApplicable": 175,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 8,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "select_existing_txids",
+            "stake_to_voting_power",
+            "decode_commit_certificate",
+            "select_batches_in_range",
+            "select_min_batch_height",
+            "select_block_latest",
+            "deserialize",
+            "insert_batch"
+          ],
+          "functions": 7,
+          "calls": 120,
+          "applicable": 14,
+          "asked": 10,
+          "mapped": 10,
+          "governed": 10,
+          "overBudget": 4,
+          "notApplicable": 106,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 10,
+            "unknown": 0,
+            "aside": 0
+          }
+        }
+      },
+      "observed": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.97,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.87,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.99,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "origin": "changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "origin": "calls_changed",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": true
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 0.96,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "origin": "shares_call",
+          "outcome": "satisfies",
+          "observation": "returns_error",
+          "probability": 1,
+          "newlyAsked": false
+        }
+      ],
+      "mappings": [
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "try_fulfill_pending_proposal",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.93
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "handle_get_value",
+          "call": "make_value()",
+          "verdict": "applies",
+          "probability": 0.9
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "rollback",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.8
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block",
+          "call": "refresh_validator_set()",
+          "verdict": "applies",
+          "probability": 0.62
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_from_anchor",
+          "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "load_raw_txs_if_unfinalized",
+          "call": "select_block_latest(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "batch_to_decided",
+          "call": "decode_commit_certificate(proto)",
+          "verdict": "applies",
+          "probability": 0.99
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "get_decided_range",
+          "call": "batch_to_decided(b)",
+          "verdict": "applies",
+          "probability": 0.93
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "min_decided_height",
+          "call": "select_min_batch_height(conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/consensus_state.rs",
+          "function": "validate_batch",
+          "call": "select_existing_txids(conn, txids)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_received_proposal_part",
+          "call": "validate_and_accept_proposal(data, height, round)",
+          "verdict": "applies",
+          "probability": 0.91
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_get_decided_values",
+          "call": "get_decided_range(&conn, *range.start(), *range.end())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/handlers.rs",
+          "function": "handle_consensus_msg",
+          "call": "handle_get_value(height, round, timeout, reply)",
+          "verdict": "applies",
+          "probability": 0.89
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "refresh_validator_set",
+          "call": "build_validator_set(&mut self.runtime)",
+          "verdict": "applies",
+          "probability": 0.9
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "build_validator_set",
+          "call": "stake_to_voting_power(v.stake)",
+          "verdict": "applies",
+          "probability": 0.82
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "process_decided_batch",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.91
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "get_decided_from_anchor(&conn, from_anchor)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "handle_block_with_decision",
+          "call": "handle_block(block)",
+          "verdict": "applies",
+          "probability": 0.82
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "try_fulfill_pending_proposal()",
+          "verdict": "applies",
+          "probability": 0.68
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "rollback(to_height)",
+          "verdict": "applies",
+          "probability": 0.96
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "drain_deferred_decisions",
+          "call": "handle_block_with_decision(block, &decision)",
+          "verdict": "applies",
+          "probability": 0.88
+        },
+        {
+          "file": "core/indexer/src/reactor/batches.rs",
+          "function": "initiate_rollback",
+          "call": "replay_blocks_from(from_anchor)",
+          "verdict": "applies",
+          "probability": 0.96
+        },
+        {
+          "file": "core/indexer/src/reactor/blocks.rs",
+          "function": "simulate",
+          "call": "savepoint()",
+          "verdict": "applies",
+          "probability": 0.97
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "process_block_event",
+          "call": "drain_deferred_decisions()",
+          "verdict": "applies",
+          "probability": 0.83
+        },
+        {
+          "file": "core/indexer/src/consensus/codec.rs",
+          "function": "decode_synced_value",
+          "call": "decode_commit_certificate(certificate)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_block_latest",
+          "call": "select_block_latest(&*env.reader.connection().await?)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/proposal_part.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(b.as_ref())",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/consensus/value.rs",
+          "function": "from_proto",
+          "call": "bitcoin::consensus::deserialize(&bytes)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "deserialize(&bs)",
+          "verdict": "applies",
+          "probability": 0.97
+        },
+        {
+          "file": "core/indexer/src/api/handlers.rs",
+          "function": "get_info",
+          "call": "get_checkpoint_latest(&conn)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/reactor/mod.rs",
+          "function": "create_runtime_executor",
+          "call": "select_block_at_height(&conn, 0)",
+          "verdict": "applies",
+          "probability": 1
+        },
+        {
+          "file": "core/indexer/src/runtime/host_storage.rs",
+          "function": "_get_primitive",
+          "call": "get(fuel, contract_id, &path)",
+          "verdict": "applies",
+          "probability": 1
+        }
+      ],
+      "findings": []
+    }
+  ]
+}

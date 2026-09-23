@@ -15,8 +15,10 @@
 //      defect is usually a different call in it
 //   3. the form says which calls are askable — for failures, a callee resolving here to something
 //      returning a `Result` — and the rest are held, with the reason, in the report
-//   4. **one** judgment budget for the requirement, spent round-robin over functions, so neither a
-//      busy body nor a busy file can take the run
+//   4. two judgment budgets for the requirement (ADR 0015) — the functions the change touched, and
+//      their callers one hop out, asked when the command asks for them (`askCallers`), after the
+//      changes' questions — each spent round-robin over functions, so neither a busy body nor a
+//      busy file can take the run
 //   5. each of those calls gets the form's two Jev questions, asked separately: what the requirement
 //      requires of the call, and what the function does under the form's assumption. One rule for
 //      every form (`outcome.ts`) reads the two answers as holding, worth checking, not settled, or
@@ -49,14 +51,19 @@ import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
-import { selectSiblings, selectSites, type Askability, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
+import { selectSiblings, selectSites, type Askability, type FunctionOrigin, type Selection, type Site, type SiteSource } from "../plan/select.ts";
 import { siblingsOf, type SiblingSet } from "../plan/siblings.ts";
 import { OUTCOMES, outcomeOf, type Outcome } from "./outcome.ts";
 import { probabilityOf } from "./requirement.ts";
 
 export interface LocalCheckOptions {
-  /** How many calls a requirement may be judged at, over every file the change reached. */
+  /** How many calls a requirement may be judged at in the functions the change touched, over every file. */
   budget: number;
+  /**
+   * How many more a requirement may be judged at in the functions that call those, one hop out, on top
+   * of what `budget` left (ADR 0015). Unset is the default.
+   */
+  callerBudget?: number;
   maxPrimaryChars: number;
   maxRelatedChars: number;
   /**
@@ -82,7 +89,7 @@ export interface LocalCheckOptions {
   siblingBudget?: number;
 }
 
-export const DEFAULT_LOCAL_CHECK = { budget: 20, siblingBudget: 10, maxPrimaryChars: 8000, maxRelatedChars: 0 } satisfies LocalCheckOptions;
+export const DEFAULT_LOCAL_CHECK = { budget: 20, callerBudget: 10, siblingBudget: 10, maxPrimaryChars: 8000, maxRelatedChars: 0 } satisfies LocalCheckOptions;
 
 export interface Observed {
   file: string;
@@ -193,7 +200,11 @@ export interface LocalCheckResult {
   /** Every mapping asked for, accepted or not. The report's two mapping sections are read off this. */
   mappings: MappingRecord[];
   findings: Finding[];
-  /** The set and the budget, so a report never leaves the size of either to be guessed. */
+  /**
+   * The set and the budgets, so a report never leaves the size of either to be guessed. The numbers at
+   * this level are over both budgets of the calls the change reached — `budget` is what the two could
+   * ask together — and `byOrigin` splits them (ADR 0015).
+   */
   counts: {
     budget: number;
     functions: Record<FunctionOrigin, number>;
@@ -209,6 +220,12 @@ export interface LocalCheckResult {
     /** The calls asked about, by outcome. They add up to `asked`. */
     outcomes: Record<Outcome, number>;
     /**
+     * The same numbers per budget: the functions the change touched, and their callers one hop out.
+     * The callers' `budget` is 10 plus what the first left, so the two budgets add up to more than the
+     * total when the first left some; every other number adds up.
+     */
+    byOrigin: Record<FunctionOrigin, OriginCounts>;
+    /**
      * The siblings of the change, counted apart against their own budget (ADR 0005), so every
      * number above means what it meant before siblings were read. Absent when no sibling was read.
      */
@@ -217,11 +234,9 @@ export interface LocalCheckResult {
   notes: string[];
 }
 
-/** What the siblings' budget found, could ask, asked and left, in the same terms as the counts above. */
-export interface SiblingCounts {
+/** What one budget found, could ask, asked and left, in the same terms as the counts above. */
+export interface OriginCounts {
   budget: number;
-  /** The names the changed code calls that siblings were looked for from. */
-  seeds: string[];
   functions: number;
   calls: number;
   applicable: number;
@@ -231,6 +246,12 @@ export interface SiblingCounts {
   overBudget: number;
   notApplicable: number;
   outcomes: Record<Outcome, number>;
+}
+
+/** What the siblings' budget found, could ask, asked and left. */
+export interface SiblingCounts extends OriginCounts {
+  /** The names the changed code calls that siblings were looked for from. */
+  seeds: string[];
 }
 
 /**
@@ -260,6 +281,13 @@ export interface LocalCheckRun {
    * about a call, so it does not stand in for one when the host answered nothing about the calls.
    */
   form: { reached: number; answered: number };
+  /**
+   * Ask about the callers one hop out, under their own budget (ADR 0015), into the results above,
+   * and count them in. Called after the changes' pass and before the siblings, so a limit stops at
+   * the callers before anything about the diff; `askSiblings` calls it first when it has not been.
+   * Once: a second call asks nothing. What it sent and what was answered is returned.
+   */
+  askCallers(): Promise<{ reached: number; answered: number }>;
   /**
    * Read the siblings of the change and ask about them, under their own budget, into the results
    * above (ADR 0005). Called last — after the changes' pass too — so the siblings never take
@@ -451,6 +479,10 @@ export async function runLocalCheck(
   const out: LocalCheckResult[] = [];
   // What each requirement's pass keeps for the siblings' pass: its form and the record to add to.
   const passes: { requirement: Requirement; form: Form; quote: string; result: LocalCheckResult }[] = [];
+  // Every requirement's changed functions are asked here; the callers are asked in `askCallers`,
+  // after the changes' questions (ADR 0015), so a limit stops at them and not at the diff.
+  const pending: Pending[] = [];
+  const callerBudget = options.callerBudget ?? DEFAULT_LOCAL_CHECK.callerBudget;
   for (const requirement of requirements) {
     // The form: the spec's word when it named one; otherwise, on a run that asks, Jev's reading of
     // the sentence (ADR 0008) — one question over the sentence alone, before the calls, and only
@@ -472,56 +504,84 @@ export async function runLocalCheck(
         formReading = { verdict: choice.verdict, probability: choice.probability, probabilities: { ...(answer?.probabilities ?? {}) }, ...(asking.failure === undefined ? {} : { failure: asking.failure }) };
       }
     }
-    const notes = [...changeNotes];
-    const observed: Observed[] = [];
-    const unchecked: Unchecked[] = [];
-    const mappings: MappingRecord[] = [];
-    const findings: Finding[] = [];
+    const into: Collected = { observed: [], unchecked: [], mappings: [], findings: [] };
 
     const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere });
-    const selection = await selectSites([...fromChange.sources.values()], decide, options.budget);
-    for (const h of selection.held) unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
-    for (const o of selection.overBudget) unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: `the budget of ${options.budget} was already spent` });
+    const selection = await selectSites([...fromChange.sources.values()], decide, options.budget, callerBudget);
+    for (const h of selection.held) into.unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
+    const spent = { changed: `the budget of ${options.budget} was already spent`, calls_changed: `the callers' budget of ${selection.byOrigin.calls_changed.budget} was already spent` } satisfies Record<FunctionOrigin, string>;
+    for (const o of selection.overBudget) into.unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: spent[o.fnOrigin as FunctionOrigin] });
 
     // The requirement as the report will quote it: the text that was given, not a fragment a model
     // picked out of it. A model choosing the fragment was the only reason a quote ever had to be
     // checked against the text.
     const quote = redact(requirement.text).text.replace(/\s+/g, " ").trim();
 
-    let asked = 0;
-    let mapped = 0;
-    const into: Collected = { observed, unchecked, mappings, findings };
-    for (const site of options.candidatesOnly ? [] : selection.budgeted) {
+    const tally = { changed: { asked: 0, mapped: 0 }, calls_changed: { asked: 0, mapped: 0 } };
+    for (const site of options.candidatesOnly ? [] : selection.byOrigin.changed.budgeted) {
       const t = await askSite(requirement, form, quote, site, into);
-      asked += t.asked;
-      mapped += t.mapped;
+      tally.changed.asked += t.asked;
+      tally.changed.mapped += t.mapped;
     }
-
-    const outcomes = Object.fromEntries(OUTCOMES.map((o) => [o, observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>;
+    pending.push({ requirement, form, quote, selection, into, tally, notes: [...changeNotes], formRecord: { formBy, formReading, formNotAsked } });
+  }
+  // The counts of one requirement, over both budgets of the calls the change reached. Taken once the
+  // changed functions are asked and again once the callers are.
+  const countsOf = ({ selection, into, tally }: Pick<Pending, "selection" | "into" | "tally">): LocalCheckResult["counts"] => {
+    const { observed, mappings } = into;
+    const outcomesOf = (list: readonly Observed[]) => Object.fromEntries(OUTCOMES.map((o) => [o, list.filter((x) => x.outcome === o).length])) as Record<Outcome, number>;
+    const byOrigin = Object.fromEntries(
+      (["changed", "calls_changed"] as const).map((origin) => {
+        const part = selection.byOrigin[origin];
+        const seen = observed.filter((x) => x.origin === origin);
+        const ids = new Set(seen.map((x) => x.callId));
+        return [
+          origin,
+          {
+            budget: part.budget,
+            functions: selection.functions[origin],
+            calls: part.widened.length,
+            applicable: part.applicable.length,
+            asked: tally[origin].asked,
+            mapped: tally[origin].mapped,
+            governed: mappings.filter((m) => ids.has(m.callId) && m.governs).length,
+            overBudget: part.overBudget.length,
+            notApplicable: part.held.length,
+            outcomes: outcomesOf(seen),
+          },
+        ];
+      }),
+    ) as Record<FunctionOrigin, OriginCounts>;
+    return {
+      // What the two could ask together: the callers' budget is 10 plus what the first left.
+      budget: options.budget + callerBudget,
+      functions: selection.functions,
+      calls: selection.widened.length,
+      applicable: selection.applicable.length,
+      asked: tally.changed.asked + tally.calls_changed.asked,
+      mapped: tally.changed.mapped + tally.calls_changed.mapped,
+      governed: mappings.filter((m) => m.governs).length,
+      overBudget: selection.overBudget.length,
+      notApplicable: selection.held.length,
+      outcomes: outcomesOf(observed),
+      byOrigin,
+    };
+  };
+  for (const { requirement, form, quote, selection, into, tally, notes, formRecord } of pending) {
+    const { observed, unchecked, mappings, findings } = into;
     out.push({
       requirementId: requirement.id,
       requirementText: requirement.text,
       form: form.name,
-      formBy,
-      ...(formReading === undefined ? {} : { formReading }),
-      ...(formNotAsked === undefined ? {} : { formNotAsked }),
+      formBy: formRecord.formBy,
+      ...(formRecord.formReading === undefined ? {} : { formReading: formRecord.formReading }),
+      ...(formRecord.formNotAsked === undefined ? {} : { formNotAsked: formRecord.formNotAsked }),
       wouldAsk: selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin })),
       observed,
       unchecked,
       mappings,
       findings,
-      counts: {
-        budget: options.budget,
-        functions: selection.functions,
-        calls: selection.widened.length,
-        applicable: selection.applicable.length,
-        asked,
-        mapped,
-        governed: mappings.filter((m) => m.governs).length,
-        overBudget: selection.overBudget.length,
-        notApplicable: selection.held.length,
-        outcomes,
-      },
+      counts: countsOf({ selection, into, tally }),
       // A file both the change and the requirement's words reached has its cap counted twice.
       notes: [...new Set(notes)],
     });
@@ -530,7 +590,30 @@ export async function runLocalCheck(
   if (hostReached > 0 && answered === 0) {
     throw new ToolError(`no judgment came back from ${failedAt ?? "the judgment provider"}: ${hostReached} request(s) were sent and none was answered`, EXIT.provider);
   }
+  // The callers one hop out, under their own budget (ADR 0015): after every requirement's changed
+  // functions and the changes' questions, before the siblings, so a limit reached in the middle of a
+  // run stops at them and not at anything about the diff itself. Once; a second call asks nothing.
+  let callersAsked: Promise<{ reached: number; answered: number }> | undefined;
+  const askCallers = (): Promise<{ reached: number; answered: number }> => {
+    if (callersAsked) return callersAsked.then(() => ({ reached: 0, answered: 0 }));
+    callersAsked = (async () => {
+      const [reachedBefore, answeredBefore] = [hostReached, answered];
+      for (const [i, p] of pending.entries()) {
+        for (const site of options.candidatesOnly ? [] : p.selection.byOrigin.calls_changed.budgeted) {
+          const t = await askSite(p.requirement, p.form, p.quote, site, p.into);
+          p.tally.calls_changed.asked += t.asked;
+          p.tally.calls_changed.mapped += t.mapped;
+        }
+        out[i]!.counts = countsOf(p);
+      }
+      return { reached: hostReached - reachedBefore, answered: answered - answeredBefore };
+    })();
+    return callersAsked;
+  };
   const askSiblings = async (): Promise<{ reached: number; answered: number }> => {
+    // The callers come before the siblings whoever asks: a run that asks for the siblings alone
+    // has its callers asked here, and what they sent is in what this returns.
+    const callers = await askCallers();
     const [reachedBefore, answeredBefore] = [hostReached, answered];
     const siblings = await siblingSetOf();
     const budget = options.siblingBudget ?? DEFAULT_LOCAL_CHECK.siblingBudget;
@@ -565,7 +648,7 @@ export async function runLocalCheck(
       };
       result.notes = [...new Set([...result.notes, ...siblings.notes])];
     }
-    return { reached: hostReached - reachedBefore, answered: answered - answeredBefore };
+    return { reached: callers.reached + hostReached - reachedBefore, answered: callers.answered + answered - answeredBefore };
   };
 
   // The siblings depend on the commit alone: read once, for every requirement.
@@ -586,11 +669,23 @@ export async function runLocalCheck(
     return siblingSet;
   };
 
-  return { requirements: out, change, reached: hostReached, answered, form: formCount, askSiblings };
+  return { requirements: out, change, reached: hostReached, answered, form: formCount, askCallers, askSiblings };
 }
 
 /** A requirement's form, as `formOf` gives it. */
 type Form = ReturnType<typeof formOf>;
+
+/** One requirement's pass, kept between the changed functions' questions and the callers'. */
+interface Pending {
+  requirement: Requirement;
+  form: Form;
+  quote: string;
+  selection: Selection;
+  into: Collected;
+  tally: Record<FunctionOrigin, { asked: number; mapped: number }>;
+  notes: string[];
+  formRecord: Pick<LocalCheckResult, "formBy" | "formReading" | "formNotAsked">;
+}
 
 /** One requirement's records that a call's questions add to. */
 interface Collected {

@@ -120,14 +120,21 @@ const SCENARIOS: { name: string; integrity: string; mapping: ChoiceAnswer; optio
   { name: "shipped", integrity: INTEGRITY, mapping: APPLIES },
   { name: "swallowing", integrity: SWALLOWING, mapping: APPLIES },
   { name: "mapping below the bar", integrity: SWALLOWING, mapping: BELOW },
-  { name: "budget of one", integrity: INTEGRITY, mapping: APPLIES, options: { budget: 1 } },
+  // Pinned when the caller `show` shared the one call with `read_baseline`. The callers have a budget
+  // of their own since ADR 0015; with it at 0 the run sends what the shared budget of one sent. What a
+  // caller's own budget adds is `local-check-run.test.ts`'s.
+  { name: "budget of one", integrity: INTEGRITY, mapping: APPLIES, options: { budget: 1, callerBudget: 0 } },
 ];
 
 async function record(): Promise<Record<string, { sent: Sent[]; listed: string[] }>> {
   const out: Record<string, { sent: Sent[]; listed: string[] }> = {};
   for (const s of SCENARIOS) {
     const { judge, sent } = recording(s.mapping);
-    const [r] = (await runLocalCheck(repo(s.integrity), { before: "BEFORE", after: "AFTER" }, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...s.options })).requirements;
+    const run = await runLocalCheck(repo(s.integrity), { before: "BEFORE", after: "AFTER" }, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...s.options });
+    // The callers one hop out are asked after the changes since ADR 0015; with no change question here
+    // they follow the changed functions directly, as they did when they shared the budget.
+    await run.askCallers();
+    const [r] = run.requirements;
     // JSON round trip: what is compared is what a host would have received.
     out[s.name] = { sent: JSON.parse(JSON.stringify(sent)), listed: r!.findings.map((f) => `${f.function} · ${f.call}`) };
   }

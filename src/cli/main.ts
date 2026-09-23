@@ -45,9 +45,10 @@ Change:
   --head <rev>          the commit after the change (default: HEAD; with --pr outside a
                         pull_request workflow, the pull request's head commit)
 
-What a run does: for each requirement, take the Rust functions the change touched and their
-callers one hop out, and — last, under a budget of their own — the other callers of the
-repository functions the changed code calls, and ask Jev two things about each call, as the
+What a run does: for each requirement, take the Rust functions the change touched (20 calls),
+their callers one hop out (a budget of their own, 10 and what the first left, asked after every
+requirement's changed functions), and — last, under a budget of their own — the other callers of
+the repository functions the changed code calls, and ask Jev two things about each call, as the
 requirement's "form" says.
 The default, failure_propagation: whether the requirement requires that a failure of the call
 not reach the caller as a success, and what the function returns when it does. The other,
@@ -531,14 +532,14 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const ledger = answersDir === undefined ? null : await RememberedProvider.open(answersDir, judges.provider, { host: endpoint.host, origin: judges.origin });
     const provider: JudgmentProvider = ledger ?? judges.provider;
 
-    // The calls first, then the changes. One provider for both; there is nothing else to send to.
+    // The changed functions' calls first, then the changes, then the callers' and the siblings'. One
+    // provider for all of them; there is nothing else to send to.
     // A requirement read from text names no form, so Jev is asked which form its sentence says
     // (ADR 0008); a spec's requirements keep the spec's word and are not asked.
     const run = await runLocalCheck(git, revisions, intent.requirements, provider, include, { ...localOptions, askForm: !resolved.spec });
     footing(run.change.changedPaths);
     trace(`changed files: ${run.change.changedPaths.length}`);
     for (const s of run.change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
-    for (const r of run.requirements) trace(`${r.requirementId} -> ${r.findings.length} worth checking of ${r.counts.asked} read`);
 
     // The other direction: every change the pull request made, against the requirements it names.
     // Not with the pull request's own description, though: a requirement its author wrote after the
@@ -551,6 +552,10 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     else changes = await reviewChanges({ change: run.change, requirements: justifying, provider, maxChars: config.evidence.max_primary_chars, threshold: config.judgment.violation_probability, trace });
     notes.push(...changes.notes);
     trace(`changes no requirement asked for: ${changes.unexpected.length}`);
+    // Then the callers one hop out (ADR 0015), on a budget of their own: after the changes, so a
+    // limit reached here stops at the callers and never at a question about the diff itself.
+    const callers = await run.askCallers();
+    for (const r of run.requirements) trace(`${r.requirementId} -> ${r.findings.length} worth checking of ${r.counts.asked} read`);
     // Last, the siblings of the change (ADR 0005): on the run's limits after everything above, so
     // they never take a request or a second from what the run asked before siblings were read.
     const siblings = await run.askSiblings();
@@ -559,8 +564,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // or not answering, and a report of nothing settled would pass for a run that judged. The local
     // check stops on its own when it asked; this covers a run whose only questions were the changes'.
     // An answer to a form question is not a judgment and does not count here (ADR 0008).
-    if (run.reached + changes.reached + siblings.reached > 0 && run.answered + changes.answered + siblings.answered === 0) {
-      throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached + siblings.reached} request(s) were sent and none was answered`, EXIT.provider);
+    const reached = run.reached + changes.reached + callers.reached + siblings.reached;
+    if (reached > 0 && run.answered + changes.answered + callers.answered + siblings.answered === 0) {
+      throw new ToolError(`no judgment came back from ${judges.origin}: ${reached} request(s) were sent and none was answered`, EXIT.provider);
     }
     // With kept answers, the callers' counts include what the ledger answered, so a run whose new
     // requests all failed can still read as answered. What decides it is what went to the host:
@@ -606,7 +612,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         requirements: run.requirements,
         unexpectedChanges: changes.unexpected,
         // `answered` stays the requests Jev answered: what the ledger answered is `reused`, not both.
-        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + siblings.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
+        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + callers.answered + siblings.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
         notes,
         prAuthor,
       }),

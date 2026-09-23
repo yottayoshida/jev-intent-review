@@ -91,7 +91,10 @@ for (const [branch, sha] of Object.entries(BRANCHES)) {
   const include = pathFilter(config.repository.include, config.repository.ignore);
   for (let run = 1; run <= RUNS; run++) {
     const provider = new OnlyTheseCalls(inner, inner?.model ?? "dry");
-    const { requirements: results } = await runLocalCheck(repo, { before, after: head }, intent.requirements, provider, include, { ...DEFAULT_LOCAL_CHECK, budget: 10_000 });
+    const checked = await runLocalCheck(repo, { before, after: head }, intent.requirements, provider, include, { ...DEFAULT_LOCAL_CHECK, budget: 10_000 });
+    // The callers one hop out are asked on their own budget since ADR 0015, when the run is asked to.
+    await checked.askCallers();
+    const { requirements: results } = checked;
     sent += provider.sent;
     answeredWithNothing += provider.answeredWithNothing;
     for (const r of results) {

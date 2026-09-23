@@ -70,8 +70,8 @@ For each requirement it takes the Rust functions the change touched and the func
 them, one hop out, and every call inside those functions — and, last and under a budget of their
 own, the other callers of the repository functions the changed code calls (*The siblings of a
 change* below). Which of those calls can be asked about, and what is asked, is the requirement's
-form. Each askable call, up to a budget of 20 per
-requirement, gets two questions to Jev, in separate requests: whether the requirement requires
+form. Each askable call, up to the budgets below — 20 per requirement in the functions the change
+touched, and 10 and what those left in their callers — gets two questions to Jev, in separate requests: whether the requirement requires
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
 
@@ -133,22 +133,47 @@ asks about their calls under a budget of its own, 10 per requirement:
   common, or were over a cap; functions that also call a changed function, may call one, had their
   calls cut, or return no `Result`.
 
-The first budget is the same set whether or not a sibling exists, and it is counted as before; the
-siblings are counted apart, in `--json` under `counts.siblings` and in the report in its own lines.
+The two budgets besides the siblings' (*The budget* below) ask the same set whether or not a sibling
+exists, and are counted in `counts` as they are with no sibling; the siblings are counted apart, in `--json` under `counts.siblings` and in the report in its own lines.
 Their calls carry `origin: shares_call` and `via`, the seed that tied them, and so does a finding in
-a sibling — a finding of the first budget carries neither, as before. The report's first line and
+a sibling — a finding of the other two budgets carries neither, as before. The report's first line and
 the Action's check run count the siblings with everything else: a sibling's call read is a call
 read. A sibling's held and left-over calls are under *Not checked*, so the check run can be neutral
 where it was green, and a finding in a sibling is a finding for `policy.fail_on`.
 
 ### The budget
 
-The budget is dealt one call per function at a time — the functions the change touched first, then
-their callers — so no single body takes it. Inside a function, the askable calls whose callee
-resolved to a function the change touched are asked before its other calls, and the rest follow in
-the order they appear. When a function gets fewer questions than it has askable calls, that decides
-which calls they go to; when more functions hold an askable call than the budget, the functions late
-in the order get none, and each of the others gets one, for its first call.
+**The functions the change touched and the functions that call them have a budget each — 20 calls
+per requirement, and at least 10 plus what the first leaves — and in the callers' budget the calls
+into a function the change touched are asked first, whichever caller they are in** (ADR 0015).
+Together the two ask at most 30 calls a requirement; the siblings' 10 are apart from both.
+
+- **The functions the change touched** take their 20 one call per function at a time, so no single
+  body takes it. Inside a function, the askable calls whose callee resolved to a function the change
+  touched are asked before its other calls, and the rest follow in the order they appear. When a
+  function gets fewer questions than it has askable calls, that decides which calls they go to; when
+  more functions hold an askable call than the budget, the functions late in the order get none, and
+  each of the others gets one, for its first call. This is the order they had when they shared the
+  budget with their callers, with the callers taken out: every call it reached then it reaches now.
+- **Their callers** take 10 and whatever the changed functions left of their 20 — places in the
+  budget, so a changed function's call that takes a place and is then held (a body too long, a call
+  it cannot point at) keeps it: first the calls
+  into a changed function, one per caller at a time, then the rest, one per caller at a time. A
+  caller is in the set because it calls a changed function, so with more callers than their budget
+  those calls take all of it, and a caller's other calls are not asked about. Where the changed
+  functions touched few calls the callers used to get more of the shared 20 than 10; they now get 10
+  and the rest of the 20. That can still be fewer than the shared pool gave them — one changed
+  function with twenty calls and nineteen callers with one each gave the callers 19 then, 10 now.
+- **Every requirement's changed functions are asked first, then the changes' questions (*Exit
+  codes*), then every requirement's callers, then the siblings.** A limit reached in the middle of a
+  run — `max_requests`, the pull request's (*A limit for the whole pull request*), the time — stops
+  at the callers, never at a later requirement's changed functions or at a question about a change.
+
+`--json` counts both under `counts` (`budget` is what the two could ask together) and each under
+`counts.byOrigin.changed` and `counts.byOrigin.calls_changed`, in the terms `counts.siblings` uses;
+the callers' `budget` there is 10 plus what the first left, so the two add up to more than `budget`
+when the first left some. The report prints one line for each. A caller's call left over is under
+*Not checked* as "the callers' budget of N was already spent".
 
 Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name the
 repository defines, or, when it defines several, the one the call's path or form picks out — and for
@@ -607,9 +632,9 @@ iota#10136 (not run through the tool in `#36` either: a 470 MB monorepo), and wi
   asked about and is outside the budget, and agentflare#229's `std::fs::read_to_string(&profile)` is
   held because the function it is in, `run`, returns `()` — true of that function.
 - **The unchanged callers' calls**: moltis#1064's and grovedb#501's can be asked about and are
-  inside the budget. **Kontor#385's can be asked about and is outside the budget of 20**, so it is
-  still not asked; how the budget is spent is `#38`'s. grovedb#500's is past its function's cap of
-  40 calls, as before.
+  inside the budget. **Kontor#385's can be asked about and was outside the budget of 20**, so it
+  was not asked; since the callers have a budget of their own (`#38`, *The callers' budget,
+  measured*) it is inside theirs. grovedb#500's is past its function's cap of 40 calls, as before.
 - The same run with the tool of `#36` (`bench/logs/precheck-vs-529b30a.json`) gives 3 of 11, and
   its count of calls inside the budget equals what that tool's `--candidates-only` printed in
   `#36` (`bench/acceptance/precheck-shipped.json`, applicable less over the budget), in all eight
@@ -682,8 +707,9 @@ run reads on its own is now held and left to be asked about there.
 How far the words reach on real code, with no request (`bench/forms/reach/`): a
 check-before-action sentence written for the changed function of each acceptance case put the
 guarded call inside the budget on both — grovedb#500's `rewrite_heights` 10th of 17 askable calls
-among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Whether Jev reads
-those right is not measured.
+among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Since the callers
+have a budget of their own (*The budget*), 4th of 17 and 11th of 22, with none left over. Whether
+Jev reads those right is not measured.
 
 ### The order inside a function
 
@@ -719,6 +745,59 @@ The two calls the order swaps in omamori `#468`'s `run_override_disable` — the
 the order was chosen — were asked of Jev three times on every branch under both requirements
 (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in any run. The
 swaps in the other four functions have not been asked of Jev.
+
+### The callers' budget, measured
+
+How the budget is split (*The budget*) was chosen on the cases the order inside a function was
+measured on — the acceptance pre-check's eight, every version of moltis#1064 and grovedb#500, and
+omamori `#468`'s five branches, 20 runs — so it is a regression result, not an unseen one
+(`bench/acceptance/README.md`, *Used so far*). Kontor#385's unchanged caller was the case that
+decided it again. Orders of one shared budget of 20 were compared first, with the listing's caps as
+they are and with every cap lifted: putting the calls into a changed function first everywhere
+brought Kontor#385's caller in (14th) and left 7 of its 14 calls on a changed line outside the budget
+and 7 of its 19 changed functions without a question; giving each changed function one turn first
+left the caller 21st. No order of one budget kept both, and the owner chose a budget of the callers'
+own.
+
+Measured without a request, the tool before (`29bc114`) against the tool with the two budgets, on
+the same 20 runs, capped and uncapped (`bench/logs/budget-by-origin-v1.json`,
+`node bench/budget-by-origin.ts --before 29bc114`):
+
+- **Every target the runs name is inside the budget**, capped and uncapped — omamori's two,
+  moltis#1064's and grovedb#500's in every version, grovedb#501's fixed call and its caller,
+  Kontor#385's fixed call and **Kontor#385's unchanged caller, 22nd of 30: second in the callers'
+  budget, where it was outside the shared one**. grovedb#500's unchanged caller (`apply_chunk` →
+  `finalize`), which the cap of forty calls per function drops, is 7th of 30 when the caps are
+  lifted.
+- **The callers are asked no less in any run**: 16 to 26 calls on moltis#1064's shipped code,
+  1 to 10 on Kontor#385, 8 to 10 on omamori; the same where they fitted before (grovedb#500 capped,
+  grovedb#501, instruckt-tauri#9).
+- **Nothing on the diff's side got worse in any run**: the calls on a changed line left outside the
+  budget are as many as before (2 on Kontor#385, 0 elsewhere) or fewer (pybun#428 uncapped, 1 to 0),
+  and no changed function that had a question lost it. That the changed functions' share asks
+  everything it asked before is also true by construction and pinned by a test
+  (`test/select-order.test.ts`).
+- Up to 10 more calls per requirement: on every run with more than 20 askable calls, as many as
+  could be asked up to 30 (29 on moltis#1064's defect-B, 30 on the others).
+
+Against real Jev, Kontor#385's shipped code three times (`bench/logs/kontor-385-callers-jev-v1.json`):
+68 requests a run, all answered. The unchanged caller's call was asked in every run and read as
+holding (`returns_error` 1.00) — the pull request fixed the function it calls, so that is the right
+reading. Nine calls a run that the tool before did not reach — eight in callers, one in a changed
+function — were read as holding in every run, and nothing was listed. Kontor#385 has no version with
+a defect at that call (it stopped at condition (c)), so whether a defect there would be listed is
+not measured.
+
+The benches before this one that count one budget of 20 — `bench/order-first-pass.ts`,
+`bench/outside-results.ts`, `bench/result-type.ts`, `bench/names-defined-twice.ts` — pass 0 for the
+callers' budget, so the total is still 20; but the changed functions now take their turns before any
+caller, so run again they no longer reproduce their logs, which name the tool they were taken with.
+`bench/order-first-pass-jev.ts` asks the callers too now, on their own budget; `bench/intent-coverage.ts`
+counts the calls inside the budget, which can be 30 where it was 20.
+
+With more callers than their budget, the calls into a changed function take all of it: a defect in a
+caller's other calls — the opposite shape the order inside a function left untested — is further
+from a question in the callers than it was.
 
 ### Reading whole signatures
 
@@ -851,7 +930,9 @@ Measured without a request, before and after, on the same 15 runs as the two par
 ### The siblings of a change, measured
 
 What *The siblings of a change* adds, on the cases above, before any case with a defect in a
-sibling has been built (`#37` stays open for that):
+sibling has been built (`#37` stays open for that). Measured before the callers had a budget of
+their own (#38, ADR 0015), when "the first budget" was one budget shared by the changed functions
+and their callers; the siblings are still asked last and counted apart:
 
 - **The first budget is the same set.** On the five branches of omamori `#468` under both of its
   requirements and on every version of moltis-1064 and grovedb-500, the calls the first budget asks
