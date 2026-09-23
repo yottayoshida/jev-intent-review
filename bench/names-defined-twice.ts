@@ -21,6 +21,8 @@ import { parseArgs } from "node:util";
 
 const HERE = resolve(import.meta.dirname, "..");
 const BUDGET = 20;
+// The callers' own budget (ADR 0015) is 0 here, so the total is the 20 this bench was taken with; how
+// the 20 is dealt is no longer what it was then, and the tool before ignores the argument.
 const { values } = parseArgs({ options: { acceptance: { type: "string" }, omamori: { type: "string" }, before: { type: "string" }, extra: { type: "string", multiple: true }, out: { type: "string" } } });
 if (!values.acceptance || !values.omamori || !values.before) throw new Error("usage: node bench/names-defined-twice.ts --acceptance <dir> --omamori <clone> --before <rev> [--extra <name>=<clone>:<before>:<after>] [--out <file>]");
 const ACC = resolve(values.acceptance);
@@ -96,7 +98,7 @@ async function decide(tool: Awaited<ReturnType<typeof toolAt>>, run: Run): Promi
   const change = await tool.analyzeChange(repo, run.before, run.after, include);
   const started = performance.now();
   const fromChange = await tool.fromDiff.sitesFromChange(new tool.fromDiff.CandidateFiles(discoverer), discoverer, tool.Discoverer.changedLines(change));
-  const selection = await tool.selectSites([...fromChange.sources.values()], (fn: unknown, call: unknown) => tool.applicabilityOf(discoverer, fn, call), BUDGET);
+  const selection = await tool.selectSites([...fromChange.sources.values()], (fn: unknown, call: unknown) => tool.applicabilityOf(discoverer, fn, call), BUDGET, 0);
   const ms = Math.round(performance.now() - started);
   const budgeted = new Set(selection.budgeted.map((s: { call: { id: string } }) => s.call.id));
   // The two tools are imported from different directories, so their types are not shared here.

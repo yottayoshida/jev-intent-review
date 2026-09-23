@@ -36,6 +36,13 @@ used to fix anything becomes a regression case from then on and is never counted
 
 Used so far:
 
+- **kontor-385, again, with every case of the pre-check and omamori `#468`'s five branches**, chose
+  how the budget is split (`#38`, ADR 0015; `docs/local-check-cli.md`, *The budget*): orders of one
+  shared budget were compared on those 20 runs, with and without the listing's caps, by where the
+  known targets fell and by what the diff's own calls lost, and the owner chose a budget of the
+  callers' own after that comparison. Those runs are what the split was judged by
+  (`bench/logs/budget-by-origin-v1.json`), and none of them is free evidence for it.
+
 - **kontor-385** chose the order inside a function (the calls into a function the change touched
   first; `docs/local-check-cli.md`, *The order inside a function*). It has no `case.json` — it
   stopped at condition (c) and was never built or sent to Jev — so this line is the record.

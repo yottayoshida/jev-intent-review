@@ -156,7 +156,14 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
   lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
   lines.push(`Form: \`${r.form ?? DEFAULT_FORM}\` (${formOrigin(r)}). ${context.nothingSent ? `Nothing was asked; the form would ask this. ${form.words.intro}` : form.words.intro}`, "");
   lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
-  lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
+  // One line per budget (ADR 0015). A record from before the callers had one says it in one line.
+  const o = c.byOrigin;
+  if (o) {
+    lines.push(`In the functions the change touched: ${o.changed.calls} calls, of which ${o.changed.applicable} could be asked about. Budget ${o.changed.budget}: ${o.changed.asked} read, ${o.changed.mapped} mapped, ${o.changed.governed} of those governed, ${o.changed.overBudget} left over, ${o.changed.notApplicable} not applicable.`);
+    lines.push(`In their callers: ${o.calls_changed.calls} calls, of which ${o.calls_changed.applicable} could be asked about. Their own budget, with what the first left, ${o.calls_changed.budget}: ${o.calls_changed.asked} read, ${o.calls_changed.mapped} mapped, ${o.calls_changed.governed} of those governed, ${o.calls_changed.overBudget} left over, ${o.calls_changed.notApplicable} not applicable.`);
+  } else {
+    lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
+  }
   if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
   // The siblings are counted apart, so the lines above mean what they meant before siblings were
   // read (ADR 0005). Said only when there was something to look for them from.

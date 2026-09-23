@@ -7,8 +7,10 @@
 // records are not comparable). At that commit the flagged path returned before the change question
 // ran, so the record holds the local check's requests and nothing else.
 //
-// After the change the default run has to send exactly these, in this order, before anything
-// else. `WRITE_GOLDEN=1` rewrites the record, for a deliberate change only.
+// After the change the default run has to send exactly these for the calls, in this order. Since the
+// callers one hop out have a budget of their own (ADR 0015) the changes' questions come between the
+// changed functions' calls and the callers', and the calls are still these. `WRITE_GOLDEN=1` rewrites
+// the record, for a deliberate change only.
 
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -50,7 +52,7 @@ function recording(): { deps: Deps; sent: Sent[] } {
   return { deps: { judges: () => ({ provider, sent: () => ({ requests: sent.length, bytes: 0 }), origin: "https://api.cloudflare.com" }) }, sent };
 }
 
-test("the default run sends, for the calls, exactly what the flagged path sent before it became the default — and the changes' questions only after", async () => {
+test("the default run sends, for the calls, exactly what the flagged path sent before it became the default — and the changes' questions between the changed functions' and the callers'", async () => {
   const repo = fixtureRepo("integrity-rust");
   try {
     const { deps, sent } = recording();
@@ -70,10 +72,16 @@ test("the default run sends, for the calls, exactly what the flagged path sent b
     assert.ok(golden.length > 0, "the record holds requests");
     assert.equal(now.length, golden.length, "how many requests for the calls");
     for (let i = 0; i < golden.length; i++) assert.equal(JSON.stringify(now[i]), JSON.stringify(golden[i]), `request ${i + 1}`);
-    // The changes are asked about after every call has been, never in between.
+    // The changes are asked about after every call in a changed function and before any call in a
+    // caller one hop out (ADR 0015): a limit reached there stops at the callers, not at the diff.
+    const inChanged = (s: Sent) => (s.state as { candidate?: { changed_by_pull_request?: boolean } }).candidate?.changed_by_pull_request === true;
     const firstChange = all.findIndex(isChange);
-    assert.ok(firstChange >= golden.length, `the changes' questions come after the calls' (first at ${firstChange + 1} of ${all.length})`);
-    assert.ok(all.slice(firstChange).every(isChange), "and nothing about a call comes after them");
+    const lastChange = all.findLastIndex(isChange);
+    assert.ok(firstChange > 0, "the changes were asked about");
+    assert.ok(all.slice(firstChange, lastChange + 1).every(isChange), "in one run of requests");
+    assert.ok(all.slice(0, firstChange).every(inChanged), `before them, only calls in a changed function (first change at ${firstChange + 1} of ${all.length})`);
+    assert.ok(all.slice(lastChange + 1).every((s) => !isChange(s) && !inChanged(s)), "after them, only calls in callers");
+    assert.ok(all.slice(lastChange + 1).length > 0, "and there are callers' calls to put after them");
   } finally {
     repo.remove();
   }

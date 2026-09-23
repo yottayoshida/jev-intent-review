@@ -13,9 +13,11 @@
 // the defect is usually a different call in it (on the saved runs, the right function three times
 // in three and the right call once).
 //
-// Then applicability, then one budget for the whole requirement — round-robin over functions, so a
-// single busy body cannot take the run and so the file a function is in cannot either. Inside a
-// function, the calls into a function the change touched take its turns first.
+// Then applicability, then two budgets for the requirement (ADR 0015): one for the functions the
+// change touched and one for their callers one hop out, each round-robin over functions, so a single
+// busy body cannot take the run and so the file a function is in cannot either. Inside a function,
+// the calls into a function the change touched take its turns first; in the callers' budget they
+// go first across every caller.
 //
 // Nothing here knows a function name, a helper name or an expected answer.
 
@@ -68,12 +70,23 @@ export interface SiteSource {
   callsChanged?: readonly string[];
 }
 
+/** One budget's share of a selection: the functions the change touched, or their callers (ADR 0015). */
+export interface OriginSelection {
+  /** What this budget could ask about: fixed for the changed functions, 10 plus what they left for the callers. */
+  budget: number;
+  widened: Site[];
+  applicable: Site[];
+  budgeted: Site[];
+  overBudget: Site[];
+  held: Site[];
+}
+
 export interface Selection {
   /** Every call in every function the change reached. The set, before any budget. */
   widened: Site[];
   /** Of those, the ones a question can be put to. */
   applicable: Site[];
-  /** What the budget will ask about. */
+  /** What the two budgets will ask about: the changed functions' first, then the callers'. */
   budgeted: Site[];
   /** Applicable and left out by the budget — unchecked, not absent. */
   overBudget: Site[];
@@ -81,6 +94,8 @@ export interface Selection {
   held: Site[];
   /** How many functions came from changed lines, and how many from one hop out. */
   functions: Record<FunctionOrigin, number>;
+  /** The same parts, per budget. The lists above are these joined, the changed functions' first. */
+  byOrigin: Record<FunctionOrigin, OriginSelection>;
 }
 
 /**
@@ -124,6 +139,12 @@ export function resolvedTo(verdict: Askability | undefined): string | undefined 
   return verdict?.ok ? verdict.calleeDefinedAt : undefined;
 }
 
+/** Whether a call's callee resolved to one of the changed functions, given where they are defined. */
+const intoChangedAt = (changedAt: ReadonlySet<string>) => (s: Site) => {
+  const at = resolvedTo(s.applicability);
+  return at !== undefined && changedAt.has(at);
+};
+
 /**
  * Within each function, the calls into a function the change touched first; the rest keep the
  * order they were found in. Functions keep theirs.
@@ -145,13 +166,11 @@ export function resolvedTo(verdict: Askability | undefined): string | undefined 
  * ponytail: the evidence that this order is better than line order is that one case, and it is
  * the case the order was chosen from. The opposite shape — a defect in a call to an unchanged
  * function, beside a call into a changed one — is untested. Measuring orders against each other
- * is #38.
+ * across functions (#38) gave the callers a budget of their own instead (ADR 0015,
+ * `callersInOrder`); inside a changed function this order stands.
  */
 export function callsIntoChangedFirst(sites: readonly Site[], changedAt: ReadonlySet<string>): Site[] {
-  const intoChanged = (s: Site) => {
-    const at = resolvedTo(s.applicability);
-    return at !== undefined && changedAt.has(at);
-  };
+  const intoChanged = intoChangedAt(changedAt);
   const byFunction = new Map<string, Site[]>();
   for (const s of sites) {
     const list = byFunction.get(s.fn.id) ?? [];
@@ -162,11 +181,31 @@ export function callsIntoChangedFirst(sites: readonly Site[], changedAt: Readonl
 }
 
 /**
- * The selection over every source, under one budget.
+ * The callers' calls in the order their budget takes them (ADR 0015): the calls into a function the
+ * change touched first, whichever caller they are in, then the rest — each group dealt one call per
+ * function at a time, and the groups joined. Dealing the joined list again would give a caller's
+ * second call a turn before another caller's call into a changed function.
  *
- * The budget is per requirement and not per file. Spending it once per file meant a requirement
+ * A caller is in the set because it calls a changed function, so nearly every caller holds such a
+ * call: with more callers than the budget, these calls take all of it.
+ */
+export function callersInOrder(sites: readonly Site[], changedAt: ReadonlySet<string>): Site[] {
+  const intoChanged = intoChangedAt(changedAt);
+  const all = (list: Site[]) => roundRobin(list, list.length).taken;
+  return [...all(sites.filter(intoChanged)), ...all(sites.filter((s) => !intoChanged(s)))];
+}
+
+/**
+ * The selection over every source, under the two budgets (ADR 0015).
+ *
+ * The budgets are per requirement and not per file. Spending one once per file meant a requirement
  * that opened three files could ask three times its stated budget, and that the last file's calls
  * were never crowded out by the first's however many there were.
+ *
+ * The functions the change touched take `budget` in the order they took it when they shared it with
+ * their callers, so what is asked of them is what was, and more where callers had taken turns. The
+ * callers take `callerBudget` plus whatever the first left: never fewer than `callerBudget`, and the
+ * two never more than `budget + callerBudget` together.
  *
  * `decide` is passed in rather than imported so this stays testable without a repository; the CLI
  * hands it the requirement's form, bound to that requirement and to the commit being read.
@@ -175,6 +214,7 @@ export async function selectSites(
   sources: readonly SiteSource[],
   decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Askability>,
   budget: number,
+  callerBudget: number,
 ): Promise<Selection> {
   // Which finder reached each function. A function the change touched keeps that label even when
   // a caller search also reached it: the label is a fact about the diff.
@@ -214,8 +254,32 @@ export async function selectSites(
   const changedAt = new Set<string>();
   for (const { fn } of seeds.values()) if (origins.get(fn.id) === "changed") changedAt.add(`${fn.path}:${fn.startLine}`);
 
-  const { taken, left } = roundRobin(callsIntoChangedFirst(applicable, changedAt), budget);
-  return { widened, applicable, budgeted: taken, overBudget: left, held, functions };
+  const of = (origin: FunctionOrigin) => (s: Site) => s.fnOrigin === origin;
+  const changedApplicable = applicable.filter(of("changed"));
+  const callersApplicable = applicable.filter(of("calls_changed"));
+  const first = roundRobin(callsIntoChangedFirst(changedApplicable, changedAt), budget);
+  const callers = callersInOrder(callersApplicable, changedAt);
+  const second = callerBudget + budget - first.taken.length;
+  const byOrigin: Record<FunctionOrigin, OriginSelection> = {
+    changed: { budget, widened: widened.filter(of("changed")), applicable: changedApplicable, budgeted: first.taken, overBudget: first.left, held: held.filter(of("changed")) },
+    calls_changed: {
+      budget: second,
+      widened: widened.filter(of("calls_changed")),
+      applicable: callersApplicable,
+      budgeted: callers.slice(0, second),
+      overBudget: callers.slice(second),
+      held: held.filter(of("calls_changed")),
+    },
+  };
+  return {
+    widened,
+    applicable,
+    budgeted: [...byOrigin.changed.budgeted, ...byOrigin.calls_changed.budgeted],
+    overBudget: [...byOrigin.changed.overBudget, ...byOrigin.calls_changed.overBudget],
+    held,
+    functions,
+    byOrigin,
+  };
 }
 
 /** The siblings' selection: the same parts as `Selection`, counted apart (ADR 0005). */

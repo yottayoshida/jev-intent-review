@@ -24,3 +24,9 @@ guarded calls came in under the budget on these two changes; a change with more 
 the sentence's words, or with the guarded call later in a busier body, would push it out, and this
 count says nothing about that. The positions are those of the budget's order at the tool commit
 recorded in each result; a later change to how the budget is ordered moves them.
+
+Counted again once the callers had a budget of their own (#38, ADR 0015), with the same sentences
+and commits and nothing sent: grovedb#500's guarded call is 4th of the 17 asked (7 in the changed
+functions, 10 in their callers, none left over), moltis#1064's 11th of the 22 asked (12 and 10, none
+left over, where 2 were). The guarded calls are in changed functions, whose share is asked first now
+that the callers do not take turns in it. The two results above are kept as they were taken.

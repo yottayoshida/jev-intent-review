@@ -2,6 +2,10 @@
 
 Status: Accepted
 
+Amended by [0015](0015-the-callers-have-a-budget-of-their-own.md): what this record calls the first
+budget is two budgets since — the functions the change touched and their callers one hop out — and
+the siblings' is the third. Siblings are still asked last and are still counted apart.
+
 ## Context
 
 The local check reads the functions a change touched and the functions that call them, one hop out

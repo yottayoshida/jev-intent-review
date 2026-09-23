@@ -1,6 +1,11 @@
 // Which calls the budget reaches first, with and without the order inside a function (the calls
 // into a function the change touched first). No request is sent.
 //
+// Taken when the functions the change touched and their callers shared one budget of 20. Since #38
+// the callers have a budget of their own (ADR 0015, `bench/budget-by-origin.ts`); run again, this
+// passes 0 for it, so the total is still 20, but the changed functions now take their turns before
+// any caller and the counts it compares with line order are no longer the same.
+//
 //   node bench/order-first-pass.ts --acceptance <dir> --omamori <clone> [--out <file>]
 //
 // `--acceptance` is the directory the acceptance set's clones were made in (one clone per
@@ -231,7 +236,8 @@ for (const run of runs) {
     const fromChange = await sitesFromChange(new CandidateFiles(discoverer), discoverer, changedLines);
     const decide = check === "shipped" ? (fn: FunctionCandidate, call: CallCandidate) => applicabilityOf(discoverer, fn, call) : widened(discoverer);
     const started = performance.now();
-    const selection = await selectSites([...fromChange.sources.values()], decide, BUDGET);
+    // 0 for the callers' own budget (ADR 0015): this bench compares orders of one shared budget of 20.
+    const selection = await selectSites([...fromChange.sources.values()], decide, BUDGET, 0);
     const ms = Math.round(performance.now() - started);
     const lineOrder = roundRobin(selection.applicable, BUDGET).taken;
     const withOrder = new Set(selection.budgeted.map((s) => s.call.id));

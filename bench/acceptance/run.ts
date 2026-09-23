@@ -62,6 +62,10 @@ async function dist() {
     load<typeof Redact>("evidence/redact.js"),
     load<typeof LocalCheck>("review/local-check-run.js"),
   ]);
+  for (const [k, v] of Object.entries(BUDGETS)) {
+    const built = (local.DEFAULT_LOCAL_CHECK as Record<string, unknown>)[k];
+    if (built !== v) throw new Error(`the build's DEFAULT_LOCAL_CHECK.${k} is ${String(built)}, and this file counts requests with ${v}`);
+  }
   return { main, client, jev, provider, candidates, applicability, discover, git, config, glob, redact, local };
 }
 type Dist = Awaited<ReturnType<typeof dist>>;
@@ -138,10 +142,17 @@ async function precheck(id: string, clone: string) {
   writeJson(join(caseDir(id), "case.json"), c);
 }
 
-/** Requests one run can send at most: two questions per call, both budgets of calls (the first and the siblings'), and room for retries. */
+/**
+ * The budgets of calls the command runs with, as `DEFAULT_LOCAL_CHECK` of the build it drives has them:
+ * this file imports no value from `src/`, so `dist()` refuses a build whose defaults are not these.
+ * The changed functions and their callers ask at most `budget + callerBudget` together (ADR 0015).
+ */
+const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10 } as const;
+
+/** Requests one run can send at most: two questions per call, every budget of calls, and room for retries. */
 function perRun(c: CaseFile, versionId: string): number {
   const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
-  return Math.ceil(requirements * 2 * (20 + 10) * 1.1);
+  return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget) * 1.1);
 }
 
 /** The cases a measurement can send for: built, and pre-checked. A regression case is measured again too. */
