@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "what": "whether the packets sent to a stand-in are the packets sent to the real endpoint, each as often",
+  "ref": "oxidezap/whatsapp-rust#759",
+  "head": "f46e703543e4",
+  "standIn": {
+    "sent": 13,
+    "exitCode": 0
+  },
+  "real": {
+    "sent": 13,
+    "exitCode": 0
+  },
+  "samePackets": true,
+  "sameOrder": false
+}
