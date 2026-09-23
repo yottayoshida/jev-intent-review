@@ -34,6 +34,15 @@ test("the committed log scores as the documentation says", () => {
   assert.ok(barLines(all).every((line) => line.endsWith("— met")), barLines(all).join("\n"));
 });
 
+test("the second set's log scores as the documentation says", () => {
+  const log = JSON.parse(readFileSync(`${ROOT}bench/logs/form-choice-v2.json`, "utf8")) as Log;
+  const all = rows(committedSet("sentences-v2.json"), log);
+  assert.equal(all.length, 7);
+  assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 21);
+  const f = summarise(all, "failure_propagation", "all");
+  assert.deepEqual([f.sentences, f.rightEveryRun, f.checkInAnyRun], [7, 7, 0]);
+});
+
 test("an answer whose choice the question did not offer reads as none, not as a label", () => {
   assert.equal(readAtBar(answer("constructor", 0.99)), "none");
   assert.equal(readAtBar(answer("neither", 0.99)), "neither");

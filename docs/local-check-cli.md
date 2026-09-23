@@ -1046,6 +1046,16 @@ sentences, five are this project's bench and fixture sentences, three were writt
 issues for this measurement, two are issue #35's as written and one is a model's fragment. The
 table says how Jev reads sentences of these shapes, not how it would read an arbitrary issue.
 
+Seven sentences came into the repository after the table, the requirements written by hand from
+the pull requests `#37`'s search read (`bench/acceptance/candidates-v2.json`). The first log records
+the sha256 of the set it was taken on and is not added to, so they are a second set
+(`bench/forms/choice/sentences-v2.json`, all labelled `failure_propagation` and written `text`,
+committed before the first request), measured the same way with its own log
+(`bench/logs/form-choice-v2.json`; 21 requests to Cloudflare, `node bench/forms/choice/run.ts score
+--set 2`). Each was read as `failure_propagation` in every run, at 1.00, and none as check; with
+them, 0 of 25 failure sentences was read as check in any run. `run.ts verify` and the test check
+the repository's sentences against the two sets together.
+
 The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
 read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its
 author's. The run does so now ([Writing a requirement](#writing-a-requirement)): the question it

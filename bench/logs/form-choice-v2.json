@@ -1,0 +1,314 @@
+{
+  "conditions": {
+    "sentences": "adca6c272b90b9211c37455e647bb265c5b22210bf94f6a5ed0a5971bfc1b55d",
+    "question": "875518b4e33ab8028f18f00491816edb89ec225cf7d580482bab5a8cf5d2a2c4",
+    "bar": 0.6,
+    "runsPerSentence": 3,
+    "provider": "cloudflare"
+  },
+  "tool": {
+    "head": "be5bfab603a82068b2f21fc3765fbc90cd980010",
+    "note": "the labelled set and the question were committed before the first request; `conditions` holds their sha256"
+  },
+  "question": {
+    "requirement_form": {
+      "type": "choice",
+      "instructions": "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
+      "criteria": {
+        "failure_propagation": "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
+        "check_before_action": "The sentence says that an operation must not be performed unless a check passes, or must never be performed in some case, and it names the operation.",
+        "neither": "The sentence says something else: what a feature does or shows, what an output contains, what stays the same, a limit on data or an interface, or a task to do."
+      }
+    }
+  },
+  "endpoint": "Cloudflare Workers AI (https://api.cloudflare.com)",
+  "runs": {
+    "candidates-v2-autonoetic-901": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 1088
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 336
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 298
+      }
+    ],
+    "candidates-v2-git-ai-1717": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 255
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 275
+      }
+    ],
+    "candidates-v2-vox-346": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 317
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 234
+      }
+    ],
+    "candidates-v2-lipilekhika-127": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 245
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 295
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 223
+      }
+    ],
+    "candidates-v2-oxicrab-155": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 258
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 288
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 239
+      }
+    ],
+    "candidates-v2-infraweave-307": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 366
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 236
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 376
+      }
+    ],
+    "candidates-v2-skuld-33": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 229
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 229
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 322
+      }
+    ]
+  }
+}
