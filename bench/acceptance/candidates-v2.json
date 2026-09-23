@@ -35,5 +35,68 @@
     "stop": "Stop at the first candidate that passes (a), (s), (d) and (c). At 30 examined with none, stop, report what was examined and which condition each failed, and leave #37 open."
   },
   "runs": "Three finished runs of each version whose target is inside a budget, by bench/acceptance/run.ts. A run is finished only when it exited 0, no request it recorded failed on the run's own limit, and no call inside the siblings' budget came back without an answer.",
-  "candidates": []
+  "candidates": [
+    {
+      "order": 1,
+      "ref": "risingwavelabs/risingwave#26399",
+      "a": "fail",
+      "why": "The fix makes a constructor return an Option for values it cannot represent: an absence is what the fix returns, which (a) counts as the failure's wrong shape. The requirement is an invariant at construction, not a failure reaching a caller as an error."
+    },
+    {
+      "order": 2,
+      "ref": "mandubian/autonoetic#901",
+      "a": "pass",
+      "why": "The tool reported `{\"ok\":true,\"status\":\"delivered\"}` for a message to a closed session: a failed delivery returned as a success.",
+      "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered."
+    },
+    {
+      "order": 3,
+      "ref": "vybestack/llxprt-jefe#416",
+      "a": "fail",
+      "why": "Reaping orphaned worker process trees on Windows; no call's failure is returned as a success."
+    },
+    {
+      "order": 4,
+      "ref": "SG-devel/tailtriage#1097",
+      "a": "fail",
+      "why": "An API consolidation; no failure is turned into a success."
+    },
+    {
+      "order": 5,
+      "ref": "Extra-Chill/homeboy#9526",
+      "a": "fail",
+      "why": "A false positive in a static detector's rule; the fix is to the detector's matching, not to a failure's handling."
+    },
+    {
+      "order": 6,
+      "ref": "edge-toolkit/core#84",
+      "a": "fail",
+      "why": "Assorted fixes to lint alerts across the code base; no one requirement about a failure reaching its caller."
+    },
+    {
+      "order": 7,
+      "ref": "thedoublejay/gather-step#67",
+      "a": "fail",
+      "why": "A feature release (confidence bands, staleness, telemetry)."
+    },
+    {
+      "order": 8,
+      "ref": "git-ai-project/git-ai#1717",
+      "a": "pass",
+      "why": "The fix removes in-memory fallbacks: bash history now fails closed when its file-backed fallback cannot initialise, where it used to fall back silently.",
+      "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection."
+    }
+  ],
+  "pool": {
+    "fixedAt": "2026-09-23",
+    "size": 97,
+    "screenedByTitleOrLicense": {
+      "goldsky-io/streamling#106": "license NOASSERTION",
+      "oneiron-dev/oneiron#738": "title: move-only refactor",
+      "anchapin/fluxion#3008": "license NOASSERTION",
+      "Smicry/rosregview#5": "license GPL-2.0",
+      "0xckruger/arbiter_v2#3": "no license",
+      "beagleboard/bb-imager-rs#653": "title: tests only"
+    }
+  }
 }
