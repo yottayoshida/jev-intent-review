@@ -12,9 +12,10 @@ import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedPro
 import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
+import { PullRequestBudget } from "../judgments/budget.ts";
 import { RememberedProvider } from "../judgments/remembered.ts";
 import { isSensitivePath } from "../evidence/redact.ts";
-import { renderJson, renderMarkdown } from "../report/markdown.ts";
+import { plural, renderJson, renderMarkdown } from "../report/markdown.ts";
 import { Git } from "../repository/git.ts";
 import { resolveRevisions, type Revisions } from "../repository/revisions.ts";
 import { DEFAULT_LOCAL_CHECK, runLocalCheck, type LocalCheckResult } from "../review/local-check-run.ts";
@@ -171,8 +172,8 @@ function parse(argv: string[]) {
   return { ...values, prNumber: number("pr"), issueNumber: number("issue") };
 }
 
-function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, env: NodeJS.ProcessEnv, fetch?: typeof globalThis.fetch) {
-  const client = new JevClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes, ...(fetch ? { fetch } : {}) });
+function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, env: NodeJS.ProcessEnv, fetch?: typeof globalThis.fetch, onRequest?: () => void) {
+  const client = new JevClient(endpoint, { deadline, maxRequests: config.limits.max_requests, maxBytes: config.limits.max_sent_bytes, ...(fetch ? { fetch } : {}), ...(onRequest ? { onRequest } : {}) });
   return {
     provider: new LimitedProvider(new JevProvider(client, { env }), { concurrency: 8, deadline }),
     sent: () => ({ ...client.sent }),
@@ -500,12 +501,30 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     }
     if (unreadable) stopUnread();
     const deadline = Date.now() + config.limits.max_seconds * 1000;
-    const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, io.env, deps.fetch);
-    // The kept answers are opened here, after the run has found its credentials and not before: a
-    // run without them — another repository's pull request among them — was skipped above and never
-    // reads what was written into its cache (ADR 0013).
+    // The kept answers, and what the pull request has sent so far, are opened here — after the run
+    // has found its credentials and not before: a run without them, another repository's pull
+    // request among them, was skipped above and never reads what was written into its cache.
     const answersDir = args.answers;
     if (answersDir !== undefined && (answersDir.trim() === "" || answersDir.includes("\0"))) throw new ToolError("--answers needs a directory", EXIT.config);
+    // A limit for the pull request as a whole narrows this run's own (ADR 0014): what is left of it, and
+    // no more than `max_requests`. The limit is read from the commit before the change, so the pull
+    // request cannot raise its own.
+    const perPullRequest = config.limits.max_requests_per_pull_request;
+    let budget: PullRequestBudget | null = null;
+    let runConfig = config;
+    if (perPullRequest !== undefined) {
+      const unapplied = (why: string) => `limits.max_requests_per_pull_request (${perPullRequest}) was not applied: ${why}. This run was held by limits.max_requests (${config.limits.max_requests}) alone.`;
+      const opened = answersDir === undefined ? { refused: "" } : await PullRequestBudget.open(answersDir);
+      if ("refused" in opened) notes.push(unapplied(answersDir === undefined ? "what a pull request has sent is counted in the --answers directory, and this run has none" : `the count in --answers could not be used (${opened.refused})`));
+      else {
+        budget = opened;
+        const left = Math.max(0, perPullRequest - opened.before);
+        runConfig = { ...config, limits: { ...config.limits, max_requests: Math.min(config.limits.max_requests, left) } };
+        notes.push(`This pull request had sent ${plural(opened.before, "request")} of its ${perPullRequest} before this run, so this run could send ${runConfig.limits.max_requests}.`);
+      }
+    }
+    // Every request is counted just before it leaves, a retry included, by the transport itself.
+    const judges = deps.judges ? deps.judges(endpoint, runConfig, deadline) : defaultJudges(endpoint, runConfig, deadline, io.env, deps.fetch, budget ? () => budget.record() : undefined);
     const ledger = answersDir === undefined ? null : await RememberedProvider.open(answersDir, judges.provider, { host: endpoint.host, origin: judges.origin });
     const provider: JudgmentProvider = ledger ?? judges.provider;
 
@@ -547,13 +566,34 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         throw new ToolError(`no judgment came back from ${judges.origin}: ${judgmentsPassedDown} judgment(s) were not among the kept answers and none of them was answered`, EXIT.provider);
       }
     }
+    // The pull request's limit left this run short: say so, and where the repository gates on
+    // findings, do not let a run that could not look pass for one that looked (ADR 0014).
+    // Which it was is decided by what happened, not by the kind of the failure: the run's own time
+    // or bytes also end a judgment as a budget, and say nothing about the pull request's limit.
+    let shortByLimit = false;
+    const gated = config.policy.fail_on.includes("finding");
+    const unsent = " policy.fail_on names finding, so the run did not finish (exit 2): what was not asked could have been a finding.";
+    if (budget) {
+      // The pull request's limit bound this run whenever what was left of it was no more than the run's own.
+      const narrowed = perPullRequest !== undefined && perPullRequest - budget.before <= config.limits.max_requests;
+      const ended = ledger?.counts.judgmentsEndedByBudget ?? 0;
+      if (narrowed && ended > 0 && judges.sent().requests >= runConfig.limits.max_requests) {
+        notes.push(`The pull request's limit of ${perPullRequest} requests was reached: ${plural(ended, "judgment")} of this run could not be sent.${gated ? unsent : ""}`);
+        shortByLimit = true;
+      }
+      if (budget.unwritten > 0) {
+        notes.push(`Not sent: ${plural(budget.unwritten, "request")} of this run, because the pull request's count in --answers could not be written.${gated ? unsent : ""}`);
+        shortByLimit = true;
+      }
+    }
     const reused = ledger?.counts.reused ?? 0;
     const reusedFromEarlierRuns = ledger?.counts.reusedFromEarlierRuns ?? 0;
 
     const sent = judges.sent();
     return output(
       report({
-        exitCode: exitCodeFor(run.requirements),
+        // A finding already fails the gate and says more than "did not finish" would.
+        exitCode: shortByLimit && gated && exitCodeFor(run.requirements) === EXIT.ok ? EXIT.incomplete : exitCodeFor(run.requirements),
         intent,
         sources: resolved.sources,
         requirements: run.requirements,

@@ -508,10 +508,13 @@ test("run.sh hands the command the kept answers, private again, and says when th
   chmodSync(answers, 0o755);
   writeFileSync(join(answers, "answers.jsonl"), "{}\n");
   chmodSync(join(answers, "answers.jsonl"), 0o644);
+  writeFileSync(join(answers, "sent.log"), "1\n");
+  chmodSync(join(answers, "sent.log"), 0o644);
   runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: answers });
   assert.deepEqual(JSON.parse(readFileSync(argv, "utf8")), ["--json", "--answers", answers]);
   assert.equal(statSync(answers).mode & 0o777, 0o700);
   assert.equal(statSync(join(answers, "answers.jsonl")).mode & 0o777, 0o600);
+  assert.equal(statSync(join(answers, "sent.log")).mode & 0o777, 0o600, "the pull request's count too, or its limit would never apply after a restore");
 
   // Off: no --answers at all.
   runSh("review", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: "" });
@@ -541,6 +544,11 @@ test("run.sh hands the command the kept answers, private again, and says when th
   writeFileSync(join(fake, "action", "finish.ts"), "\n");
   assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: answers }).outputs, /answers-kept=true\n$/);
   assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: join(scratch(), "none") }).outputs, /answers-kept=false\n$/);
+  // Only what the pull request has sent (ADR 0014): kept too, though no answer was.
+  const spentOnly = join(scratch(), "spent");
+  mkdirSync(spentOnly);
+  writeFileSync(join(spentOnly, "sent.log"), "1\n");
+  assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: spentOnly }).outputs, /answers-kept=true\n$/);
   // A directory that is itself a symlink was not passed on, so there is nothing of this run to save.
   writeFileSync(join(outside, "answers.jsonl"), "{}\n");
   assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: dirLink }).outputs, /answers-kept=false\n$/);

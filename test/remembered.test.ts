@@ -70,7 +70,7 @@ test("an answer is kept and a byte-identical request is not sent again; a questi
     assert.equal(second.calls.length, 1, "a question whose words differ is asked");
     await two.judge({ code: "g()" }, QUESTION);
     assert.equal(second.calls.length, 2, "a different state is asked");
-    assert.deepEqual(two.counts, { reused: 1, reusedFromEarlierRuns: 1, judgmentsPassedDown: 2, judgmentsAnsweredDown: 2 });
+    assert.deepEqual(two.counts, { reused: 1, reusedFromEarlierRuns: 1, judgmentsPassedDown: 2, judgmentsAnsweredDown: 2, judgmentsEndedByBudget: 0 });
   } finally {
     d.remove();
   }

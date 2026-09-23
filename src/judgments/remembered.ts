@@ -41,6 +41,8 @@ export interface LedgerCounts {
    */
   judgmentsPassedDown: number;
   judgmentsAnsweredDown: number;
+  /** Judgments — the form question aside — that the run's budget ended instead (ADR 0014 reads it). */
+  judgmentsEndedByBudget: number;
 }
 
 export class RememberedProvider implements JudgmentProvider {
@@ -54,7 +56,7 @@ export class RememberedProvider implements JudgmentProvider {
   #writes: Promise<void> = Promise.resolve();
   #unwritten = 0;
   #unusable = 0;
-  readonly counts: LedgerCounts = { reused: 0, reusedFromEarlierRuns: 0, judgmentsPassedDown: 0, judgmentsAnsweredDown: 0 };
+  readonly counts: LedgerCounts = { reused: 0, reusedFromEarlierRuns: 0, judgmentsPassedDown: 0, judgmentsAnsweredDown: 0, judgmentsEndedByBudget: 0 };
   readonly #fromEarlierRuns: Set<string>;
 
   private constructor(inner: JudgmentProvider, where: { host: string; origin: string }, file: string | null, kept: Map<string, unknown>, notes: string[]) {
@@ -149,9 +151,15 @@ export class RememberedProvider implements JudgmentProvider {
     if (flying) {
       // The same request is already out: share its answer, and its failure. A shared failure is
       // not counted as reused — nothing was.
-      const answers = await flying;
-      this.counts.reused += 1;
-      return answers;
+      const judgment = !Object.hasOwn(questions, FORM_KEY);
+      try {
+        const answers = await flying;
+        this.counts.reused += 1;
+        return answers;
+      } catch (error) {
+        if (judgment && error instanceof ProviderError && error.kind === "budget") this.counts.judgmentsEndedByBudget += 1;
+        throw error;
+      }
     }
     const judgment = !Object.hasOwn(questions, FORM_KEY);
     const request = this.#inner.judge(state, questions);
@@ -166,7 +174,9 @@ export class RememberedProvider implements JudgmentProvider {
       this.#keep(key, answers);
       return answers;
     } catch (error) {
-      if (judgment && !(error instanceof ProviderError && error.kind === "budget")) this.counts.judgmentsPassedDown += 1;
+      const budget = error instanceof ProviderError && error.kind === "budget";
+      if (judgment && !budget) this.counts.judgmentsPassedDown += 1;
+      if (judgment && budget) this.counts.judgmentsEndedByBudget += 1;
       throw error;
     } finally {
       this.#inFlight.delete(key);
