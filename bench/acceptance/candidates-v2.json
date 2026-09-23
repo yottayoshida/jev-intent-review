@@ -47,7 +47,15 @@
       "ref": "mandubian/autonoetic#901",
       "a": "pass",
       "why": "The tool reported `{\"ok\":true,\"status\":\"delivered\"}` for a message to a closed session: a failed delivery returned as a success.",
-      "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered."
+      "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered.",
+      "revisions": {
+        "base": "45f11d15e12fd41e6aebe3fda89d4f19ad8b160a",
+        "head": "01970eea5a24656ba513c0a7c2a82fcd3b43ecd7"
+      },
+      "s": "pass",
+      "placeS": "bench/acceptance/place-s.ts: 8 seeds (workflow_approval_gate_active, try_acquire_reservation, pending_approval_requests_for_root, release_reservation, enqueue_task, validate_agent_id, save_workflow_run, save_task_run); 13 functions the rule accepts, the first agent_revision.rs:2484 execute (seed validate_agent_id), the other 12 in scheduler/workflow_store.rs (seeds save_workflow_run, save_task_run).",
+      "d": "fail",
+      "dWhy": "The requirement is about delivering a message to a closed session. None of the 13 is governed by it: the first validates an agent id in the agent-revision tool, the other 12 persist workflow and task runs. Each was read and set aside for that reason."
     },
     {
       "order": 3,
@@ -84,7 +92,13 @@
       "ref": "git-ai-project/git-ai#1717",
       "a": "pass",
       "why": "The fix removes in-memory fallbacks: bash history now fails closed when its file-backed fallback cannot initialise, where it used to fall back silently.",
-      "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection."
+      "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection.",
+      "revisions": {
+        "base": "95c101ecccf017f514cac970bfd1099eb6fb398b",
+        "head": "f7662258f630ffa94e78ff14567f953ad9e43e3c"
+      },
+      "s": "fail",
+      "sWhy": "bench/acceptance/place-s.ts: 20 changed functions — the pull request routes every SQLite open through one helper, so it changes the callers too — and one seed (ensure_derived_columns) whose other callers the rule accepts none of."
     }
   ],
   "pool": {
