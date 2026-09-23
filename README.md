@@ -161,6 +161,9 @@ permissions:
   pull-requests: read
   issues: read
   checks: write
+concurrency:
+  group: intent-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   review:
     name: intent review (same-repository pull requests only)
@@ -176,6 +179,9 @@ jobs:
           cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 ```
+
+`concurrency` stops a pull request's earlier run when a later push starts one, so pushing several
+times in a row pays for the last push rather than for every one.
 
 Pin the Action to a commit: there is no tag yet, and `@main` would change under you. The version of
 the command is the Action's own — it runs the source at that commit, not a published package.
