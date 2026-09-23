@@ -3,7 +3,7 @@
   "repo": "https://github.com/dashpay/grovedb",
   "pr": 500,
   "license": "MIT",
-  "role": "unseen",
+  "role": "regression",
   "source": "bench/acceptance/candidates.json order 23; targets fixed in bench/acceptance/targets-fixed.json",
   "build": "bench/acceptance/build-branches.sh <clone> <merge-base> <pr-head> <this dir> <base-patch|-> <head-patch|-> grovedb-500-<version>",
   "prHead": "c0e02819ac99a545e70a858208f2095c5fb461c7",
@@ -106,12 +106,18 @@
           "calls_changed": 13
         },
         "calls": 215,
-        "applicable": 8,
+        "applicable": 12,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 207
+        "notApplicable": 203,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 0,
+          "unknown": 0,
+          "aside": 0
+        }
       },
       "notes": [
         "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
@@ -141,12 +147,18 @@
           "calls_changed": 13
         },
         "calls": 215,
-        "applicable": 8,
+        "applicable": 12,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 207
+        "notApplicable": 203,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 0,
+          "unknown": 0,
+          "aside": 0
+        }
       },
       "notes": [
         "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
@@ -176,12 +188,18 @@
           "calls_changed": 13
         },
         "calls": 215,
-        "applicable": 8,
+        "applicable": 12,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 207
+        "notApplicable": 203,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 0,
+          "unknown": 0,
+          "aside": 0
+        }
       },
       "notes": [
         "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
@@ -211,12 +229,18 @@
           "calls_changed": 13
         },
         "calls": 216,
-        "applicable": 9,
+        "applicable": 13,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 207
+        "notApplicable": 203,
+        "outcomes": {
+          "violates": 0,
+          "satisfies": 0,
+          "unknown": 0,
+          "aside": 0
+        }
       },
       "notes": [
         "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",

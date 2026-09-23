@@ -36,7 +36,8 @@ import type { AcceptanceLog } from "./replay.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const DIST = new URL("../../dist/", import.meta.url);
-const LOG = join(HERE, "..", "logs", "acceptance-v1.json");
+// v1 is the measurement of #36 and is not appended to: a later tool writes a later version.
+const LOG = join(HERE, "..", "logs", "acceptance-v2.json");
 const RUNS = 3;
 const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
@@ -141,16 +142,17 @@ function perRun(c: CaseFile, versionId: string): number {
   return Math.ceil(requirements * 2 * 20 * 1.1);
 }
 
-function unseenCases(): (CaseFile & { precheck?: Record<string, { live?: boolean }> })[] {
+/** The cases a measurement can send for: built, and pre-checked. A regression case is measured again too. */
+function precheckedCases(): (CaseFile & { precheck?: Record<string, { live?: boolean }> })[] {
   return readdirSync(join(HERE, "cases"))
     .filter((id) => existsSync(join(caseDir(id), "case.json")))
     .map(readCase)
-    .filter((c) => c.role === "unseen") as (CaseFile & { precheck?: Record<string, { live?: boolean }> })[];
+    .filter((c) => c.precheck !== undefined) as (CaseFile & { precheck?: Record<string, { live?: boolean }> })[];
 }
 
 function estimate(): number {
   let total = 0;
-  for (const c of unseenCases()) {
+  for (const c of precheckedCases()) {
     for (const versionId of Object.keys(c.versions)) {
       const live = c.precheck?.[versionId]?.live;
       if (live === undefined) throw new Error(`${c.id} ${versionId} has no pre-check; run precheck first`);
@@ -168,6 +170,12 @@ function distil(r: LocalCheck.LocalCheckResult) {
 
 async function measure(id: string, clone: string, limit: number) {
   const d = await dist();
+  // The log names Cloudflare's model; a run sent elsewhere (another JEV_PROVIDER, or JEV_API_URL)
+  // would make that untrue. The environment's values are not repeated.
+  const endpoint = d.client.endpointFromEnv(process.env);
+  if (endpoint?.host !== "cloudflare") {
+    throw new Error(`the log records Cloudflare's model and this environment sends judgments ${endpoint ? `to ${d.client.hostName(endpoint.host)}` : "nowhere"}; set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN and leave JEV_PROVIDER unset or cloudflare, with no JEV_API_URL`);
+  }
   const self = await d.git.Git.open(join(HERE, "..", ".."));
   // The log names the commit its source was built from; changes beside the log itself would make that
   // untrue. The log is left out: measuring a second case, or resuming, writes to it before any commit.
@@ -189,6 +197,9 @@ async function measure(id: string, clone: string, limit: number) {
   for (const cc of Object.values(log.cases)) for (const v of Object.values(cc.versions)) for (const run of v.runs as (RunRecord & { requests?: number })[]) spent += run.requests ?? 0;
 
   const entry = (log.cases[id] ??= { versions: {} });
+  // The role the case had when it was measured: tuning with it later does not make this run tuned.
+  if (entry.role !== undefined && entry.role !== c.role) throw new Error(`${id} was measured in this log as ${entry.role} and its case.json now says ${c.role}`);
+  entry.role = c.role;
   for (const [versionId, version] of Object.entries(c.versions)) {
     const enumeration = await enumerationOf(d, id, clone, version.base, version.head);
     const targetApplicability: Record<string, { ok: boolean; kind?: string }> = {};

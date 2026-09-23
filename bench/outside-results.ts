@@ -118,21 +118,48 @@ async function decide(tool: Awaited<ReturnType<typeof toolAt>>, run: Run): Promi
   return { decisions, ms };
 }
 
+/** How many times `text` occurs in `file` at the run's head. */
+function occurrencesIn(run: Run, file: string, text: string): number {
+  let source: string;
+  try {
+    source = git(run.clone, "show", `${run.after}:${file}`);
+  } catch {
+    return -1;
+  }
+  return source.split(text).length - 1;
+}
+
 /** The calls this part is for, and the defects inside the diff the budget must keep. */
-const WATCHED = [
-  { case: "instruckt-tauri-9", tag: "fixed", file: "src/mcp/server.rs", function: "resolve", call: "serde_json::to_string_pretty(&result)" },
-  { case: "instruckt-tauri-9", tag: "fixed", file: "src/mcp/server.rs", function: "get_all_pending", call: "serde_json::to_string_pretty(&result)" },
-  { case: "pybun-428", tag: "not opened", file: "src/build.rs", function: "collect_inputs_recursive", call: "file_type()" },
-  { case: "cce-rust-168", tag: "fixed", file: "src/sync/commands.rs", function: "cmd_pull", call: "SyncState::load_strict(root)" },
-  { case: "cce-rust-168", tag: "fixed", file: "src/sync/commands.rs", function: "pull_workspace", call: "SyncState::load_strict(&member_dir)" },
-  { case: "cce-rust-168", tag: "fixed", file: "src/sync/knowledge_commands.rs", function: "cmd_knowledge_pull", call: "KnowledgeSyncState::load_strict(root)" },
-  { case: "dataprof-370", tag: "fixed", file: "crates/dataprof-db/src/lib.rs", function: "analyze_database", call: "count_table_rows(query)" },
-  { case: "moltis-1064", tag: "A", file: "crates/gateway/src/session/title.rs", function: "generate_title_for_session", call: "moltis_agents::title::generate_title(provider, &chat_msgs)" },
+// `fixed` marks a call the pull request fixed — what #36's condition (b) counts, one case at a time.
+// `written` is the call as its file writes it, for a call the listing does not reach: it is counted
+// in the file's text, so a call dropped by a cap is told from a call written here in another form.
+const WATCHED: { case: string; tag: string; file: string; function: string; call: string; fixed?: true; written?: string }[] = [
+  { case: "instruckt-tauri-9", tag: "fixed", fixed: true, file: "src/mcp/server.rs", function: "resolve", call: "serde_json::to_string_pretty(&result)" },
+  { case: "instruckt-tauri-9", tag: "fixed", fixed: true, file: "src/mcp/server.rs", function: "get_all_pending", call: "serde_json::to_string_pretty(&result)" },
+  { case: "instruckt-tauri-9", tag: "fixed", fixed: true, file: "src/mcp/server.rs", function: "get_source_location", call: "serde_json::to_string_pretty(&result)" },
+  { case: "instruckt-tauri-9", tag: "fixed", fixed: true, file: "src/mcp/server.rs", function: "get_component_stack", call: "serde_json::to_string_pretty(&result)" },
+  { case: "instruckt-tauri-9", tag: "fixed", fixed: true, file: "src/mcp/server.rs", function: "get_project_structure", call: "serde_json::to_string_pretty(&result)" },
+  { case: "pybun-428", tag: "not opened", fixed: true, file: "src/build.rs", function: "collect_inputs_recursive", call: "file_type()" },
+  { case: "whatsapp-rust-759", tag: "A", fixed: true, file: "wacore/src/appstate_sync.rs", function: "process_parsed_patch_list", call: "download_external_blobs(&mut pl, &download)", written: "download_external_blobs(&mut pl, &download)?" },
+  { case: "quebec-136", tag: "A", fixed: true, file: "src/scheduler.rs", function: "enqueue_job", call: "get_concurrency_constraint(args_ref, None::<&serde_yaml::Value>)", written: ".get_concurrency_constraint(args_ref, None::<&serde_yaml::Value>)" },
+  { case: "cce-rust-168", tag: "fixed", fixed: true, file: "src/sync/commands.rs", function: "cmd_pull", call: "SyncState::load_strict(root)" },
+  { case: "cce-rust-168", tag: "fixed", fixed: true, file: "src/sync/commands.rs", function: "pull_workspace", call: "SyncState::load_strict(&member_dir)" },
+  { case: "cce-rust-168", tag: "fixed", fixed: true, file: "src/sync/knowledge_commands.rs", function: "cmd_knowledge_pull", call: "KnowledgeSyncState::load_strict(root)" },
+  { case: "dataprof-370", tag: "fixed", fixed: true, file: "crates/dataprof-db/src/lib.rs", function: "analyze_database", call: "count_table_rows(query)" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/alias.rs", function: "run", call: "std::fs::read_to_string(&profile)" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "try_atomic_write", call: "flush()" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "try_atomic_write", call: "sync_all()" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "try_atomic_write", call: "std::fs::set_permissions(&tmp, perms.clone())" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "in_place_overwrite", call: "flush()" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "in_place_overwrite", call: "sync_all()" },
+  { case: "agentflare-229", tag: "fixed", fixed: true, file: "src/atomic_fs.rs", function: "in_place_overwrite", call: "std::fs::set_permissions(path, perms.clone())" },
+  { case: "moltis-1064", tag: "A", fixed: true, file: "crates/gateway/src/session/title.rs", function: "generate_title_for_session", call: "moltis_agents::title::generate_title(provider, &chat_msgs)" },
   { case: "moltis-1064", tag: "B", file: "crates/gateway/src/channel_events/commands/dispatch.rs", function: "dispatch_command", call: "session_handlers::handle_title(state, &session_key)" },
-  { case: "kontor-385", tag: "A", file: "core/indexer/src/reactor/consensus_state.rs", function: "get_decided_range", call: "batch_to_decided(b)" },
+  { case: "kontor-385", tag: "A", fixed: true, file: "core/indexer/src/reactor/consensus_state.rs", function: "get_decided_range", call: "batch_to_decided(b)" },
   { case: "kontor-385", tag: "B", file: "core/indexer/src/reactor/batches.rs", function: "initiate_rollback", call: "get_decided_from_anchor(&conn, from_anchor)" },
-  { case: "grovedb-500", tag: "A", file: "merk/src/merk/restore.rs", function: "finalize", call: "rewrite_heights(grove_version)" },
-  { case: "grovedb-501", tag: "fixed", file: "merk/src/merk/restore.rs", function: "process_chunk", call: "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))" },
+  { case: "grovedb-500", tag: "A", fixed: true, file: "merk/src/merk/restore.rs", function: "finalize", call: "rewrite_heights(grove_version)" },
+  { case: "grovedb-500", tag: "B", file: "grovedb/src/replication/state_sync_session.rs", function: "apply_chunk", call: "finalize(grove_version)", written: "prefix_data.restorer.finalize(grove_version)" },
+  { case: "grovedb-501", tag: "fixed", fixed: true, file: "merk/src/merk/restore.rs", function: "process_chunk", call: "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))" },
   { case: "grovedb-501", tag: "B", file: "grovedb/src/replication/state_sync_session.rs", function: "apply_inner_chunk", call: "process_chunk(chunk_id, ops, grove_version)" },
   { case: "omamori-468", tag: "R1", file: "src/integrity.rs", function: "read_baseline", call: "crate::atomic_file::read_to_string_capped(&path, MAX_TRACKED_FILE_BYTES)" },
   { case: "omamori-468", tag: "R2", file: "src/config.rs", function: "raw_override_disables", call: "crate::atomic_file::read_to_string_capped(path, MAX_CONFIG_FILE_BYTES)" },
@@ -181,7 +208,9 @@ for (const run of runs) {
       const at = (ds: readonly Decision[]) => ds.find((d) => d.file === w.file && d.function === w.function && d.call === w.call);
       const b = at(before.decisions);
       const a = at(after.decisions);
-      return { tag: w.tag, call: w.call, before: b ? { kind: b.kind, inBudget: b.inBudget } : null, after: a ? { kind: a.kind, inBudget: a.inBudget } : null };
+      // Absent from both listings: how often the file's text holds it, so a cap is told from a typo.
+      const inText = !a && !b ? occurrencesIn(run, w.file, w.written ?? w.call) : undefined;
+      return { tag: w.tag, fixed: w.fixed === true, file: w.file, function: w.function, call: w.call, before: b ? { kind: b.kind, inBudget: b.inBudget } : null, after: a ? { kind: a.kind, inBudget: a.inBudget } : null, ...(inText === undefined ? {} : { inText }) };
     }),
     // Asked about before and held now: this part should not take questions away.
     askableToHeld: changed.filter((d) => d.before?.kind === "askable").map((d) => ({ ...shape(d), was: d.before?.kind })),
@@ -226,7 +255,34 @@ for (const run of out) {
   }
 }
 const tally = (key: "repo" | "row") => [...opened.values()].reduce<Record<string, number>>((m, d) => ({ ...m, [d[key]]: (m[d[key]] ?? 0) + 1 }), {});
+// #45's first "done when", fixed before measuring: a case counts once any call its pull request fixed
+// is inside the budget — #36's condition (b) counted "the fixed call" one case at a time — and every
+// fixed call is listed with it. The calls tagged `B` are the unchanged callers' calls.
+const inBudget = (at: { inBudget: boolean } | null) => at?.inBudget === true;
+const byCase = new Map<string, { calls: number; before: number; after: number }>();
+const callers: { case: string; call: string; before: unknown; after: unknown }[] = [];
+const seen = new Set<string>();
+for (const run of out) {
+  // omamori `#468` runs once per branch; its watched calls are not fixed calls, and one run is enough.
+  if (seen.has(run.case)) continue;
+  seen.add(run.case);
+  for (const w of run.watched) {
+    if (w.tag === "B") callers.push({ case: run.case, call: w.call, before: w.before, after: w.after });
+    if (!w.fixed) continue;
+    const c = byCase.get(run.case) ?? { calls: 0, before: 0, after: 0 };
+    c.calls += 1;
+    c.before += inBudget(w.before) ? 1 : 0;
+    c.after += inBudget(w.after) ? 1 : 0;
+    byCase.set(run.case, c);
+  }
+}
+const fixedCalls = {
+  casesInBudget: { before: [...byCase.values()].filter((c) => c.before > 0).length, after: [...byCase.values()].filter((c) => c.after > 0).length, of: byCase.size },
+  byCase: Object.fromEntries(byCase),
+  callers,
+};
 const summary = {
+  fixedCalls,
   wall,
   askableCalls: { calls: opened.size, inBudget: [...opened.values()].filter((d) => d.inBudget).length, byRow: tally("row"), byRepo: tally("repo") },
   before: values.before,

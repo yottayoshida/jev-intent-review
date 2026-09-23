@@ -41,13 +41,19 @@ Used so far:
   stopped at condition (c) and was never built or sent to Jev — so this line is the record.
 - **moltis-1064, kontor-385 and grovedb-501** were what the whole-signature reading was built on
   (`#45`, first part; `docs/local-check-cli.md`, *Reading whole signatures*). moltis-1064's
-  `case.json` still says `unseen`: changing it now would stop `replay.ts` from rebuilding the
-  measured table from `acceptance-v1.json`. It is changed with the re-run of this set that closes
-  `#45`, and until then this line is the record.
+  `case.json` says `regression` since the re-run after `#45` (`acceptance-v2.json`).
+- **grovedb-500**, with moltis-1064, was what the order inside a function and the whole-signature
+  reading were judged by: "every defect inside the diff stays inside the budget" named both cases'
+  versions (`docs/local-check-cli.md`, *The order inside a function*, *Reading whole signatures*).
+  Its `case.json` says `regression` since the same re-run.
 - **cce-rust#168 and dataprof#370** — two pull requests outside this set — were what the narrowing
   of a name defined more than once was built on (`#45`, second part; `docs/local-check-cli.md`,
   *Names defined more than once*). They have no case here; this line is the record, and they are
   not free evidence for anything that narrowing decides from now on.
+
+A case's role is also written into the log of each measurement, as it was when that measurement
+was taken, and `replay.ts` reads it from there: `acceptance-v1.json` records none, because both of
+its cases were unseen then, and its table is still the table of two unseen cases.
 
 ## Building a case
 
