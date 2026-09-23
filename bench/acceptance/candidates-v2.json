@@ -22,7 +22,8 @@
     "changedFunctions": "The Rust functions `bench/acceptance/changed-functions.ts` gives for base..head, outside tests.",
     "seeds": "Names called in the changed functions — on lines the change kept, added or removed — of at least 3 characters, with exactly one `fn` of that name outside tests, whose return type (after `->`, not a parameter's type) names `Result`, that is not a changed function, used in at most 20 Rust files outside tests. Ordered: called on a changed line first, then called from more changed functions, then used in fewer files, then by name. The first 8.",
     "sFunction": "For each seed in that order, `git grep -w` its name; among the functions outside tests that are not changed functions, that call no changed function by name, whose return type names `Result`, that make at most 40 calls, and that call the seed as a free function or by a path (`seed(…)`, `module::seed(…)`, `Type::seed(…)` — a method call `x.seed(…)` does not count, and is recorded as such), the first by file path, then by line. If (d) does not hold of it, the next, with the reason recorded.",
-    "target": "In the function S, the first call to the seed. Its expression must occur exactly once in S's function at every version (`occurrences`)."
+    "target": "In the function S, the first call to the seed. Its expression must occur exactly once in S's function at every version (`occurrences`).",
+    "revisions": "base is the merge base of the pull request's base and head (as precheck-shipped.json took #36's), head its head: a pull request's recorded base can predate what its head merged in from the default branch."
   },
   "versions": {
     "shipped": "The pull request's head. S is expected not listed.",
@@ -49,11 +50,12 @@
       "why": "The tool reported `{\"ok\":true,\"status\":\"delivered\"}` for a message to a closed session: a failed delivery returned as a success.",
       "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered.",
       "revisions": {
-        "base": "45f11d15e12fd41e6aebe3fda89d4f19ad8b160a",
-        "head": "01970eea5a24656ba513c0a7c2a82fcd3b43ecd7"
+        "base": "d70b163b6ac30719ae8a67ae73f387870f12042c",
+        "head": "01970eea5a24656ba513c0a7c2a82fcd3b43ecd7",
+        "how": "merge base of 45f11d15e12fd41e6aebe3fda89d4f19ad8b160a and the head"
       },
       "s": "pass",
-      "placeS": "bench/acceptance/place-s.ts: 8 seeds (workflow_approval_gate_active, try_acquire_reservation, pending_approval_requests_for_root, release_reservation, enqueue_task, validate_agent_id, save_workflow_run, save_task_run); 13 functions the rule accepts, the first agent_revision.rs:2484 execute (seed validate_agent_id), the other 12 in scheduler/workflow_store.rs (seeds save_workflow_run, save_task_run).",
+      "placeS": "bench/acceptance/place-s.ts: 2 changed functions (execute, guidance in runtime/tools/agent.rs); 8 seeds (workflow_approval_gate_active, try_acquire_reservation, pending_approval_requests_for_root, release_reservation, enqueue_task, validate_agent_id, save_workflow_run, save_task_run); 13 functions the rule accepts, the first agent_revision.rs:2484 execute (seed validate_agent_id), the other 12 in scheduler/workflow_store.rs (seeds save_workflow_run, save_task_run).",
       "d": "fail",
       "dWhy": "The requirement is about delivering a message to a closed session. None of the 13 is governed by it: the first validates an agent id in the agent-revision tool, the other 12 persist workflow and task runs. Each was read and set aside for that reason."
     },
@@ -95,7 +97,8 @@
       "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection.",
       "revisions": {
         "base": "95c101ecccf017f514cac970bfd1099eb6fb398b",
-        "head": "f7662258f630ffa94e78ff14567f953ad9e43e3c"
+        "head": "f7662258f630ffa94e78ff14567f953ad9e43e3c",
+        "how": "the pull request's base is the merge base"
       },
       "s": "fail",
       "sWhy": "bench/acceptance/place-s.ts: 20 changed functions — the pull request routes every SQLite open through one helper, so it changes the callers too — and one seed (ensure_derived_columns) whose other callers the rule accepts none of."
@@ -123,7 +126,14 @@
       "ref": "vox-foundation/vox#346",
       "a": "pass",
       "why": "The pull request says `parse_registry_file()` now propagates errors instead of silently returning an empty set.",
-      "requirement": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set."
+      "requirement": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set.",
+      "revisions": {
+        "base": "f199c9cfc512db9b043a25e335d27886f1dc5c9d",
+        "head": "f3010ffdc1713deb394e6949833c8c3a7c6f1a4c",
+        "how": "merge base of 12e4712aa96740b22797271b93029eefd1e0d636 and the head"
+      },
+      "s": "fail",
+      "sWhy": "From the merge base, the pull request changes no Rust function outside tests: its description names parse_registry_file (crates/vox-cli/src/commands/ci/config_hygiene.rs), which none of its 11 files is. There is no changed code to take a seed from."
     },
     {
       "order": 13,
