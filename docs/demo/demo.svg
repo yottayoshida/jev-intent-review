@@ -1,0 +1,146 @@
+<svg class="rich-terminal" viewBox="0 0 1238 586.8" xmlns="http://www.w3.org/2000/svg">
+    <!-- Generated with Rich https://www.textualize.io -->
+    <style>
+
+    @font-face {
+        font-family: "Fira Code";
+        src: local("FiraCode-Regular"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
+        font-style: normal;
+        font-weight: 400;
+    }
+    @font-face {
+        font-family: "Fira Code";
+        src: local("FiraCode-Bold"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
+        font-style: bold;
+        font-weight: 700;
+    }
+
+    .terminal-2044600865-matrix {
+        font-family: Fira Code, monospace;
+        font-size: 20px;
+        line-height: 24.4px;
+        font-variant-east-asian: full-width;
+    }
+
+    .terminal-2044600865-title {
+        font-size: 18px;
+        font-weight: bold;
+        font-family: arial;
+    }
+
+    .terminal-2044600865-r1 { fill: #98a84b;font-weight: bold }
+.terminal-2044600865-r2 { fill: #c5c8c6 }
+.terminal-2044600865-r3 { fill: #68a0b3;font-weight: bold }
+.terminal-2044600865-r4 { fill: #868887 }
+.terminal-2044600865-r5 { fill: #d0b344 }
+    </style>
+
+    <defs>
+    <clipPath id="terminal-2044600865-clip-terminal">
+      <rect x="0" y="0" width="1219.0" height="535.8" />
+    </clipPath>
+    <clipPath id="terminal-2044600865-line-0">
+    <rect x="0" y="1.5" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-1">
+    <rect x="0" y="25.9" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-2">
+    <rect x="0" y="50.3" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-3">
+    <rect x="0" y="74.7" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-4">
+    <rect x="0" y="99.1" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-5">
+    <rect x="0" y="123.5" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-6">
+    <rect x="0" y="147.9" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-7">
+    <rect x="0" y="172.3" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-8">
+    <rect x="0" y="196.7" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-9">
+    <rect x="0" y="221.1" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-10">
+    <rect x="0" y="245.5" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-11">
+    <rect x="0" y="269.9" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-12">
+    <rect x="0" y="294.3" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-13">
+    <rect x="0" y="318.7" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-14">
+    <rect x="0" y="343.1" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-15">
+    <rect x="0" y="367.5" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-16">
+    <rect x="0" y="391.9" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-17">
+    <rect x="0" y="416.3" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-18">
+    <rect x="0" y="440.7" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-19">
+    <rect x="0" y="465.1" width="1220" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2044600865-line-20">
+    <rect x="0" y="489.5" width="1220" height="24.65"/>
+            </clipPath>
+    </defs>
+
+    <rect fill="#292929" stroke="rgba(255,255,255,0.35)" stroke-width="1" x="1" y="1" width="1236" height="584.8" rx="8"/><text class="terminal-2044600865-title" fill="#c5c8c6" text-anchor="middle" x="618" y="27">jev-intent-review&#160;--candidates-only</text>
+            <g transform="translate(26,22)">
+            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
+            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
+            <circle cx="44" cy="0" r="7" fill="#28c840"/>
+            </g>
+        
+    <g transform="translate(9, 41)" clip-path="url(#terminal-2044600865-clip-terminal)">
+    
+    <g class="terminal-2044600865-matrix">
+    <text class="terminal-2044600865-r1" x="0" y="20" textLength="24.4" clip-path="url(#terminal-2044600865-line-0)">$&#160;</text><text class="terminal-2044600865-r1" x="24.4" y="20" textLength="976" clip-path="url(#terminal-2044600865-line-0)">jev-intent-review&#160;--candidates-only&#160;--base&#160;52a58fa&#160;--head&#160;e58c04f&#160;--intent-spec&#160;</text><text class="terminal-2044600865-r2" x="1220" y="20" textLength="12.2" clip-path="url(#terminal-2044600865-line-0)">
+</text><text class="terminal-2044600865-r1" x="0" y="44.4" textLength="402.6" clip-path="url(#terminal-2044600865-line-1)">stated-failure-handling.spec.json</text><text class="terminal-2044600865-r2" x="1220" y="44.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-1)">
+</text><text class="terminal-2044600865-r3" x="0" y="68.8" textLength="231.8" clip-path="url(#terminal-2044600865-line-2)">#&#160;jev-intent-review</text><text class="terminal-2044600865-r2" x="1220" y="68.8" textLength="12.2" clip-path="url(#terminal-2044600865-line-2)">
+</text><text class="terminal-2044600865-r2" x="1220" y="93.2" textLength="12.2" clip-path="url(#terminal-2044600865-line-3)">
+</text><text class="terminal-2044600865-r2" x="0" y="117.6" textLength="1171.2" clip-path="url(#terminal-2044600865-line-4)">**Result:&#160;the&#160;set&#160;was&#160;built&#160;and&#160;nothing&#160;was&#160;asked.**&#160;60&#160;calls&#160;inside&#160;the&#160;budget,&#160;1502&#160;calls&#160;not&#160;</text><text class="terminal-2044600865-r2" x="1220" y="117.6" textLength="12.2" clip-path="url(#terminal-2044600865-line-4)">
+</text><text class="terminal-2044600865-r2" x="0" y="142" textLength="585.6" clip-path="url(#terminal-2044600865-line-5)">checked,&#160;for&#160;the&#160;reasons&#160;under&#160;each&#160;requirement.</text><text class="terminal-2044600865-r2" x="1220" y="142" textLength="12.2" clip-path="url(#terminal-2044600865-line-5)">
+</text><text class="terminal-2044600865-r4" x="0" y="166.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-6)">…</text><text class="terminal-2044600865-r2" x="1220" y="166.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-6)">
+</text><text class="terminal-2044600865-r3" x="0" y="190.8" textLength="61" clip-path="url(#terminal-2044600865-line-7)">##&#160;R1</text><text class="terminal-2044600865-r2" x="1220" y="190.8" textLength="12.2" clip-path="url(#terminal-2044600865-line-7)">
+</text><text class="terminal-2044600865-r4" x="0" y="215.2" textLength="12.2" clip-path="url(#terminal-2044600865-line-8)">…</text><text class="terminal-2044600865-r2" x="1220" y="215.2" textLength="12.2" clip-path="url(#terminal-2044600865-line-8)">
+</text><text class="terminal-2044600865-r2" x="0" y="239.6" textLength="805.2" clip-path="url(#terminal-2044600865-line-9)">Functions&#160;reached:&#160;23&#160;the&#160;change&#160;touched,&#160;20&#160;calling&#160;one&#160;of&#160;those.</text><text class="terminal-2044600865-r2" x="1220" y="239.6" textLength="12.2" clip-path="url(#terminal-2044600865-line-9)">
+</text><text class="terminal-2044600865-r2" x="0" y="264" textLength="1146.8" clip-path="url(#terminal-2044600865-line-10)">Calls&#160;in&#160;them:&#160;739,&#160;of&#160;which&#160;56&#160;could&#160;be&#160;asked&#160;about.&#160;Budget&#160;20:&#160;0&#160;read,&#160;0&#160;mapped,&#160;0&#160;of&#160;those&#160;</text><text class="terminal-2044600865-r2" x="1220" y="264" textLength="12.2" clip-path="url(#terminal-2044600865-line-10)">
+</text><text class="terminal-2044600865-r2" x="0" y="288.4" textLength="524.6" clip-path="url(#terminal-2044600865-line-11)">governed,&#160;36&#160;left&#160;over,&#160;683&#160;not&#160;applicable.</text><text class="terminal-2044600865-r2" x="1220" y="288.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-11)">
+</text><text class="terminal-2044600865-r4" x="0" y="312.8" textLength="12.2" clip-path="url(#terminal-2044600865-line-12)">…</text><text class="terminal-2044600865-r2" x="1220" y="312.8" textLength="12.2" clip-path="url(#terminal-2044600865-line-12)">
+</text><text class="terminal-2044600865-r3" x="0" y="337.2" textLength="256.2" clip-path="url(#terminal-2044600865-line-13)">###&#160;Inside&#160;the&#160;budget</text><text class="terminal-2044600865-r2" x="1220" y="337.2" textLength="12.2" clip-path="url(#terminal-2044600865-line-13)">
+</text><text class="terminal-2044600865-r4" x="0" y="361.6" textLength="12.2" clip-path="url(#terminal-2044600865-line-14)">…</text><text class="terminal-2044600865-r2" x="1220" y="361.6" textLength="12.2" clip-path="url(#terminal-2044600865-line-14)">
+</text><text class="terminal-2044600865-r5" x="0" y="386" textLength="1183.4" clip-path="url(#terminal-2044600865-line-15)">-&#160;src/atomic_file.rs&#160;·&#160;open_read_regular&#160;—&#160;`reject_non_regular(&amp;file,&#160;path)`&#160;_(in&#160;a&#160;function&#160;the&#160;</text><text class="terminal-2044600865-r2" x="1220" y="386" textLength="12.2" clip-path="url(#terminal-2044600865-line-15)">
+</text><text class="terminal-2044600865-r5" x="0" y="410.4" textLength="195.2" clip-path="url(#terminal-2044600865-line-16)">change&#160;touched)_</text><text class="terminal-2044600865-r2" x="1220" y="410.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-16)">
+</text><text class="terminal-2044600865-r5" x="0" y="434.8" textLength="1220" clip-path="url(#terminal-2044600865-line-17)">-&#160;src/audit/mod.rs&#160;·&#160;append&#160;—&#160;`open_audit_rw(&amp;self.path)`&#160;_(in&#160;a&#160;function&#160;that&#160;calls&#160;one&#160;the&#160;change&#160;</text><text class="terminal-2044600865-r2" x="1220" y="434.8" textLength="12.2" clip-path="url(#terminal-2044600865-line-17)">
+</text><text class="terminal-2044600865-r5" x="0" y="459.2" textLength="109.8" clip-path="url(#terminal-2044600865-line-18)">touched)_</text><text class="terminal-2044600865-r2" x="1220" y="459.2" textLength="12.2" clip-path="url(#terminal-2044600865-line-18)">
+</text><text class="terminal-2044600865-r5" x="0" y="483.6" textLength="1220" clip-path="url(#terminal-2044600865-line-19)">-&#160;src/cli/config_cmd.rs&#160;·&#160;run_override_enable&#160;—&#160;`resolve_config_path_checked()`&#160;_(in&#160;a&#160;function&#160;that</text><text class="terminal-2044600865-r2" x="1220" y="483.6" textLength="12.2" clip-path="url(#terminal-2044600865-line-19)">
+</text><text class="terminal-2044600865-r5" x="0" y="508" textLength="817.4" clip-path="url(#terminal-2044600865-line-20)">calls&#160;what&#160;the&#160;changed&#160;code&#160;calls,&#160;and&#160;nothing&#160;the&#160;change&#160;touched)_</text><text class="terminal-2044600865-r2" x="1220" y="508" textLength="12.2" clip-path="url(#terminal-2044600865-line-20)">
+</text><text class="terminal-2044600865-r4" x="0" y="532.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-21)">…</text><text class="terminal-2044600865-r2" x="1220" y="532.4" textLength="12.2" clip-path="url(#terminal-2044600865-line-21)">
+</text>
+    </g>
+    </g>
+</svg>

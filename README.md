@@ -10,28 +10,9 @@ It starts from the requirement, not from the changed lines: **the diff is a sear
 A real run on omamori's [PR #476](https://github.com/yottayoshida/omamori/pull/476) (`52a58fa` → `e58c04f`) with the requirements in [`bench/fixtures/omamori-468/stated-failure-handling.spec.json`](bench/fixtures/omamori-468/stated-failure-handling.spec.json).
 `--candidates-only` builds the set of calls and sends nothing to Jev. Lines left out are marked `…`.
 
-```sh
-jev-intent-review --candidates-only --base 52a58fa --head e58c04f \
-  --intent-spec stated-failure-handling.spec.json
-```
+![A real --candidates-only run on omamori PR #476: 23 functions the change touched, 20 callers, and calls in functions that call what the changed code calls](docs/demo/demo.svg)
 
-```text
-# jev-intent-review
-
-**Result: the set was built and nothing was asked.** 60 calls inside the budget, 1502 calls not checked, for the reasons under each requirement.
-…
-## R1
-…
-Functions reached: 23 the change touched, 20 calling one of those.
-Calls in them: 739, of which 56 could be asked about. Budget 20: 0 read, 0 mapped, 0 of those governed, 36 left over, 683 not applicable.
-…
-### Inside the budget
-…
-- src/atomic_file.rs · open_read_regular — `reject_non_regular(&file, path)` _(in a function the change touched)_
-- src/audit/mod.rs · append — `open_audit_rw(&self.path)` _(in a function that calls one the change touched)_
-- src/cli/config_cmd.rs · run_override_enable — `resolve_config_path_checked()` _(in a function that calls what the changed code calls, and nothing the change touched)_
-…
-```
+The image is drawn from that run's output by [`docs/demo/render.py`](docs/demo/render.py), which refuses to draw a line the output does not contain.
 
 Without `--candidates-only`, each of those calls is asked about and the report sorts them into *worth checking*, *holding*, *not settled* and *not required of by the requirement* — see [reading the output](docs/local-check-cli.md#reading-the-output).
 
