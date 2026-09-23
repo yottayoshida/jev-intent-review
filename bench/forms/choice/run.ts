@@ -186,7 +186,7 @@ function score(name: SetName): number {
 const args = process.argv.slice(2);
 const at = args.indexOf("--set");
 const name = (at >= 0 ? args.splice(at, 2)[1] : "1") as SetName;
-if (!(name in SETS)) throw new Error(`--set is one of ${Object.keys(SETS).join(", ")}`);
+if (!Object.hasOwn(SETS, name)) throw new Error(`--set is one of ${Object.keys(SETS).join(", ")}`);
 const [mode, n] = args;
 if (mode === "verify") process.exitCode = verify();
 else if (mode === "measure") process.exitCode = await measure(name, Number(n ?? 3));

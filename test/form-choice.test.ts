@@ -3,13 +3,22 @@
 // written by hand, so that a table cannot be right for a wrong reason.
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { chooseForm, FORM_QUESTION, keywordForm } from "../bench/forms/choice/question.ts";
+import { chooseForm, FORM_QUESTION, keywordForm, QUESTION_HASH } from "../bench/forms/choice/question.ts";
 import { barLines, duplicates, isFragment, normalise, readAtBar, renderTables, requirementSentencesIn, rows, summarise, type Log, type SentenceSet } from "../bench/forms/choice/score.ts";
 import { answer } from "./helpers/fakes.ts";
 
 const ROOT = new URL("../", import.meta.url).pathname;
+/** The log, after checking it was taken on this set and this question, as `run.ts score` does. */
+const committedLog = (log: string, set: string): Log => {
+  const parsed = JSON.parse(readFileSync(`${ROOT}bench/logs/${log}`, "utf8")) as Log;
+  assert.equal(parsed.conditions.sentences, createHash("sha256").update(readFileSync(`${ROOT}bench/forms/choice/${set}`, "utf8")).digest("hex"), `${log} was taken on another ${set}`);
+  assert.equal(parsed.conditions.question, QUESTION_HASH, `${log} was taken with another wording of the question`);
+  return parsed;
+};
 const committedSet = (file = "sentences.json"): SentenceSet => JSON.parse(readFileSync(`${ROOT}bench/forms/choice/${file}`, "utf8")) as SentenceSet;
 
 test("every requirement sentence in the repository's spec, fixture and golden files is in one of the labelled sets", () => {
@@ -21,7 +30,7 @@ test("every requirement sentence in the repository's spec, fixture and golden fi
 });
 
 test("the committed log scores as the documentation says", () => {
-  const log = JSON.parse(readFileSync(`${ROOT}bench/logs/form-choice-v1.json`, "utf8")) as Log;
+  const log = committedLog("form-choice-v1.json", "sentences.json");
   const all = rows(committedSet(), log);
   assert.equal(all.length, 72);
   assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 216);
@@ -35,12 +44,24 @@ test("the committed log scores as the documentation says", () => {
 });
 
 test("the second set's log scores as the documentation says", () => {
-  const log = JSON.parse(readFileSync(`${ROOT}bench/logs/form-choice-v2.json`, "utf8")) as Log;
+  const log = committedLog("form-choice-v2.json", "sentences-v2.json");
   const all = rows(committedSet("sentences-v2.json"), log);
   assert.equal(all.length, 7);
   assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 21);
   const f = summarise(all, "failure_propagation", "all");
   assert.deepEqual([f.sentences, f.rightEveryRun, f.checkInAnyRun], [7, 7, 0]);
+  // The set has no check and no neither sentence: those classes have no bar to meet or miss.
+  const lines = barLines(all);
+  assert.match(lines[0]!, /0 of 7 \(bar: 0\) — met$/);
+  assert.match(lines[1]!, /0 of 0 .* — no sentences$/);
+  assert.match(lines[2]!, /0 of 0 .* — no sentences$/);
+});
+
+test("run.ts takes --set 1 or 2 and nothing else, a name an object has by inheritance included", () => {
+  for (const bad of ["3", "toString"]) {
+    assert.throws(() => execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", bad], { stdio: "pipe" }), (e: { stderr: Buffer }) => /--set is one of 1, 2/.test(String(e.stderr)));
+  }
+  assert.match(execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", "2"], { encoding: "utf8" }), /\| failure_propagation \| all \| 7 \|/);
 });
 
 test("an answer whose choice the question did not offer reads as none, not as a label", () => {

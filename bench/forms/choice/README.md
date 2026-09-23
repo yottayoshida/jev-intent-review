@@ -9,8 +9,12 @@ this measures whether it can (ADR 0008). Nothing here changes what the run sends
   0.6, is that form; `neither`, under the bar or no answer is the default). Also the keyword rule
   scored beside Jev for scale.
 - `sentences.json` — the labelled set. `run.ts verify` checks it against the files it names.
+- `sentences-v2.json` — a second set: the 7 sentences `bench/acceptance/candidates-v2.json` added on
+  2026-09-23. The first log records the first set's sha256 and is not added to, so this set has its
+  own log, `bench/logs/form-choice-v2.json`. `verify` checks the repository against both together.
 - `run.ts verify | measure [runs] | score` — see the file's head. `measure` needs `JEV_PROVIDER` and
-  that host's key; the log is `bench/logs/form-choice-v1.json`.
+  that host's key; the log is `bench/logs/form-choice-v1.json`, or `form-choice-v2.json` with
+  `--set 2`.
 - `score.ts` — the table `docs/local-check-cli.md` quotes, from the log.
 
 ## The set

@@ -278,10 +278,11 @@ export interface SentRecord {
 }
 
 /**
- * Whether a run was cut short by its own limits, so that it does not count as finished even though
- * it exited 0. The siblings are asked last (ADR 0005), so a limit reached late cuts them alone: a
- * request that failed on the budget, or a sibling's call inside its budget that came back without
- * an answer, and the run would score a sibling's defect as missed when it was never asked.
+ * Whether a run did not ask everything it set out to, so that it does not count as finished even
+ * though it exited 0: a request that failed on the run's own budget, or a sibling's call inside its
+ * budget that came back without an answer for any reason (a limit, a timeout, a host that failed).
+ * The siblings are asked last (ADR 0005), so a limit reached late cuts them alone, and the run would
+ * score a sibling's defect as missed when it was never asked.
  */
 export function cutShort(requirements: readonly RequirementRun[], sent: readonly SentRecord[]): boolean {
   if (sent.some((r) => /: budget$/.test(r.error ?? ""))) return true;
