@@ -1,0 +1,229 @@
+{
+ "what": "One run of the local check on omamori #468 / PR #476, branch `correct` (the shipped code), with the tool of #37 (siblings), against real Jev on Cloudflare: to see the siblings pass sent and answered, and count what it listed. Distilled from the --json report: the report itself names local paths.",
+ "command": "jev-intent-review --base <merge-base of 52a58fa and e58c04f> --head e58c04f6df082146969320b91f09aa7a0123ac1f --intent-spec bench/fixtures/omamori-468/stated-failure-handling.spec.json --skip-change-check --json",
+ "seconds": 54,
+ "exitCode": 0,
+ "sent": {
+  "requests": 112,
+  "bytes": 363762,
+  "answered": 112,
+  "endpoint": "https://api.cloudflare.com",
+  "host": "cloudflare"
+ },
+ "requirements": [
+  {
+   "requirementId": "R1",
+   "first": {
+    "budget": 20,
+    "asked": 19,
+    "governed": 2,
+    "outcomes": {
+     "violates": 0,
+     "satisfies": 2,
+     "unknown": 3,
+     "aside": 14
+    }
+   },
+   "siblings": {
+    "budget": 10,
+    "seeds": [
+     "resolve_config_path_checked",
+     "resolve_exe_or_warn",
+     "run_config_list",
+     "validate_rule_name",
+     "decode_hex_secret",
+     "merge_claude_settings",
+     "regenerate_hooks_for_exe",
+     "mutate_config"
+    ],
+    "functions": 3,
+    "calls": 42,
+    "applicable": 11,
+    "asked": 9,
+    "mapped": 9,
+    "governed": 0,
+    "overBudget": 1,
+    "notApplicable": 31,
+    "outcomes": {
+     "violates": 0,
+     "satisfies": 0,
+     "unknown": 0,
+     "aside": 9
+    }
+   },
+   "findings": [],
+   "siblingReadings": [
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "resolve_config_path_checked()",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_list()",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/installer.rs",
+     "function": "regenerate_hooks_with_verifier",
+     "call": "regenerate_hooks_for_exe(base_dir, None, verify)",
+     "via": "regenerate_hooks_for_exe",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "guard_ai_config_modification(\"override enable\")",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_add(args)",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_disable(rule_name)",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "run_config_list()",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    }
+   ]
+  },
+  {
+   "requirementId": "R2",
+   "first": {
+    "budget": 20,
+    "asked": 19,
+    "governed": 4,
+    "outcomes": {
+     "violates": 0,
+     "satisfies": 4,
+     "unknown": 4,
+     "aside": 11
+    }
+   },
+   "siblings": {
+    "budget": 10,
+    "seeds": [
+     "resolve_config_path_checked",
+     "resolve_exe_or_warn",
+     "run_config_list",
+     "validate_rule_name",
+     "decode_hex_secret",
+     "merge_claude_settings",
+     "regenerate_hooks_for_exe",
+     "mutate_config"
+    ],
+    "functions": 3,
+    "calls": 42,
+    "applicable": 11,
+    "asked": 9,
+    "mapped": 9,
+    "governed": 0,
+    "overBudget": 1,
+    "notApplicable": 31,
+    "outcomes": {
+     "violates": 0,
+     "satisfies": 0,
+     "unknown": 0,
+     "aside": 9
+    }
+   },
+   "findings": [],
+   "siblingReadings": [
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "resolve_config_path_checked()",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_list()",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/installer.rs",
+     "function": "regenerate_hooks_with_verifier",
+     "call": "regenerate_hooks_for_exe(base_dir, None, verify)",
+     "via": "regenerate_hooks_for_exe",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "guard_ai_config_modification(\"override enable\")",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_validate(args.get(3).and_then(|item| item.to_str()))",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "validate_rule_name(rule_name, &core_rule_names_owned())",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_add(args)",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_config_command",
+     "call": "run_config_disable(rule_name)",
+     "via": "run_config_list",
+     "outcome": "aside"
+    },
+    {
+     "file": "src/cli/config_cmd.rs",
+     "function": "run_override_enable",
+     "call": "run_config_list()",
+     "via": "resolve_config_path_checked",
+     "outcome": "aside"
+    }
+   ]
+  }
+ ]
+}

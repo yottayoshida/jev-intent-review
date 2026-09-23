@@ -1,0 +1,426 @@
+{
+ "summary": {
+  "before": "43d10d3",
+  "beforeCommit": "43d10d31a814409a871a024a987f707d6e2961bb",
+  "branches": 15,
+  "firstBudgetSameEverywhere": true,
+  "branchesWithSiblingRows": 9
+ },
+ "runs": [
+  {
+   "branch": "omamori-468/correct",
+   "revisions": {
+    "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+    "head": "e58c04f6df082146969320b91f09aa7a0123ac1f"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    },
+    {
+     "requirement": "R2",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "omamori-468/m-read-baseline",
+   "revisions": {
+    "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+    "head": "46cd434299a05ff8c6d2664f720f0606d7e11579"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    },
+    {
+     "requirement": "R2",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "omamori-468/v-read-baseline",
+   "revisions": {
+    "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+    "head": "a3dae0a134cc70952fe467bad860a714e4c45792"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    },
+    {
+     "requirement": "R2",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "omamori-468/m-raw-override",
+   "revisions": {
+    "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+    "head": "e8f2fdc8385e539aaffd6602ef869cfcbccd2bea"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    },
+    {
+     "requirement": "R2",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "omamori-468/v-raw-override",
+   "revisions": {
+    "base": "52a58fa58b2fc51efd76bdf7444359593d0f5c43",
+    "head": "6c96366a0ec6e0e5ef3092866d0a2d2da871e332"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    },
+    {
+     "requirement": "R2",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 10,
+     "siblingFunctions": 3,
+     "seeds": [
+      "resolve_config_path_checked",
+      "resolve_exe_or_warn",
+      "run_config_list",
+      "validate_rule_name",
+      "decode_hex_secret",
+      "merge_claude_settings",
+      "regenerate_hooks_for_exe",
+      "mutate_config"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/shipped",
+   "revisions": {
+    "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+    "head": "4106d46dad04481a932597141739e42a5452cc86"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/defect-A",
+   "revisions": {
+    "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+    "head": "fa45a528825734c277a84107af93b4ea9ff105d0"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/rewrite-A",
+   "revisions": {
+    "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+    "head": "e14b5b7d1268fc583d428735086583335943e684"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/hidden-A",
+   "revisions": {
+    "base": "d2697974d470b2adde91472e85ed5c14e78174b4",
+    "head": "e5f20ac177a50c402b266ba5516d9559b8938686"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "settle_step",
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/defect-B",
+   "revisions": {
+    "base": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+    "head": "4697c3977399b015efd2ac38fd9aec6797783117"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "moltis-1064/defect-C",
+   "revisions": {
+    "base": "d07c04faef9832e01f17967fc9903c4a0a9915e2",
+    "head": "3e35d5175e2f0fe27db7259f2741a97f0d424527"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 20,
+     "siblingRows": 0,
+     "siblingFunctions": 0,
+     "seeds": [
+      "generate_title"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "grovedb-500/shipped",
+   "revisions": {
+    "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+    "head": "c0e02819ac99a545e70a858208f2095c5fb461c7"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 12,
+     "siblingRows": 4,
+     "siblingFunctions": 2,
+     "seeds": [
+      "rewrite_heights",
+      "load_base_root",
+      "verify_height"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "grovedb-500/defect-A",
+   "revisions": {
+    "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+    "head": "26efc3e5a004ad96250d823e95e7ca893e13d62f"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 12,
+     "siblingRows": 4,
+     "siblingFunctions": 2,
+     "seeds": [
+      "load_base_root",
+      "rewrite_heights",
+      "verify_height"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "grovedb-500/rewrite-A",
+   "revisions": {
+    "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+    "head": "87e06509bc8da68b9c815ad5799f507d81183c69"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 12,
+     "siblingRows": 4,
+     "siblingFunctions": 2,
+     "seeds": [
+      "rewrite_heights",
+      "load_base_root",
+      "verify_height"
+     ]
+    }
+   ]
+  },
+  {
+   "branch": "grovedb-500/hidden-A",
+   "revisions": {
+    "base": "ad3f80263ed21321bee9f450a854d0ee92356b8a",
+    "head": "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd"
+   },
+   "rows": [
+    {
+     "requirement": "R1",
+     "firstBudgetSame": true,
+     "firstBudget": 13,
+     "siblingRows": 4,
+     "siblingFunctions": 2,
+     "seeds": [
+      "rewrite_heights",
+      "step_outcome",
+      "load_base_root",
+      "verify_height"
+     ]
+    }
+   ]
+  }
+ ]
+}

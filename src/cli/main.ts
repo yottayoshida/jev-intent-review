@@ -45,7 +45,9 @@ Change:
                         pull_request workflow, the pull request's head commit)
 
 What a run does: for each requirement, take the Rust functions the change touched and their
-callers one hop out, and ask Jev two things about each call, as the requirement's "form" says.
+callers one hop out, and — last, under a budget of their own — the other callers of the
+repository functions the changed code calls, and ask Jev two things about each call, as the
+requirement's "form" says.
 The default, failure_propagation: whether the requirement requires that a failure of the call
 not reach the caller as a success, and what the function returns when it does. The other,
 check_before_action: whether the requirement requires a check to pass before the call, and
@@ -474,6 +476,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       // `askForm` is passed so the report can say the form was not asked here; the run asks nothing
       // when it builds the set only.
       const run = await runLocalCheck(git, revisions, intent.requirements, { model: "none", judge: asksNothing } as unknown as JudgmentProvider, include, { ...localOptions, candidatesOnly: true, askForm: !resolved.spec });
+      await run.askSiblings();
       footing(run.change.changedPaths);
       return output(report({ exitCode: EXIT.ok, intent, sources: resolved.sources, requirements: run.requirements, notes, prAuthor }));
     }
@@ -529,12 +532,16 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     else changes = await reviewChanges({ change: run.change, requirements: justifying, provider, maxChars: config.evidence.max_primary_chars, threshold: config.judgment.violation_probability, trace });
     notes.push(...changes.notes);
     trace(`changes no requirement asked for: ${changes.unexpected.length}`);
+    // Last, the siblings of the change (ADR 0005): on the run's limits after everything above, so
+    // they never take a request or a second from what the run asked before siblings were read.
+    const siblings = await run.askSiblings();
+    for (const r of run.requirements) if (r.counts.siblings) trace(`${r.requirementId} siblings -> ${r.counts.siblings.asked} read of ${r.counts.siblings.functions} function(s)`);
     // Reached the host and could not read one answer from it, over both passes: the host is wrong
     // or not answering, and a report of nothing settled would pass for a run that judged. The local
     // check stops on its own when it asked; this covers a run whose only questions were the changes'.
     // An answer to a form question is not a judgment and does not count here (ADR 0008).
-    if (run.reached + changes.reached > 0 && run.answered + changes.answered === 0) {
-      throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached} request(s) were sent and none was answered`, EXIT.provider);
+    if (run.reached + changes.reached + siblings.reached > 0 && run.answered + changes.answered + siblings.answered === 0) {
+      throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached + siblings.reached} request(s) were sent and none was answered`, EXIT.provider);
     }
     // With kept answers, the callers' counts include what the ledger answered, so a run whose new
     // requests all failed can still read as answered. What decides it is what went to the host:
@@ -559,7 +566,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         requirements: run.requirements,
         unexpectedChanges: changes.unexpected,
         // `answered` stays the requests Jev answered: what the ledger answered is `reused`, not both.
-        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
+        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + siblings.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
         notes,
         prAuthor,
       }),

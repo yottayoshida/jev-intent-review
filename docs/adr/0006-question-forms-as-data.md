@@ -113,8 +113,11 @@ helper whose body is not sent, Jev still answered with confidence (0.92–0.96).
 - A check placed in another function is not in what is sent, so the local reading at `f` can
   disagree with the requirement read over the whole path. This is the same limit as the failure
   form's, and the reason no requirement-level verdict is stated.
-- Sibling widening (#37) takes its seeds, and filters its siblings, by the form's condition rather
+- ~~Sibling widening (#37) takes its seeds, and filters its siblings, by the form's condition rather
   than by a fixed "returns a `Result`". Its cap on seeds is applied per requirement, after that
-  filter, so seeds that one requirement cannot ask about do not take another's places.
+  filter, so seeds that one requirement cannot ask about do not take another's places.~~
+  Superseded by ADR 0005 (2026-09-23, owner's ruling): seeds and siblings are chosen once for the
+  run by returning a `Result`, whatever the form; which of a sibling's calls can be asked about is
+  still the form's, per requirement. How the other form should choose its places is #39's.
 - The failure form's condition is whatever decides "returns a `Result`" (today `applicabilityOf`;
   #45 replaces how that is decided). The form only calls it.
