@@ -158,6 +158,55 @@
       "ref": "snowflakedb/drivers#911",
       "a": "fail",
       "why": "State-machine correctness and input validation for an ODBC call; no failure was being returned as a success."
+    },
+    {
+      "order": 17,
+      "ref": "zeroclaw-labs/zeroclaw#6512",
+      "a": "fail",
+      "why": "Four email-channel defects (a default subject, Markdown as plain text, zero-byte attachments because a file was never read, lost threading); none is a failed call returned as a success."
+    },
+    {
+      "order": 18,
+      "ref": "AgentWorkforce/burn#426",
+      "a": "fail",
+      "why": "A new SDK function."
+    },
+    {
+      "order": 19,
+      "ref": "kennguy3n/knowledge#32",
+      "a": "fail",
+      "why": "A six-workstream implementation (encryption, CI, routing, FFI, docs); no one failure returned as a success."
+    },
+    {
+      "order": 20,
+      "ref": "shubhattin/lipilekhika#127",
+      "a": "pass",
+      "why": "The pull request introduces an error enum so that errors are surfaced across the bindings instead of being silently ignored or returned as null.",
+      "requirement": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null."
+    },
+    {
+      "order": 21,
+      "ref": "BoundaryML/baml#3464",
+      "a": "fail",
+      "why": "A revert of a feature."
+    },
+    {
+      "order": 22,
+      "ref": "Jonathangadeaharder/pytest-linter#17",
+      "a": "fail",
+      "why": "New lint rules."
+    },
+    {
+      "order": 23,
+      "ref": "nilesh32236/vector-mcp-rust#29",
+      "a": "fail",
+      "why": "A new frontend and search features."
+    },
+    {
+      "order": 24,
+      "ref": "dobesv/harnx#353",
+      "a": "fail",
+      "why": "A new crate (git-backed history and rollback)."
     }
   ],
   "pool": {
@@ -175,7 +224,9 @@
       "DawnLandTeam/dawnland-launcher#17": "title: a version bump",
       "jrollin/cartog#80": "title: refactor",
       "oven-sh/bun#31496": "license NOASSERTION",
-      "guacsec/trustify#2366": "title: documentation"
+      "guacsec/trustify#2366": "title: documentation",
+      "aptos-labs/aptos-core#19649": "license NOASSERTION",
+      "aptos-labs/aptos-core#19592": "license NOASSERTION"
     }
   }
 }
