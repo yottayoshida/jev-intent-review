@@ -132,8 +132,9 @@ change, the issue template is the stronger of the two.
 ## Pull requests opened before a template
 
 A template only shapes what is written after it is added. A pull request opened before, with no
-requirement in either form and no issue it closes, is skipped as having none (`policy.no_intent`);
-the check run's title and the job summary say so. To have it read, add an *Acceptance criteria*
+requirement in either form and no issue it closes that has one, stops with exit 11 — its check run
+is red and titled *Requirements could not be read* — whether its description is prose or empty: the
+description is read, so there is something that did not read as requirements. To have it read, add an *Acceptance criteria*
 section or a `Property:` paragraph to its description — or `Closes #N` for an issue that has one — and
 then push, or re-run its job: the tool reads the description from GitHub when the job runs, not from
 the event that started it. Editing the description alone starts no run, because `pull_request`

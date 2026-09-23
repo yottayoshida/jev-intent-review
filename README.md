@@ -256,7 +256,7 @@ warning.
 | from another repository — a fork | The job is skipped. Nothing runs, so no runner time is spent and no request is sent. | The job's name, in the checks list. A skipped job has no summary, no check run and no log to open. |
 | from a fork that has since been deleted | The same: GitHub answers `head.repo` with nothing, which is not this repository's name. | The same. |
 | opened by Dependabot | The job runs — the branch is this repository's — and is given no secrets, so nothing is judged. | The job summary, and one warning annotation. Dependabot's token cannot write checks, so there is no check run. |
-| with no requirement in either form, or none anywhere | The job runs and judges nothing. Add a section to its description and push or re-run the job ([how](docs/writing-requirements.md#pull-requests-opened-before-a-template)). | The check run's title, and the job summary. |
+| with no requirement in either form — its description empty or in prose, and no issue it closes that has one | The job runs, judges nothing and fails: exit 11, *Requirements could not be read*. Add a section to its description and push or re-run the job ([how](docs/writing-requirements.md#pull-requests-opened-before-a-template)). | The check run's title, and the job summary. |
 | from a first-time contributor | If the repository asks for approval of their workflow runs, GitHub waits for a maintainer. Approving changes nothing here: the pull request is still from a fork, so the job is skipped. | The job's name, as above. |
 
 Where each of those sentences can be read is above because it differs: only a run that happens, with
@@ -284,10 +284,11 @@ are the thing [#42](https://github.com/yottayoshida/jev-intent-review/issues/42)
 
 **What it does not do yet.** It runs on `pull_request` only; `pull_request_target` is refused at the
 Action's entry.
-A pull request with no requirement in either form is skipped
-(`policy.no_intent`), and one whose requirements cannot be read stops with exit 11, which makes the
-job red — as does the Action's own stop (exit 10) on an event other than `pull_request` or a runner
-whose Node is older than 22.18. That stop is the backstop for a workflow that reaches the Action
+A pull request with no requirement in either form stops with exit 11 (*Requirements could not be
+read*), which makes the job red: its description is read, so there is something that did not read
+as requirements. `policy.no_intent` applies only when there is nothing to read at all — a pull
+request that closes no issue, under `intent.include_pr_description: false`. The Action's own stop
+(exit 10) also makes the job red, on an event other than `pull_request` or a runner whose Node is older than 22.18. That stop is the backstop for a workflow that reaches the Action
 another way: under the workflow above, a job of any other event has no pull request to read a head
 repository from, so the condition skips it before the Action starts. A change the change question could not judge — the budget, the host — is said in the
 report's notes and does not make the check run neutral. Requirements the pull request's author wrote
