@@ -108,6 +108,7 @@ export function intentSection(intent: IntentSpec, sources: readonly Omit<IntentS
 const ORIGIN_WORDS: Record<Observed["origin"], string> = {
   changed: "in a function the change touched",
   calls_changed: "in a function that calls one the change touched",
+  shares_call: "in a function that calls what the changed code calls, and nothing the change touched",
 };
 
 /** The two sentences every report opens the requirements with. */
@@ -157,12 +158,21 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
   lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
   lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
   if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
+  // The siblings are counted apart, so the lines above mean what they meant before siblings were
+  // read (ADR 0005). Said only when there was something to look for them from.
+  const s = c.siblings;
+  if (s && s.seeds.length > 0) {
+    lines.push(`Siblings of the change: ${s.functions} function${s.functions === 1 ? "" : "s"} calling what the changed code calls (${s.seeds.map((n) => codeSpan(n)).join(", ")}) and nothing it touched.`);
+    lines.push(`Calls in them: ${s.calls}, of which ${s.applicable} could be asked about. Their own budget ${s.budget}: ${s.asked} read, ${s.mapped} mapped, ${s.governed} of those governed, ${s.overBudget} left over, ${s.notApplicable} not applicable.`);
+    if (s.asked > 0) lines.push(`Of the ${s.asked} read in siblings: ${s.outcomes.violates} worth checking, ${s.outcomes.satisfies} holding, ${s.outcomes.unknown} not settled, ${s.outcomes.aside} not required of.`);
+  }
   lines.push("");
 
   if (r.findings.length > 0) {
     lines.push("### Worth checking", "");
     for (const f of r.findings) {
       lines.push(`#### ${f.file}:${f.lines} · ${f.function} — \`${f.call}\``);
+      if (f.origin === "shares_call") lines.push(`- **Reached as**: a sibling of the change — it calls ${codeSpan(f.via ?? "")}, which the changed code calls, and nothing the change touched`);
       lines.push(`- **Requirement ${f.requirementId}**: ${codeSpan(f.quote)}`);
       lines.push(`- **Assumed**: ${f.condition}`);
       lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
@@ -214,7 +224,9 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
 
 /**
  * The counts the result line is drawn from. Nothing else is: no verdict is stated. `worthChecking`
- * is the list the report prints under that heading, so the two cannot disagree.
+ * is the list the report prints under that heading, so the two cannot disagree. Every one of them
+ * takes in the siblings of the change (ADR 0005): the lists hold their calls, and so does `read`,
+ * or a finding in a sibling would be "worth checking of 0 read".
  */
 export function counts(report: ReviewReport): { read: number; worthChecking: number; inBudget: number; notChecked: number } {
   let read = 0;
@@ -222,7 +234,7 @@ export function counts(report: ReviewReport): { read: number; worthChecking: num
   let inBudget = 0;
   let notChecked = 0;
   for (const r of report.requirements) {
-    read += r.counts.asked;
+    read += r.counts.asked + (r.counts.siblings?.asked ?? 0);
     worthChecking += r.findings.length;
     inBudget += r.wouldAsk.length;
     notChecked += r.unchecked.length;

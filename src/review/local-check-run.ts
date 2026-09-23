@@ -36,7 +36,7 @@
 // A finding is two readings that disagree, printed with everything needed to disagree with them.
 
 import { analyzeChange, type ChangeAnalysis } from "../change/seeds.ts";
-import { Discoverer } from "../discovery/discover.ts";
+import { Discoverer, isTestPath } from "../discovery/discover.ts";
 import { buildEvidence } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
 import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
@@ -49,7 +49,8 @@ import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
-import { selectSites, type Askability, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
+import { selectSiblings, selectSites, type Askability, type FunctionOrigin, type Site, type SiteSource } from "../plan/select.ts";
+import { siblingsOf, type SiblingSet } from "../plan/siblings.ts";
 import { OUTCOMES, outcomeOf, type Outcome } from "./outcome.ts";
 import { probabilityOf } from "./requirement.ts";
 
@@ -72,15 +73,24 @@ export interface LocalCheckOptions {
    * one that builds the set only; the result says which.
    */
   askForm?: boolean;
+  /**
+   * How many calls a requirement may be judged at in the siblings of the change — functions that
+   * call what the changed code calls and nothing it touched (ADR 0005). A budget of its own, asked
+   * after everything else the run asks, so what is asked above is the same whether or not a
+   * sibling exists. Unset is the default.
+   */
+  siblingBudget?: number;
 }
 
-export const DEFAULT_LOCAL_CHECK: LocalCheckOptions = { budget: 20, maxPrimaryChars: 8000, maxRelatedChars: 0 };
+export const DEFAULT_LOCAL_CHECK = { budget: 20, siblingBudget: 10, maxPrimaryChars: 8000, maxRelatedChars: 0 } satisfies LocalCheckOptions;
 
 export interface Observed {
   file: string;
   function: string;
   call: string;
   origin: Site["origin"];
+  /** For a sibling: the name the changed code calls that tied it. */
+  via?: string;
   /** The same call's entry in `mappings`. */
   callId: string;
   result: LocalResult;
@@ -93,6 +103,8 @@ export interface Unchecked {
   function: string;
   call: string;
   origin: Site["origin"];
+  /** For a sibling: the name the changed code calls that tied it. */
+  via?: string;
   why: string;
 }
 
@@ -107,6 +119,9 @@ export interface Unchecked {
  */
 export interface Finding {
   requirementId: string;
+  /** Present only for a sibling's call (ADR 0005): how the run reached it, and what tied it. */
+  origin?: "shares_call";
+  via?: string;
   file: string;
   /** Where in the file, so a reader can open it rather than search for it. */
   lines: string;
@@ -172,7 +187,7 @@ export interface LocalCheckResult {
    * them out was a report that listed everything *except* the calls it had chosen, which reads
    * exactly like not having reached them.
    */
-  wouldAsk: { file: string; function: string; call: string; origin: Site["origin"] }[];
+  wouldAsk: { file: string; function: string; call: string; origin: Site["origin"]; via?: string }[];
   observed: Observed[];
   unchecked: Unchecked[];
   /** Every mapping asked for, accepted or not. The report's two mapping sections are read off this. */
@@ -193,8 +208,29 @@ export interface LocalCheckResult {
     notApplicable: number;
     /** The calls asked about, by outcome. They add up to `asked`. */
     outcomes: Record<Outcome, number>;
+    /**
+     * The siblings of the change, counted apart against their own budget (ADR 0005), so every
+     * number above means what it meant before siblings were read. Absent when no sibling was read.
+     */
+    siblings?: SiblingCounts;
   };
   notes: string[];
+}
+
+/** What the siblings' budget found, could ask, asked and left, in the same terms as the counts above. */
+export interface SiblingCounts {
+  budget: number;
+  /** The names the changed code calls that siblings were looked for from. */
+  seeds: string[];
+  functions: number;
+  calls: number;
+  applicable: number;
+  asked: number;
+  mapped: number;
+  governed: number;
+  overBudget: number;
+  notApplicable: number;
+  outcomes: Record<Outcome, number>;
 }
 
 /**
@@ -224,6 +260,13 @@ export interface LocalCheckRun {
    * about a call, so it does not stand in for one when the host answered nothing about the calls.
    */
   form: { reached: number; answered: number };
+  /**
+   * Read the siblings of the change and ask about them, under their own budget, into the results
+   * above (ADR 0005). Called last — after the changes' pass too — so the siblings never take
+   * requests or time from anything the run asked before siblings existed. What it sent and what
+   * was answered is returned, to be added to `reached` and `answered`.
+   */
+  askSiblings(): Promise<{ reached: number; answered: number }>;
 }
 
 export async function runLocalCheck(
@@ -313,7 +356,101 @@ export async function runLocalCheck(
     return enumerated.find((fn) => fn.name === callee && fn.path === def.path && def.line >= fn.startLine && def.line <= fn.endLine) ?? null;
   };
 
+  // One call's two questions, in two requests, into one requirement's records. The same for the
+  // calls the change reached and for its siblings, so a sibling is asked exactly as they are.
+  const askSite = async (requirement: Requirement, form: Form, quote: string, site: Site, into: Collected): Promise<{ asked: number; mapped: number }> => {
+    const tally = { asked: 0, mapped: 0 };
+    const candidate: Candidate = {
+      path: site.fn.path,
+      startLine: site.fn.startLine,
+      endLine: site.fn.endLine,
+      symbol: site.fn.name,
+      changed: site.fnOrigin === "changed",
+      reasons: [`a call in ${site.fn.name}, which the run reached by ${site.origin}`],
+    };
+    const evidence = await buildEvidence(discoverer, requirement, candidate, { maxPrimaryChars: options.maxPrimaryChars, maxRelatedChars: options.maxRelatedChars });
+    // The body itself cut is not the same as its surroundings cut: an answer about a body that
+    // arrived in two halves is an answer about neither of them.
+    if (evidence.cut.own) {
+      into.unchecked.push({ ...placeOf(site), why: `the body of ${site.fn.name} did not fit the evidence limit, so an answer would be about part of it` });
+      return tally;
+    }
+    const body = evidence.packet.evidence.code;
+    const located = locateCall(body, site.call);
+    if (!located.ok) {
+      into.unchecked.push({ ...placeOf(site), why: located.reason ?? "the call could not be located in the body read here" });
+      return tally;
+    }
+    const place = placeOf(site);
+
+    // Two questions, two requests. The mapping is about the requirement's words and must not be
+    // asked under the assumption the observation makes — nor in the same breath as it.
+    const asking = await ask(evidence.packet, form.mappingQuestion(site.fn, site.call));
+    const mappingAnswers = asking.answers;
+    const unanswered = asking.failure ? `the mapping question was not answered (${asking.failure})` : "the mapping question was not answered";
+    tally.mapped += 1;
+    const mapping = acceptMapping(mappingAnswers.requirement_governs);
+    into.mappings.push({
+      requirementId: requirement.id,
+      callId: site.call.id,
+      file: place.file,
+      function: place.function,
+      call: place.call,
+      verdict: mapping.verdict,
+      probability: mapping.probability,
+      probabilities: mapping.probabilities,
+      governs: mapping.governs,
+      why:
+        mapping.verdict === "no_answer"
+          ? unanswered
+          : mapping.governs
+            ? `the requirement is read as requiring this of the call (${mapping.probability.toFixed(2)})`
+            : `read as \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}), which is below the bar of ${MAPPING_BAR} or not a requirement of this call`,
+    });
+
+    // The observation's failure is handled as the mapping's is: until it was, a failure the mapping
+    // survived — a malformed answer, a spent budget — ended the whole run here instead.
+    const reading = await ask(evidence.packet, form.observationQuestions(site.fn, site.call));
+    const answer = reading.answers[form.observationKey];
+    const p = answer ? probabilityOf(answer, answer.choice) : 0;
+    tally.asked += 1;
+    const described = describe(answer, p, form.words.reading);
+    const result = reading.failure ? { ...described, why: `the observation question was not answered (${reading.failure})` } : described;
+
+    // The one rule, for every form. Its readings are the answers as the report records them: the
+    // mapping's verdict and number, and the observation after the bar has been applied to it.
+    const outcome = outcomeOf(
+      mapping.verdict === "no_answer" ? undefined : { choice: mapping.verdict, probability: mapping.probability },
+      result.observation === "withheld" ? undefined : { choice: result.observation, probability: result.probability },
+      form,
+      { mapping: MAPPING_BAR, observation: BAR },
+    );
+    into.observed.push({ ...place, callId: site.call.id, result, outcome });
+
+    if (outcome === "violates") {
+      into.findings.push({
+        requirementId: requirement.id,
+        // Said only of a sibling, so the record of every other run is what it was.
+        ...(site.origin === "shares_call" ? { origin: site.origin, via: site.via } : {}),
+        file: place.file,
+        lines: `${site.fn.startLine}-${site.fn.endLine}`,
+        function: place.function,
+        call: place.call,
+        quote,
+        condition: form.words.assumed(site.fn, site.call),
+        property: form.property,
+        mapping,
+        observation: result.observation,
+        probability: result.probability,
+        why: form.words.whyListed(site.fn.name, mapping, result.observation, result.probability),
+      });
+    }
+    return tally;
+  };
+
   const out: LocalCheckResult[] = [];
+  // What each requirement's pass keeps for the siblings' pass: its form and the record to add to.
+  const passes: { requirement: Requirement; form: Form; quote: string; result: LocalCheckResult }[] = [];
   for (const requirement of requirements) {
     // The form: the spec's word when it named one; otherwise, on a run that asks, Jev's reading of
     // the sentence (ADR 0008) — one question over the sentence alone, before the calls, and only
@@ -353,90 +490,11 @@ export async function runLocalCheck(
 
     let asked = 0;
     let mapped = 0;
+    const into: Collected = { observed, unchecked, mappings, findings };
     for (const site of options.candidatesOnly ? [] : selection.budgeted) {
-      const candidate: Candidate = {
-        path: site.fn.path,
-        startLine: site.fn.startLine,
-        endLine: site.fn.endLine,
-        symbol: site.fn.name,
-        changed: site.fnOrigin === "changed",
-        reasons: [`a call in ${site.fn.name}, which the run reached by ${site.origin}`],
-      };
-      const evidence = await buildEvidence(discoverer, requirement, candidate, { maxPrimaryChars: options.maxPrimaryChars, maxRelatedChars: options.maxRelatedChars });
-      // The body itself cut is not the same as its surroundings cut: an answer about a body that
-      // arrived in two halves is an answer about neither of them.
-      if (evidence.cut.own) {
-        unchecked.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, why: `the body of ${site.fn.name} did not fit the evidence limit, so an answer would be about part of it` });
-        continue;
-      }
-      const body = evidence.packet.evidence.code;
-      const located = locateCall(body, site.call);
-      if (!located.ok) {
-        unchecked.push({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, why: located.reason ?? "the call could not be located in the body read here" });
-        continue;
-      }
-      const place = { file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin };
-
-      // Two questions, two requests. The mapping is about the requirement's words and must not be
-      // asked under the assumption the observation makes — nor in the same breath as it.
-      const asking = await ask(evidence.packet, form.mappingQuestion(site.fn, site.call));
-      const mappingAnswers = asking.answers;
-      const unanswered = asking.failure ? `the mapping question was not answered (${asking.failure})` : "the mapping question was not answered";
-      mapped += 1;
-      const mapping = acceptMapping(mappingAnswers.requirement_governs);
-      mappings.push({
-        requirementId: requirement.id,
-        callId: site.call.id,
-        file: place.file,
-        function: place.function,
-        call: place.call,
-        verdict: mapping.verdict,
-        probability: mapping.probability,
-        probabilities: mapping.probabilities,
-        governs: mapping.governs,
-        why:
-          mapping.verdict === "no_answer"
-            ? unanswered
-            : mapping.governs
-              ? `the requirement is read as requiring this of the call (${mapping.probability.toFixed(2)})`
-              : `read as \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}), which is below the bar of ${MAPPING_BAR} or not a requirement of this call`,
-      });
-
-      // The observation's failure is handled as the mapping's is: until it was, a failure the mapping
-      // survived — a malformed answer, a spent budget — ended the whole run here instead.
-      const reading = await ask(evidence.packet, form.observationQuestions(site.fn, site.call));
-      const answer = reading.answers[form.observationKey];
-      const p = answer ? probabilityOf(answer, answer.choice) : 0;
-      asked += 1;
-      const described = describe(answer, p, form.words.reading);
-      const result = reading.failure ? { ...described, why: `the observation question was not answered (${reading.failure})` } : described;
-
-      // The one rule, for every form. Its readings are the answers as the report records them: the
-      // mapping's verdict and number, and the observation after the bar has been applied to it.
-      const outcome = outcomeOf(
-        mapping.verdict === "no_answer" ? undefined : { choice: mapping.verdict, probability: mapping.probability },
-        result.observation === "withheld" ? undefined : { choice: result.observation, probability: result.probability },
-        form,
-        { mapping: MAPPING_BAR, observation: BAR },
-      );
-      observed.push({ ...place, callId: site.call.id, result, outcome });
-
-      if (outcome === "violates") {
-        findings.push({
-          requirementId: requirement.id,
-          file: place.file,
-          lines: `${site.fn.startLine}-${site.fn.endLine}`,
-          function: place.function,
-          call: place.call,
-          quote,
-          condition: form.words.assumed(site.fn, site.call),
-          property: form.property,
-          mapping,
-          observation: result.observation,
-          probability: result.probability,
-          why: form.words.whyListed(site.fn.name, mapping, result.observation, result.probability),
-        });
-      }
+      const t = await askSite(requirement, form, quote, site, into);
+      asked += t.asked;
+      mapped += t.mapped;
     }
 
     const outcomes = Object.fromEntries(OUTCOMES.map((o) => [o, observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>;
@@ -467,12 +525,83 @@ export async function runLocalCheck(
       // A file both the change and the requirement's words reached has its cap counted twice.
       notes: [...new Set(notes)],
     });
+    passes.push({ requirement, form, quote, result: out[out.length - 1]! });
   }
   if (hostReached > 0 && answered === 0) {
     throw new ToolError(`no judgment came back from ${failedAt ?? "the judgment provider"}: ${hostReached} request(s) were sent and none was answered`, EXIT.provider);
   }
-  return { requirements: out, change, reached: hostReached, answered, form: formCount };
+  const askSiblings = async (): Promise<{ reached: number; answered: number }> => {
+    const [reachedBefore, answeredBefore] = [hostReached, answered];
+    const siblings = await siblingSetOf();
+    const budget = options.siblingBudget ?? DEFAULT_LOCAL_CHECK.siblingBudget;
+    for (const { requirement, form, quote, result } of passes) {
+      const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere });
+      const selection = await selectSiblings(siblings.siblings, decide, budget);
+      for (const h of selection.held) result.unchecked.push({ ...placeOf(h), why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
+      for (const o of selection.overBudget) result.unchecked.push({ ...placeOf(o), why: `the siblings' budget of ${budget} was already spent` });
+      result.wouldAsk.push(...selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin, ...(s.via === undefined ? {} : { via: s.via }) })));
+      const into: Collected = { observed: [], unchecked: result.unchecked, mappings: [], findings: result.findings };
+      let asked = 0;
+      let mapped = 0;
+      for (const site of options.candidatesOnly ? [] : selection.budgeted) {
+        const t = await askSite(requirement, form, quote, site, into);
+        asked += t.asked;
+        mapped += t.mapped;
+      }
+      result.observed.push(...into.observed);
+      result.mappings.push(...into.mappings);
+      result.counts.siblings = {
+        budget,
+        seeds: siblings.seeds.map((s) => s.name),
+        functions: selection.functions,
+        calls: selection.widened.length,
+        applicable: selection.applicable.length,
+        asked,
+        mapped,
+        governed: into.mappings.filter((m) => m.governs).length,
+        overBudget: selection.overBudget.length,
+        notApplicable: selection.held.length,
+        outcomes: Object.fromEntries(OUTCOMES.map((o) => [o, into.observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>,
+      };
+      result.notes = [...new Set([...result.notes, ...siblings.notes])];
+    }
+    return { reached: hostReached - reachedBefore, answered: answered - answeredBefore };
+  };
+
+  // The siblings depend on the commit alone: read once, for every requirement.
+  let siblingSet: Promise<SiblingSet> | undefined;
+  const siblingSetOf = () => {
+    if (!siblingSet) {
+      const known = new Set<string>();
+      const changedSites: { fn: FunctionCandidate; candidates: SiteSource["candidates"] }[] = [];
+      for (const source of fromChange.sources.values()) {
+        for (const id of [...(source.changed ?? []), ...(source.callsChanged ?? [])]) known.add(id);
+        for (const id of source.changed ?? []) {
+          const fn = source.candidates.functions.find((f) => f.id === id);
+          if (fn && !isTestPath(fn.path)) changedSites.push({ fn, candidates: source.candidates });
+        }
+      }
+      siblingSet = siblingsOf(files, discoverer, change, changedSites, known);
+    }
+    return siblingSet;
+  };
+
+  return { requirements: out, change, reached: hostReached, answered, form: formCount, askSiblings };
 }
+
+/** A requirement's form, as `formOf` gives it. */
+type Form = ReturnType<typeof formOf>;
+
+/** One requirement's records that a call's questions add to. */
+interface Collected {
+  observed: Observed[];
+  unchecked: Unchecked[];
+  mappings: MappingRecord[];
+  findings: Finding[];
+}
+
+/** Where a call is, as every record of it says so; a sibling's also says what tied it. */
+const placeOf = (site: Site) => ({ file: site.fn.path, function: site.fn.name, call: shown(site.call), origin: site.origin, ...(site.via === undefined ? {} : { via: site.via }) });
 
 /**
  * What a failed request was, for the report: the kind and the host, never the host's own words, which
