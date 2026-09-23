@@ -99,6 +99,55 @@
       },
       "s": "fail",
       "sWhy": "bench/acceptance/place-s.ts: 20 changed functions — the pull request routes every SQLite open through one helper, so it changes the callers too — and one seed (ensure_derived_columns) whose other callers the rule accepts none of."
+    },
+    {
+      "order": 9,
+      "ref": "pnpm/pnpm#12506",
+      "a": "fail",
+      "why": "A new feature (an OSV index that blocks vulnerable versions); failing closed is part of the feature, not a failure that was being returned as a success."
+    },
+    {
+      "order": 10,
+      "ref": "iii-hq/workers#292",
+      "a": "fail",
+      "why": "A new feature (a Telegram bot)."
+    },
+    {
+      "order": 11,
+      "ref": "qdrant/qdrant#9429",
+      "a": "fail",
+      "why": "A refactor for batched reads, for speed."
+    },
+    {
+      "order": 12,
+      "ref": "vox-foundation/vox#346",
+      "a": "pass",
+      "why": "The pull request says `parse_registry_file()` now propagates errors instead of silently returning an empty set.",
+      "requirement": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set."
+    },
+    {
+      "order": 13,
+      "ref": "ng/yggdrasil#103",
+      "a": "fail",
+      "why": "Raising a tool's timeout and isolating a signal; no failure returned as a success."
+    },
+    {
+      "order": 14,
+      "ref": "andrewdavidmackenzie/flow#2680",
+      "a": "fail",
+      "why": "A buffer size and a GUI layout, with a new example."
+    },
+    {
+      "order": 15,
+      "ref": "ben1009/mini-lsm#76",
+      "a": "fail",
+      "why": "A new module (a value log)."
+    },
+    {
+      "order": 16,
+      "ref": "snowflakedb/drivers#911",
+      "a": "fail",
+      "why": "State-machine correctness and input validation for an ODBC call; no failure was being returned as a success."
     }
   ],
   "pool": {
@@ -110,7 +159,13 @@
       "anchapin/fluxion#3008": "license NOASSERTION",
       "Smicry/rosregview#5": "license GPL-2.0",
       "0xckruger/arbiter_v2#3": "no license",
-      "beagleboard/bb-imager-rs#653": "title: tests only"
+      "beagleboard/bb-imager-rs#653": "title: tests only",
+      "openfootmanager/openfootmanager#229": "license GPL-3.0",
+      "leynos/netsuke#335": "license ISC",
+      "DawnLandTeam/dawnland-launcher#17": "title: a version bump",
+      "jrollin/cartog#80": "title: refactor",
+      "oven-sh/bun#31496": "license NOASSERTION",
+      "guacsec/trustify#2366": "title: documentation"
     }
   }
 }
