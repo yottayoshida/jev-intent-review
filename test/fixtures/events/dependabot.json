@@ -1,0 +1,28 @@
+{
+  "_what": "a pull request Dependabot opened in the repository itself: head and base are the same repository, and it is given no secrets either",
+  "_copied_from": "https://api.github.com/repos/cli/cli/pulls/14486",
+  "_copied_on": "2026-09-22",
+  "action": "opened",
+  "number": 14486,
+  "pull_request": {
+    "number": 14486,
+    "user": {
+      "login": "dependabot[bot]"
+    },
+    "head": {
+      "repo": {
+        "full_name": "cli/cli",
+        "fork": false
+      }
+    },
+    "base": {
+      "repo": {
+        "full_name": "cli/cli",
+        "fork": false
+      }
+    }
+  },
+  "repository": {
+    "full_name": "cli/cli"
+  }
+}

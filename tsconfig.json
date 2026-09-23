@@ -14,6 +14,6 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "include": ["src", "test", "bench"],
+  "include": ["src", "test", "bench", "action"],
   "exclude": ["test/fixtures", "bench/generic"]
 }

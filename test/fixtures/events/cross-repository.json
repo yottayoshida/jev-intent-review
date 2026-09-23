@@ -1,0 +1,28 @@
+{
+  "_what": "a pull request from another repository, which GitHub gives no secrets (note head.repo.fork is true here, and is true of a pull request opened inside a fork too, which is why it is not what decides)",
+  "_copied_from": "https://api.github.com/repos/cli/cli/pulls/14474",
+  "_copied_on": "2026-09-22",
+  "action": "opened",
+  "number": 14474,
+  "pull_request": {
+    "number": 14474,
+    "user": {
+      "login": "jarrensj"
+    },
+    "head": {
+      "repo": {
+        "full_name": "jarrensj/gh-cli",
+        "fork": true
+      }
+    },
+    "base": {
+      "repo": {
+        "full_name": "cli/cli",
+        "fork": false
+      }
+    }
+  },
+  "repository": {
+    "full_name": "cli/cli"
+  }
+}

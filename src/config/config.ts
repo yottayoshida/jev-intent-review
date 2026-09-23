@@ -47,7 +47,9 @@ const NO_LONGER_APPLIES: Record<string, string> = {
   "policy.unknown": "no requirement-level UNKNOWN is stated",
 };
 
-// `policy.missing_credentials` is a provisional default, to be settled before 1.0.
+// `policy.missing_credentials` is `skip`, settled in ADR 0009: read by a maintainer on a pull
+// request, `fail` would turn every pull request without secrets — every one from a fork — red, and
+// a skipped run is told apart from a clean one by the Action's check run, which is neutral.
 export function defaultConfig(): Config {
   return {
     version: 1,

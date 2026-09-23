@@ -1,0 +1,126 @@
+name: jev-intent-review
+description: Read a pull request's requirements as written and ask Jev about the calls its change touches. The report goes to a check run, the job summary and an artifact; nothing the command prints reaches the log.
+author: yottayoshida
+
+inputs:
+  jev-provider:
+    description: Where Jev is asked — cloudflare, typesafe or vercel. Leave empty to use jev-api-url, or the Cloudflare pair on its own.
+    required: false
+    default: ""
+  cloudflare-account-id:
+    description: The Cloudflare account ID, for jev-provider cloudflare.
+    required: false
+    default: ""
+  cloudflare-api-token:
+    description: A Cloudflare API token with Workers AI access, for jev-provider cloudflare.
+    required: false
+    default: ""
+  typesafe-api-key:
+    description: The TypeSafe API key, for jev-provider typesafe.
+    required: false
+    default: ""
+  ai-gateway-api-key:
+    description: The Vercel AI Gateway API key, for jev-provider vercel.
+    required: false
+    default: ""
+  jev-api-url:
+    description: An endpoint that serves a Workers AI run request, instead of jev-provider.
+    required: false
+    default: ""
+  jev-api-token:
+    description: The token for jev-api-url. It is sent to that URL and nowhere else.
+    required: false
+    default: ""
+  github-token:
+    description: The token the command reads the pull request and its issues with. The check run is always created with the job's own token.
+    required: false
+    default: ${{ github.token }}
+  artifact-name:
+    description: The name of the artifact that holds the report, its JSON, the command's stderr and which version of the Action ran.
+    required: false
+    default: jev-intent-review
+
+outputs:
+  exit-code:
+    description: The command's exit code — 0 finished or skipped, 1 a call worth checking with policy.fail_on [finding], 2 did not finish, 10 configuration (the Action's own stops too), 11 requirements could not be read, 12 judgment provider, 13 repository.
+    value: ${{ steps.finish.outputs.exit-code || steps.prepare.outputs.exit-code }}
+  checked:
+    description: true when at least one call was read; false for a run that was skipped, found no requirement, asked nothing, read no call or stopped before a report.
+    value: ${{ steps.finish.outputs.checked || 'false' }}
+
+runs:
+  using: composite
+  steps:
+    # No key is set here: npm ci — the one step that reaches a registry — gets empty values under
+    # every name a key is read from, the GitHub tokens among them, so nothing in the job's
+    # environment can be sent with it.
+    - id: prepare
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        GITHUB_TOKEN: ""
+        GH_TOKEN: ""
+        JEV_PROVIDER: ""
+        JEV_API_URL: ""
+        JEV_API_TOKEN: ""
+        CLOUDFLARE_ACCOUNT_ID: ""
+        CLOUDFLARE_API_TOKEN: ""
+        TYPESAFE_API_KEY: ""
+        AI_GATEWAY_API_KEY: ""
+      run: bash "$ACTION_PATH/action/run.sh" prepare
+
+    # The keys come from the inputs and nowhere else: a step's env wins over the job's, and an empty
+    # value is read by the command as not set.
+    - id: review
+      if: steps.prepare.outputs.ready == 'true'
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        JEV_WORK: ${{ steps.prepare.outputs.work }}
+        JEV_PROVIDER: ${{ inputs.jev-provider }}
+        JEV_API_URL: ${{ inputs.jev-api-url }}
+        JEV_API_TOKEN: ${{ inputs.jev-api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        TYPESAFE_API_KEY: ${{ inputs.typesafe-api-key }}
+        AI_GATEWAY_API_KEY: ${{ inputs.ai-gateway-api-key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ""
+      run: bash "$ACTION_PATH/action/run.sh" review
+
+    # finish.ts is given the keys only to take them out of everything it writes.
+    - id: finish
+      if: always() && steps.prepare.outputs.ready == 'true'
+      shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        ACTION_REF: ${{ github.action_ref }}
+        ARTIFACT_NAME: ${{ inputs.artifact-name }}
+        JEV_WORK: ${{ steps.prepare.outputs.work }}
+        CHECK_TOKEN: ${{ github.token }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        JEV_PROVIDER: ${{ inputs.jev-provider }}
+        JEV_API_URL: ${{ inputs.jev-api-url }}
+        JEV_API_TOKEN: ${{ inputs.jev-api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        TYPESAFE_API_KEY: ${{ inputs.typesafe-api-key }}
+        AI_GATEWAY_API_KEY: ${{ inputs.ai-gateway-api-key }}
+      run: bash "$ACTION_PATH/action/run.sh" finish
+
+    # Only the redacted copies finish.ts wrote are uploaded, from the working directory under
+    # RUNNER_TEMP — never from the Action's own directory, which is the pull request's under `uses: ./`.
+    - if: always() && steps.prepare.outputs.ready == 'true'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.prepare.outputs.work }}/artifact
+        if-no-files-found: ignore
+
+    - if: always()
+      shell: bash
+      env:
+        CODE: ${{ steps.finish.outputs.exit-code || steps.prepare.outputs.exit-code }}
+      run: |
+        case "$CODE" in '' | *[!0-9]*) exit 2 ;; esac
+        exit "$CODE"

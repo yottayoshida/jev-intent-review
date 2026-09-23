@@ -81,7 +81,7 @@ sure. A spec's requirement is not asked; nor is one on a run that read no functi
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
-| a call can be asked about when | its callee has one `fn` definition in the repository and returns a `Result`, and so does the function (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
 | the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
@@ -107,22 +107,28 @@ the order they appear. When a function gets fewer questions than it has askable 
 which calls they go to; when more functions hold an askable call than the budget, the functions late
 in the order get none, and each of the others gets one, for its first call.
 
-Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name
-the repository defines (below). A name defined twice resolves to neither, and such a call is not
-asked about. The `check_before_action` form resolves no callee for a call it asks
-about — a call whose callee is a function this run reads is not askable there — so its calls keep
-the order they appear in. A changed function the listing's caps left out (see *Notes*) is not
-counted as one.
+Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name the
+repository defines, or, when it defines several, the one the call's path or form picks out — and for
+a trait's method read as one thing, the trait's declaration, which is not where any implementation
+is (*Which definition a call reaches*), and for a call into a function this repository does not
+define, the table's row (`fs::read_to_string`), which is nowhere in this repository and so is never
+a changed function. A name nothing settles is not asked about and resolves to nowhere. The
+`check_before_action` form resolves no callee for a call it asks about — a call whose callee is a
+function this run reads is not askable there — so its calls keep the order they appear in. A
+changed function the listing's caps left out (see *Notes*) is not counted as one.
 
 ### Whether a function returns a `Result`
 
 For `failure_propagation`, both the function and its callee must return a `Result`, and that is
 read from each one's signature — never from how the call's line looks:
 
-- The callee is the one `fn <name>` the repository defines outside tests, found by searching for
-  `fn <name>`. A name with no such line, or with more than one, is not asked about, and a search
+- The callee is a `fn <name>` the repository defines outside tests, found by searching for
+  `fn <name>`; a definition in a file some module declares `#[cfg(test)] mod x;` does not count,
+  because no shipped code reaches it. A name with no such line is not asked about **unless the call
+  writes a path the table in *Functions this repository does not define* holds**, and a search
   stopped at its cap of 200 hits settles nothing. A JavaScript function, a `let` line or a snippet
-  in a Markdown file is not a definition.
+  in a Markdown file is not a definition. When the name has more than one definition,
+  *Which definition a call reaches* below says when one of them is settled.
 - The return type is the signature's own, read past its generics and parameters up to the body, a
   `;` or `where` (at most 30 lines). No `->` is `()`.
 - A name in it is followed: a rename in the same file's `use` (`Result as ChannelResult`), and an
@@ -151,7 +157,100 @@ meet a repository's `fn to_string(accessor, value)`. These checks can only rule 
 never show that a call reaches it: a method call with the right number of arguments still meets the
 one definition of its name, whatever type it is made on — grovedb's `x.value.map_err(…)`, a method
 of the standard library's `Result`, meets `CostContext::map_err`. Calls whose callee is not defined
-here, or is defined more than once, are the next part of `#45`.
+here at all are the next part of `#45`.
+
+#### Functions this repository does not define
+
+A callee with no `fn` here — every call into the standard library or into a dependency — used to
+end the reading. One table now answers for some of them, and it is the only thing this tool claims
+about code it cannot read (ADR 0011):
+
+| written as | functions |
+|---|---|
+| `fs::…` | `canonicalize`, `copy`, `create_dir`, `create_dir_all`, `exists`, `hard_link`, `metadata`, `read`, `read_dir`, `read_link`, `read_to_string`, `remove_dir`, `remove_dir_all`, `remove_file`, `rename`, `set_permissions`, `set_permissions_nofollow`, `set_times`, `set_times_nofollow`, `soft_link`, `symlink_metadata`, `write` |
+| `File::…` | `create`, `create_buffered`, `create_new`, `lock`, `lock_shared`, `open`, `open_buffered`, `set_len`, `set_modified`, `set_permissions`, `set_times`, `sync_all`, `sync_data`, `try_clone`, `try_lock`, `try_lock_shared`, `unlock` |
+| `env::…` | `current_dir`, `current_exe`, `join_paths`, `set_current_dir` |
+| `io::…` | `pipe`, `try_set_output_capture` |
+| `serde_json::…` | `from_reader`, `from_slice`, `from_str`, `from_value`, `to_raw_value`, `to_string`, `to_string_pretty`, `to_value`, `to_vec`, `to_vec_pretty`, `to_writer`, `to_writer_pretty` |
+| only written in full | `std::env::var`, `std::io::copy`, `std::io::read_to_string`, `fs::File::metadata` |
+
+How it is read:
+
+- **The path a call writes is what is matched**, by its ending: a row `fs::rename` matches
+  `fs::rename(a, b)` and `std::fs::rename(a, b)`. The four rows in the last line are matched only
+  at that length, because the shorter ending means something else somewhere:
+  `gix-path`'s `env::var` returns an `Option`, tokio's `io::read_to_string` and futures-util's
+  `io::copy` return a future, and a crate's `File::metadata` returns an `Option<&Metadata>`.
+- **A method call is not matched, whatever the table holds.** Rust resolves a method by the type of
+  its receiver, which this does not read; `Metadata::file_type` returns a `FileType` and
+  `DirEntry::file_type` an `io::Result<FileType>`, and both are written `entry.file_type()`. This
+  is why pybun#428's fixed call is still held.
+- **`crate::`, `self::` and `super::` say the callee is in this repository**, so the table does not
+  answer for them.
+- **A path written `std::` is answered by the table before this repository's definitions are read**
+  — the call said which library it means. Any other path is answered only when this repository
+  defines no `fn` of that name, so a repository with its own `fs::read_to_string` keeps its own.
+  Only the first word of a path is looked at for this repository: a module of its own written
+  `util::fs::rename(a, b)`, with no `fn rename` anywhere here, is answered by the row `fs::rename`.
+- **The ending is all that is matched**, so another library's function of the same path is taken
+  for the one in the table: `tokio::fs::read_to_string(p)` matches `fs::read_to_string`. The scan
+  read tokio's too: it is an `async fn` declared to return an `io::Result`, which the call gives
+  once awaited.
+- A few rows are functions the standard library has not stabilised — `File::create_buffered`,
+  `File::open_buffered`, `fs::set_permissions_nofollow`, `fs::set_times`, `fs::set_times_nofollow`,
+  `io::try_set_output_capture` — and match only code built for nightly. They are there because the
+  scan read them in the standard library's source, not because a repository measured here calls
+  them.
+- The table says what a function returns, not how many arguments it takes: a call that passes the
+  wrong number is not caught here.
+- A repository that declares `mod std;` of its own would make `std::` mean something else; nothing
+  here checks for that. A rename (`use std::fs as stdfs;`) is not followed, so `stdfs::read(p)`
+  stays held.
+
+Every row is there because `bench/outside-results-check.ts` read the standard library's own source
+and a machine's cargo registry and found no definition a call could reach that way returning
+anything but a `Result`. That finding is "no counterexample in those 1,798 crates", not "no
+counterexample anywhere". The rows come from those sources, not from the repositories this tool is
+measured on.
+
+#### Which definition a call reaches
+
+A name this repository defines more than once used to end the reading there. Three things narrow
+it, in this order, and what none of them settles is held as before. A name defined **once** is
+unchanged: the path is not read at all, and that one definition is the callee as it always was.
+
+- **The path the call writes.** `SyncState::load_strict(root)` keeps the definitions inside an
+  `impl SyncState`, `impl Trait for SyncState` or `trait SyncState`; `Self::path(root)` keeps those
+  inside the `impl` the call itself is written in; `install::add_package(args)` keeps those written
+  in `install.rs` or `install/mod.rs` **inside the crate the call is in** — a workspace has a
+  `util.rs` in every crate. `crate::`, `super::` and `self::` are passed over. The item a
+  definition sits in is read from indentation — the first line above it that is less indented and
+  begins an item — so a `fn` written above it inside the same `impl` is not its header. A header
+  spread over several lines (`impl<T>` / `Trait for` / `Q` / `{`) cannot be read, and then the call
+  is held: nothing further may settle it, or the form below would pick the very definition the path
+  was about to rule out.
+- **The form of the call.** A method call reaches no definition that takes no `self`, and none that
+  takes a different number of arguments (counted as above). When that leaves one, it is the one.
+  Past 20 definitions after the path, their signatures are not read and the call is held.
+- **Definitions that are versions of one thing.** A trait's method — the declaration
+  `trait X { fn name(…); }` in *this* repository and the implementations of that same trait — or a
+  function written once per platform (`#[cfg(unix)]` and `#[cfg(not(unix))]`, at the top of one
+  file). Which version runs is not settled, so all of them must return a `Result`; one that does
+  not holds the call, and the reason names it. The declaration must be here: two
+  `impl TryFrom<A> for B` blocks do not make `try_from` this repository's method.
+
+**A path that matches none of the definitions is held, never reported as "no definition here".** A
+type brought in under another name (`use moltis_channels::Error as ChannelError`) and a function
+re-exported from another file (`model::values_to_chat_messages`, written in `model/convert.rs`) are
+both real definitions this does not follow; saying they are not defined would be false. For the
+same reason, a name whose only definitions are in files declared `#[cfg(test)] mod x;` is held with
+that as its reason. A module declared `#[cfg(test)]` in one file and plainly in another — a crate
+whose `main.rs` declares it for tests and whose `lib.rs` declares it outright — is code.
+
+When several versions are read together, the definition the report names — and the one the order
+inside a function compares against (*The order inside a function*) — is the trait's declaration, or
+the first of the platform versions. A pull request that changes an implementation rather than the
+declaration is therefore not sorted first by that order.
 
 ## Reading the output
 
@@ -360,8 +459,11 @@ version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`,
 - how many calls each function gets, and in what order the functions take their turns, is the same
   as in line order in every run;
 - with today's check (the `failure_propagation` form's), the order changes which call is asked in
-  Kontor#385 (three functions) and in omamori `#468` (one function, `run_override_disable`, on every
-  branch); in the other seven cases nothing changes, since every askable call fits in the budget;
+  Kontor#385 (eight functions), in omamori `#468` (five functions on every branch, among them
+  `run_override_disable`) and in pybun#428 (one); in the other six cases nothing changes, since
+  every askable call fits in the budget. Kontor#385's fixed call is inside the budget with the order
+  and outside it without. When the order was chosen this held only under the wider check below; the
+  calls `#45`'s second and third parts made askable made it true of today's check;
 - with a wider check standing in for `#45` (any type whose name ends in `Result` taken as one, and a
   callee's definition found by `fn <name>` and held when that search is cut — which holds one call
   today's check asks about, `verify(...)` in grovedb#500's `finalize`), every
@@ -369,9 +471,10 @@ version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`,
   grovedb#500's in every version, Kontor#385's — and without the order Kontor#385's falls out.
   Kontor#385's unchanged caller is outside the budget either way.
 
-The two calls the order swaps on omamori `#468` were asked of Jev three times on every branch under
-both requirements (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in
-any run. On that case the order adds no finding and loses none.
+The two calls the order swaps in omamori `#468`'s `run_override_disable` — the only swap there when
+the order was chosen — were asked of Jev three times on every branch under both requirements
+(`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in any run. The
+swaps in the other four functions have not been asked of Jev.
 
 ### Reading whole signatures
 
@@ -399,13 +502,198 @@ branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`
   only the rules and the list), 808 decisions agree and none disagree for an unknown reason. 72
   disagree for a reason settled and recorded there, and none of them is about what a function
   returns: 49 are about which code counts as test code (a file declared under
-  `#[cfg(test)] mod x;`, which the tool reads as code; an item marked `#[cfg(test)]` on its own),
+  `#[cfg(test)] mod x;`, which the tool read as code at the time — a callee's definitions there no
+  longer count, see *Names defined more than once*; an item marked `#[cfg(test)]` on its own),
   and 23 are calls the labels, which find a callee by name alone, matched to a definition the call
   cannot reach (a method call to a function that takes no `self`, or the wrong number of
   arguments). Nine callees outside the labelled items were labelled afterwards and are marked so.
 - Before this reading, 436 of those decisions said "does not return a Result" of a call whose label
   says it returns one or is not settled.
 - Deciding took 92 seconds in all, against 99 before (one run of each).
+
+### Names defined more than once
+
+Which definition a call reaches, when its name has several (see *Which definition a call reaches*).
+It was built on two pull requests whose fix was held by this — cce-rust#168, where
+`SyncState::load_strict(root)` is one of two `load_strict`, and dataprof#370, where
+`count_table_rows(query)` is a trait's method with three implementations — so those two are
+regression cases from here on, and they are in the acceptance set's record as cases used to tune.
+Measured without a request, before and after, on the acceptance pre-check's eight cases, omamori
+`#468`'s five branches and those two pull requests, 15 runs (`bench/logs/names-defined-twice-v1.json`,
+`node bench/names-defined-twice.ts`):
+
+- Both pull requests' fixed calls can be asked about now, inside the budget of 20: cce-rust#168's
+  `SyncState::load_strict` in `cmd_pull` and in `pull_workspace`, and dataprof#370's
+  `count_table_rows`. cce-rust#168's third, `KnowledgeSyncState::load_strict` in
+  `cmd_knowledge_pull`, is askable and outside the budget.
+- 45 calls can be asked about that could not before (33 distinct calls; omamori's three repeat on
+  its five branches). **None that could before can no longer** — the definitions that stopped
+  counting, in files declared `#[cfg(test)] mod x;`, had settled no call that was asked about.
+- 6 calls fell out of the budget of 20 and 20 entered it. **No call the acceptance set names moved
+  across the budget**: those inside it stay inside, and Kontor#385's `get_decided_from_anchor` is
+  outside it before and after, as *Reading whole signatures* already recorded. Four of the six that
+  fell out are in a function where another call entered; the other two — cce-rust#168's `cmd_sync`
+  and `ensure_index` — lost their function's turn to a function that became askable, so a function
+  can lose its question to another function, not only to a call beside it.
+- 349 calls that are held before and after are held for a different reason. 133 of them are held
+  under a different kind: 63 are now "every definition here is in a file declared
+  `#[cfg(test)] mod x;`" (55 of those used to be "does not return a Result" about a definition in
+  such a file, 8 "not settled"), 42 moved from "defined N times" to what could not be read, 21 to
+  "does not return a Result" with the definition named, and 7 to "this call does not reach any of
+  them". The other 216 keep their kind and say what the narrowing found — which definitions the
+  path left, or that none of them is written under it.
+- Scored against what three fresh subagents said each call reaches, reading the calling code, its
+  `use` lines and its re-exports with the narrowing rules withheld from them
+  (`bench/names-defined-twice-expected.json`, the majority of three, 45 of 53 unanimous): **all 45
+  calls that became askable reach a definition in the repository that returns a `Result`, and none
+  disagrees.** Where a trait's method was settled, the labellers named the implementation and the
+  tool names the declaration; that is the choice above, not a disagreement about what runs.
+- Deciding took 110 seconds over the 15 runs, against 100 before (one run of each); an earlier pair
+  measured 101 and 97, so the difference is not larger than what one run to the next varies by. The
+  extra work is reading the module file above each definition's file, once per file.
+- **There is no held-out repository here.** The rules were shaped by what the counts over these
+  same 15 runs showed, and the two candidates of the acceptance set that nothing has used
+  (`iotaledger/iota#10136`, `getappz/agentflare#229`) cannot serve as one: the first was dropped at
+  the probe condition as a 470 MB monorepo, and every call the second fixes goes to the standard
+  library, which this change does not touch. The labels are what stands in for a held-out set —
+  they were written without the rules.
+- Of 20 calls still held, sampled five per reason and labelled the same way: 9 reach something
+  outside the repository and 6 reach a definition here that returns no `Result` — held rightly; 4
+  are held as "not settled" where the labels say "not a `Result`", which holds them either way; and
+  one — Kontor#385's `simulate(0, tx)` — reaches a definition that does return one, in a file
+  declared `#[cfg(test)] mod x;`. That last one is what this deliberately stops asking about.
+
+### Functions outside the repository
+
+What the table of *Functions this repository does not define* opens. It was built from the standard
+library's own source and a machine's cargo registry, not from the repositories below, and the two
+pull requests it was aimed at are cce-rust#168's neighbours — instruckt-tauri#9, whose fixed call is
+`serde_json::to_string_pretty`, and pybun#428, whose fixed call it deliberately does not open.
+Measured without a request, before and after, on the same 15 runs as the two parts before it
+(`bench/logs/outside-results-v1.json`, `node bench/outside-results.ts`; the scan behind the table is
+`bench/logs/outside-results-check-v1.json`, `node bench/outside-results-check.ts`):
+
+- **The wall, counted once per call** rather than once per branch of the same repository: 973 calls
+  were held with "no definition in this repository". 178 of them write a path; 733 are method
+  calls, which this does not open; the other 62 are bare names, and at least 54 of those are not
+  calls at all — `let (a, b)` patterns, attributes such as `cfg(unix)`, words in strings such as
+  `file(s)` — which the call reader takes for calls and which were never asked about
+  (`summary.wall`).
+- **40 calls can be asked about that could not before**, in five of the ten repositories, 20 of
+  them inside the budget of 20. **None that could before can no longer.** 18 of the table's 61 rows
+  are what opened them — `serde_json::to_string_pretty` (5), `env::current_dir` (5),
+  `serde_json::from_str` (4), `serde_json::to_string` (3), `fs::create_dir_all` (3),
+  `std::env::var` (3), and 12 more with one or two each (`summary.askableCalls`). The other 43
+  rows fired on nothing here.
+- **instruckt-tauri#9's fixed call is askable and inside the budget.** pybun#428's
+  `entry.file_type()` is still held, as a method call the table does not answer for.
+- 14 calls fell out of the budget of 20 and 20 entered it. Every defect the acceptance set names
+  stays where it was.
+- Scored against what three fresh subagents said each of the 40 calls reaches, reading the calling
+  code and its `use` lines with the table withheld from them
+  (`bench/outside-results-expected.json`, all 40 unanimous): **every one goes where the table says
+  — 26 into the standard library, 14 into `serde_json` — and every one returns a `Result`.** The
+  labellers checked the two shapes that could have gone the other way: pybun declares a `pub mod
+  env` of its own (the calls are written `std::env::`, so they do not reach it), and omamori's
+  `use std::os::unix::fs::PermissionsExt;` brings in the trait, not the module, so `fs::` there is
+  still the standard library's.
+- The scan behind the table read 553 definitions a call could reach the way a row is written, in
+  the standard library and in 1,798 crates; 3 of those hits were doc comments quoting
+  `serde_json::to_value`, not definitions, and were not judged. Four of its 61 candidates had a
+  counterexample and are written in full instead (`std::env::var`, `std::io::copy`,
+  `std::io::read_to_string`, `fs::File::metadata`); none was dropped. A scan that reads nothing
+  finds no counterexample either, so it prints what it read.
+
+### What another push would not have to ask again
+
+Whether keeping a pull request's answers would save anything, measured before anything keeps them
+(ADR 0012; `bench/packet-reuse.ts`, log `bench/logs/packet-reuse-v1.json`). Answers decide nothing
+about what is sent, so they came from a stand-in on localhost and no request was billed:
+`selectSites` finishes before the first request and asks no model, and the observation question is
+sent whatever the mapping question answered. Every number here was taken with the tool at `0029a95`,
+before the table of *Functions outside the repository* (ADR 0011) was merged; that table changes
+which calls are asked about, so the packets a run sends now can differ from the ones counted.
+
+The corpus is every pull request in the acceptance set's candidates (`bench/acceptance/candidates.json`,
+40 entries), each attempted. **12 were measured, over 31 pairs of consecutive pushes.** The 28 that
+were not are in the log with the reason: **17 are not pull requests at all** — those entries name
+issues of `yottayoshida/omamori`, another repository by this tool's author, and `/pulls/{n}`
+answers 404 for each — and 11 have a single commit, which is no pair. Every run that was measured
+exited 0; a pair is counted only when both of its runs did, because a run that dies leaves no trace
+and would read as one that sent nothing (none was left out). A push here is a commit the author
+pushed, in order; every run was given the same requirement, in the `Property:` form, because most of
+these pull requests state none in a form this tool reads.
+
+| pull request | heads | of each later push, the judgments already answered at the push before |
+|---|---|---|
+| `oxidezap/whatsapp-rust#759` | 2 | 9/13 |
+| `moltis-org/moltis#1064` | 2 | 52/61 |
+| `KontorProtocol/Kontor#385` | 4 | 49/52, 45/57, 54/58 |
+| `TyRoXx/NonlocalityOS#433` | 3 | 5/13, 13/14 |
+| `armaxri/termiHub#2751` | 4 | 7/25, 25/34, 34/34 |
+| `armaxri/termiHub#2732` | 2 | 20/37 |
+| `beboite/boite-legacy#187` | 12 | 10/41, 41/64, 64/64, 64/64, 64/64, 64/64, 64/78, 78/81, 81/85, 81/86, 79/89 |
+| `Diogo-Esteves/polyVocal#60` | 2 | 53/72 |
+| `TumbleOwlee/ferrowl#127` | 4 | 0/1, 1/14, 9/22 |
+| `getappz/agentflare#229` | 2 | 11/11 |
+| `Davidslv/cce-rust#168` | 3 | 4/41, 21/46 |
+| `AndreaBozzo/dataprof#370` | 3 | 49/50, 50/55 |
+
+**The median over the 31 pairs is 0.852**: in the median pair, 85% of the later push's judgments ask
+again about the same evidence, byte for byte. By side: the calls' questions, 528 of 628; the change
+question, 673 of 862.
+
+One pull request carries 11 of the 31 pairs — `beboite/boite-legacy#187`, four of them 64/64 — so
+the median of pairs leans on it. Counted other ways the share is lower, and every one is still above
+the 0.50 the decision was fixed at: the median of each pull request's own median, 0.736; the 20
+pairs without that pull request, 0.736; every judgment pooled, 1201 of 1490 (0.806); only each pull
+request's first pair, 0.616.
+
+**A packet that differs only in where its code sits is rare.** Blanking every `lines` value before
+comparing — the function's start and end line, and the change's — moves 6 of the calls' 628 and 15
+of the changes' 862, and the median from 0.852 to 0.869. The line numbers a packet carries were the
+reason to expect little reuse; they are not what decides it. A key that ignored them would buy
+about two points.
+
+**Adding a requirement moves the packets of the requirements already there, unless it goes last.**
+On `moltis-org/moltis#1064` at its head, with one requirement and then two
+(`bench/logs/requirement-positions-v1.json`): a packet holds one requirement, so appending a second
+leaves the first's packets as they were — 34 of the 68 sent were already there, which is all of the
+first requirement's. Putting the second one *first* renumbers the ids the packets carry, and none of
+the 68 was: 0. The change question's state holds every requirement at once, so its packets change
+either way: 0 of 27.
+
+**What a stored answer would change.** The acceptance bench asks every place three times with
+byte-identical input (`bench/answer-spread.ts`, log `bench/logs/answer-spread-v1.json`, over
+`bench/logs/acceptance-v1.json`). The reading differed between runs in 2 of 34 places, and 8 of the
+102 readings sit within 0.1 of the bar of 0.6; both places that differed are among them. In both,
+Jev chose `returns_success` every time; what moved was its probability, between 0.57 and 0.68, and a
+reading below the bar is reported as `cannot_determine`. So a place that differs between runs is one
+whose probability sits at the bar, by how the bar works. A stored answer would keep one of those
+draws for every later push; asking again gives a fresh one each time. These places are not a real
+pull request's: 8 of the 34 are pull request heads (`shipped`), and the other 26 are versions built
+for the acceptance bench (`defect`, `rewrite`, `hidden`). One of the two that differed is a
+`hidden` version, which is built so that its answer should be `cannot_determine` or below the bar
+(`bench/acceptance/README.md`).
+
+What this does not measure:
+
+- How a pull request's pushes are spread over time, and so whether a cache would still hold the
+  earlier push's answers when the later one runs.
+- Pushes as people make them. A push is counted here per commit; a push that carries several commits
+  changes more between runs, so a share per real push would be lower than this. Of
+  `beboite/boite-legacy#187`'s 12 commits, the first six landed within four minutes. History a
+  force-push removed is not seen at all.
+- Whether the stand-in is sent exactly what the real endpoint is, beyond one pull request. On
+  `oxidezap/whatsapp-rust#759` at its head, one run against the stand-in and one against Jev
+  (Cloudflare) sent the same 13 packets, each once (`bench/logs/fidelity-v1.json`, from
+  `node bench/packet-reuse.ts --work <dir> --fidelity owner/repo#n`). Their order differed: the
+  change questions go out together and a trace line is written when its answer comes back, so the
+  comparison is of the packets and not of their order. The other eleven pull requests rest on the
+  argument from the code above.
+- Any pull request of this tool's author's repositories: the 17 entries of `yottayoshida/omamori`
+  are issues.
+
 ### How Jev reads the form of a sentence
 
 Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it

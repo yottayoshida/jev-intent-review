@@ -1,0 +1,25 @@
+{
+  "_what": "a pull request from a fork that has since been deleted: GitHub leaves head.repo null, and the pull request still came from another repository",
+  "_copied_from": "https://api.github.com/repos/cli/cli/pulls/14393",
+  "_copied_on": "2026-09-22",
+  "action": "opened",
+  "number": 14393,
+  "pull_request": {
+    "number": 14393,
+    "user": {
+      "login": "kishansaaai"
+    },
+    "head": {
+      "repo": null
+    },
+    "base": {
+      "repo": {
+        "full_name": "cli/cli",
+        "fork": false
+      }
+    }
+  },
+  "repository": {
+    "full_name": "cli/cli"
+  }
+}

@@ -1,0 +1,1011 @@
+{
+ "sources": {
+  "std": "/opt/homebrew/Cellar/rust/1.98.1/lib/rustlib/src/rust/library",
+  "registry": "~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f",
+  "crates": 1798
+ },
+ "candidates": 61,
+ "definitionsSeen": 553,
+ "unread": 3,
+ "clean": [
+  "fs::read",
+  "fs::read_to_string",
+  "fs::write",
+  "fs::set_times",
+  "fs::set_times_nofollow",
+  "fs::remove_file",
+  "fs::metadata",
+  "fs::symlink_metadata",
+  "fs::rename",
+  "fs::copy",
+  "fs::hard_link",
+  "fs::soft_link",
+  "fs::read_link",
+  "fs::canonicalize",
+  "fs::create_dir",
+  "fs::create_dir_all",
+  "fs::remove_dir",
+  "fs::remove_dir_all",
+  "fs::read_dir",
+  "fs::set_permissions",
+  "fs::set_permissions_nofollow",
+  "fs::exists",
+  "env::current_dir",
+  "env::set_current_dir",
+  "env::join_paths",
+  "env::current_exe",
+  "io::pipe",
+  "io::try_set_output_capture",
+  "File::open",
+  "File::open_buffered",
+  "File::create",
+  "File::create_buffered",
+  "File::create_new",
+  "File::sync_all",
+  "File::sync_data",
+  "File::lock",
+  "File::lock_shared",
+  "File::try_lock",
+  "File::try_lock_shared",
+  "File::unlock",
+  "File::set_len",
+  "File::try_clone",
+  "File::set_permissions",
+  "File::set_times",
+  "File::set_modified",
+  "serde_json::from_reader",
+  "serde_json::from_slice",
+  "serde_json::from_str",
+  "serde_json::to_raw_value",
+  "serde_json::to_writer",
+  "serde_json::to_writer_pretty",
+  "serde_json::to_vec",
+  "serde_json::to_vec_pretty",
+  "serde_json::to_string",
+  "serde_json::to_string_pretty",
+  "serde_json::to_value",
+  "serde_json::from_value"
+ ],
+ "unseen": [],
+ "refused": [
+  {
+   "path": "env::var",
+   "counterexamples": [
+    {
+     "at": "gix-path-0.12.0/src/env/mod.rs:215",
+     "returns": "Option<OsString>"
+    }
+   ]
+  },
+  {
+   "path": "io::copy",
+   "counterexamples": [
+    {
+     "at": "futures-util-0.3.32/src/io/copy.rs:34",
+     "returns": "Copy<'_, R, W>"
+    },
+    {
+     "at": "futures-util-0.3.34/src/io/copy.rs:34",
+     "returns": "Copy<'_, R, W>"
+    }
+   ]
+  },
+  {
+   "path": "io::read_to_string",
+   "counterexamples": [
+    {
+     "at": "tokio-1.52.1/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    },
+    {
+     "at": "tokio-1.51.1/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    },
+    {
+     "at": "tokio-1.49.0/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    }
+   ]
+  },
+  {
+   "path": "File::metadata",
+   "counterexamples": [
+    {
+     "at": "include_dir-0.7.4/src/file.rs:57",
+     "returns": "Option<&crate::Metadata>"
+    }
+   ]
+  }
+ ],
+ "dropped": [],
+ "table": [
+  {
+   "path": "env::current_dir",
+   "from": "std/src/env.rs:53",
+   "returns": "io::Result<PathBuf>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "env::current_exe",
+   "from": "std/src/env.rs:757",
+   "returns": "io::Result<PathBuf>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "env::join_paths",
+   "from": "std/src/env.rs:578",
+   "returns": "Result<OsString, JoinPathsError>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "env::set_current_dir",
+   "from": "std/src/env.rs:80",
+   "returns": "io::Result<()>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::create",
+   "from": "std/src/fs.rs:637",
+   "returns": "io::Result<File>",
+   "why": "5 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::create_buffered",
+   "from": "std/src/fs.rs:673",
+   "returns": "io::Result<io::BufWriter<File>>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::create_new",
+   "from": "std/src/fs.rs:711",
+   "returns": "io::Result<File>",
+   "why": "5 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::lock",
+   "from": "std/src/fs.rs:864",
+   "returns": "io::Result<()>",
+   "why": "20 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::lock_shared",
+   "from": "std/src/fs.rs:916",
+   "returns": "io::Result<()>",
+   "why": "19 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::open",
+   "from": "std/src/fs.rs:569",
+   "returns": "io::Result<File>",
+   "why": "23 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::open_buffered",
+   "from": "std/src/fs.rs:605",
+   "returns": "io::Result<io::BufReader<File>>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::set_len",
+   "from": "std/src/fs.rs:1120",
+   "returns": "io::Result<()>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::set_modified",
+   "from": "std/src/fs.rs:1276",
+   "returns": "io::Result<()>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::set_permissions",
+   "from": "std/src/fs.rs:1220",
+   "returns": "io::Result<()>",
+   "why": "23 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::set_times",
+   "from": "std/src/fs.rs:1267",
+   "returns": "io::Result<()>",
+   "why": "18 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::sync_all",
+   "from": "std/src/fs.rs:779",
+   "returns": "io::Result<()>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::sync_data",
+   "from": "std/src/fs.rs:811",
+   "returns": "io::Result<()>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::try_clone",
+   "from": "std/src/fs.rs:1182",
+   "returns": "io::Result<File>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::try_lock",
+   "from": "std/src/fs.rs:981",
+   "returns": "Result<(), TryLockError>",
+   "why": "20 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::try_lock_shared",
+   "from": "std/src/fs.rs:1045",
+   "returns": "Result<(), TryLockError>",
+   "why": "19 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "File::unlock",
+   "from": "std/src/fs.rs:1082",
+   "returns": "io::Result<()>",
+   "why": "21 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::canonicalize",
+   "from": "std/src/fs.rs:3009",
+   "returns": "io::Result<PathBuf>",
+   "why": "25 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::copy",
+   "from": "std/src/fs.rs:2854",
+   "returns": "io::Result<u64>",
+   "why": "26 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::create_dir",
+   "from": "std/src/fs.rs:3051",
+   "returns": "io::Result<()>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::create_dir_all",
+   "from": "std/src/fs.rs:3097",
+   "returns": "io::Result<()>",
+   "why": "5 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::exists",
+   "from": "std/src/fs.rs:3503",
+   "returns": "io::Result<bool>",
+   "why": "14 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::File::metadata",
+   "from": "std/src/fs.rs:1138",
+   "returns": "io::Result<Metadata>",
+   "why": "1 of 8 definitions a call could reach this way return something else (Option<&crate::Metadata> at include_dir-0.7.4/src/file.rs:57)"
+  },
+  {
+   "path": "fs::hard_link",
+   "from": "std/src/fs.rs:2900",
+   "returns": "io::Result<()>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::metadata",
+   "from": "std/src/fs.rs:2708",
+   "returns": "io::Result<Metadata>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::read",
+   "from": "std/src/fs.rs:340",
+   "returns": "io::Result<Vec<u8>>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::read_dir",
+   "from": "std/src/fs.rs:3285",
+   "returns": "io::Result<ReadDir>",
+   "why": "8 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::read_link",
+   "from": "std/src/fs.rs:2966",
+   "returns": "io::Result<PathBuf>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::read_to_string",
+   "from": "std/src/fs.rs:382",
+   "returns": "io::Result<String>",
+   "why": "5 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::remove_dir",
+   "from": "std/src/fs.rs:3142",
+   "returns": "io::Result<()>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::remove_dir_all",
+   "from": "std/src/fs.rs:3206",
+   "returns": "io::Result<()>",
+   "why": "20 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::remove_file",
+   "from": "std/src/fs.rs:2669",
+   "returns": "io::Result<()>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::rename",
+   "from": "std/src/fs.rs:2791",
+   "returns": "io::Result<()>",
+   "why": "36 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::set_permissions",
+   "from": "std/src/fs.rs:3336",
+   "returns": "io::Result<()>",
+   "why": "9 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::set_permissions_nofollow",
+   "from": "std/src/fs.rs:3355",
+   "returns": "io::Result<()>",
+   "why": "6 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::set_times",
+   "from": "std/src/fs.rs:462",
+   "returns": "io::Result<()>",
+   "why": "21 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::set_times_nofollow",
+   "from": "std/src/fs.rs:503",
+   "returns": "io::Result<()>",
+   "why": "22 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::soft_link",
+   "from": "std/src/fs.rs:2932",
+   "returns": "io::Result<()>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::symlink_metadata",
+   "from": "std/src/fs.rs:2743",
+   "returns": "io::Result<Metadata>",
+   "why": "7 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "fs::write",
+   "from": "std/src/fs.rs:419",
+   "returns": "io::Result<()>",
+   "why": "8 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "io::pipe",
+   "from": "std/src/io/pipe.rs:83",
+   "returns": "io::Result<(PipeReader, PipeWriter)>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "io::try_set_output_capture",
+   "from": "std/src/io/stdio.rs:1132",
+   "returns": "Result<Option<LocalStream>, AccessError>",
+   "why": "2 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::from_reader",
+   "from": "serde_json-1.0.151/src/de.rs:2624",
+   "returns": "Result<T>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::from_slice",
+   "from": "serde_json-1.0.151/src/de.rs:2667",
+   "returns": "Result<T>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::from_str",
+   "from": "serde_json-1.0.151/src/de.rs:2709",
+   "returns": "Result<T>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::from_value",
+   "from": "serde_json-1.0.151/src/value/mod.rs:1037",
+   "returns": "Result<T, Error>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_raw_value",
+   "from": "serde_json-1.0.151/src/raw.rs:334",
+   "returns": "Result<Box<RawValue>, Error>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_string",
+   "from": "serde_json-1.0.151/src/ser.rs:2245",
+   "returns": "Result<String>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_string_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2264",
+   "returns": "Result<String>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_value",
+   "from": "serde_json-1.0.151/src/value/mod.rs:995",
+   "returns": "Result<Value, Error>",
+   "why": "6 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_vec",
+   "from": "serde_json-1.0.151/src/ser.rs:2213",
+   "returns": "Result<Vec<u8>>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_vec_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2229",
+   "returns": "Result<Vec<u8>>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_writer",
+   "from": "serde_json-1.0.151/src/ser.rs:2177",
+   "returns": "Result<()>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "serde_json::to_writer_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2197",
+   "returns": "Result<()>",
+   "why": "3 definitions a call could reach this way, in the standard library and the registry, all returning a Result"
+  },
+  {
+   "path": "std::env::var",
+   "from": "std/src/env.rs:228",
+   "returns": "Result<String, VarError>",
+   "why": "1 of 3 definitions a call could reach this way return something else (Option<OsString> at gix-path-0.12.0/src/env/mod.rs:215)"
+  },
+  {
+   "path": "std::io::copy",
+   "from": "std/src/io/copy.rs:62",
+   "returns": "Result<u64>",
+   "why": "2 of 6 definitions a call could reach this way return something else (Copy<'_, R, W> at futures-util-0.3.32/src/io/copy.rs:34)"
+  },
+  {
+   "path": "std::io::read_to_string",
+   "from": "std/src/io/mod.rs:1399",
+   "returns": "Result<String>",
+   "why": "3 of 5 definitions a call could reach this way return something else (ReadToString<'a, R> at tokio-1.52.1/src/io/util/read_to_string.rs:33)"
+  }
+ ],
+ "checked": [
+  {
+   "path": "env::current_dir",
+   "from": "std/src/env.rs:53",
+   "returns": "io::Result<PathBuf>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "env::current_exe",
+   "from": "std/src/env.rs:757",
+   "returns": "io::Result<PathBuf>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "env::join_paths",
+   "from": "std/src/env.rs:578",
+   "returns": "Result<OsString, JoinPathsError>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "env::set_current_dir",
+   "from": "std/src/env.rs:80",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "env::var",
+   "from": "std/src/env.rs:228",
+   "returns": "Result<String, VarError>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": [
+    {
+     "at": "gix-path-0.12.0/src/env/mod.rs:215",
+     "returns": "Option<OsString>"
+    }
+   ]
+  },
+  {
+   "path": "File::create",
+   "from": "std/src/fs.rs:637",
+   "returns": "io::Result<File>",
+   "definitionsSeen": 5,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::create_buffered",
+   "from": "std/src/fs.rs:673",
+   "returns": "io::Result<io::BufWriter<File>>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::create_new",
+   "from": "std/src/fs.rs:711",
+   "returns": "io::Result<File>",
+   "definitionsSeen": 5,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::lock",
+   "from": "std/src/fs.rs:864",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 20,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::lock_shared",
+   "from": "std/src/fs.rs:916",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 19,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::metadata",
+   "from": "std/src/fs.rs:1138",
+   "returns": "io::Result<Metadata>",
+   "definitionsSeen": 8,
+   "unread": 0,
+   "counterexamples": [
+    {
+     "at": "include_dir-0.7.4/src/file.rs:57",
+     "returns": "Option<&crate::Metadata>"
+    }
+   ]
+  },
+  {
+   "path": "File::open",
+   "from": "std/src/fs.rs:569",
+   "returns": "io::Result<File>",
+   "definitionsSeen": 23,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::open_buffered",
+   "from": "std/src/fs.rs:605",
+   "returns": "io::Result<io::BufReader<File>>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::set_len",
+   "from": "std/src/fs.rs:1120",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::set_modified",
+   "from": "std/src/fs.rs:1276",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::set_permissions",
+   "from": "std/src/fs.rs:1220",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 23,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::set_times",
+   "from": "std/src/fs.rs:1267",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 18,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::sync_all",
+   "from": "std/src/fs.rs:779",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::sync_data",
+   "from": "std/src/fs.rs:811",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::try_clone",
+   "from": "std/src/fs.rs:1182",
+   "returns": "io::Result<File>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::try_lock",
+   "from": "std/src/fs.rs:981",
+   "returns": "Result<(), TryLockError>",
+   "definitionsSeen": 20,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::try_lock_shared",
+   "from": "std/src/fs.rs:1045",
+   "returns": "Result<(), TryLockError>",
+   "definitionsSeen": 19,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "File::unlock",
+   "from": "std/src/fs.rs:1082",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 21,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::canonicalize",
+   "from": "std/src/fs.rs:3009",
+   "returns": "io::Result<PathBuf>",
+   "definitionsSeen": 25,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::copy",
+   "from": "std/src/fs.rs:2854",
+   "returns": "io::Result<u64>",
+   "definitionsSeen": 26,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::create_dir",
+   "from": "std/src/fs.rs:3051",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::create_dir_all",
+   "from": "std/src/fs.rs:3097",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 5,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::exists",
+   "from": "std/src/fs.rs:3503",
+   "returns": "io::Result<bool>",
+   "definitionsSeen": 14,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::hard_link",
+   "from": "std/src/fs.rs:2900",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::metadata",
+   "from": "std/src/fs.rs:2708",
+   "returns": "io::Result<Metadata>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::read",
+   "from": "std/src/fs.rs:340",
+   "returns": "io::Result<Vec<u8>>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::read_dir",
+   "from": "std/src/fs.rs:3285",
+   "returns": "io::Result<ReadDir>",
+   "definitionsSeen": 8,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::read_link",
+   "from": "std/src/fs.rs:2966",
+   "returns": "io::Result<PathBuf>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::read_to_string",
+   "from": "std/src/fs.rs:382",
+   "returns": "io::Result<String>",
+   "definitionsSeen": 5,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::remove_dir",
+   "from": "std/src/fs.rs:3142",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::remove_dir_all",
+   "from": "std/src/fs.rs:3206",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 20,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::remove_file",
+   "from": "std/src/fs.rs:2669",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::rename",
+   "from": "std/src/fs.rs:2791",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 36,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::set_permissions",
+   "from": "std/src/fs.rs:3336",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 9,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::set_permissions_nofollow",
+   "from": "std/src/fs.rs:3355",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 6,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::set_times",
+   "from": "std/src/fs.rs:462",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 21,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::set_times_nofollow",
+   "from": "std/src/fs.rs:503",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 22,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::soft_link",
+   "from": "std/src/fs.rs:2932",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::symlink_metadata",
+   "from": "std/src/fs.rs:2743",
+   "returns": "io::Result<Metadata>",
+   "definitionsSeen": 7,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "fs::write",
+   "from": "std/src/fs.rs:419",
+   "returns": "io::Result<()>",
+   "definitionsSeen": 8,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "io::copy",
+   "from": "std/src/io/copy.rs:62",
+   "returns": "Result<u64>",
+   "definitionsSeen": 6,
+   "unread": 0,
+   "counterexamples": [
+    {
+     "at": "futures-util-0.3.32/src/io/copy.rs:34",
+     "returns": "Copy<'_, R, W>"
+    },
+    {
+     "at": "futures-util-0.3.34/src/io/copy.rs:34",
+     "returns": "Copy<'_, R, W>"
+    }
+   ]
+  },
+  {
+   "path": "io::pipe",
+   "from": "std/src/io/pipe.rs:83",
+   "returns": "io::Result<(PipeReader, PipeWriter)>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "io::read_to_string",
+   "from": "std/src/io/mod.rs:1399",
+   "returns": "Result<String>",
+   "definitionsSeen": 5,
+   "unread": 0,
+   "counterexamples": [
+    {
+     "at": "tokio-1.52.1/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    },
+    {
+     "at": "tokio-1.51.1/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    },
+    {
+     "at": "tokio-1.49.0/src/io/util/read_to_string.rs:33",
+     "returns": "ReadToString<'a, R>"
+    }
+   ]
+  },
+  {
+   "path": "io::try_set_output_capture",
+   "from": "std/src/io/stdio.rs:1132",
+   "returns": "Result<Option<LocalStream>, AccessError>",
+   "definitionsSeen": 2,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::from_reader",
+   "from": "serde_json-1.0.151/src/de.rs:2624",
+   "returns": "Result<T>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::from_slice",
+   "from": "serde_json-1.0.151/src/de.rs:2667",
+   "returns": "Result<T>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::from_str",
+   "from": "serde_json-1.0.151/src/de.rs:2709",
+   "returns": "Result<T>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::from_value",
+   "from": "serde_json-1.0.151/src/value/mod.rs:1037",
+   "returns": "Result<T, Error>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_raw_value",
+   "from": "serde_json-1.0.151/src/raw.rs:334",
+   "returns": "Result<Box<RawValue>, Error>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_string",
+   "from": "serde_json-1.0.151/src/ser.rs:2245",
+   "returns": "Result<String>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_string_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2264",
+   "returns": "Result<String>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_value",
+   "from": "serde_json-1.0.151/src/value/mod.rs:995",
+   "returns": "Result<Value, Error>",
+   "definitionsSeen": 6,
+   "unread": 3,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_vec",
+   "from": "serde_json-1.0.151/src/ser.rs:2213",
+   "returns": "Result<Vec<u8>>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_vec_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2229",
+   "returns": "Result<Vec<u8>>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_writer",
+   "from": "serde_json-1.0.151/src/ser.rs:2177",
+   "returns": "Result<()>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  },
+  {
+   "path": "serde_json::to_writer_pretty",
+   "from": "serde_json-1.0.151/src/ser.rs:2197",
+   "returns": "Result<()>",
+   "definitionsSeen": 3,
+   "unread": 0,
+   "counterexamples": []
+  }
+ ]
+}

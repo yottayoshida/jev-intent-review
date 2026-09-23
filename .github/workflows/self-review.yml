@@ -1,0 +1,37 @@
+name: self-review
+
+# The Action, on this repository's own pull requests, from the entry a user has. No keys are set
+# here, so every run is skipped and its check run is neutral: what this exercises is the entry, the
+# place the report lands and the mark a run that checked nothing gets. A run with keys is measured
+# on a repository of its own (#41).
+#
+# A pull request that changes the Action changes what runs here: `uses: ./` is the pull request's
+# own copy, so this run says nothing about whether that change is sound.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  checks: write
+
+concurrency:
+  group: self-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # The same condition and name the README gives, on this repository itself: a pull request from
+    # another repository is given no secrets, so the job is skipped under a name that says why.
+    name: intent review (same-repository pull requests only)
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The command compares the pull request's merge commit with the commit before the change,
+          # and reads both from the clone.
+          fetch-depth: 0
+      - uses: ./
