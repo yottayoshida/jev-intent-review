@@ -376,7 +376,106 @@ node bench/acceptance/replay.ts
 
 A test compares the table above with that output byte for byte, and the script refuses to print a
 table for fewer than two repositories, no defect outside the diff, a branch sent to Jev fewer than
-three times, or commits other than the ones each case fixed.
+three times, or commits other than the ones each case fixed. The same two cases measured again with
+the tool after `#45` are the next section.
+
+### The acceptance set after `#45`
+
+This table is the acceptance set measured with the tool shipped after `#45`'s three parts, and it
+says which cases were used to tune the tool before it was taken. Both were: moltis-1064 is what
+the whole-signature reading was built on, and both cases' versions were what the order inside a
+function and that reading were judged by (`bench/acceptance/README.md`, *Used so far*). So this is
+a regression check of the whole tool, not a second unseen measurement — and the wording of the
+questions changed since the table above too (forms, `#35`), so a difference is not `#45`'s alone.
+Every branch whose target is inside the budget was run three times, as before
+(`bench/logs/acceptance-v2.json`; the rules are the same). The tool it names is the commit it was
+measured at; the question that asks Jev which form a sentence says (ADR 0008) came after it, and
+is not sent for these cases: their requirements are read from a spec file, and a spec's
+requirements are never asked it.
+
+<!-- acceptance-v2:begin -->
+Measured again with the tool at ec1f706: 2 requirements from 2 repositories. Used to tune the tool before this measurement: moltis-1064, grovedb-500.
+
+| case | role | version | target | expected | reach | readings (mapping / behaviour) | result |
+|---|---|---|---|---|---|---|---|
+| moltis-1064 | regression | shipped | A `generate_title_for_session` | not listed | asked | applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 0.99; applies 1.00 / returns_error 0.99 | 3/3 agrees |
+| moltis-1064 | regression | shipped | B `dispatch_command` | not listed | asked | applies 0.90 / returns_error 0.95; applies 0.88 / returns_error 0.97; applies 0.88 / returns_error 0.91 | 3/3 agrees |
+| moltis-1064 | regression | shipped | C `generate_title` | not listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+| moltis-1064 | regression | defect-A | A `generate_title_for_session` | listed | asked | applies 0.98 / returns_success 1.00 · listed; applies 0.97 / returns_success 1.00 · listed; applies 0.99 / returns_success 1.00 · listed | 3/3 agrees |
+| moltis-1064 | regression | rewrite-A | A `generate_title_for_session` | not listed | asked | applies 1.00 / returns_error 1.00; applies 0.99 / returns_error 1.00; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| moltis-1064 | regression | hidden-A | A `generate_title_for_session` | no confident reading | asked | applies 0.98 / returns_error 0.93; applies 0.99 / returns_error 0.91; applies 0.98 / returns_error 0.93 | 0/3 differs |
+| moltis-1064 | regression | defect-B | B `dispatch_command` | listed | asked | applies 0.97 / returns_success 1.00 · listed; applies 0.95 / returns_success 1.00 · listed; applies 0.96 / returns_success 1.00 · listed | 3/3 agrees |
+| moltis-1064 | regression | defect-C | C `generate_title` | listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+| grovedb-500 | regression | shipped | A `finalize` | not listed | asked | applies 1.00 / returns_error 0.99; applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| grovedb-500 | regression | defect-A | A `finalize` | listed | asked | applies 0.99 / returns_success 0.93 · listed; applies 0.99 / returns_success 0.93 · listed; applies 0.99 / returns_success 0.91 · listed | 3/3 agrees |
+| grovedb-500 | regression | rewrite-A | A `finalize` | not listed | asked | applies 1.00 / returns_error 0.99; applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 0.99 | 3/3 agrees |
+| grovedb-500 | regression | hidden-A | A `finalize` | no confident reading | asked | applies 1.00 / returns_error 0.95; applies 1.00 / returns_error 0.95; applies 1.00 / returns_error 0.93 | 0/3 differs |
+
+Calls other than the targets that were listed in these runs, not scored: 0. Requests sent to Jev: 708, over 27 runs.
+<!-- acceptance-v2:end -->
+
+What it shows, and no more than that:
+
+- **Inside the diff, both cases read as they did.** The six cells that agreed three of three
+  before agree three of three again, and each defect-A was listed at its own call in every run.
+- **A defect outside the diff was asked about, and listed.** moltis-1064's defect-B — an unchanged
+  caller that turns the changed function's failure into a success — was listed at its own call in
+  three runs of three, and the same call on the shipped code was not listed in any. Before `#45`
+  that call was held before any question: its caller returns `ChannelResult<String>`, an alias.
+  The defect in a function that neither changed nor calls one that did (defect-C) is still outside
+  what the tool enumerates.
+- **Jev still reads through a helper it was not shown** (hidden-A, `returns_error` at 0.91–0.95 in
+  every run of both cases), and that is still scored against "no confident reading".
+- 708 requests over 27 runs, about three and a half times what the table above spent: more calls can be asked
+  about now, and a run of moltis sent 34 requests where it sent 4 to 6, one of grovedb 16 to 18
+  where it sent 12 to 14.
+
+Measured without a request, on the twelve candidates whose requirement fits the question, less
+iota#10136 (not run through the tool in `#36` either: a 470 MB monorepo), and with the tool before
+`#45` for comparison (`bench/logs/precheck-vs-8798e60.json`, `node bench/outside-results.ts
+--before 8798e60`; `8798e60` is the commit before `#45`'s first part):
+
+- **A fixed call is inside the budget in 8 of the 11 candidates, where it was 3.** A candidate
+  counts once any call its pull request fixed is inside the budget, as condition (b) counted it:
+  instruckt-tauri#9 (5 of its 5 fixed calls), grovedb#501, cce-rust#168 (2 of 3), dataprof#370 and
+  agentflare#229 (2 of 7, both `std::fs::set_permissions`) joined moltis#1064, Kontor#385 and
+  grovedb#500. Still outside: whatsapp-rust#759's, which the cap of calls per function drops before
+  anything is decided; quebec#136's, whose change is inside a generic function the tool reports as
+  touching no Rust function (both are in their file once, so they are not written differently);
+  pybun#428's `entry.file_type()` and agentflare#229's four `flush()` and `sync_all()`, method calls
+  the tool does not resolve outside the repository (*Functions this repository does not define*).
+  Two more fixed calls are not asked: cce-rust#168's `KnowledgeSyncState::load_strict(root)` can be
+  asked about and is outside the budget, and agentflare#229's `std::fs::read_to_string(&profile)` is
+  held because the function it is in, `run`, returns `()` — true of that function.
+- **The unchanged callers' calls**: moltis#1064's and grovedb#501's can be asked about and are
+  inside the budget. **Kontor#385's can be asked about and is outside the budget of 20**, so it is
+  still not asked; how the budget is spent is `#38`'s. grovedb#500's is past its function's cap of
+  40 calls, as before.
+- The same run with the tool of `#36` (`bench/logs/precheck-vs-529b30a.json`) gives 3 of 11, and
+  its count of calls inside the budget equals what that tool's `--candidates-only` printed in
+  `#36` (`bench/acceptance/precheck-shipped.json`, applicable less over the budget), in all eight
+  candidates that were run then.
+
+No report says a function does not return a `Result` when it does, on these runs: every reason with
+those words in the listings of the pre-check's eight cases and omamori `#468`'s five branches — 541
+distinct ones (`bench/logs/result-type-after-45.json`, `node bench/result-type.ts`) — was checked
+against a label. 526 had one from the parts before that settles it; the other 15 — 13 with none,
+and 2 whose earlier label said the name was ambiguous — were labelled by three fresh subagents who
+were shown neither the tool's reasons nor the earlier labels, unanimously
+(`bench/says-not-after-45-labels.json`). All 541 agree. One kind names a definition other than the
+one the call reaches: a call to `shutdown` inside a file declared `#[cfg(test)] mod` is said to meet
+the definition outside tests, because definitions in such files are not counted (see *Whether a
+function returns a `Result`*) — the call is itself in that file, and reaches the one there. Both
+return `()`, so what the reason says about the return type is still true.
+
+Reproducible from what is committed, without sending anything:
+
+```sh
+node bench/acceptance/replay.ts bench/logs/acceptance-v2.json
+```
+
+A test compares the table above with that output byte for byte, and fails if either is committed
+without the other.
 
 ### The case v0.1 was tuned on
 

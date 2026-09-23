@@ -169,11 +169,13 @@ function distil(r: LocalCheck.LocalCheckResult) {
 }
 
 async function measure(id: string, clone: string, limit: number) {
-  // The log names Cloudflare's model; a run sent elsewhere would make that untrue.
-  if (process.env.JEV_PROVIDER !== undefined && process.env.JEV_PROVIDER !== "cloudflare") {
-    throw new Error(`JEV_PROVIDER is ${process.env.JEV_PROVIDER}; the log records Cloudflare's model, so unset it or set it to cloudflare`);
-  }
   const d = await dist();
+  // The log names Cloudflare's model; a run sent elsewhere (another JEV_PROVIDER, or JEV_API_URL)
+  // would make that untrue. The environment's values are not repeated.
+  const endpoint = d.client.endpointFromEnv(process.env);
+  if (endpoint?.host !== "cloudflare") {
+    throw new Error(`the log records Cloudflare's model and this environment sends judgments ${endpoint ? `to ${d.client.hostName(endpoint.host)}` : "nowhere"}; set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN and leave JEV_PROVIDER unset or cloudflare, with no JEV_API_URL`);
+  }
   const self = await d.git.Git.open(join(HERE, "..", ".."));
   // The log names the commit its source was built from; changes beside the log itself would make that
   // untrue. The log is left out: measuring a second case, or resuming, writes to it before any commit.

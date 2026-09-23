@@ -80,7 +80,10 @@ function result(row: Row): string {
 export function render(cases: readonly CaseFile[], log: AcceptanceLog, candidates: Candidates): string {
   const recordsRoles = Object.values(log.cases).some((c) => c.role !== undefined);
   const roleOf = (id: string) => log.cases[id]?.role ?? "unseen";
-  // A table of unseen cases that leaves one out would read as covering them all.
+  // A table of unseen cases that leaves one out would read as covering them all. Only a log that
+  // records no role is held to this: v1, whose cases were the only unseen ones. A case built unseen
+  // later is measured into a later log, and this check would then refuse v1's table; whoever adds
+  // one decides then how v1 names what it did not measure.
   if (!recordsRoles) {
     for (const c of cases) if (c.role === "unseen" && !log.cases[c.id]) throw new ScoringError(`${c.id} is an unseen case with no measurement in the log`);
   }
