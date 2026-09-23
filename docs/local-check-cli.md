@@ -67,7 +67,7 @@ an assumption.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
-| a call can be asked about when | its callee settles to a definition in the repository that returns a `Result` — one `fn` of its name, or the one the call's path or form picks out of several, or a trait's method whose versions all return one — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
+| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
 | the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
@@ -96,11 +96,12 @@ in the order get none, and each of the others gets one, for its first call.
 Where a callee resolved to is the `failure_propagation` form's answer: the one `fn` of that name the
 repository defines, or, when it defines several, the one the call's path or form picks out — and for
 a trait's method read as one thing, the trait's declaration, which is not where any implementation
-is (*Which definition a call reaches*). A name nothing settles is not asked about and resolves to
-nowhere. The `check_before_action` form resolves no callee for a call it asks
-about — a call whose callee is a function this run reads is not askable there — so its calls keep
-the order they appear in. A changed function the listing's caps left out (see *Notes*) is not
-counted as one.
+is (*Which definition a call reaches*), and for a call into a function this repository does not
+define, the table's row (`fs::read_to_string`), which is nowhere in this repository and so is never
+a changed function. A name nothing settles is not asked about and resolves to nowhere. The
+`check_before_action` form resolves no callee for a call it asks about — a call whose callee is a
+function this run reads is not askable there — so its calls keep the order they appear in. A
+changed function the listing's caps left out (see *Notes*) is not counted as one.
 
 ### Whether a function returns a `Result`
 
@@ -109,7 +110,8 @@ read from each one's signature — never from how the call's line looks:
 
 - The callee is a `fn <name>` the repository defines outside tests, found by searching for
   `fn <name>`; a definition in a file some module declares `#[cfg(test)] mod x;` does not count,
-  because no shipped code reaches it. A name with no such line is not asked about, and a search
+  because no shipped code reaches it. A name with no such line is not asked about **unless the call
+  writes a path the table in *Functions this repository does not define* holds**, and a search
   stopped at its cap of 200 hits settles nothing. A JavaScript function, a `let` line or a snippet
   in a Markdown file is not a definition. When the name has more than one definition,
   *Which definition a call reaches* below says when one of them is settled.
@@ -142,6 +144,60 @@ never show that a call reaches it: a method call with the right number of argume
 one definition of its name, whatever type it is made on — grovedb's `x.value.map_err(…)`, a method
 of the standard library's `Result`, meets `CostContext::map_err`. Calls whose callee is not defined
 here at all are the next part of `#45`.
+
+#### Functions this repository does not define
+
+A callee with no `fn` here — every call into the standard library or into a dependency — used to
+end the reading. One table now answers for some of them, and it is the only thing this tool claims
+about code it cannot read (ADR 0011):
+
+| written as | functions |
+|---|---|
+| `fs::…` | `canonicalize`, `copy`, `create_dir`, `create_dir_all`, `exists`, `hard_link`, `metadata`, `read`, `read_dir`, `read_link`, `read_to_string`, `remove_dir`, `remove_dir_all`, `remove_file`, `rename`, `set_permissions`, `set_permissions_nofollow`, `set_times`, `set_times_nofollow`, `soft_link`, `symlink_metadata`, `write` |
+| `File::…` | `create`, `create_buffered`, `create_new`, `lock`, `lock_shared`, `open`, `open_buffered`, `set_len`, `set_modified`, `set_permissions`, `set_times`, `sync_all`, `sync_data`, `try_clone`, `try_lock`, `try_lock_shared`, `unlock` |
+| `env::…` | `current_dir`, `current_exe`, `join_paths`, `set_current_dir` |
+| `io::…` | `pipe`, `try_set_output_capture` |
+| `serde_json::…` | `from_reader`, `from_slice`, `from_str`, `from_value`, `to_raw_value`, `to_string`, `to_string_pretty`, `to_value`, `to_vec`, `to_vec_pretty`, `to_writer`, `to_writer_pretty` |
+| only written in full | `std::env::var`, `std::io::copy`, `std::io::read_to_string`, `fs::File::metadata` |
+
+How it is read:
+
+- **The path a call writes is what is matched**, by its ending: a row `fs::rename` matches
+  `fs::rename(a, b)` and `std::fs::rename(a, b)`. The four rows in the last line are matched only
+  at that length, because the shorter ending means something else somewhere:
+  `gix-path`'s `env::var` returns an `Option`, tokio's `io::read_to_string` and futures-util's
+  `io::copy` return a future, and a crate's `File::metadata` returns an `Option<&Metadata>`.
+- **A method call is not matched, whatever the table holds.** Rust resolves a method by the type of
+  its receiver, which this does not read; `Metadata::file_type` returns a `FileType` and
+  `DirEntry::file_type` an `io::Result<FileType>`, and both are written `entry.file_type()`. This
+  is why pybun#428's fixed call is still held.
+- **`crate::`, `self::` and `super::` say the callee is in this repository**, so the table does not
+  answer for them.
+- **A path written `std::` is answered by the table before this repository's definitions are read**
+  — the call said which library it means. Any other path is answered only when this repository
+  defines no `fn` of that name, so a repository with its own `fs::read_to_string` keeps its own.
+  Only the first word of a path is looked at for this repository: a module of its own written
+  `util::fs::rename(a, b)`, with no `fn rename` anywhere here, is answered by the row `fs::rename`.
+- **The ending is all that is matched**, so another library's function of the same path is taken
+  for the one in the table: `tokio::fs::read_to_string(p)` matches `fs::read_to_string`. The scan
+  read tokio's too: it is an `async fn` declared to return an `io::Result`, which the call gives
+  once awaited.
+- A few rows are functions the standard library has not stabilised — `File::create_buffered`,
+  `File::open_buffered`, `fs::set_permissions_nofollow`, `fs::set_times`, `fs::set_times_nofollow`,
+  `io::try_set_output_capture` — and match only code built for nightly. They are there because the
+  scan read them in the standard library's source, not because a repository measured here calls
+  them.
+- The table says what a function returns, not how many arguments it takes: a call that passes the
+  wrong number is not caught here.
+- A repository that declares `mod std;` of its own would make `std::` mean something else; nothing
+  here checks for that. A rename (`use std::fs as stdfs;`) is not followed, so `stdfs::read(p)`
+  stays held.
+
+Every row is there because `bench/outside-results-check.ts` read the standard library's own source
+and a machine's cargo registry and found no definition a call could reach that way returning
+anything but a `Result`. That finding is "no counterexample in those 1,798 crates", not "no
+counterexample anywhere". The rows come from those sources, not from the repositories this tool is
+measured on.
 
 #### Which definition a call reaches
 
@@ -389,8 +445,11 @@ version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`,
 - how many calls each function gets, and in what order the functions take their turns, is the same
   as in line order in every run;
 - with today's check (the `failure_propagation` form's), the order changes which call is asked in
-  Kontor#385 (three functions) and in omamori `#468` (one function, `run_override_disable`, on every
-  branch); in the other seven cases nothing changes, since every askable call fits in the budget;
+  Kontor#385 (eight functions), in omamori `#468` (five functions on every branch, among them
+  `run_override_disable`) and in pybun#428 (one); in the other six cases nothing changes, since
+  every askable call fits in the budget. Kontor#385's fixed call is inside the budget with the order
+  and outside it without. When the order was chosen this held only under the wider check below; the
+  calls `#45`'s second and third parts made askable made it true of today's check;
 - with a wider check standing in for `#45` (any type whose name ends in `Result` taken as one, and a
   callee's definition found by `fn <name>` and held when that search is cut — which holds one call
   today's check asks about, `verify(...)` in grovedb#500's `finalize`), every
@@ -398,9 +457,10 @@ version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`,
   grovedb#500's in every version, Kontor#385's — and without the order Kontor#385's falls out.
   Kontor#385's unchanged caller is outside the budget either way.
 
-The two calls the order swaps on omamori `#468` were asked of Jev three times on every branch under
-both requirements (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in
-any run. On that case the order adds no finding and loses none.
+The two calls the order swaps in omamori `#468`'s `run_override_disable` — the only swap there when
+the order was chosen — were asked of Jev three times on every branch under both requirements
+(`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in any run. The
+swaps in the other four functions have not been asked of Jev.
 
 ### Reading whole signatures
 
@@ -488,6 +548,47 @@ Measured without a request, before and after, on the acceptance pre-check's eigh
   are held as "not settled" where the labels say "not a `Result`", which holds them either way; and
   one — Kontor#385's `simulate(0, tx)` — reaches a definition that does return one, in a file
   declared `#[cfg(test)] mod x;`. That last one is what this deliberately stops asking about.
+
+### Functions outside the repository
+
+What the table of *Functions this repository does not define* opens. It was built from the standard
+library's own source and a machine's cargo registry, not from the repositories below, and the two
+pull requests it was aimed at are cce-rust#168's neighbours — instruckt-tauri#9, whose fixed call is
+`serde_json::to_string_pretty`, and pybun#428, whose fixed call it deliberately does not open.
+Measured without a request, before and after, on the same 15 runs as the two parts before it
+(`bench/logs/outside-results-v1.json`, `node bench/outside-results.ts`; the scan behind the table is
+`bench/logs/outside-results-check-v1.json`, `node bench/outside-results-check.ts`):
+
+- **The wall, counted once per call** rather than once per branch of the same repository: 973 calls
+  were held with "no definition in this repository". 178 of them write a path; 733 are method
+  calls, which this does not open; the other 62 are bare names, and at least 54 of those are not
+  calls at all — `let (a, b)` patterns, attributes such as `cfg(unix)`, words in strings such as
+  `file(s)` — which the call reader takes for calls and which were never asked about
+  (`summary.wall`).
+- **40 calls can be asked about that could not before**, in five of the ten repositories, 20 of
+  them inside the budget of 20. **None that could before can no longer.** 18 of the table's 61 rows
+  are what opened them — `serde_json::to_string_pretty` (5), `env::current_dir` (5),
+  `serde_json::from_str` (4), `serde_json::to_string` (3), `fs::create_dir_all` (3),
+  `std::env::var` (3), and 12 more with one or two each (`summary.askableCalls`). The other 43
+  rows fired on nothing here.
+- **instruckt-tauri#9's fixed call is askable and inside the budget.** pybun#428's
+  `entry.file_type()` is still held, as a method call the table does not answer for.
+- 14 calls fell out of the budget of 20 and 20 entered it. Every defect the acceptance set names
+  stays where it was.
+- Scored against what three fresh subagents said each of the 40 calls reaches, reading the calling
+  code and its `use` lines with the table withheld from them
+  (`bench/outside-results-expected.json`, all 40 unanimous): **every one goes where the table says
+  — 26 into the standard library, 14 into `serde_json` — and every one returns a `Result`.** The
+  labellers checked the two shapes that could have gone the other way: pybun declares a `pub mod
+  env` of its own (the calls are written `std::env::`, so they do not reach it), and omamori's
+  `use std::os::unix::fs::PermissionsExt;` brings in the trait, not the module, so `fs::` there is
+  still the standard library's.
+- The scan behind the table read 553 definitions a call could reach the way a row is written, in
+  the standard library and in 1,798 crates; 3 of those hits were doc comments quoting
+  `serde_json::to_value`, not definitions, and were not judged. Four of its 61 candidates had a
+  counterexample and are written in full instead (`std::env::var`, `std::io::copy`,
+  `std::io::read_to_string`, `fs::File::metadata`); none was dropped. A scan that reads nothing
+  finds no counterexample either, so it prints what it read.
 
 ### How Jev reads the form of a sentence
 

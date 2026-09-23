@@ -1,0 +1,1287 @@
+{
+ "what": "What each call reaches and whether that returns a `Result`, labelled by three fresh subagents reading the calling code and its `use` lines, with the table of `src/plan/outside-results.ts` withheld from them. The majority of three is the label; every vote is kept. The calls are the 40 the table makes askable.",
+ "written": "2026-09-22",
+ "how": "bench/outside-results.ts was run first to list the calls whose decision changed; the labellers were given the list (case, clone, commit, file, line, function, call) and nothing else.",
+ "labels": [
+  {
+   "id": "T1",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 82,
+   "function": "get_all_pending",
+   "call": "serde_json::to_string_pretty(&result)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Cargo.toml has serde_json=1, no local serde_json mod; to_string_pretty gives serde_json::Result<String>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Cargo.toml dep serde_json=1; no local mod serde_json; to_string_pretty returns serde_json::Result<String>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "fully-qualified serde_json::to_string_pretty; no local serde_json mod; Cargo.toml has serde_json=1; returns serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T2",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 133,
+   "function": "resolve",
+   "call": "serde_json::to_string_pretty(&result)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Same fully-qualified serde_json::to_string_pretty as T1, line 133; returns serde_json::Result<String>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same file and path as T1; mapped with map_err then ? so callee yields Result"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same path as T1 in resolve(); result is fed to map_err then ?, so Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T3",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 173,
+   "function": "get_source_location",
+   "call": "serde_json::to_string_pretty(&result)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 173 mirrors T1; .map_err on the call confirms a Result is produced."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same crate path; serde_json::Result<String>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "get_source_location uses same fully-qualified serde_json::to_string_pretty; serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T4",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 207,
+   "function": "get_component_stack",
+   "call": "serde_json::to_string_pretty(&result)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 207 mirrors T1; .map_err(McpError::internal_error) applied directly to the returned Result."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same crate path; serde_json::Result<String>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "get_component_stack, same fully-qualified serde_json call; serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T5",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 220,
+   "function": "get_project_structure",
+   "call": "std::env::current_dir()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Fully-qualified std::env::current_dir at line 220; std returns io::Result<PathBuf>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "fully qualified std::env::current_dir; returns io::Result<PathBuf>; mapped to McpError"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_dir fully qualified, no local env mod; io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T6",
+   "case": "instruckt-tauri-9",
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "file": "src/mcp/server.rs",
+   "line": 308,
+   "function": "get_project_structure",
+   "call": "serde_json::to_string_pretty(&result)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 308 mirrors T1; same external serde_json::to_string_pretty returning serde_json::Result<String>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same crate path as T1; serde_json::Result<String>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "get_project_structure tail, same serde_json::to_string_pretty; serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T7",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/build.rs",
+   "line": 207,
+   "function": "collect_inputs_recursive",
+   "call": "fs::read_dir(current)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "build.rs line 7 has `use std::fs;` and no local fs mod; read_dir gives io::Result<ReadDir>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "build.rs has use std::fs; so fs::read_dir is std::fs::read_dir, io::Result<ReadDir>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "build.rs has use std::fs; no local fs module in repo; fs::read_dir gives io::Result<ReadDir>"
+    }
+   ]
+  },
+  {
+   "id": "T8",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/python.rs",
+   "line": 165,
+   "function": "python_which",
+   "call": "std::env::current_dir()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Written std::env::, so crate::env (pybun's own mod env) is not reached; io::Result<PathBuf>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "crate has pub mod env but call is std::env::current_dir; io::Result<PathBuf>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_dir fully qualified, followed by ?; io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T9",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/project.rs",
+   "line": 249,
+   "function": "run_drift",
+   "call": "std::env::current_dir()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "project.rs line 249 uses std::env:: prefix, not crate::env; io::Result<PathBuf>, mapped with eyre!."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std-qualified despite crate::env existing; io::Result<PathBuf>, map_err to eyre"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "run_drift, std::env::current_dir fully qualified then map_err; io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T10",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/mcp/tools/maintenance.rs",
+   "line": 718,
+   "function": "call_context",
+   "call": "std::env::current_dir()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "maintenance.rs line 718 std::env::current_dir, .map_err on it; io::Result<PathBuf>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_dir in call_context; io::Result<PathBuf>, map_err to String"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "call_context else-branch, std::env::current_dir with map_err(to_string); io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T11",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/mcp/tools/maintenance.rs",
+   "line": 925,
+   "function": "call_drift",
+   "call": "std::env::current_dir()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "maintenance.rs line 925, same std::env::current_dir with .map_err; io::Result<PathBuf>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_dir in call_drift; io::Result<PathBuf>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "call_drift else-branch, std::env::current_dir with map_err; io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T12",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/mcp/tools/maintenance.rs",
+   "line": 929,
+   "function": "call_drift",
+   "call": "serde_json::to_string(&json!({ \"error\": \"pyproject.toml not found\", \"undeclared_imports\": [], \"unused_declarations\": [], \"analysis_notes\": [\"pyproject.toml not found\"], \"files_scanned\": 0",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json=1.0 in Cargo.toml, no local mod; to_string returns Result, unwrapped at line 936."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "use serde_json::{Value, json}; to_string returns serde_json::Result<String>, unwrapped at site"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json::to_string fully qualified over json! literal, then .unwrap(); serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T13",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/mcp/tools/maintenance.rs",
+   "line": 940,
+   "function": "call_drift",
+   "call": "serde_json::to_string(&json!({ \"undeclared_imports\": result.undeclared_imports, \"unused_declarations\": result.unused_declarations, \"analysis_notes\": result.analysis_notes, \"files_scanned\": result.files_scanned, }))",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 940 same serde_json::to_string, .unwrap() at 946 confirms serde_json::Result<String>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same crate path as T12; serde_json::Result<String> then .unwrap()"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same fully-qualified serde_json::to_string at call_drift tail, then .unwrap(); serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T14",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/run.rs",
+   "line": 210,
+   "function": "run_script",
+   "call": "std::fs::create_dir_all(&dir)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "run.rs line 210 fully-qualified std::fs::create_dir_all; io::Result<()>, mapped with eyre!."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::create_dir_all fully qualified; io::Result<()>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::create_dir_all fully qualified in run_script, then map_err; io::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T15",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/run.rs",
+   "line": 216,
+   "function": "run_script",
+   "call": "std::env::var(\"PYBUN_PEP723_DRY_RUN\")",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env:: prefix bypasses pybun's crate::env; std::env::var gives Result<String, VarError>, .is_ok() called."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var returns Result<String, VarError>; site calls .is_ok()"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var fully qualified, then .is_ok(); Result<String, VarError>"
+    }
+   ]
+  },
+  {
+   "id": "T16",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/run.rs",
+   "line": 218,
+   "function": "run_script",
+   "call": "std::env::var(\"PYBUN_PEP723_NO_CACHE\")",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 218 same std::env::var with .is_ok(); Result<String, VarError>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var, Result<String, VarError>; .is_ok()"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var fully qualified, then .is_ok(); Result<String, VarError>"
+    }
+   ]
+  },
+  {
+   "id": "T17",
+   "case": "pybun-428",
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "file": "src/commands/run.rs",
+   "line": 220,
+   "function": "run_script",
+   "call": "std::env::var(\"PYBUN_PEP723_BACKEND\")",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 220 std::env::var with .unwrap_or_else(|_| ...); Result<String, VarError>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var, Result<String, VarError>; unwrap_or_else default auto"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::var fully qualified, then unwrap_or_else; Result<String, VarError>"
+    }
+   ]
+  },
+  {
+   "id": "T18",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/secret.rs",
+   "line": 732,
+   "function": "read_secret",
+   "call": "fs::symlink_metadata(path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "secret.rs line 11 `use std::fs::{self, OpenOptions}`; symlink_metadata gives io::Result<Metadata>, `?` applied."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "secret.rs has use std::fs::{self, OpenOptions}; symlink_metadata is io::Result<Metadata>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "secret.rs has use std::fs::{self, OpenOptions}; fs::symlink_metadata is io::Result<Metadata>, used with ?"
+    }
+   ]
+  },
+  {
+   "id": "T19",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/integrity.rs",
+   "line": 139,
+   "function": "generate_baseline",
+   "call": "std::env::current_exe()",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "integrity.rs line 139 std::env::current_exe with .map/.unwrap_or_default; io::Result<PathBuf>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_exe fully qualified; io::Result<PathBuf>, unwrap_or_default"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::env::current_exe fully qualified, then .map().unwrap_or_default(); io::Result<PathBuf>"
+    }
+   ]
+  },
+  {
+   "id": "T20",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/integrity.rs",
+   "line": 147,
+   "function": "generate_baseline",
+   "call": "fs::read_link(&link_path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "integrity.rs line 7 `use std::fs;`; read_link returns io::Result<PathBuf>, .unwrap_or_default applied."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "integrity.rs has use std::fs; read_link returns io::Result<PathBuf>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "integrity.rs has use std::fs; fs::read_link is io::Result<PathBuf>, then unwrap_or_default"
+    }
+   ]
+  },
+  {
+   "id": "T21",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/integrity.rs",
+   "line": 218,
+   "function": "read_baseline",
+   "call": "serde_json::from_str(&content)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json=1.0 in Cargo.toml, no local mod; from_str returns serde_json::Result, .map_err applied."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "no local serde_json mod in lib.rs; from_str returns serde_json::Result<IntegrityBaseline>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "read_baseline uses fully-qualified serde_json::from_str with map_err; serde_json::Result<IntegrityBaseline>"
+    }
+   ]
+  },
+  {
+   "id": "T22",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/mod.rs",
+   "line": 264,
+   "function": "append",
+   "call": "fs::create_dir_all(parent)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "audit/mod.rs line 34 `use std::fs;`; create_dir_all returns io::Result<()>, `?` applied."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "audit/mod.rs line 34 use std::fs; create_dir_all is io::Result<()>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "audit/mod.rs line 34 has use std::fs; fs::create_dir_all is io::Result<()>, used with ?"
+    }
+   ]
+  },
+  {
+   "id": "T23",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/mod.rs",
+   "line": 327,
+   "function": "append",
+   "call": "serde_json::to_writer(&mut file, &event)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 327 serde_json::to_writer with `?` inside fn returning io::Error; serde_json::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "crate path; to_writer returns serde_json::Result<()>, propagated with ?"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json::to_writer fully qualified, used with ?; serde_json::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T24",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/secret.rs",
+   "line": 965,
+   "function": "rotate_key_locked",
+   "call": "fs::rename(&secret_path, &retired_path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "fs is std::fs from secret.rs line 11; rename returns io::Result<()>, .map_err(AuditError::Io)."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "file-level use std::fs; rename returns io::Result<()>, map_err to AuditError::Io"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "secret.rs use std::fs::{self,..}; fs::rename is io::Result<()>, mapped to AuditError::Io"
+    }
+   ]
+  },
+  {
+   "id": "T25",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/secret.rs",
+   "line": 971,
+   "function": "rotate_key_locked",
+   "call": "fs::set_permissions(&retired_path, fs::Permissions::from_mode(0o600))",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Inner `use std::os::unix::fs::PermissionsExt` imports only the trait, so fs stays std::fs; io::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "inner use imports only PermissionsExt trait, so fs is still std::fs; io::Result<()>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "fs::set_permissions from std::fs is io::Result<()>; discarded via let _ ="
+    }
+   ]
+  },
+  {
+   "id": "T26",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/verify.rs",
+   "line": 394,
+   "function": "verify_chain",
+   "call": "serde_json::from_str(trimmed)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "verify.rs line 394 serde_json::from_str matched on Ok/Err; serde_json::Result<AuditEvent>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "verify.rs has no fs/serde shadow; from_str returns serde_json::Result<AuditEvent>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "verify_chain matches on fully-qualified serde_json::from_str; serde_json::Result<AuditEvent>"
+    }
+   ]
+  },
+  {
+   "id": "T27",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/verify.rs",
+   "line": 678,
+   "function": "show_entries",
+   "call": "serde_json::from_str(trimmed)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 678 same serde_json::from_str matched on Ok/Err; serde_json::Result<AuditEvent>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "same crate path as T26; matched on Ok/Err at site"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "show_entries matches Ok/Err of serde_json::from_str; serde_json::Result<AuditEvent>"
+    }
+   ]
+  },
+  {
+   "id": "T28",
+   "case": "omamori-468",
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "file": "src/audit/verify.rs",
+   "line": 728,
+   "function": "show_entries",
+   "call": "serde_json::to_writer(&mut *out, event)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "Line 728 serde_json::to_writer with .map_err(std::io::Error::from); serde_json::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "to_writer returns serde_json::Result<()>; map_err(std::io::Error::from)"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json::to_writer fully qualified, map_err(io::Error::from) then ?; serde_json::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T29",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 89,
+   "function": "load_strict",
+   "call": "std::fs::read_to_string(&path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Fully-qualified std::fs::read_to_string matched on Err(e)/Ok(text); io::Result<String>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read_to_string fully qualified; io::Result<String>, matched on ErrorKind"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read_to_string fully qualified, matched on Err(e) e.kind(); io::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T30",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 92,
+   "function": "load_strict",
+   "call": "serde_json::from_str(&text)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json=1.0.150 in Cargo.toml, no local mod; from_str with .map/.map_err gives serde_json::Result."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "no local serde_json mod; from_str returns serde_json::Result<SyncState>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "serde_json::from_str fully qualified, then .map(Some).map_err(..); serde_json::Result<SyncState>"
+    }
+   ]
+  },
+  {
+   "id": "T31",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 522,
+   "function": "install_artifact",
+   "call": "std::fs::metadata(&store)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 522 `if let Ok(meta) = std::fs::metadata(&store)`; io::Result<Metadata>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::metadata; io::Result<Metadata>, used in if let Ok"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::metadata fully qualified inside if let Ok(meta); io::Result<Metadata>"
+    }
+   ]
+  },
+  {
+   "id": "T32",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 523,
+   "function": "install_artifact",
+   "call": "std::fs::set_permissions(&staged, meta.permissions())",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 523 std::fs::set_permissions with .map_err and `?`; io::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::set_permissions; io::Result<()>, map_err to String"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::set_permissions fully qualified, map_err then ?; io::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T33",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 532,
+   "function": "install_artifact",
+   "call": "std::fs::read(&staged)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 532 std::fs::read with .ok().map(...); io::Result<Vec<u8>>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read; io::Result<Vec<u8>>, .ok() at site"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read fully qualified, then .ok().map(..); io::Result<Vec<u8>>"
+    }
+   ]
+  },
+  {
+   "id": "T34",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 542,
+   "function": "install_artifact",
+   "call": "std::fs::remove_file(&staged)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 542 `let _ = std::fs::remove_file(&staged)`; io::Result<()> discarded but still a Result."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::remove_file; io::Result<()>, discarded with let _"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::remove_file fully qualified, discarded via let _ =; io::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T35",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 547,
+   "function": "install_artifact",
+   "call": "std::fs::rename(&staged, &store)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 547 std::fs::rename with .map_err and `?`; io::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::rename; io::Result<()>, map_err to String"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::rename fully qualified, map_err then ?; io::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T36",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/commands.rs",
+   "line": 1226,
+   "function": "cmd_pull_all",
+   "call": "std::fs::create_dir_all(into)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Line 1226 std::fs::create_dir_all with .map_err and `?`; io::Result<()>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::create_dir_all; io::Result<()>, map_err to String"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "cmd_pull_all uses fully-qualified std::fs::create_dir_all with map_err; io::Result<()>"
+    }
+   ]
+  },
+  {
+   "id": "T37",
+   "case": "cce-rust-168",
+   "commit": "6d33a9bdc12cc8e9c79a60ec1ae1f1de30d2197b",
+   "file": "src/sync/knowledge_commands.rs",
+   "line": 702,
+   "function": "cmd_knowledge_pull",
+   "call": "std::fs::read(&store_path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "knowledge_commands.rs line 702 std::fs::read with .ok().map(...); io::Result<Vec<u8>>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read in knowledge_commands; io::Result<Vec<u8>>, .ok()"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::read fully qualified, then .ok().map(hash); io::Result<Vec<u8>>"
+    }
+   ]
+  },
+  {
+   "id": "T38",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-engines/src/streaming/async_reader.rs",
+   "line": 358,
+   "function": "json_reader_task",
+   "call": "serde_json::to_string(v)",
+   "reaches": "crate:serde_json",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "dataprof-engines Cargo has serde_json workspace dep; to_string returns Result, .expect() at line 359."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "dataprof-engines Cargo.toml has serde_json dep; to_string returns serde_json::Result<String>, .expect()"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "crate:serde_json",
+     "returns": "result",
+     "note": "fn-local use serde_json::Value; dep:serde_json in engines Cargo.toml; to_string then .expect(); serde_json::Result<String>"
+    }
+   ]
+  },
+  {
+   "id": "T39",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-csv/src/lib.rs",
+   "line": 158,
+   "function": "detect_delimiter_from_path",
+   "call": "std::fs::File::open(path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "Fully-qualified std::fs::File::open, `?` in fn returning std::io::Result<u8>; io::Result<File>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::File::open; io::Result<File>, propagated with ? into io::Result<u8>"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::File::open fully qualified, used with ? in fn returning std::io::Result<u8>; io::Result<File>"
+    }
+   ]
+  },
+  {
+   "id": "T40",
+   "case": "dataprof-370",
+   "commit": "7974b4793554717e7da03e91ef2b6ea271dac7f3",
+   "file": "crates/dataprof-csv/src/robust_csv.rs",
+   "line": 264,
+   "function": "detect_delimiter",
+   "call": "std::fs::File::open(file_path)",
+   "reaches": "std",
+   "returns": "result",
+   "agreed": 3,
+   "votes": [
+    {
+     "by": "labeller-c1",
+     "reaches": "std",
+     "returns": "result",
+     "note": "robust_csv.rs line 264 std::fs::File::open with `?` into anyhow::Result; io::Result<File>."
+    },
+    {
+     "by": "labeller-c2",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::File::open in robust_csv; io::Result<File> converted by ? into anyhow Result"
+    },
+    {
+     "by": "labeller-c3",
+     "reaches": "std",
+     "returns": "result",
+     "note": "std::fs::File::open fully qualified in robust_csv detect_delimiter, used with ?; io::Result<File>"
+    }
+   ]
+  }
+ ]
+}
