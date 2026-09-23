@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { loadCases, render, type AcceptanceLog } from "../bench/acceptance/replay.ts";
 import { occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
@@ -193,14 +193,41 @@ test("one repository, no target outside the diff, fewer than three runs, zero ru
   extra.cases[1]!.versions.other = version({ A: "not_listed" });
   assert.throws(() => render(extra.cases, extra.log, candidates), /in the log and not in case\.json/);
 
-  // A case the log measured whose case.json is missing, or not marked unseen, would leave the table unseen.
+  // A case the log measured whose case.json is missing would leave the table unseen.
   const orphan = good();
-  orphan.cases[1] = { ...orphan.cases[1]!, role: "regression" };
-  assert.throws(() => render(orphan.cases, orphan.log, candidates), /has no case\.json marked unseen/);
+  orphan.cases.pop();
+  assert.throws(() => render(orphan.cases, orphan.log, candidates), /has no case\.json/);
 
   const moved = good();
   moved.log.cases.two!.versions.shipped!.base = "c".repeat(40);
   assert.throws(() => render(moved.cases, moved.log, candidates), /case\.json says/);
+});
+
+test("(i) a case's role is the log's, as it was when it was measured, not what its case.json says now", () => {
+  // Tuned with later: a log with no role was measured on unseen cases, and its table stays that table.
+  const later = good();
+  for (const c of later.cases) c.role = "regression";
+  assert.equal(render(later.cases, later.log, candidates), render(good().cases, good().log, candidates));
+  assert.match(render(later.cases, later.log, candidates), /^Candidates examined: /);
+
+  // A log that records roles says so in its table, whatever case.json says.
+  const again = good();
+  again.log.conditions = { tool: { commit: "abcdef0123456789" } };
+  again.log.cases.one!.role = "regression";
+  again.log.cases.two!.role = "unseen";
+  const table = render(again.cases, again.log, candidates);
+  assert.match(table, /^Measured again with the tool at abcdef0: 2 requirements from 2 repositories\. Used to tune the tool before this measurement: one\./);
+  assert.doesNotMatch(table, /Candidates examined/);
+  assert.match(table, /\| case \| role \| version \|/);
+  assert.match(table, /\| one \| regression \| shipped \|/);
+  assert.match(table, /\| two \| unseen \| shipped \|/);
+
+  // The gates hold of a table of tuned cases too.
+  const oneRepo = good();
+  oneRepo.log.cases.one!.role = "regression";
+  oneRepo.log.cases.two!.role = "regression";
+  oneRepo.cases[1] = { ...oneRepo.cases[1]!, repo: oneRepo.cases[0]!.repo };
+  assert.throws(() => render(oneRepo.cases, oneRepo.log, candidates), /the claim needs two or more/);
 });
 
 // ---- 3b. The document says what the committed record says, byte for byte ------------------------
@@ -213,5 +240,19 @@ test("the table in docs/local-check-cli.md is exactly what the committed log and
   const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
   const log = read<AcceptanceLog>("../bench/logs/acceptance-v1.json");
   const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
+  assert.equal(block, render(loadCases(), log, candidates));
+});
+
+test("the re-run's table in docs/local-check-cli.md is exactly what acceptance-v2.json produces, and one is not there without the other", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- acceptance-v2:begin -->\n";
+  const end = "\n<!-- acceptance-v2:end -->";
+  const logged = existsSync(new URL("../bench/logs/acceptance-v2.json", import.meta.url));
+  assert.equal(doc.split(begin).length - 1, logged ? 1 : 0, logged ? "exactly one acceptance-v2:begin marker" : "no table for a measurement that is not committed");
+  if (!logged) return;
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = read<AcceptanceLog>("../bench/logs/acceptance-v2.json");
+  const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
+  assert.ok(Object.values(log.cases).every((c) => c.role !== undefined), "every case of the re-run records its role");
   assert.equal(block, render(loadCases(), log, candidates));
 });
