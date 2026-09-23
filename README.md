@@ -226,6 +226,16 @@ kept, and `--json` has them in `sent.reused` and `sent.reusedFromEarlierRuns`;
 on real pull requests, is in [docs/local-check-cli.md](docs/local-check-cli.md#what-a-later-push-asks-again).
 Set `remember-answers: false` to ask everything every time.
 
+**A limit for the whole pull request.** With `limits.max_requests_per_pull_request` set in
+`.jev-intent-review.yml` and `remember-answers` on, the runs of one pull request together send at
+most that many requests to Jev, as far as the count carried in its cache goes; a run the limit
+leaves short says so, and where `policy.fail_on` names `finding` it fails (exit 2, or 1 when it
+listed a finding), so spending the limit cannot make a change pass unasked ([ADR 0014](docs/adr/0014-a-limit-for-the-whole-pull-request.md)).
+The value is read from the commit before the change, but the count lives in the pull request's own
+cache, which its author can clear; what that leaves unguarded is in
+[docs/local-check-cli.md](docs/local-check-cli.md#a-limit-for-the-whole-pull-request). Unset, there
+is no such limit; `limits.max_requests` still holds each run.
+
 **How a run reads at a glance.** The check run is green only when at least one call was read and
 nothing is left to look at; red when the command did not exit 0; and neutral — grey — for everything
 else: a run that was skipped, found no requirement, asked nothing, read no call, left a call without
@@ -273,8 +283,7 @@ sending the evidence a fork's own code assembled, or running the fork's code wit
 are the thing [#42](https://github.com/yottayoshida/jev-intent-review/issues/42) asked to keep out.
 
 **What it does not do yet.** It runs on `pull_request` only; `pull_request_target` is refused at the
-Action's entry. A budget per pull request is
-[#42](https://github.com/yottayoshida/jev-intent-review/issues/42).
+Action's entry.
 A pull request with no requirement in either form is skipped
 (`policy.no_intent`), and one whose requirements cannot be read stops with exit 11, which makes the
 job red — as does the Action's own stop (exit 10) on an event other than `pull_request` or a runner

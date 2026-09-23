@@ -404,6 +404,50 @@ What is not guaranteed:
 - A kept answer is the one draw Jev gave; asking again would give a fresh one. Where the reading sits
   at the bar, the two can differ ([below](#what-another-push-would-not-have-to-ask-again)).
 
+## A limit for the whole pull request
+
+**With `limits.max_requests_per_pull_request` set, and the Action keeping the pull request's
+answers, the runs of one pull request together send at most that many requests to Jev, as far as
+the count carried in its cache goes; a run the limit leaves short says so**
+([ADR 0014](adr/0014-a-limit-for-the-whole-pull-request.md)).
+
+- **Where it is counted.** In the `--answers` directory, as `sent.log`: the transport writes one
+  line just before each request leaves, a retry included, so a run stopped halfway — even killed —
+  has counted what it sent. A request whose line cannot be written is not sent, and the notes say
+  how many were not sent for that reason. The unit is the
+  directory: the Action keeps one per pull request; from the command line, whatever shares a
+  directory shares the count.
+- **How it holds a run.** At the start, what is left of the limit narrows the run's own
+  `limits.max_requests`; a run with nothing left sends nothing. A question it could not send is
+  left without an answer, with the budget as the reason — as under the run's own limit — and the
+  notes say "This pull request had sent N requests of its M before this run, so this run could send
+  K." and, when the limit cut the run short, how many judgments could not be sent. Kept answers are
+  still used, since they send nothing.
+- **Where the repository gates on findings** (`policy.fail_on: [finding]`), a run the limit left
+  short — or that sent nothing because its count could not be written — exits 2, it did not
+  finish, unless it listed a finding, which exits 1 as before. Either way the check is red: pushing
+  until the limit is spent cannot make a change pass unasked. Without that setting it exits 0, as a
+  run held by its own limit does. A run stopped by its own time or bytes is not said to have reached
+  the pull request's limit.
+- **Who sets it.** `.jev-intent-review.yml` at the commit before the change, like every other
+  setting: a pull request that raises it in its own change is still held by the old value.
+- **When it does not apply.** Without `--answers` there is nowhere to count, and a directory or file
+  others can read is not used (the Action makes the restored ones private first); the notes say the
+  limit was not applied, and `limits.max_requests` alone held the run.
+
+Not guaranteed:
+
+- **The count lives in the pull request's own workflow and cache.** An author of a pull request
+  from a branch of the repository can set `remember-answers: false` in that workflow — the limit is
+  then said not to apply — or clear the cache, which starts the count from 0. The workflow change is
+  said in the notes (as any change to `.github/workflows/` is); clearing the cache is not.
+- A cache GitHub has evicted starts from 0.
+- A restore brings back one cache, the newest. Runs of one pull request that overlap, the Action in
+  two jobs of one pull request, and the legs of a matrix each save their own count, and only one of
+  them reaches the next run: the limit can be passed. Under the README's `concurrency`, a run a
+  later push cancels saves its count only as it stops, and whether that lands before the next run
+  restores the cache is not yet measured on GitHub.
+
 ## What has been measured
 
 Everything below is about `failure_propagation` except two parts: the one measurement of

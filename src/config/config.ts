@@ -22,7 +22,11 @@ export interface Config {
   };
   evidence: { max_primary_chars: number; max_related_chars: number };
   judgment: { violation_probability: number; satisfaction_probability: number; relevance_probability: number };
-  limits: { max_requests: number; max_sent_bytes: number; max_seconds: number };
+  /**
+   * `max_requests_per_pull_request`: what the runs of one pull request may send together, counted in
+   * the directory of kept answers (`--answers`, ADR 0014). Absent: no such limit.
+   */
+  limits: { max_requests: number; max_sent_bytes: number; max_seconds: number; max_requests_per_pull_request?: number };
   policy: {
     /** `finding`: exit 1 when a call is worth checking. `violation` in a file is read as `finding`. */
     fail_on: "finding"[];
@@ -108,6 +112,7 @@ const RULES: Record<string, Record<string, Rule>> = {
     max_requests: { kind: "number", min: 1, max: 100_000 },
     max_sent_bytes: { kind: "number", min: 1_000, max: 1_000_000_000 },
     max_seconds: { kind: "number", min: 10, max: 86_400 },
+    max_requests_per_pull_request: { kind: "number", min: 1, max: 1_000_000 },
   },
   policy: {
     fail_on: { kind: "enums", values: ["finding", "violation"] },

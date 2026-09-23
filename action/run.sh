@@ -61,7 +61,9 @@ case "${1:-}" in
     if [ -n "${JEV_ANSWERS:-}" ] && [ ! -L "$JEV_ANSWERS" ]; then
       mkdir -p "$JEV_ANSWERS" && chmod 700 "$JEV_ANSWERS" && set -- --answers "$JEV_ANSWERS"
       # Not through a symlink: chmod would change what it points to. The command refuses a symlink.
-      if [ -f "$JEV_ANSWERS/answers.jsonl" ] && [ ! -L "$JEV_ANSWERS/answers.jsonl" ]; then chmod 600 "$JEV_ANSWERS/answers.jsonl"; fi
+      for kept in answers.jsonl sent.log; do
+        if [ -f "$JEV_ANSWERS/$kept" ] && [ ! -L "$JEV_ANSWERS/$kept" ]; then chmod 600 "$JEV_ANSWERS/$kept"; fi
+      done
     fi
     node "${ACTION_PATH:?}/src/cli/main.ts" --json "$@" > "${JEV_WORK:?}/stdout.json" 2> "$JEV_WORK/stderr.txt"
     code=$?
@@ -81,7 +83,8 @@ case "${1:-}" in
     output exit-code "$code"
     output checked "$checked"
     # Whether there is a ledger to save: a run that opened none leaves nothing, and a save of nothing warns.
-    if [ -n "${JEV_ANSWERS:-}" ] && [ ! -L "$JEV_ANSWERS" ] && [ -f "$JEV_ANSWERS/answers.jsonl" ]; then output answers-kept true; else output answers-kept false; fi
+    # What the pull request has sent (sent.log, ADR 0014) is kept too, even when no answer was.
+    if [ -n "${JEV_ANSWERS:-}" ] && [ ! -L "$JEV_ANSWERS" ] && { [ -f "$JEV_ANSWERS/answers.jsonl" ] || [ -f "$JEV_ANSWERS/sent.log" ]; }; then output answers-kept true; else output answers-kept false; fi
     ;;
 
   *)

@@ -234,6 +234,11 @@ export interface ClientOptions {
   maxRequests?: number;
   maxBytes?: number;
   now?: () => number;
+  /**
+   * Called once for every request just before it leaves, a retry included, after the run's own
+   * limits have let it through. A `ProviderError` it throws stops that request unsent (ADR 0014).
+   */
+  onRequest?: () => void;
 }
 
 // 529 is TypeSafe's "overloaded", which its documentation says to retry with backoff.
@@ -262,6 +267,7 @@ export class JevClient {
   readonly #sleep: (ms: number) => Promise<void>;
   readonly #deadline: number;
   readonly #maxRequests: number;
+  readonly #onRequest: (() => void) | undefined;
   readonly #maxBytes: number;
   readonly #now: () => number;
 
@@ -288,6 +294,7 @@ export class JevClient {
     this.#sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
     this.#deadline = options.deadline ?? Number.POSITIVE_INFINITY;
     this.#maxRequests = options.maxRequests ?? Number.POSITIVE_INFINITY;
+    this.#onRequest = options.onRequest;
     this.#maxBytes = options.maxBytes ?? Number.POSITIVE_INFINITY;
     this.#now = options.now ?? Date.now;
   }
@@ -342,6 +349,9 @@ export class JevClient {
       if (remaining <= 0) throw new ProviderError("budget", "time limit reached");
       if (this.sent.requests + 1 > this.#maxRequests) throw new ProviderError("budget", `request limit reached (${this.#maxRequests})`);
       if (this.sent.bytes + size > this.#maxBytes) throw new ProviderError("budget", `byte limit reached (${this.#maxBytes})`);
+      // Counted where the pull request keeps its count, before the request leaves; if it cannot be,
+      // the request does not leave.
+      this.#onRequest?.();
       const timeout = Math.min(options.timeoutMs ?? this.#timeoutMs, remaining);
       let response: Response;
       let text: string;
