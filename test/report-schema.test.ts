@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { parseIntentSpec, validateIntentSpec } from "../src/intent/schema.ts";
-import { codeBlock, codeSpan, renderJson, renderMarkdown } from "../src/report/markdown.ts";
+import { codeBlock, codeSpan, renderJson, renderMarkdown, resultKind } from "../src/report/markdown.ts";
 import { EXIT, ToolError } from "../src/types.ts";
 import { VERSION } from "../src/version.ts";
 import { FIXTURES } from "./helpers/repo.ts";
@@ -45,9 +45,9 @@ test("the Markdown report leads with a result line drawn from the counts alone, 
   // that did not fit) has that call under "Not checked", and is not read as a run that stopped.
   const inBudget = { file: "src/auth.rs", function: "open_session", call: "create_session(store, &record)", origin: "changed" as const };
   const stopped = { ...unread, wouldAsk: [inBudget] };
-  assert.match(renderMarkdown(report({ requirements: [stopped], sent: { requests: 0, bytes: 0, answered: 0 } })), /\*\*Result: the set was built and nothing was asked\.\*\* 1 call inside the budget, 1 call not checked/);
+  assert.match(renderMarkdown(report({ requirements: [stopped], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } })), /\*\*Result: the set was built and nothing was asked\.\*\* 1 call inside the budget, 1 call not checked/);
   const heldLate = { ...stopped, unchecked: [...unread.unchecked, { ...inBudget, why: "the body of open_session did not fit the evidence limit, so an answer would be about part of it" }] };
-  assert.match(renderMarkdown(report({ requirements: [heldLate], sent: { requests: 0, bytes: 0, answered: 0 } })), /\*\*Result: no call was read\.\*\* 2 calls not checked/);
+  assert.match(renderMarkdown(report({ requirements: [heldLate], sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 } })), /\*\*Result: no call was read\.\*\* 2 calls not checked/);
   for (const word of ["VERIFIED", "VIOLATION", "UNKNOWN", "verdict:"]) assert.ok(!text.includes(word), `${word} is not in the report`);
   assert.ok(!/violat/i.test(text.replace(/`[^`]*`/g, "")), "no verdict word of the tool's own outside a code span");
 });
@@ -63,6 +63,19 @@ test("the Markdown report shows each requirement's calls: worth checking with ev
   assert.ok(!text.includes("<img"), "notes cannot carry HTML");
   assert.match(text, /&lt;img src=x&gt;/);
   assert.match(text, /- 4 requests, 4 answers, 12,345 bytes/);
+});
+
+test("the sent line says how many answers were reused and how many of those an earlier run kept, and a run answered from them all is not 'Nothing was asked'", () => {
+  const base = report();
+  const reused = report({ sent: { ...base.sent, requests: 1, answered: 1, reused: 3, reusedFromEarlierRuns: 2 } });
+  assert.match(renderMarkdown(reused), /- 1 request, 1 answer, 3 answers reused \(2 kept from earlier runs, the rest repeats within this one\), /);
+  assert.ok(!/reused/.test(renderMarkdown(base)), "nothing reused, nothing said");
+  // Every request answered from kept answers: nothing was sent, and the run still read its calls.
+  const allKept = report({ sent: { ...base.sent, requests: 0, answered: 0, reused: 4, reusedFromEarlierRuns: 4 } });
+  const none = report({ sent: { ...base.sent, requests: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 }, requirements: [{ ...base.requirements[0]!, wouldAsk: [{ file: "src/auth.rs", function: "open_session", call: "load_key(store, key)" } as never] }] });
+  assert.notEqual(resultKind(allKept).kind, "nothing_asked");
+  assert.equal(resultKind({ ...allKept, requirements: none.requirements }).kind === "nothing_asked", false, "reused answers count as asked");
+  assert.equal(resultKind(none).kind, "nothing_asked", "the control: with nothing sent and nothing reused it is");
 });
 
 test("the report names the endpoint and its host, and says so at the top when it was set by JEV_API_URL", () => {

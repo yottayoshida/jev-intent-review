@@ -1,0 +1,861 @@
+{
+  "version": 1,
+  "what": "the ledger on consecutive pushes: requests answered from kept answers, against the count expected from the packets, and whether the report reads the same",
+  "requirement": "Property: If an operation fails, the failure must be returned to its caller rather than turned into a success.",
+  "standIn": "hashed",
+  "corpus": [
+    "yottayoshida/omamori#556",
+    "yottayoshida/omamori#461",
+    "yottayoshida/omamori#514",
+    "yottayoshida/omamori#490",
+    "yottayoshida/omamori#483",
+    "yottayoshida/omamori#506",
+    "yottayoshida/omamori#487",
+    "yottayoshida/omamori#391",
+    "yottayoshida/omamori#114",
+    "yottayoshida/omamori#111",
+    "yottayoshida/omamori#99",
+    "yottayoshida/omamori#75",
+    "yottayoshida/omamori#60",
+    "yottayoshida/omamori#323",
+    "yottayoshida/omamori#182",
+    "yottayoshida/omamori#271",
+    "yottayoshida/omamori#387",
+    "oxidezap/whatsapp-rust#759",
+    "moltis-org/moltis#1064",
+    "KontorProtocol/Kontor#385",
+    "Naoray/instruckt-tauri#9",
+    "dashpay/grovedb#501",
+    "dashpay/grovedb#500",
+    "TyRoXx/NonlocalityOS#433",
+    "iotaledger/iota#10136",
+    "armaxri/termiHub#2751",
+    "armaxri/termiHub#2732",
+    "ratazzi/quebec#136",
+    "VOID-TECHNOLOGY-INC/PyBun#428",
+    "beboite/boite-legacy#187",
+    "Diogo-Esteves/polyVocal#60",
+    "cavi-ai/bobby-browser#163",
+    "dolang-org/dolang#337",
+    "TumbleOwlee/ferrowl#127",
+    "MarshalX/python-libipld#117",
+    "getappz/agentflare#229",
+    "dsx-ai-factory/infra-controller#3469",
+    "Davidslv/cce-rust#168",
+    "liveask/liveask#127",
+    "AndreaBozzo/dataprof#370"
+  ],
+  "measured": [
+    {
+      "ref": "oxidezap/whatsapp-rust#759",
+      "base": "0df74ff98e7b",
+      "heads": 2,
+      "pushes": [
+        {
+          "head": "243d6f4b274e",
+          "ran": true,
+          "sent": 12,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 12,
+          "requestsWith": 12,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "f46e703543e4",
+          "ran": true,
+          "sent": 14,
+          "expectedReused": 10,
+          "reused": 10,
+          "expectedFromEarlierRuns": 10,
+          "reusedFromEarlierRuns": 10,
+          "requestsWithout": 14,
+          "requestsWith": 4,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "moltis-org/moltis#1064",
+      "base": "be4431a57851",
+      "heads": 2,
+      "pushes": [
+        {
+          "head": "15fb822ae131",
+          "ran": true,
+          "sent": 60,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 60,
+          "requestsWith": 60,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "4106d46dad04",
+          "ran": true,
+          "sent": 62,
+          "expectedReused": 53,
+          "reused": 53,
+          "expectedFromEarlierRuns": 53,
+          "reusedFromEarlierRuns": 53,
+          "requestsWithout": 62,
+          "requestsWith": 9,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "KontorProtocol/Kontor#385",
+      "base": "99cfbdfd4b0b",
+      "heads": 4,
+      "pushes": [
+        {
+          "head": "498ac413211a",
+          "ran": true,
+          "sent": 50,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 50,
+          "requestsWith": 50,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "8646c509669b",
+          "ran": true,
+          "sent": 53,
+          "expectedReused": 50,
+          "reused": 50,
+          "expectedFromEarlierRuns": 50,
+          "reusedFromEarlierRuns": 50,
+          "requestsWithout": 53,
+          "requestsWith": 3,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "44110a790081",
+          "ran": true,
+          "sent": 58,
+          "expectedReused": 46,
+          "reused": 46,
+          "expectedFromEarlierRuns": 46,
+          "reusedFromEarlierRuns": 46,
+          "requestsWithout": 58,
+          "requestsWith": 12,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "5523cc5ad646",
+          "ran": true,
+          "sent": 59,
+          "expectedReused": 55,
+          "reused": 55,
+          "expectedFromEarlierRuns": 55,
+          "reusedFromEarlierRuns": 55,
+          "requestsWithout": 59,
+          "requestsWith": 4,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "TyRoXx/NonlocalityOS#433",
+      "base": "338c28a8180d",
+      "heads": 3,
+      "pushes": [
+        {
+          "head": "8842bd76f5e2",
+          "ran": true,
+          "sent": 8,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 8,
+          "requestsWith": 8,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "fe3b1f95bbcb",
+          "ran": true,
+          "sent": 16,
+          "expectedReused": 8,
+          "reused": 8,
+          "expectedFromEarlierRuns": 8,
+          "reusedFromEarlierRuns": 8,
+          "requestsWithout": 16,
+          "requestsWith": 8,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "b616698df262",
+          "ran": true,
+          "sent": 17,
+          "expectedReused": 16,
+          "reused": 16,
+          "expectedFromEarlierRuns": 16,
+          "reusedFromEarlierRuns": 16,
+          "requestsWithout": 17,
+          "requestsWith": 1,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "armaxri/termiHub#2751",
+      "base": "a3ee73822616",
+      "heads": 4,
+      "pushes": [
+        {
+          "head": "860996bbb9c1",
+          "ran": true,
+          "sent": 7,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 7,
+          "requestsWith": 7,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "35266dde23af",
+          "ran": true,
+          "sent": 25,
+          "expectedReused": 7,
+          "reused": 7,
+          "expectedFromEarlierRuns": 7,
+          "reusedFromEarlierRuns": 7,
+          "requestsWithout": 25,
+          "requestsWith": 18,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "318bb8dca0c1",
+          "ran": true,
+          "sent": 34,
+          "expectedReused": 25,
+          "reused": 25,
+          "expectedFromEarlierRuns": 25,
+          "reusedFromEarlierRuns": 25,
+          "requestsWithout": 34,
+          "requestsWith": 9,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "a2e75c6b9eb1",
+          "ran": true,
+          "sent": 34,
+          "expectedReused": 34,
+          "reused": 34,
+          "expectedFromEarlierRuns": 34,
+          "reusedFromEarlierRuns": 34,
+          "requestsWithout": 34,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "armaxri/termiHub#2732",
+      "base": "eb8f16637cc2",
+      "heads": 2,
+      "pushes": [
+        {
+          "head": "a0dd5a52539b",
+          "ran": true,
+          "sent": 20,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 20,
+          "requestsWith": 20,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "532e9bcc3ea3",
+          "ran": true,
+          "sent": 37,
+          "expectedReused": 20,
+          "reused": 20,
+          "expectedFromEarlierRuns": 20,
+          "reusedFromEarlierRuns": 20,
+          "requestsWithout": 37,
+          "requestsWith": 17,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "beboite/boite-legacy#187",
+      "base": "66b78cc89b79",
+      "heads": 12,
+      "pushes": [
+        {
+          "head": "85918fce9008",
+          "ran": true,
+          "sent": 11,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 11,
+          "requestsWith": 11,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "0c6e6aaf042d",
+          "ran": true,
+          "sent": 42,
+          "expectedReused": 11,
+          "reused": 11,
+          "expectedFromEarlierRuns": 11,
+          "reusedFromEarlierRuns": 11,
+          "requestsWithout": 42,
+          "requestsWith": 31,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "a788623e9b9d",
+          "ran": true,
+          "sent": 65,
+          "expectedReused": 42,
+          "reused": 42,
+          "expectedFromEarlierRuns": 42,
+          "reusedFromEarlierRuns": 42,
+          "requestsWithout": 65,
+          "requestsWith": 23,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "1cca9a69d0e7",
+          "ran": true,
+          "sent": 65,
+          "expectedReused": 65,
+          "reused": 65,
+          "expectedFromEarlierRuns": 65,
+          "reusedFromEarlierRuns": 65,
+          "requestsWithout": 65,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "7bc9c605bd4e",
+          "ran": true,
+          "sent": 65,
+          "expectedReused": 65,
+          "reused": 65,
+          "expectedFromEarlierRuns": 65,
+          "reusedFromEarlierRuns": 65,
+          "requestsWithout": 65,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "887ab0192c72",
+          "ran": true,
+          "sent": 65,
+          "expectedReused": 65,
+          "reused": 65,
+          "expectedFromEarlierRuns": 65,
+          "reusedFromEarlierRuns": 65,
+          "requestsWithout": 65,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "02bcc7ee38f8",
+          "ran": true,
+          "sent": 65,
+          "expectedReused": 65,
+          "reused": 65,
+          "expectedFromEarlierRuns": 65,
+          "reusedFromEarlierRuns": 65,
+          "requestsWithout": 65,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "857aaecacee6",
+          "ran": true,
+          "sent": 79,
+          "expectedReused": 65,
+          "reused": 65,
+          "expectedFromEarlierRuns": 65,
+          "reusedFromEarlierRuns": 65,
+          "requestsWithout": 79,
+          "requestsWith": 14,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "08d2ead09e2f",
+          "ran": true,
+          "sent": 82,
+          "expectedReused": 79,
+          "reused": 79,
+          "expectedFromEarlierRuns": 79,
+          "reusedFromEarlierRuns": 79,
+          "requestsWithout": 82,
+          "requestsWith": 3,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "b8fd19530b38",
+          "ran": true,
+          "sent": 86,
+          "expectedReused": 82,
+          "reused": 82,
+          "expectedFromEarlierRuns": 82,
+          "reusedFromEarlierRuns": 82,
+          "requestsWithout": 86,
+          "requestsWith": 4,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "c5980e5a1d3c",
+          "ran": true,
+          "sent": 87,
+          "expectedReused": 82,
+          "reused": 82,
+          "expectedFromEarlierRuns": 82,
+          "reusedFromEarlierRuns": 82,
+          "requestsWithout": 87,
+          "requestsWith": 5,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "af1c0b51ddcb",
+          "ran": true,
+          "sent": 90,
+          "expectedReused": 80,
+          "reused": 80,
+          "expectedFromEarlierRuns": 80,
+          "reusedFromEarlierRuns": 80,
+          "requestsWithout": 90,
+          "requestsWith": 10,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "Diogo-Esteves/polyVocal#60",
+      "base": "ce12f00c3d02",
+      "heads": 2,
+      "pushes": [
+        {
+          "head": "7b81126991dd",
+          "ran": true,
+          "sent": 60,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 60,
+          "requestsWith": 60,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "9ce0dbba353b",
+          "ran": true,
+          "sent": 77,
+          "expectedReused": 58,
+          "reused": 58,
+          "expectedFromEarlierRuns": 58,
+          "reusedFromEarlierRuns": 58,
+          "requestsWithout": 77,
+          "requestsWith": 19,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "TumbleOwlee/ferrowl#127",
+      "base": "2f06e402f1a4",
+      "heads": 4,
+      "pushes": [
+        {
+          "head": "e84329ce0176",
+          "ran": true,
+          "sent": 0,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 0,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "1771e1a557bc",
+          "ran": true,
+          "sent": 2,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 2,
+          "requestsWith": 2,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "a408a005fb31",
+          "ran": true,
+          "sent": 15,
+          "expectedReused": 2,
+          "reused": 2,
+          "expectedFromEarlierRuns": 2,
+          "reusedFromEarlierRuns": 2,
+          "requestsWithout": 15,
+          "requestsWith": 13,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "791c0bda366f",
+          "ran": true,
+          "sent": 23,
+          "expectedReused": 10,
+          "reused": 10,
+          "expectedFromEarlierRuns": 10,
+          "reusedFromEarlierRuns": 10,
+          "requestsWithout": 23,
+          "requestsWith": 13,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "getappz/agentflare#229",
+      "base": "eca529858636",
+      "heads": 2,
+      "pushes": [
+        {
+          "head": "990a8ad0d1f5",
+          "ran": true,
+          "sent": 22,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 22,
+          "requestsWith": 22,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "7f35f67b0388",
+          "ran": true,
+          "sent": 22,
+          "expectedReused": 22,
+          "reused": 22,
+          "expectedFromEarlierRuns": 22,
+          "reusedFromEarlierRuns": 22,
+          "requestsWithout": 22,
+          "requestsWith": 0,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "Davidslv/cce-rust#168",
+      "base": "9c7702d7474f",
+      "heads": 3,
+      "pushes": [
+        {
+          "head": "cf25818ada69",
+          "ran": true,
+          "sent": 5,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 5,
+          "requestsWith": 5,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "b6b6032069fd",
+          "ran": true,
+          "sent": 44,
+          "expectedReused": 5,
+          "reused": 5,
+          "expectedFromEarlierRuns": 5,
+          "reusedFromEarlierRuns": 5,
+          "requestsWithout": 44,
+          "requestsWith": 39,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "6d33a9bdc12c",
+          "ran": true,
+          "sent": 49,
+          "expectedReused": 22,
+          "reused": 22,
+          "expectedFromEarlierRuns": 22,
+          "reusedFromEarlierRuns": 22,
+          "requestsWithout": 49,
+          "requestsWith": 27,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    },
+    {
+      "ref": "AndreaBozzo/dataprof#370",
+      "base": "814d9c003530",
+      "heads": 3,
+      "pushes": [
+        {
+          "head": "79401d72fd92",
+          "ran": true,
+          "sent": 49,
+          "expectedReused": 0,
+          "reused": 0,
+          "expectedFromEarlierRuns": 0,
+          "reusedFromEarlierRuns": 0,
+          "requestsWithout": 49,
+          "requestsWith": 49,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "2222534ca049",
+          "ran": true,
+          "sent": 49,
+          "expectedReused": 48,
+          "reused": 48,
+          "expectedFromEarlierRuns": 48,
+          "reusedFromEarlierRuns": 48,
+          "requestsWithout": 49,
+          "requestsWith": 1,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        },
+        {
+          "head": "7974b4793554",
+          "ran": true,
+          "sent": 54,
+          "expectedReused": 49,
+          "reused": 49,
+          "expectedFromEarlierRuns": 49,
+          "reusedFromEarlierRuns": 49,
+          "requestsWithout": 54,
+          "requestsWith": 5,
+          "sameRequirements": true,
+          "sameChanges": true,
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "ref": "yottayoshida/omamori#556",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/556 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#461",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/461 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#514",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/514 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#490",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/490 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#483",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/483 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#506",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/506 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#487",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/487 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#391",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/391 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#114",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/114 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#111",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/111 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#99",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/99 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#75",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/75 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#60",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/60 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#323",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/323 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#182",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/182 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#271",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/271 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#387",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/387 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "Naoray/instruckt-tauri#9",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dashpay/grovedb#501",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dashpay/grovedb#500",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "iotaledger/iota#10136",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "ratazzi/quebec#136",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "cavi-ai/bobby-browser#163",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dolang-org/dolang#337",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "MarshalX/python-libipld#117",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dsx-ai-factory/infra-controller#3469",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "liveask/liveask#127",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    }
+  ],
+  "pushes": 43,
+  "pushesNotRun": 0,
+  "reusedMatchesExpected": 43,
+  "fromEarlierRunsMatchesExpected": 43,
+  "requestsAddUp": 43,
+  "reportsSame": 43,
+  "medianReusedShareOfLaterPushes": 0.8548387096774194,
+  "reusedOfLaterPushes": {
+    "reused": 1241,
+    "sent": 1535
+  }
+}

@@ -54,7 +54,16 @@ case "${1:-}" in
     ;;
 
   review)
-    node "${ACTION_PATH:?}/src/cli/main.ts" --json > "${JEV_WORK:?}/stdout.json" 2> "$JEV_WORK/stderr.txt"
+    # The kept answers (ADR 0013): a restored cache may come back readable by others, and the command
+    # refuses a directory that is, so it is made private again first. Empty when remember-answers is off.
+    set --
+    # A directory that is itself a symlink is left alone and not passed: chmod would change what it points to.
+    if [ -n "${JEV_ANSWERS:-}" ] && [ ! -L "$JEV_ANSWERS" ]; then
+      mkdir -p "$JEV_ANSWERS" && chmod 700 "$JEV_ANSWERS" && set -- --answers "$JEV_ANSWERS"
+      # Not through a symlink: chmod would change what it points to. The command refuses a symlink.
+      if [ -f "$JEV_ANSWERS/answers.jsonl" ] && [ ! -L "$JEV_ANSWERS/answers.jsonl" ]; then chmod 600 "$JEV_ANSWERS/answers.jsonl"; fi
+    fi
+    node "${ACTION_PATH:?}/src/cli/main.ts" --json "$@" > "${JEV_WORK:?}/stdout.json" 2> "$JEV_WORK/stderr.txt"
     code=$?
     printf '%s\n' "$code" > "$JEV_WORK/exit-code"
     say "the command exited ${code}."
@@ -71,6 +80,8 @@ case "${1:-}" in
     [ "$checked" = "true" ] || checked=false
     output exit-code "$code"
     output checked "$checked"
+    # Whether there is a ledger to save: a run that opened none leaves nothing, and a save of nothing warns.
+    if [ -n "${JEV_ANSWERS:-}" ] && [ ! -L "$JEV_ANSWERS" ] && [ -f "$JEV_ANSWERS/answers.jsonl" ]; then output answers-kept true; else output answers-kept false; fi
     ;;
 
   *)
