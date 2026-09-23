@@ -19,7 +19,7 @@
 import { STOP_WORDS } from "../discovery/discover.ts";
 import { redact } from "../evidence/redact.ts";
 import type { Questions } from "../judgments/provider.ts";
-import type { Requirement, RequirementForm } from "../types.ts";
+import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
 import { BAR, conditionFor, questionsFor } from "./local-check.ts";
 import { MAPPING_PROPERTY, mappingQuestionFor, type MappingAnswer, whyListed } from "./mapping.ts";
@@ -51,6 +51,12 @@ export interface Form {
   name: RequirementForm;
   /** What the mapping asks the requirement to require of the call, as a stable name for the record. */
   property: string;
+  /**
+   * What a sentence of this form says: the form's option in the question that asks Jev which form
+   * a requirement's sentence has (`FORM_QUESTION`, ADR 0008). Measured wording — a word changed
+   * here is a changed measurement, and `test/forms.test.ts` holds the question to the measured hash.
+   */
+  says: string;
   askable(context: AskContext): Promise<Askability>;
   /** Always keyed `requirement_governs`, with the options `applies`, `does_not_apply`, `unknown`. */
   mappingQuestion(fn: FunctionCandidate, call: CallCandidate): Questions;
@@ -83,6 +89,7 @@ const named = (call: CallCandidate) => redact(call.expression).text.replace(/`/g
 const failurePropagation: Form = {
   name: "failure_propagation",
   property: MAPPING_PROPERTY,
+  says: "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
   askable: ({ fn, call, resultOf }) => resultOf(fn, call),
   mappingQuestion: (fn, call) => mappingQuestionFor(fn, call, named(call)),
   observationKey: "on_error_result",
@@ -121,6 +128,7 @@ const REACH_CRITERIA = {
 const checkBeforeAction: Form = {
   name: "check_before_action",
   property: "check_passes_before_call",
+  says: "The sentence says that an operation must not be performed unless a check passes, or must never be performed in some case, and it names the operation.",
   askable: async ({ requirement, call, readHere }) => {
     // The words first: they cost nothing, and only a call they let through needs its callee's
     // definitions looked up.
@@ -185,15 +193,72 @@ export const FORMS: Readonly<Record<RequirementForm, Form>> = {
 
 export const formOf = (requirement: Requirement): Form => FORMS[requirement.form ?? DEFAULT_FORM];
 
+// --- Which form a sentence says (ADR 0008) --------------------------------------------------------
+//
+// A requirement read from an issue, a pull request or the command line names no form. Before its
+// calls, the run puts one typed choice to Jev over the sentence alone — `{ requirement: { id, text } }`,
+// no code, no hints — and reads the answer by one rule. Measured first on 72 sentences
+// (`bench/forms/choice/`, `bench/logs/form-choice-v1.json`); the log fingerprints this question's
+// serialisation, and `test/forms.test.ts` holds it there, so the question sent is the question measured.
+
+/** Not a form: the option for every other sentence. */
+export const NEITHER_SAYS = "The sentence says something else: what a feature does or shows, what an output contains, what stays the same, a limit on data or an interface, or a task to do.";
+
 /**
- * The wording of every question a form can send, rendered on one fixed place, so a report can carry
- * a fingerprint of what was asked (`QUESTIONS_HASH`). Change a criterion or a template and the
- * fingerprint moves; change nothing and it does not.
+ * The question, assembled from the forms in the order they are declared and then `neither`. The
+ * key order (`type`, `instructions`, `criteria`; the criteria in that order) is part of what the
+ * measurement's hash covers, so it is fixed here on purpose.
  */
-export const FORMS_FINGERPRINT: Readonly<Record<RequirementForm, { mapping: Questions; observation: Questions }>> = (() => {
+export const FORM_QUESTION: Questions = {
+  requirement_form: {
+    type: "choice",
+    instructions: "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
+    criteria: { ...Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, form.says])), neither: NEITHER_SAYS },
+  },
+};
+
+export type OptionReading = { kind: "option"; option: string; probability: number } | { kind: "under"; option: string; probability: number } | { kind: "none" };
+
+/**
+ * One answer read at a bar: the option chosen when the question offered it and its probability is
+ * at the bar or above; `under` when it is below; `none` when there is no answer or the option was
+ * not one of those offered. `chooseForm` and the bench's scorer both read through this, so there
+ * is one line, not two.
+ */
+export function readOption(answer: ChoiceAnswer | undefined, offered: readonly string[], bar: number): OptionReading {
+  if (!answer || !offered.includes(answer.choice)) return { kind: "none" };
+  return { kind: answer.probability >= bar ? "option" : "under", option: answer.choice, probability: answer.probability };
+}
+
+export interface FormChoice {
+  form: RequirementForm;
+  by: "jev" | "default";
+  /** Jev's choice as given, `no_answer` when there was none. */
+  verdict: string;
+  probability: number;
+}
+
+/**
+ * The rule, fixed before the measurement: a form's option at the bar or above is that form;
+ * `neither`, an answer under the bar, or no answer is the default.
+ */
+export function chooseForm(answer: ChoiceAnswer | undefined): FormChoice {
+  if (!answer) return { form: DEFAULT_FORM, by: "default", verdict: "no_answer", probability: 0 };
+  const read = readOption(answer, REQUIREMENT_FORMS, BAR);
+  return { form: read.kind === "option" ? (read.option as RequirementForm) : DEFAULT_FORM, by: read.kind === "option" ? "jev" : "default", verdict: answer.choice, probability: answer.probability };
+}
+
+/**
+ * The wording of every question a form can send — each form's two, rendered on one fixed place, and
+ * the one that asks which form a sentence says — so a report can carry a fingerprint of what was
+ * asked (`QUESTIONS_HASH`). Change a criterion or a template and the fingerprint moves; change
+ * nothing and it does not.
+ */
+export const FORMS_FINGERPRINT: Readonly<{ forms: Record<RequirementForm, { mapping: Questions; observation: Questions }>; choice: Questions }> = (() => {
   const fn = { id: "f", path: "src/f.rs", name: "f", startLine: 1, endLine: 1, signature: "fn f() -> Result<(), E>" } as FunctionCandidate;
   const call = { id: "src/f.rs:call-1", functionId: "f", line: 1, text: "g(x)?;", callee: "g", expression: "g(x)", expressionComplete: true } as CallCandidate;
-  return Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, { mapping: form.mappingQuestion(fn, call), observation: form.observationQuestions(fn, call) }])) as Record<RequirementForm, { mapping: Questions; observation: Questions }>;
+  const forms = Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, { mapping: form.mappingQuestion(fn, call), observation: form.observationQuestions(fn, call) }])) as Record<RequirementForm, { mapping: Questions; observation: Questions }>;
+  return { forms, choice: FORM_QUESTION };
 })();
 
 // --- Words, for `check_before_action` -------------------------------------------------------------

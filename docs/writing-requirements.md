@@ -55,6 +55,17 @@ A requirement read only from a pull request's own description is its author's cl
 own change: the report says so, it is not used to justify the change's other lines, and an issue
 that could not be read is named in the report's notes.
 
+## Which form a requirement is checked under
+
+The local check asks one of two things of each call — how a failure must propagate, or that a
+check passes before an action ([docs/local-check-cli.md](local-check-cli.md), *Writing a
+requirement*). A requirement read from an issue or a pull request names neither, so the run asks
+Jev once, over the sentence alone, which form it says, and checks under that form when Jev is sure
+(0.6 or more); otherwise, and when Jev reads neither, under failure propagation, as before. The
+report says which form and who chose it. A sentence that names the operation it forbids — "A
+disabled API key must never create a session." — reaches the calls that share a word with it; one
+that names none reaches no call, and the report says so for each call it held.
+
 ## What is read, exactly
 
 - Left out, and only these: HTML comments, code blocks, link reference definitions

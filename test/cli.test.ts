@@ -12,7 +12,7 @@ import type { GitHub } from "../src/intent/github.ts";
 import { validateIntentSpec } from "../src/intent/schema.ts";
 import { EXIT, type IntentSpec, type ReviewReport } from "../src/types.ts";
 import { VERSION } from "../src/version.ts";
-import { formsProvider } from "./helpers/fakes.ts";
+import { answer, formsProvider } from "./helpers/fakes.ts";
 import { FIXTURES, fixtureRepo, tempRepo } from "./helpers/repo.ts";
 
 const CREDENTIALS = { CLOUDFLARE_ACCOUNT_ID: "0123456789abcdef0123456789abcdef", CLOUDFLARE_API_TOKEN: "test-token" };
@@ -43,8 +43,8 @@ const RUST_SPEC = join(FIXTURES, "integrity-rust", "spec.json");
 const EVENT = (name: string) => join(import.meta.dirname, "fixtures", "events", `${name}.json`);
 
 /** No compiler: requirements come from a spec file or from an acceptance-criteria list. */
-function fakeDeps(github?: Partial<GitHub>): Deps & { provider: ReturnType<typeof formsProvider> } {
-  const provider = formsProvider();
+function fakeDeps(github?: Partial<GitHub>, jev: Parameters<typeof formsProvider>[0] = {}): Deps & { provider: ReturnType<typeof formsProvider> } {
+  const provider = formsProvider(jev);
   return {
     provider,
     judges: () => ({ provider, sent: () => ({ requests: provider.calls.length, bytes: 0 }), origin: "https://api.cloudflare.com" }),
@@ -130,7 +130,7 @@ test("--experimental-local-check changes nothing, and a requirement of the other
     assert.match(set.out(), /\*\*Result: the set was built and nothing was asked\.\*\* 2 calls inside the budget, 2 calls not checked/);
     assert.match(set.out(), /^Nothing was asked: the set was built and the run stopped\./m);
     assert.ok(!set.out().includes("what the requirement requires of the call, and what the function does under an assumption"), "the opening that says two questions were put is not printed");
-    assert.match(set.out(), /^Form: `failure_propagation`\. Nothing was asked; the form would ask this\./m);
+    assert.match(set.out(), /^Form: `failure_propagation` \(the default\)\. Nothing was asked; the form would ask this\./m);
     assert.match(set.out(), /### Inside the budget/);
 
     // Both forms in one spec: the check-before-action requirement is asked its own question, in the
@@ -781,6 +781,63 @@ test("--skip-change-check leaves the changes unasked and says so; without it eve
     assert.equal(report.requirements[0]!.findings.length, 1, "the calls were still read");
     assert.deepEqual(report.unexpectedChanges, []);
     assert.equal(report.sent.requests, 4);
+  } finally {
+    repo.remove();
+  }
+});
+
+test("a requirement read from text is asked its form first, over the sentence alone; a spec's is not; the set built only asks nothing and says so", async () => {
+  const repo = fixtureRepo("integrity-rust");
+  const parsed = (out: string) => JSON.parse(out) as ReviewReport;
+  try {
+    const file = join(repo.dir, "intent.md");
+    writeFileSync(file, "## Acceptance criteria\n- A baseline that cannot be read is not reported as no baseline at all.\n");
+    const args = ["--base", repo.base, "--head", repo.head, "--intent-file", file, "--skip-change-check", "--json"];
+
+    // Jev reads the sentence as the check form: the first request is the form question, carrying the
+    // requirement and nothing else, and every question after it is the check form's.
+    const asChecked = fakeDeps(undefined, { form: answer("check_before_action", 0.9) });
+    const checked = io(repo.dir, CREDENTIALS);
+    assert.equal(await main(args, checked.value, asChecked), EXIT.ok);
+    assert.deepEqual(asChecked.provider.calls[0]?.questions, ["requirement_form"]);
+    assert.deepEqual(Object.keys(asChecked.provider.calls[0]!.state), ["requirement"]);
+    assert.equal(asChecked.provider.calls.filter((c) => c.questions.includes("requirement_form")).length, 1);
+    const later = asChecked.provider.calls.slice(1).flatMap((c) => c.questions);
+    assert.ok(later.includes("in_forbidden_case") && !later.includes("on_error_result"), later.join(","));
+    const checkedReport = parsed(checked.out());
+    assert.deepEqual([checkedReport.requirements[0]!.form, checkedReport.requirements[0]!.formBy, checkedReport.requirements[0]!.formReading?.verdict], ["check_before_action", "jev", "check_before_action"]);
+    assert.equal(checkedReport.sent.requests, asChecked.provider.calls.length, "the form question is counted with the rest");
+    assert.equal(checkedReport.sent.answered, asChecked.provider.calls.length, "and among the answers");
+
+    // The scripted `neither` every other test runs with: the default form, and the reading kept.
+    const asNeither = fakeDeps();
+    const plain = io(repo.dir, CREDENTIALS);
+    assert.equal(await main(args, plain.value, asNeither), EXIT.ok);
+    const plainReport = parsed(plain.out());
+    assert.deepEqual([plainReport.requirements[0]!.form, plainReport.requirements[0]!.formBy, plainReport.requirements[0]!.formReading?.verdict], ["failure_propagation", "default", "neither"]);
+    assert.ok(asNeither.provider.calls.slice(1).some((c) => c.questions.includes("on_error_result")));
+    const plainText = io(repo.dir, CREDENTIALS);
+    await main(args.filter((a) => a !== "--json"), plainText.value, fakeDeps());
+    assert.match(plainText.out(), /Form: `failure_propagation` \(the default: Jev read the sentence as `neither`, 0\.90\)\./);
+
+    // A spec names the form: no question about it, whatever the fake would answer.
+    const fromSpec = fakeDeps(undefined, { form: answer("check_before_action", 0.9) });
+    const spec = io(repo.dir, CREDENTIALS);
+    assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", RUST_SPEC, "--skip-change-check", "--json"], spec.value, fromSpec), EXIT.ok);
+    assert.ok(!fromSpec.provider.calls.some((c) => c.questions.includes("requirement_form")), "a spec's requirement is never asked its form");
+    assert.deepEqual([parsed(spec.out()).requirements[0]!.formBy, parsed(spec.out()).requirements[0]!.formReading], ["default", undefined]);
+
+    // Building the set only: no request of any kind, and the report says the form was not asked.
+    const building = fakeDeps(undefined, { form: answer("check_before_action", 0.9) });
+    const built = io(repo.dir, {});
+    assert.equal(await main([...args, "--candidates-only"], built.value, building), EXIT.ok);
+    assert.equal(building.provider.calls.length, 0);
+    const builtReport = parsed(built.out());
+    assert.equal(builtReport.sent.requests, 0);
+    assert.deepEqual([builtReport.requirements[0]!.formBy, builtReport.requirements[0]!.formNotAsked], ["default", "candidates_only"]);
+    const builtText = io(repo.dir, {});
+    await main([...args.filter((a) => a !== "--json"), "--candidates-only"], builtText.value, fakeDeps());
+    assert.match(builtText.out(), /the default: the form was not asked — `--candidates-only` asks nothing/);
   } finally {
     repo.remove();
   }

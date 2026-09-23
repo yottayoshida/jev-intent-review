@@ -34,20 +34,28 @@ the sentence has to say depends on its **form** — what the check asks of each 
 }
 ```
 
-`form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
-from the sentence. Whether Jev could is measured — [below](#how-jev-reads-the-form-of-a-sentence),
-on every requirement sentence this repository holds in a spec, fixture or golden file (a spec's
-`ambiguities`, which record what was not read, are not requirements) — and ADR 0008 records what
-was decided on it. For `check_before_action` the words of the sentence and
-of `searchHints` decide which calls are asked about (below), so a requirement that names no
-action — "every session-creation path must enforce the same guard" — reaches no call, and one
-whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as
-a call) reaches nothing either. The report says why for each call it holds.
+A spec names the form; a value outside the two stops the run. A requirement read from an issue, a
+pull request, `--intent` or `--intent-file` names none, so before its calls the run asks Jev once,
+over the sentence alone, which form it says ([ADR 0008](adr/0008-who-chooses-a-requirements-form.md);
+measured first on every requirement sentence this repository holds in a spec, fixture or golden
+file — [below](#how-jev-reads-the-form-of-a-sentence)): the form Jev says at the bar of 0.6,
+`failure_propagation` or `check_before_action`; when Jev reads `neither`, is under the bar, or
+gives no answer, the default, `failure_propagation`, as before. The report's form line says which form and who chose it
+(`named in the spec`, `the default`, `Jev read the sentence as this, 0.91`, or the default with
+what Jev read instead), and `--json` carries `formBy`, `formReading` and `formNotAsked` per
+requirement. `--candidates-only` asks nothing and says so; a change that reached no function is
+not asked either. A requirement read from text carries no `searchHints`, so under
+`check_before_action` it reaches only the calls whose names share a word with the sentence
+itself. For `check_before_action` the words of the sentence and of `searchHints` decide which
+calls are asked about (below), so a requirement that names no action — "every session-creation
+path must enforce the same guard" — reaches no call, and one whose action is not a call
+(`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as a call) reaches nothing
+either. The report says why for each call it holds.
 
 The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
 (`## Acceptance criteria`, `## Acceptance`, …), one requirement per item, and a paragraph that begins
-`Property:`. Every requirement read that way is `failure_propagation`. Each source is read on its
+`Property:`. Every requirement read that way is asked its form (above). Each source is read on its
 own. Ordinary prose is not turned into requirements — no model writes or picks them — so a source in
 neither way is named in the report's Intent section with the reason, and a run that could read
 nothing stops (exit 11) and prints that section too. The report and `--json` (its `intent`,
@@ -64,6 +72,12 @@ and what is asked, is the requirement's form. Each askable call, up to a budget 
 requirement, gets two questions to Jev, in separate requests: whether the requirement requires
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
+
+A requirement that names no form — one read from text — is first asked which form its sentence
+says: one request carrying `{ requirement: { id, text } }` and nothing else (the measurement sent
+every sentence as `R1`; the run sends the requirement's own id), and its calls are then read under
+the form Jev chose at the bar, or under `failure_propagation` when Jev read neither form or was not
+sure. A spec's requirement is not asked; nor is one on a run that read no function.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
@@ -747,8 +761,10 @@ table says how Jev reads sentences of these shapes, not how it would read an arb
 
 The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
 read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its
-author's. That wiring is a change of its own and is not in this version — until it lands, every
-requirement read from text is `failure_propagation`, as above.
+author's. The run does so now ([Writing a requirement](#writing-a-requirement)): the question it
+sends is the one above, held to the log's hash by `test/forms.test.ts`, and `metadata.questionsHash`
+covers it from that change on — the records above carry the hash of their day, and a spec run's
+hash moved with it though what it sends did not.
 
 ## Only Jev
 

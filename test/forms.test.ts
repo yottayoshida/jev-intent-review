@@ -5,12 +5,13 @@
 // and the recorded answers of #36 read again through the rule.
 
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { parseIntentSpec } from "../src/intent/schema.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { CallCandidate } from "../src/plan/candidates.ts";
-import { callTerms, formOf, FORMS, identifierWords, requirementTerms, termsMeet } from "../src/plan/forms.ts";
+import { callTerms, chooseForm, FORM_QUESTION, formOf, FORMS, identifierWords, NEITHER_SAYS, readOption, requirementTerms, termsMeet } from "../src/plan/forms.ts";
 import { BAR as OBSERVATION_BAR, describe } from "../src/plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR } from "../src/plan/mapping.ts";
 import { LOCAL_CHECK_INTRO, requirementSection } from "../src/report/markdown.ts";
@@ -20,7 +21,7 @@ const renderLocalCheck = (results: readonly LocalCheckResultType[]) => [...LOCAL
 import { outcomeOf, type Outcome, type Reading } from "../src/review/outcome.ts";
 import { probabilityOf } from "../src/review/requirement.ts";
 import type { Git } from "../src/repository/git.ts";
-import type { ChoiceAnswer, Requirement, RequirementForm } from "../src/types.ts";
+import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../src/types.ts";
 
 const BAR = OBSERVATION_BAR;
 const FORM_NAMES = Object.keys(FORMS) as RequirementForm[];
@@ -404,4 +405,34 @@ test("every recorded answer pair of #36 comes out of the rule listed exactly whe
   }
   // The recorded set, so a log that lost its runs cannot pass by having nothing in it.
   assert.deepEqual({ pairs, listed }, { pairs: 102, listed: 6 });
+});
+
+// --- Which form a sentence says (ADR 0008) ----------------------------------------------------------
+
+test("the form question is the measured one: its serialisation hashes to what the log recorded", () => {
+  const log = JSON.parse(readFileSync(new URL("../bench/logs/form-choice-v1.json", import.meta.url), "utf8")) as { conditions: { question: string } };
+  const hash = createHash("sha256").update(JSON.stringify(FORM_QUESTION)).digest("hex");
+  assert.equal(hash, log.conditions.question, "the question's wording or its key order differs from the one measured in bench/logs/form-choice-v1.json");
+});
+
+test("the form question is assembled from the forms' own criteria, in their order, then neither", () => {
+  const q = FORM_QUESTION.requirement_form!;
+  assert.deepEqual(Object.keys(q), ["type", "instructions", "criteria"]);
+  assert.deepEqual(Object.keys(q.criteria), [...FORM_NAMES, "neither"]);
+  for (const name of FORM_NAMES) assert.equal(q.criteria[name], FORMS[name].says);
+  assert.equal(q.criteria.neither, NEITHER_SAYS);
+  assert.ok(!(REQUIREMENT_FORMS as readonly string[]).includes("neither"), "neither is an option, not a form");
+});
+
+test("readOption: an offered option at the bar, under it, or none; chooseForm reads the forms through it", () => {
+  const a = (choice: string, p: number): ChoiceAnswer => ({ choice, probability: p, confidence: p, probabilities: { [choice]: p } });
+  assert.deepEqual(readOption(a("check_before_action", 0.6), REQUIREMENT_FORMS, BAR), { kind: "option", option: "check_before_action", probability: 0.6 });
+  assert.deepEqual(readOption(a("check_before_action", 0.59), REQUIREMENT_FORMS, BAR), { kind: "under", option: "check_before_action", probability: 0.59 });
+  assert.deepEqual(readOption(a("neither", 0.99), REQUIREMENT_FORMS, BAR), { kind: "none" });
+  assert.deepEqual(readOption(a("neither", 0.99), [...REQUIREMENT_FORMS, "neither"], BAR), { kind: "option", option: "neither", probability: 0.99 });
+  assert.deepEqual(readOption(undefined, REQUIREMENT_FORMS, BAR), { kind: "none" });
+  assert.deepEqual(chooseForm(a("check_before_action", 0.6)), { form: "check_before_action", by: "jev", verdict: "check_before_action", probability: 0.6 });
+  assert.deepEqual(chooseForm(a("neither", 0.99)), { form: "failure_propagation", by: "default", verdict: "neither", probability: 0.99 });
+  assert.deepEqual(chooseForm(a("failure_propagation", 0.59)), { form: "failure_propagation", by: "default", verdict: "failure_propagation", probability: 0.59 });
+  assert.deepEqual(chooseForm(undefined), { form: "failure_propagation", by: "default", verdict: "no_answer", probability: 0 });
 });
