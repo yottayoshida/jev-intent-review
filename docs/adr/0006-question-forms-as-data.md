@@ -60,10 +60,13 @@ helper whose body is not sent, Jev still answered with confidence (0.92–0.96).
       repository is at a function the change reached — is not asked about: a check before what it
       does is asked about inside it. A name two functions share resolves to neither.
 - A requirement names its form in the spec, `form`, optional and experimental, defaulting to
-  `failure_propagation`. An unknown value is refused when the spec is read. Requirements read from
-  a pull request's acceptance-criteria list are all `failure_propagation`. Jev does not choose a
-  form. Whether it should is to be measured first, and that decision also settles whether this
-  field stays. (Measured in ADR 0008, which records the numbers and the owner's ruling.)
+  `failure_propagation`. An unknown value is refused when the spec is read. As decided here,
+  requirements read from a pull request's acceptance-criteria list were all `failure_propagation`
+  and Jev did not choose a form, pending a measurement that would also settle whether this field
+  stays. ADR 0008 took that measurement and rules otherwise: Jev chooses the form of a requirement
+  read from text — a sixth part, what its sentence says, is added to the five above, and the
+  question is assembled from the forms — while the `form` field stays, a spec's word, and is not
+  asked.
 - The four values are **readings per call, not requirement verdicts.** No requirement-level status
   is stated, the Markdown report keeps "Nothing here is a requirement verdict" and no verdict word,
   and a listed call still leaves the exit code at 0. The JSON carries `outcome` and `form` per call.

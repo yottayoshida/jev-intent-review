@@ -31,6 +31,7 @@ export function localCheckResult(): LocalCheckResult {
     requirementId: "R1",
     requirementText: "Disabled users cannot authenticate.",
     form: "failure_propagation",
+    formBy: "spec",
     wouldAsk: [],
     observed: [observed("create_session(store, &record)", "returns_success", 0.61, "violates"), observed("load_key(store, key)", "returns_error", 0.99, "satisfies")],
     unchecked: [{ file: "src/auth.rs", function: "open_session", call: "audit(store)", origin: "changed", why: "audit has no definition in this repository, so what it returns is not established here" }],

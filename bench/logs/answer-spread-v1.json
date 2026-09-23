@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "log": "bench/logs/acceptance-v1.json",
+  "bar": 0.6,
+  "window": 0.1,
+  "places": 34,
+  "runsPerPlace": [
+    3
+  ],
+  "placesAskedMoreThanOnce": 34,
+  "placesWhoseReadingMoved": 2,
+  "readings": 102,
+  "readingsNearTheBar": 8,
+  "moved": [
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "requirement": "R1",
+      "function": "finalize",
+      "call": "verify_height(grove_version)",
+      "readings": [
+        {
+          "observation": "returns_success",
+          "probability": 0.62
+        },
+        {
+          "observation": "cannot_determine",
+          "probability": 0.57
+        },
+        {
+          "observation": "returns_success",
+          "probability": 0.6799999999999999
+        }
+      ],
+      "everyReadingNearTheBar": true
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "requirement": "R1",
+      "function": "finalize",
+      "call": "verify_height(grove_version)",
+      "readings": [
+        {
+          "observation": "returns_success",
+          "probability": 0.64
+        },
+        {
+          "observation": "cannot_determine",
+          "probability": 0.59
+        },
+        {
+          "observation": "cannot_determine",
+          "probability": 0.5700000000000001
+        }
+      ],
+      "everyReadingNearTheBar": true
+    }
+  ]
+}

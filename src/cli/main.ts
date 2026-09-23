@@ -47,9 +47,12 @@ What a run does: for each requirement, take the Rust functions the change touche
 callers one hop out, and ask Jev two things about each call, as the requirement's "form" says.
 The default, failure_propagation: whether the requirement requires that a failure of the call
 not reach the caller as a success, and what the function returns when it does. The other,
-check_before_action (set "form" in --intent-spec): whether the requirement requires a check to
-pass before the call, and whether the function still makes the call when the check does not
-pass. One rule reads each call as holding, worth checking, not settled, or not required of. A
+check_before_action: whether the requirement requires a check to pass before the call, and
+whether the function still makes the call when the check does not pass. A spec names a
+requirement's form; one read from an issue, a pull request, --intent or --intent-file is first
+asked of Jev, once, which form its sentence says, and is read under that form when Jev is sure
+(0.6), else under the default. One rule reads each call as holding, worth checking, not
+settled, or not required of. A
 call worth checking is listed with the requirement's words, the code, the assumption and both
 answers. Then every change the pull request made is asked about once: is it asked for by any
 requirement? No file, function or expected answer is named on the command line. No requirement
@@ -462,7 +465,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
       const asksNothing = () => {
         throw new Error("--candidates-only reached a model");
       };
-      const run = await runLocalCheck(git, revisions, intent.requirements, { model: "none", judge: asksNothing } as unknown as JudgmentProvider, include, { ...localOptions, candidatesOnly: true });
+      // `askForm` is passed so the report can say the form was not asked here; the run asks nothing
+      // when it builds the set only.
+      const run = await runLocalCheck(git, revisions, intent.requirements, { model: "none", judge: asksNothing } as unknown as JudgmentProvider, include, { ...localOptions, candidatesOnly: true, askForm: !resolved.spec });
       footing(run.change.changedPaths);
       return output(report({ exitCode: EXIT.ok, intent, sources: resolved.sources, requirements: run.requirements, notes, prAuthor }));
     }
@@ -492,7 +497,9 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const judges = deps.judges ? deps.judges(endpoint, config, deadline) : defaultJudges(endpoint, config, deadline, io.env, deps.fetch);
 
     // The calls first, then the changes. One provider for both; there is nothing else to send to.
-    const run = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, localOptions);
+    // A requirement read from text names no form, so Jev is asked which form its sentence says
+    // (ADR 0008); a spec's requirements keep the spec's word and are not asked.
+    const run = await runLocalCheck(git, revisions, intent.requirements, judges.provider, include, { ...localOptions, askForm: !resolved.spec });
     footing(run.change.changedPaths);
     trace(`changed files: ${run.change.changedPaths.length}`);
     for (const s of run.change.skipped) trace(`  skipped ${s.path}: ${s.reason}`);
@@ -512,6 +519,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // Reached the host and could not read one answer from it, over both passes: the host is wrong
     // or not answering, and a report of nothing settled would pass for a run that judged. The local
     // check stops on its own when it asked; this covers a run whose only questions were the changes'.
+    // An answer to a form question is not a judgment and does not count here (ADR 0008).
     if (run.reached + changes.reached > 0 && run.answered + changes.answered === 0) {
       throw new ToolError(`no judgment came back from ${judges.origin}: ${run.reached + changes.reached} request(s) were sent and none was answered`, EXIT.provider);
     }
@@ -524,7 +532,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         sources: resolved.sources,
         requirements: run.requirements,
         unexpectedChanges: changes.unexpected,
-        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + changes.answered, endpoint: judges.origin, host: endpoint.host },
+        sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered, endpoint: judges.origin, host: endpoint.host },
         notes,
         prAuthor,
       }),

@@ -84,7 +84,7 @@ v0.1 is an experimental implementation of the broader intent-review model.
 It currently supports:
 
 * Rust repositories — in any other language no function is read and no call is asked about; only the change question runs
-* two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action
+* two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action — which form a sentence read from an issue says is Jev's reading, measured on 72 sentences ([ADR 0008](docs/adr/0008-who-chooses-a-requirements-form.md))
 * functions touched by the change and callers one hop out
 * requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](#intent))
 * Jev as the only judgment model
@@ -161,6 +161,9 @@ permissions:
   pull-requests: read
   issues: read
   checks: write
+concurrency:
+  group: intent-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   review:
     name: intent review (same-repository pull requests only)
@@ -176,6 +179,9 @@ jobs:
           cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 ```
+
+`concurrency` stops a pull request's earlier run when a later push starts one, so pushing several
+times in a row pays for the last push rather than for every one.
 
 Pin the Action to a commit: there is no tag yet, and `@main` would change under you. The version of
 the command is the Action's own — it runs the source at that commit, not a published package.
@@ -271,6 +277,8 @@ of the log — redirect stdout and stderr to files.
 ## Intent
 
 No model writes the requirements and no model picks them out of prose. They are read from two forms, as written: the items of a requirements section (`## Acceptance criteria`, `## Acceptance`, `## Requirements`, `## Definition of done`, `## Done when`), and a paragraph that begins `Property:`. [docs/writing-requirements.md](docs/writing-requirements.md) has the details and an issue template to copy.
+
+Which of the two things the check can ask — how a failure must propagate, or that a check passes before an action — a requirement's sentence says is Jev's one typed reading of the sentence, taken before its calls; when Jev reads neither or is not sure, the requirement is checked as failure propagation, as before, and the report says which form and who chose it ([ADR 0008](docs/adr/0008-who-chooses-a-requirements-form.md)).
 
 Whenever the tool prints its report, or stops because it could not read the requirements, every issue and pull request it read is either read into requirements as written — from a requirements section or a `Property:` paragraph, leaving out only HTML comments, code blocks, link reference definitions and characters that display as nothing — or named with the reason it was not. An issue the pull request closes and the tool does not read — in another repository, missing, or past the ten GitHub lists — is named too.
 

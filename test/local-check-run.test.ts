@@ -99,23 +99,34 @@ interface Asked {
   instructions: string;
   candidate: { symbol?: string; changed: boolean };
   body: string;
+  /** The top-level keys of the state sent: a form question carries `requirement` and nothing else. */
+  stateKeys: string[];
 }
 
 /**
  * One Jev, answering both questions.
  *
  * The mapping answer is scripted per call; the reading of the code comes from the body, so the
- * two never agree by construction.
+ * two never agree by construction. The form question, when asked, is answered as scripted, or not
+ * at all (`form` throwing) — it names no call and carries no code.
  */
-function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choice: "applies", probability: 0.9, confidence: 0.9, probabilities: { applies: 0.9 } })): { judge: JudgmentProvider; asked: Asked[] } {
+function jev(
+  mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choice: "applies", probability: 0.9, confidence: 0.9, probabilities: { applies: 0.9 } }),
+  form: () => ChoiceAnswer | undefined = () => undefined,
+): { judge: JudgmentProvider; asked: Asked[] } {
   const asked: Asked[] = [];
   const judge: JudgmentProvider = {
     model: "typesafe/jev",
     async judge(state: unknown, questions: Questions) {
-      const packet = state as { candidate: { symbol?: string; changed_by_pull_request: boolean }; evidence: { code: string } };
       const keys = Object.keys(questions);
       const q = questions as unknown as Record<string, { instructions: string }>;
-      const entry: Asked = { keys, instructions: q[keys[0]!]!.instructions, candidate: { symbol: packet.candidate.symbol, changed: packet.candidate.changed_by_pull_request }, body: packet.evidence.code };
+      if (keys.includes("requirement_form")) {
+        asked.push({ keys, instructions: q.requirement_form!.instructions, candidate: { changed: false }, body: "", stateKeys: Object.keys(state as object) });
+        const answer = form();
+        return answer ? { requirement_form: answer } : {};
+      }
+      const packet = state as { candidate: { symbol?: string; changed_by_pull_request: boolean }; evidence: { code: string } };
+      const entry: Asked = { keys, instructions: q[keys[0]!]!.instructions, candidate: { symbol: packet.candidate.symbol, changed: packet.candidate.changed_by_pull_request }, body: packet.evidence.code, stateKeys: Object.keys(state as object) };
       asked.push(entry);
       if (keys.includes("requirement_governs")) {
         const answer = mapping(entry);
@@ -125,7 +136,7 @@ function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choi
       const expression = /reaches the call `([^`]+)`/.exec(entry.instructions)?.[1] ?? "";
       const out: Record<string, ChoiceAnswer> = {};
       for (const key of keys) {
-        const choice = key === "on_error_result" ? (flat.includes(`${expression}?`) ? "returns_error" : "returns_success") : "stops_there";
+        const choice = key === "on_error_result" ? (flat.includes(`${expression}?`) ? "returns_error" : "returns_success") : key === "in_forbidden_case" ? "reaches_it" : "stops_there";
         out[key] = { choice, probability: 0.95, confidence: 0.95, probabilities: { [choice]: 0.95 } };
       }
       return out;
@@ -134,11 +145,14 @@ function jev(mapping: (asked: Asked) => ChoiceAnswer | undefined = () => ({ choi
   return { judge, asked };
 }
 
-async function run(options?: Partial<LocalCheckOptions>, integrity?: string, mapping?: (a: Asked) => ChoiceAnswer | undefined) {
-  const { judge, asked } = jev(mapping);
-  const { requirements: results } = await runLocalCheck(repo(integrity), REVISIONS, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
-  return { r: results[0]!, results, asked, text: renderRequirements(results) };
+async function run(options?: Partial<LocalCheckOptions>, integrity?: string, mapping?: (a: Asked) => ChoiceAnswer | undefined, form?: () => ChoiceAnswer | undefined, requirements: Requirement[] = [requirement]) {
+  const { judge, asked } = jev(mapping, form);
+  const full = await runLocalCheck(repo(integrity), REVISIONS, requirements, judge, () => true, { ...DEFAULT_LOCAL_CHECK, ...options });
+  const results = full.requirements;
+  return { r: results[0]!, results, asked, text: renderRequirements(results), full };
 }
+
+const said = (choice: string, probability: number): ChoiceAnswer => ({ choice, probability, confidence: probability, probabilities: { [choice]: probability } });
 
 test("the change reaches the call it introduced, and its caller one hop out", async () => {
   const { r } = await run();
@@ -332,4 +346,110 @@ test("the report states no verdict of its own and quotes no model prose", async 
   assert.ok(!/violat/i.test(text), "no verdict of the tool's own");
   assert.ok(!/VERIFIED|NOT_VERIFIED/.test(text), "and no requirement-level status");
   assert.match(text, /Nothing here is a requirement verdict/);
+});
+
+// --- Which form: Jev's reading of the sentence (ADR 0008) --------------------------------------------
+
+test("a run that asks puts the form question first, over the sentence alone, and checks under the form Jev read", async () => {
+  const { r, asked, full } = await run({ askForm: true }, undefined, undefined, () => said("check_before_action", 0.9));
+  assert.deepEqual(asked[0]!.keys, ["requirement_form"]);
+  assert.deepEqual(asked[0]!.stateKeys, ["requirement"]);
+  assert.equal(asked.filter((a) => a.keys.includes("requirement_form")).length, 1, "asked once");
+  const later = asked.slice(1).flatMap((a) => a.keys);
+  assert.ok(later.includes("in_forbidden_case"), `the check form's questions follow: ${later.join(",")}`);
+  assert.ok(!later.includes("on_error_result"), "the failure form's questions do not");
+  assert.equal(r.form, "check_before_action");
+  assert.equal(r.formBy, "jev");
+  assert.deepEqual(r.formReading, { verdict: "check_before_action", probability: 0.9, probabilities: { check_before_action: 0.9 } });
+  assert.equal(r.formNotAsked, undefined);
+  assert.deepEqual(full.form, { reached: 1, answered: 1 }, "the form question is counted apart from the calls'");
+  assert.equal(full.answered, asked.length - 1, "the calls' answers do not include it");
+});
+
+test("neither, a reading under the bar, or no answer leaves the default form, and the reading is kept", async () => {
+  const neither = await run({ askForm: true }, undefined, undefined, () => said("neither", 0.9));
+  assert.equal(neither.r.form, "failure_propagation");
+  assert.equal(neither.r.formBy, "default");
+  assert.equal(neither.r.formReading?.verdict, "neither");
+  assert.ok(neither.asked.slice(1).some((a) => a.keys.includes("on_error_result")), "the failure form's questions follow");
+  assert.match(neither.text, /Form: `failure_propagation` \(the default: Jev read the sentence as `neither`, 0\.90\)\./);
+
+  const under = await run({ askForm: true }, undefined, undefined, () => said("check_before_action", 0.5));
+  assert.equal(under.r.form, "failure_propagation");
+  assert.deepEqual([under.r.formBy, under.r.formReading?.verdict, under.r.formReading?.probability], ["default", "check_before_action", 0.5]);
+  assert.match(under.text, /the default: Jev's reading of `check_before_action` was under the bar, 0\.50/);
+
+  const none = await run({ askForm: true }, undefined, undefined, () => undefined);
+  assert.deepEqual([none.r.formBy, none.r.formReading?.verdict, none.r.formReading?.probability], ["default", "no_answer", 0]);
+  assert.match(none.text, /the default: the form question was not answered/);
+});
+
+test("without askForm nothing is asked about the form; a spec's form is never asked even with it", async () => {
+  const plain = await run(undefined, undefined, undefined, () => said("check_before_action", 0.9));
+  assert.ok(!plain.asked.some((a) => a.keys.includes("requirement_form")));
+  assert.deepEqual([plain.r.form, plain.r.formBy, plain.r.formReading], ["failure_propagation", "default", undefined]);
+  assert.match(plain.text, /Form: `failure_propagation` \(the default\)\./);
+
+  const named = await run({ askForm: true }, undefined, undefined, () => said("failure_propagation", 0.99), [{ ...requirement, form: "check_before_action" }]);
+  assert.ok(!named.asked.some((a) => a.keys.includes("requirement_form")), "the spec's word is not questioned");
+  assert.deepEqual([named.r.form, named.r.formBy], ["check_before_action", "spec"]);
+  assert.match(named.text, /Form: `check_before_action` \(named in the spec\)\./);
+});
+
+test("the set built only, or a change that reached no function, asks no form and says why", async () => {
+  const built = await run({ askForm: true, candidatesOnly: true }, undefined, undefined, () => said("check_before_action", 0.9));
+  assert.equal(built.asked.length, 0, "nothing at all is asked");
+  assert.deepEqual([built.r.formBy, built.r.formNotAsked], ["default", "candidates_only"]);
+  assert.match(renderRequirements(built.results).replace(/\n/g, " "), /the default: the form was not asked — `--candidates-only` asks nothing/);
+
+  // A diff that touches no Rust function: there is no call any form could ask about.
+  const docsOnly: Git = {
+    async readText(_rev: string, path: string) {
+      return path === "README.md" ? "# a\n" : (FILES[path] ?? null);
+    },
+    async changedFiles() {
+      return [{ status: "modified" as const, oldPath: "README.md", newPath: "README.md" }];
+    },
+    async diffText() {
+      return "diff --git a/README.md b/README.md\n--- a/README.md\n+++ b/README.md\n@@ -1 +1 @@\n-# a\n+# b\n";
+    },
+    async grep() {
+      return { hits: [], more: false };
+    },
+  } as unknown as Git;
+  const { judge, asked } = jev(undefined, () => said("check_before_action", 0.9));
+  const { requirements: results } = await runLocalCheck(docsOnly, REVISIONS, [requirement], judge, () => true, { ...DEFAULT_LOCAL_CHECK, askForm: true });
+  assert.equal(asked.length, 0, "no request at all");
+  assert.deepEqual([results[0]!.formBy, results[0]!.formNotAsked], ["default", "no_function"]);
+  assert.match(renderRequirements(results), /the default: the form was not asked — no function was read/);
+});
+
+test("a form question the host fails leaves the default and the run goes on; an answered form question does not stand in for the calls", async () => {
+  // The host fails the form question only: no answer → the default, and every call is still asked.
+  const failing = await run({ askForm: true }, undefined, undefined, () => {
+    throw new ProviderError("bad_response", "unreadable", undefined, "https://api.cloudflare.com");
+  });
+  assert.deepEqual([failing.r.formBy, failing.r.formReading?.verdict, failing.r.formReading?.failure], ["default", "no_answer", "bad_response from https://api.cloudflare.com"]);
+  assert.match(failing.text, /the default: the form question was not answered \(bad_response from https:\/\/api\.cloudflare\.com\)/);
+  assert.ok(failing.asked.slice(1).some((a) => a.keys.includes("requirement_governs")), "the calls were asked");
+  assert.deepEqual(failing.full.form, { reached: 1, answered: 0 });
+
+  // A failure that ends every later request ends the run from the form question too.
+  await assert.rejects(
+    run({ askForm: true }, undefined, undefined, () => {
+      throw new ProviderError("auth", "refused", 401, "https://api.cloudflare.com");
+    }),
+    (e: unknown) => e instanceof ProviderError && e.kind === "auth",
+  );
+
+  // The host answers the form question and nothing else: that is a host that judged no call, and the
+  // run fails as it did before the form question existed, rather than printing "not settled" everywhere.
+  const formOnly: JudgmentProvider = {
+    model: "typesafe/jev",
+    async judge(_state: unknown, questions: Questions) {
+      if ("requirement_form" in questions) return { requirement_form: said("check_before_action", 0.9) };
+      throw new ProviderError("bad_response", "unreadable", undefined, "https://api.cloudflare.com");
+    },
+  };
+  await assert.rejects(runLocalCheck(repo(), REVISIONS, [requirement], formOnly, () => true, { ...DEFAULT_LOCAL_CHECK, askForm: true }), (e: unknown) => e instanceof ToolError && e.exitCode === EXIT.provider);
 });

@@ -34,20 +34,28 @@ the sentence has to say depends on its **form** — what the check asks of each 
 }
 ```
 
-`form` is read from a spec only; a value outside the two stops the run. Nothing chooses a form
-from the sentence. Whether Jev could is measured — [below](#how-jev-reads-the-form-of-a-sentence),
-on every requirement sentence this repository holds in a spec, fixture or golden file (a spec's
-`ambiguities`, which record what was not read, are not requirements) — and ADR 0008 records what
-was decided on it. For `check_before_action` the words of the sentence and
-of `searchHints` decide which calls are asked about (below), so a requirement that names no
-action — "every session-creation path must enforce the same guard" — reaches no call, and one
-whose action is not a call (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as
-a call) reaches nothing either. The report says why for each call it holds.
+A spec names the form; a value outside the two stops the run. A requirement read from an issue, a
+pull request, `--intent` or `--intent-file` names none, so before its calls the run asks Jev once,
+over the sentence alone, which form it says ([ADR 0008](adr/0008-who-chooses-a-requirements-form.md);
+measured first on every requirement sentence this repository holds in a spec, fixture or golden
+file — [below](#how-jev-reads-the-form-of-a-sentence)): the form Jev says at the bar of 0.6,
+`failure_propagation` or `check_before_action`; when Jev reads `neither`, is under the bar, or
+gives no answer, the default, `failure_propagation`, as before. The report's form line says which form and who chose it
+(`named in the spec`, `the default`, `Jev read the sentence as this, 0.91`, or the default with
+what Jev read instead), and `--json` carries `formBy`, `formReading` and `formNotAsked` per
+requirement. `--candidates-only` asks nothing and says so; a change that reached no function is
+not asked either. A requirement read from text carries no `searchHints`, so under
+`check_before_action` it reaches only the calls whose names share a word with the sentence
+itself. For `check_before_action` the words of the sentence and of `searchHints` decide which
+calls are asked about (below), so a requirement that names no action — "every session-creation
+path must enforce the same guard" — reaches no call, and one whose action is not a call
+(`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as a call) reaches nothing
+either. The report says why for each call it holds.
 
 The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
 (`## Acceptance criteria`, `## Acceptance`, …), one requirement per item, and a paragraph that begins
-`Property:`. Every requirement read that way is `failure_propagation`. Each source is read on its
+`Property:`. Every requirement read that way is asked its form (above). Each source is read on its
 own. Ordinary prose is not turned into requirements — no model writes or picks them — so a source in
 neither way is named in the report's Intent section with the reason, and a run that could read
 nothing stops (exit 11) and prints that section too. The report and `--json` (its `intent`,
@@ -64,6 +72,12 @@ and what is asked, is the requirement's form. Each askable call, up to a budget 
 requirement, gets two questions to Jev, in separate requests: whether the requirement requires
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
+
+A requirement that names no form — one read from text — is first asked which form its sentence
+says: one request carrying `{ requirement: { id, text } }` and nothing else (the measurement sent
+every sentence as `R1`; the run sends the requirement's own id), and its calls are then read under
+the form Jev chose at the bar, or under `failure_propagation` when Jev read neither form or was not
+sure. A spec's requirement is not asked; nor is one on a run that read no function.
 
 | | `failure_propagation` | `check_before_action` |
 |---|---|---|
@@ -689,6 +703,96 @@ Measured without a request, before and after, on the same 15 runs as the two par
   `std::io::read_to_string`, `fs::File::metadata`); none was dropped. A scan that reads nothing
   finds no counterexample either, so it prints what it read.
 
+### What another push would not have to ask again
+
+Whether keeping a pull request's answers would save anything, measured before anything keeps them
+(ADR 0012; `bench/packet-reuse.ts`, log `bench/logs/packet-reuse-v1.json`). Answers decide nothing
+about what is sent, so they came from a stand-in on localhost and no request was billed:
+`selectSites` finishes before the first request and asks no model, and the observation question is
+sent whatever the mapping question answered. Every number here was taken with the tool at `0029a95`,
+before the table of *Functions outside the repository* (ADR 0011) was merged; that table changes
+which calls are asked about, so the packets a run sends now can differ from the ones counted.
+
+The corpus is every pull request in the acceptance set's candidates (`bench/acceptance/candidates.json`,
+40 entries), each attempted. **12 were measured, over 31 pairs of consecutive pushes.** The 28 that
+were not are in the log with the reason: **17 are not pull requests at all** — those entries name
+issues of `yottayoshida/omamori`, another repository by this tool's author, and `/pulls/{n}`
+answers 404 for each — and 11 have a single commit, which is no pair. Every run that was measured
+exited 0; a pair is counted only when both of its runs did, because a run that dies leaves no trace
+and would read as one that sent nothing (none was left out). A push here is a commit the author
+pushed, in order; every run was given the same requirement, in the `Property:` form, because most of
+these pull requests state none in a form this tool reads.
+
+| pull request | heads | of each later push, the judgments already answered at the push before |
+|---|---|---|
+| `oxidezap/whatsapp-rust#759` | 2 | 9/13 |
+| `moltis-org/moltis#1064` | 2 | 52/61 |
+| `KontorProtocol/Kontor#385` | 4 | 49/52, 45/57, 54/58 |
+| `TyRoXx/NonlocalityOS#433` | 3 | 5/13, 13/14 |
+| `armaxri/termiHub#2751` | 4 | 7/25, 25/34, 34/34 |
+| `armaxri/termiHub#2732` | 2 | 20/37 |
+| `beboite/boite-legacy#187` | 12 | 10/41, 41/64, 64/64, 64/64, 64/64, 64/64, 64/78, 78/81, 81/85, 81/86, 79/89 |
+| `Diogo-Esteves/polyVocal#60` | 2 | 53/72 |
+| `TumbleOwlee/ferrowl#127` | 4 | 0/1, 1/14, 9/22 |
+| `getappz/agentflare#229` | 2 | 11/11 |
+| `Davidslv/cce-rust#168` | 3 | 4/41, 21/46 |
+| `AndreaBozzo/dataprof#370` | 3 | 49/50, 50/55 |
+
+**The median over the 31 pairs is 0.852**: in the median pair, 85% of the later push's judgments ask
+again about the same evidence, byte for byte. By side: the calls' questions, 528 of 628; the change
+question, 673 of 862.
+
+One pull request carries 11 of the 31 pairs — `beboite/boite-legacy#187`, four of them 64/64 — so
+the median of pairs leans on it. Counted other ways the share is lower, and every one is still above
+the 0.50 the decision was fixed at: the median of each pull request's own median, 0.736; the 20
+pairs without that pull request, 0.736; every judgment pooled, 1201 of 1490 (0.806); only each pull
+request's first pair, 0.616.
+
+**A packet that differs only in where its code sits is rare.** Blanking every `lines` value before
+comparing — the function's start and end line, and the change's — moves 6 of the calls' 628 and 15
+of the changes' 862, and the median from 0.852 to 0.869. The line numbers a packet carries were the
+reason to expect little reuse; they are not what decides it. A key that ignored them would buy
+about two points.
+
+**Adding a requirement moves the packets of the requirements already there, unless it goes last.**
+On `moltis-org/moltis#1064` at its head, with one requirement and then two
+(`bench/logs/requirement-positions-v1.json`): a packet holds one requirement, so appending a second
+leaves the first's packets as they were — 34 of the 68 sent were already there, which is all of the
+first requirement's. Putting the second one *first* renumbers the ids the packets carry, and none of
+the 68 was: 0. The change question's state holds every requirement at once, so its packets change
+either way: 0 of 27.
+
+**What a stored answer would change.** The acceptance bench asks every place three times with
+byte-identical input (`bench/answer-spread.ts`, log `bench/logs/answer-spread-v1.json`, over
+`bench/logs/acceptance-v1.json`). The reading differed between runs in 2 of 34 places, and 8 of the
+102 readings sit within 0.1 of the bar of 0.6; both places that differed are among them. In both,
+Jev chose `returns_success` every time; what moved was its probability, between 0.57 and 0.68, and a
+reading below the bar is reported as `cannot_determine`. So a place that differs between runs is one
+whose probability sits at the bar, by how the bar works. A stored answer would keep one of those
+draws for every later push; asking again gives a fresh one each time. These places are not a real
+pull request's: 8 of the 34 are pull request heads (`shipped`), and the other 26 are versions built
+for the acceptance bench (`defect`, `rewrite`, `hidden`). One of the two that differed is a
+`hidden` version, which is built so that its answer should be `cannot_determine` or below the bar
+(`bench/acceptance/README.md`).
+
+What this does not measure:
+
+- How a pull request's pushes are spread over time, and so whether a cache would still hold the
+  earlier push's answers when the later one runs.
+- Pushes as people make them. A push is counted here per commit; a push that carries several commits
+  changes more between runs, so a share per real push would be lower than this. Of
+  `beboite/boite-legacy#187`'s 12 commits, the first six landed within four minutes. History a
+  force-push removed is not seen at all.
+- Whether the stand-in is sent exactly what the real endpoint is, beyond one pull request. On
+  `oxidezap/whatsapp-rust#759` at its head, one run against the stand-in and one against Jev
+  (Cloudflare) sent the same 13 packets, each once (`bench/logs/fidelity-v1.json`, from
+  `node bench/packet-reuse.ts --work <dir> --fidelity owner/repo#n`). Their order differed: the
+  change questions go out together and a trace line is written when its answer comes back, so the
+  comparison is of the packets and not of their order. The other eleven pull requests rest on the
+  argument from the code above.
+- Any pull request of this tool's author's repositories: the 17 entries of `yottayoshida/omamori`
+  are issues.
+
 ### How Jev reads the form of a sentence
 
 Whether Jev can tell a sentence's form from its words alone was measured before anyone lets it
@@ -756,8 +860,10 @@ table says how Jev reads sentences of these shapes, not how it would read an arb
 
 The owner's ruling on these numbers (2026-09-22, ADR 0008): Jev chooses the form of a requirement
 read from an issue, a pull request, `--intent` or `--intent-file`; a spec's `form` stays its
-author's. That wiring is a change of its own and is not in this version — until it lands, every
-requirement read from text is `failure_propagation`, as above.
+author's. The run does so now ([Writing a requirement](#writing-a-requirement)): the question it
+sends is the one above, held to the log's hash by `test/forms.test.ts`, and `metadata.questionsHash`
+covers it from that change on — the records above carry the hash of their day, and a spec run's
+hash moved with it though what it sends did not.
 
 ## Only Jev
 

@@ -1,0 +1,1222 @@
+{
+  "version": 1,
+  "what": "the share of a push's judgments whose packet was already answered at the push before it",
+  "requirement": "Property: If an operation fails, the failure must be returned to its caller rather than turned into a success.",
+  "standIn": true,
+  "requestsToTheStandIn": 1769,
+  "corpus": [
+    "yottayoshida/omamori#556",
+    "yottayoshida/omamori#461",
+    "yottayoshida/omamori#514",
+    "yottayoshida/omamori#490",
+    "yottayoshida/omamori#483",
+    "yottayoshida/omamori#506",
+    "yottayoshida/omamori#487",
+    "yottayoshida/omamori#391",
+    "yottayoshida/omamori#114",
+    "yottayoshida/omamori#111",
+    "yottayoshida/omamori#99",
+    "yottayoshida/omamori#75",
+    "yottayoshida/omamori#60",
+    "yottayoshida/omamori#323",
+    "yottayoshida/omamori#182",
+    "yottayoshida/omamori#271",
+    "yottayoshida/omamori#387",
+    "oxidezap/whatsapp-rust#759",
+    "moltis-org/moltis#1064",
+    "KontorProtocol/Kontor#385",
+    "Naoray/instruckt-tauri#9",
+    "dashpay/grovedb#501",
+    "dashpay/grovedb#500",
+    "TyRoXx/NonlocalityOS#433",
+    "iotaledger/iota#10136",
+    "armaxri/termiHub#2751",
+    "armaxri/termiHub#2732",
+    "ratazzi/quebec#136",
+    "VOID-TECHNOLOGY-INC/PyBun#428",
+    "beboite/boite-legacy#187",
+    "Diogo-Esteves/polyVocal#60",
+    "cavi-ai/bobby-browser#163",
+    "dolang-org/dolang#337",
+    "TumbleOwlee/ferrowl#127",
+    "MarshalX/python-libipld#117",
+    "getappz/agentflare#229",
+    "dsx-ai-factory/infra-controller#3469",
+    "Davidslv/cce-rust#168",
+    "liveask/liveask#127",
+    "AndreaBozzo/dataprof#370"
+  ],
+  "measured": [
+    {
+      "ref": "oxidezap/whatsapp-rust#759",
+      "base": "0df74ff98e7b",
+      "heads": 2,
+      "sentPerHead": [
+        11,
+        13
+      ],
+      "exitCodes": [
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "243d6f4b274e",
+          "to": "f46e703543e4",
+          "ran": true,
+          "all": {
+            "sent": 13,
+            "identical": 9,
+            "onlyLinesMoved": 2,
+            "new": 2,
+            "goneFromBefore": 2
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 13,
+            "identical": 9,
+            "onlyLinesMoved": 2,
+            "new": 2,
+            "goneFromBefore": 2
+          }
+        }
+      ]
+    },
+    {
+      "ref": "moltis-org/moltis#1064",
+      "base": "be4431a57851",
+      "heads": 2,
+      "sentPerHead": [
+        59,
+        61
+      ],
+      "exitCodes": [
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "15fb822ae131",
+          "to": "4106d46dad04",
+          "ran": true,
+          "all": {
+            "sent": 61,
+            "identical": 52,
+            "onlyLinesMoved": 1,
+            "new": 8,
+            "goneFromBefore": 7
+          },
+          "calls": {
+            "sent": 34,
+            "identical": 32,
+            "onlyLinesMoved": 0,
+            "new": 2,
+            "goneFromBefore": 2
+          },
+          "changes": {
+            "sent": 27,
+            "identical": 20,
+            "onlyLinesMoved": 1,
+            "new": 6,
+            "goneFromBefore": 5
+          }
+        }
+      ]
+    },
+    {
+      "ref": "KontorProtocol/Kontor#385",
+      "base": "99cfbdfd4b0b",
+      "heads": 4,
+      "sentPerHead": [
+        49,
+        52,
+        57,
+        58
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "498ac413211a",
+          "to": "8646c509669b",
+          "ran": true,
+          "all": {
+            "sent": 52,
+            "identical": 49,
+            "onlyLinesMoved": 0,
+            "new": 3,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 24,
+            "identical": 21,
+            "onlyLinesMoved": 0,
+            "new": 3,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "8646c509669b",
+          "to": "44110a790081",
+          "ran": true,
+          "all": {
+            "sent": 57,
+            "identical": 45,
+            "onlyLinesMoved": 3,
+            "new": 9,
+            "goneFromBefore": 7
+          },
+          "calls": {
+            "sent": 30,
+            "identical": 22,
+            "onlyLinesMoved": 2,
+            "new": 6,
+            "goneFromBefore": 6
+          },
+          "changes": {
+            "sent": 27,
+            "identical": 23,
+            "onlyLinesMoved": 1,
+            "new": 3,
+            "goneFromBefore": 1
+          }
+        },
+        {
+          "from": "44110a790081",
+          "to": "5523cc5ad646",
+          "ran": true,
+          "all": {
+            "sent": 58,
+            "identical": 54,
+            "onlyLinesMoved": 0,
+            "new": 4,
+            "goneFromBefore": 3
+          },
+          "calls": {
+            "sent": 30,
+            "identical": 30,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 28,
+            "identical": 24,
+            "onlyLinesMoved": 0,
+            "new": 4,
+            "goneFromBefore": 3
+          }
+        }
+      ]
+    },
+    {
+      "ref": "TyRoXx/NonlocalityOS#433",
+      "base": "338c28a8180d",
+      "heads": 3,
+      "sentPerHead": [
+        5,
+        13,
+        14
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "8842bd76f5e2",
+          "to": "fe3b1f95bbcb",
+          "ran": true,
+          "all": {
+            "sent": 13,
+            "identical": 5,
+            "onlyLinesMoved": 0,
+            "new": 8,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 6,
+            "identical": 4,
+            "onlyLinesMoved": 0,
+            "new": 2,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 7,
+            "identical": 1,
+            "onlyLinesMoved": 0,
+            "new": 6,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "fe3b1f95bbcb",
+          "to": "b616698df262",
+          "ran": true,
+          "all": {
+            "sent": 14,
+            "identical": 13,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 6,
+            "identical": 6,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 8,
+            "identical": 7,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    },
+    {
+      "ref": "armaxri/termiHub#2751",
+      "base": "a3ee73822616",
+      "heads": 4,
+      "sentPerHead": [
+        7,
+        25,
+        34,
+        34
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "860996bbb9c1",
+          "to": "35266dde23af",
+          "ran": true,
+          "all": {
+            "sent": 25,
+            "identical": 7,
+            "onlyLinesMoved": 0,
+            "new": 18,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 25,
+            "identical": 7,
+            "onlyLinesMoved": 0,
+            "new": 18,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "35266dde23af",
+          "to": "318bb8dca0c1",
+          "ran": true,
+          "all": {
+            "sent": 34,
+            "identical": 25,
+            "onlyLinesMoved": 0,
+            "new": 9,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 34,
+            "identical": 25,
+            "onlyLinesMoved": 0,
+            "new": 9,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "318bb8dca0c1",
+          "to": "a2e75c6b9eb1",
+          "ran": true,
+          "all": {
+            "sent": 34,
+            "identical": 34,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 34,
+            "identical": 34,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    },
+    {
+      "ref": "armaxri/termiHub#2732",
+      "base": "eb8f16637cc2",
+      "heads": 2,
+      "sentPerHead": [
+        20,
+        37
+      ],
+      "exitCodes": [
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "a0dd5a52539b",
+          "to": "532e9bcc3ea3",
+          "ran": true,
+          "all": {
+            "sent": 37,
+            "identical": 20,
+            "onlyLinesMoved": 0,
+            "new": 17,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 37,
+            "identical": 20,
+            "onlyLinesMoved": 0,
+            "new": 17,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    },
+    {
+      "ref": "beboite/boite-legacy#187",
+      "base": "66b78cc89b79",
+      "heads": 12,
+      "sentPerHead": [
+        10,
+        41,
+        64,
+        64,
+        64,
+        64,
+        64,
+        78,
+        81,
+        85,
+        86,
+        89
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "85918fce9008",
+          "to": "0c6e6aaf042d",
+          "ran": true,
+          "all": {
+            "sent": 41,
+            "identical": 10,
+            "onlyLinesMoved": 0,
+            "new": 31,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 2,
+            "onlyLinesMoved": 0,
+            "new": 26,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 13,
+            "identical": 8,
+            "onlyLinesMoved": 0,
+            "new": 5,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "0c6e6aaf042d",
+          "to": "a788623e9b9d",
+          "ran": true,
+          "all": {
+            "sent": 64,
+            "identical": 41,
+            "onlyLinesMoved": 0,
+            "new": 23,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 36,
+            "identical": 13,
+            "onlyLinesMoved": 0,
+            "new": 23,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "a788623e9b9d",
+          "to": "1cca9a69d0e7",
+          "ran": true,
+          "all": {
+            "sent": 64,
+            "identical": 64,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 36,
+            "identical": 36,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "1cca9a69d0e7",
+          "to": "7bc9c605bd4e",
+          "ran": true,
+          "all": {
+            "sent": 64,
+            "identical": 64,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 36,
+            "identical": 36,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "7bc9c605bd4e",
+          "to": "887ab0192c72",
+          "ran": true,
+          "all": {
+            "sent": 64,
+            "identical": 64,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 36,
+            "identical": 36,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "887ab0192c72",
+          "to": "02bcc7ee38f8",
+          "ran": true,
+          "all": {
+            "sent": 64,
+            "identical": 64,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 36,
+            "identical": 36,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "02bcc7ee38f8",
+          "to": "857aaecacee6",
+          "ran": true,
+          "all": {
+            "sent": 78,
+            "identical": 64,
+            "onlyLinesMoved": 0,
+            "new": 14,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 50,
+            "identical": 36,
+            "onlyLinesMoved": 0,
+            "new": 14,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "857aaecacee6",
+          "to": "08d2ead09e2f",
+          "ran": true,
+          "all": {
+            "sent": 81,
+            "identical": 78,
+            "onlyLinesMoved": 0,
+            "new": 3,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 53,
+            "identical": 50,
+            "onlyLinesMoved": 0,
+            "new": 3,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "08d2ead09e2f",
+          "to": "b8fd19530b38",
+          "ran": true,
+          "all": {
+            "sent": 85,
+            "identical": 81,
+            "onlyLinesMoved": 0,
+            "new": 4,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 57,
+            "identical": 53,
+            "onlyLinesMoved": 0,
+            "new": 4,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "b8fd19530b38",
+          "to": "c5980e5a1d3c",
+          "ran": true,
+          "all": {
+            "sent": 86,
+            "identical": 81,
+            "onlyLinesMoved": 2,
+            "new": 3,
+            "goneFromBefore": 4
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 58,
+            "identical": 53,
+            "onlyLinesMoved": 2,
+            "new": 3,
+            "goneFromBefore": 4
+          }
+        },
+        {
+          "from": "c5980e5a1d3c",
+          "to": "af1c0b51ddcb",
+          "ran": true,
+          "all": {
+            "sent": 89,
+            "identical": 79,
+            "onlyLinesMoved": 5,
+            "new": 5,
+            "goneFromBefore": 7
+          },
+          "calls": {
+            "sent": 28,
+            "identical": 28,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 61,
+            "identical": 51,
+            "onlyLinesMoved": 5,
+            "new": 5,
+            "goneFromBefore": 7
+          }
+        }
+      ]
+    },
+    {
+      "ref": "Diogo-Esteves/polyVocal#60",
+      "base": "ce12f00c3d02",
+      "heads": 2,
+      "sentPerHead": [
+        53,
+        72
+      ],
+      "exitCodes": [
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "7b81126991dd",
+          "to": "9ce0dbba353b",
+          "ran": true,
+          "all": {
+            "sent": 72,
+            "identical": 53,
+            "onlyLinesMoved": 0,
+            "new": 19,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 30,
+            "identical": 20,
+            "onlyLinesMoved": 0,
+            "new": 10,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 42,
+            "identical": 33,
+            "onlyLinesMoved": 0,
+            "new": 9,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    },
+    {
+      "ref": "TumbleOwlee/ferrowl#127",
+      "base": "2f06e402f1a4",
+      "heads": 4,
+      "sentPerHead": [
+        0,
+        1,
+        14,
+        22
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "e84329ce0176",
+          "to": "1771e1a557bc",
+          "ran": true,
+          "all": {
+            "sent": 1,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 0,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 1,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "1771e1a557bc",
+          "to": "a408a005fb31",
+          "ran": true,
+          "all": {
+            "sent": 14,
+            "identical": 1,
+            "onlyLinesMoved": 0,
+            "new": 13,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 4,
+            "identical": 0,
+            "onlyLinesMoved": 0,
+            "new": 4,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 10,
+            "identical": 1,
+            "onlyLinesMoved": 0,
+            "new": 9,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "a408a005fb31",
+          "to": "791c0bda366f",
+          "ran": true,
+          "all": {
+            "sent": 22,
+            "identical": 9,
+            "onlyLinesMoved": 1,
+            "new": 12,
+            "goneFromBefore": 5
+          },
+          "calls": {
+            "sent": 4,
+            "identical": 4,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 18,
+            "identical": 5,
+            "onlyLinesMoved": 1,
+            "new": 12,
+            "goneFromBefore": 5
+          }
+        }
+      ]
+    },
+    {
+      "ref": "getappz/agentflare#229",
+      "base": "eca529858636",
+      "heads": 2,
+      "sentPerHead": [
+        11,
+        11
+      ],
+      "exitCodes": [
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "990a8ad0d1f5",
+          "to": "7f35f67b0388",
+          "ran": true,
+          "all": {
+            "sent": 11,
+            "identical": 11,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 4,
+            "identical": 4,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 7,
+            "identical": 7,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    },
+    {
+      "ref": "Davidslv/cce-rust#168",
+      "base": "9c7702d7474f",
+      "heads": 3,
+      "sentPerHead": [
+        4,
+        41,
+        46
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "cf25818ada69",
+          "to": "b6b6032069fd",
+          "ran": true,
+          "all": {
+            "sent": 41,
+            "identical": 4,
+            "onlyLinesMoved": 0,
+            "new": 37,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 34,
+            "identical": 2,
+            "onlyLinesMoved": 0,
+            "new": 32,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 7,
+            "identical": 2,
+            "onlyLinesMoved": 0,
+            "new": 5,
+            "goneFromBefore": 0
+          }
+        },
+        {
+          "from": "b6b6032069fd",
+          "to": "6d33a9bdc12c",
+          "ran": true,
+          "all": {
+            "sent": 46,
+            "identical": 21,
+            "onlyLinesMoved": 7,
+            "new": 18,
+            "goneFromBefore": 20
+          },
+          "calls": {
+            "sent": 34,
+            "identical": 18,
+            "onlyLinesMoved": 4,
+            "new": 12,
+            "goneFromBefore": 16
+          },
+          "changes": {
+            "sent": 12,
+            "identical": 3,
+            "onlyLinesMoved": 3,
+            "new": 6,
+            "goneFromBefore": 4
+          }
+        }
+      ]
+    },
+    {
+      "ref": "AndreaBozzo/dataprof#370",
+      "base": "814d9c003530",
+      "heads": 3,
+      "sentPerHead": [
+        50,
+        50,
+        55
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0
+      ],
+      "stderrTail": [],
+      "pairs": [
+        {
+          "from": "79401d72fd92",
+          "to": "2222534ca049",
+          "ran": true,
+          "all": {
+            "sent": 50,
+            "identical": 49,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 1
+          },
+          "calls": {
+            "sent": 38,
+            "identical": 38,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 12,
+            "identical": 11,
+            "onlyLinesMoved": 0,
+            "new": 1,
+            "goneFromBefore": 1
+          }
+        },
+        {
+          "from": "2222534ca049",
+          "to": "7974b4793554",
+          "ran": true,
+          "all": {
+            "sent": 55,
+            "identical": 50,
+            "onlyLinesMoved": 0,
+            "new": 5,
+            "goneFromBefore": 0
+          },
+          "calls": {
+            "sent": 38,
+            "identical": 38,
+            "onlyLinesMoved": 0,
+            "new": 0,
+            "goneFromBefore": 0
+          },
+          "changes": {
+            "sent": 17,
+            "identical": 12,
+            "onlyLinesMoved": 0,
+            "new": 5,
+            "goneFromBefore": 0
+          }
+        }
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "ref": "yottayoshida/omamori#556",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/556 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#461",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/461 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#514",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/514 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#490",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/490 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#483",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/483 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#506",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/506 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#487",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/487 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#391",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/391 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#114",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/114 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#111",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/111 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#99",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/99 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#75",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/75 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#60",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/60 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#323",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/323 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#182",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/182 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#271",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/271 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "yottayoshida/omamori#387",
+      "why": "Command failed: gh api /repos/yottayoshida/omamori/pulls/387 --jq .base.sha — gh: Not Found (HTTP 404)"
+    },
+    {
+      "ref": "Naoray/instruckt-tauri#9",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dashpay/grovedb#501",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dashpay/grovedb#500",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "iotaledger/iota#10136",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "ratazzi/quebec#136",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "cavi-ai/bobby-browser#163",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dolang-org/dolang#337",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "MarshalX/python-libipld#117",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "dsx-ai-factory/infra-controller#3469",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    },
+    {
+      "ref": "liveask/liveask#127",
+      "why": "the pull request has 1 commit(s), so it has no pair of pushes"
+    }
+  ],
+  "pairs": 31,
+  "pairsNotRun": 0,
+  "medianIdenticalShare": 0.8524590163934426,
+  "medianIdenticalOrLinesMovedShare": 0.8688524590163934,
+  "externalRefs": [
+    "oxidezap/whatsapp-rust#759",
+    "moltis-org/moltis#1064",
+    "KontorProtocol/Kontor#385",
+    "TyRoXx/NonlocalityOS#433",
+    "armaxri/termiHub#2751",
+    "armaxri/termiHub#2732",
+    "beboite/boite-legacy#187",
+    "Diogo-Esteves/polyVocal#60",
+    "TumbleOwlee/ferrowl#127",
+    "getappz/agentflare#229",
+    "Davidslv/cce-rust#168",
+    "AndreaBozzo/dataprof#370"
+  ],
+  "externalPairs": 31,
+  "externalMedianIdenticalShare": 0.8524590163934426,
+  "externalMedianIdenticalOrLinesMovedShare": 0.8688524590163934
+}

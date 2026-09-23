@@ -119,6 +119,24 @@ export const LOCAL_CHECK_INTRO = [
 ];
 
 /**
+ * Who chose the requirement's form, in the report's own words (ADR 0008): the spec that named it,
+ * Jev's reading of the sentence with its number, or the default — and, for the default, why: what
+ * Jev read instead, or why it was not asked. A record from before this field reads as the default.
+ */
+export function formOrigin(r: Pick<LocalCheckResult, "formBy" | "formReading" | "formNotAsked">): string {
+  const by = r.formBy ?? "default";
+  if (by === "spec") return "named in the spec";
+  if (by === "jev") return `Jev read the sentence as this, ${(r.formReading?.probability ?? 0).toFixed(2)}`;
+  if (r.formNotAsked === "candidates_only") return "the default: the form was not asked — `--candidates-only` asks nothing";
+  if (r.formNotAsked === "no_function") return "the default: the form was not asked — no function was read";
+  const reading = r.formReading;
+  if (!reading) return "the default";
+  if (reading.verdict === "no_answer") return `the default: the form question was not answered${reading.failure === undefined ? "" : ` (${reading.failure})`}`;
+  if (reading.verdict === "neither") return `the default: Jev read the sentence as \`neither\`, ${reading.probability.toFixed(2)}`;
+  return `the default: Jev's reading of \`${reading.verdict}\` was under the bar, ${reading.probability.toFixed(2)}`;
+}
+
+/**
  * One requirement's section: what is worth checking, then what was read and how each call came out,
  * then what was not checked and why.
  *
@@ -135,7 +153,7 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
   // The requirement is the author's text: a code span, so no line of it can become a heading, a
   // comment that hides the rest of the report, or a workflow command; and redacted for display.
   lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
-  lines.push(`Form: \`${r.form ?? DEFAULT_FORM}\`. ${context.nothingSent ? `Nothing was asked; the form would ask this. ${form.words.intro}` : form.words.intro}`, "");
+  lines.push(`Form: \`${r.form ?? DEFAULT_FORM}\` (${formOrigin(r)}). ${context.nothingSent ? `Nothing was asked; the form would ask this. ${form.words.intro}` : form.words.intro}`, "");
   lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
   lines.push(`Calls in them: ${c.calls}, of which ${c.applicable} could be asked about. Budget ${c.budget}: ${c.asked} read, ${c.mapped} mapped, ${c.governed} of those governed, ${c.overBudget} left over, ${c.notApplicable} not applicable.`);
   if (c.asked > 0) lines.push(`Of the ${c.asked} read: ${c.outcomes.violates} worth checking, ${c.outcomes.satisfies} holding, ${c.outcomes.unknown} not settled, ${c.outcomes.aside} not required of.`);
