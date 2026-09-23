@@ -24,6 +24,7 @@
 import { defines, definedName } from "../change/blocks.ts";
 import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
+import { namesTheStandardLibrary, outsideResult } from "./outside-results.ts";
 import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
 
 export type Applicability =
@@ -216,6 +217,13 @@ function unreachable(call: CallCandidate, parameters: readonly string[]): string
   if (method === undefined) return null;
   const takesSelf = parameters.length > 0 && TAKES_SELF.test(parameters[0]!);
   if (method && !takesSelf) return "is called as a method here and takes no `self`";
+  // `fs::rename(a, b)` names a module, and a module holds no method: a `fn rename(&mut self, …)`
+  // is reached by `x.rename(…)` or by its type's name, never by this. A capitalised segment is a
+  // type, where `Type::method(&mut x, …)` is how a method is written in full.
+  const qualifier = call.callee.split("::").at(-2);
+  if (!method && takesSelf && qualifier !== undefined && /^[a-z_]/.test(qualifier)) {
+    return `takes \`self\`, and \`${qualifier}\` names a module, which holds no method`;
+  }
   const expected = parameters.length - (method ? 1 : 0);
   const passed = argumentCount(call);
   if (passed !== undefined && passed !== expected) return `takes ${expected} argument${expected === 1 ? "" : "s"} as this call is written, and this call passes ${passed}`;
@@ -398,16 +406,30 @@ export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandid
     return { ok: false, kind: "target_return_unknown", reason: `whether ${fn.name} returns a Result is not settled here: ${target.why}` };
   }
   const bare = call.callee.split("::").pop()!;
+  const outside = outsideResult(call.callee);
+  // A call that writes `std::` says which library it means, and no definition here is that library.
+  if (outside && namesTheStandardLibrary(call.callee)) return { ok: true, calleeDefinedAt: outside.path };
   const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);
   if (more) return { ok: false, kind: "callee_return_unknown", reason: `the search for \`fn ${bare}\` stopped at its cap, so not every definition of ${bare} was seen` };
   if (found.length === 0) {
+    // Nothing here defines the name, and the path the call writes is one this tool knows from
+    // outside the repository (ADR 0011). Definitions compiled only for tests do not count against
+    // that: the docs say they are not the callee's definitions at all.
+    if (outside) return { ok: true, calleeDefinedAt: outside.path };
     // Definitions this repository compiles only for tests are not definitions this call reaches,
     // and their absence is not the absence of a definition.
     if (testOnly > 0) return { ok: false, kind: "callee_ambiguous", reason: `every definition of ${bare} here (${testOnly}) is in a file declared under \`#[cfg(test)] mod\`, so what this call reaches outside tests is not established here` };
     return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
   }
   const narrowed = await narrow(discoverer, fn, call, bare, found);
-  if (!narrowed.ok) return narrowed.held;
+  // Nothing here that this call can reach, and a path the table knows: the definitions found share
+  // the name with something else. `fs::rename(a, b)` meets a repository's `Session::rename(&mut
+  // self, …)` by name alone, and a module holds no method.
+  if (!narrowed.ok) {
+    const held = narrowed.held;
+    if (!held.ok && held.kind === "callee_unresolved" && outside) return { ok: true, calleeDefinedAt: outside.path };
+    return held;
+  }
   const { definitions, sole } = narrowed;
   const def = definitions[0]!;
   const at = `${def.path}:${def.line}`;
@@ -417,6 +439,7 @@ export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandid
     const signature = await reader.signature(def.path, def.line, bare);
     if (sole && signature.ok) {
       const why = unreachable(call, signature.parameters);
+      if (why && outside) return { ok: true, calleeDefinedAt: outside.path };
       if (why) return { ok: false, kind: "callee_unresolved", reason: `${named} ${why}, so this call does not reach it and what it returns is not established here` };
     }
     const callee = await reader.readingOf(signature, def.path);

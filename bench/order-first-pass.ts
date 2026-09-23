@@ -40,6 +40,7 @@ import { pathFilter } from "../src/config/glob.ts";
 import { Discoverer, isTestPath } from "../src/discovery/discover.ts";
 import { applicabilityOf, type Applicability } from "../src/plan/applicability.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "../src/plan/candidates.ts";
+import { namesTheStandardLibrary, outsideResult } from "../src/plan/outside-results.ts";
 import { CandidateFiles, sitesFromChange } from "../src/plan/from-diff.ts";
 import { resolvedTo, roundRobin, selectSites, type Site } from "../src/plan/select.ts";
 import { Git } from "../src/repository/git.ts";
@@ -196,8 +197,14 @@ function widened(discoverer: Discoverer) {
   return async (fn: FunctionCandidate, call: CallCandidate): Promise<Applicability> => {
     const own = returnTypeAt((await discoverer.index(fn.path))?.lines ?? [], fn.startLine);
     if (!own || !RESULT_LIKE.test(own)) return { ok: false, kind: "target_not_result", reason: `returns ${own}` };
+    // The same order as the shipped check: a path into a function outside this repository is
+    // answered by the table, and a `std::` one before this repository's definitions are looked at
+    // (`src/plan/outside-results.ts`, ADR 0011).
+    const outside = outsideResult(call.callee);
+    if (outside && namesTheStandardLibrary(call.callee)) return { ok: true, calleeDefinedAt: outside.path };
     const found = await definitionsOf(call.callee.split("::").pop()!);
     if (found === "cut") return { ok: false, kind: "callee_ambiguous", reason: "the search was cut" };
+    if (found.length === 0 && outside) return { ok: true, calleeDefinedAt: outside.path };
     if (found.length !== 1) return { ok: false, kind: found.length === 0 ? "callee_unresolved" : "callee_ambiguous", reason: `${found.length} definitions` };
     const theirs = returnTypeAt((await discoverer.index(found[0]!.path))?.lines ?? [], found[0]!.line);
     if (!theirs || !RESULT_LIKE.test(theirs)) return { ok: false, kind: "callee_not_result", reason: `returns ${theirs}` };
