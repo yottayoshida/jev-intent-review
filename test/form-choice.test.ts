@@ -10,10 +10,10 @@ import { barLines, duplicates, isFragment, normalise, readAtBar, renderTables, r
 import { answer } from "./helpers/fakes.ts";
 
 const ROOT = new URL("../", import.meta.url).pathname;
-const committedSet = (): SentenceSet => JSON.parse(readFileSync(`${ROOT}bench/forms/choice/sentences.json`, "utf8")) as SentenceSet;
+const committedSet = (file = "sentences.json"): SentenceSet => JSON.parse(readFileSync(`${ROOT}bench/forms/choice/${file}`, "utf8")) as SentenceSet;
 
-test("every requirement sentence in the repository's spec, fixture and golden files is in the labelled set", () => {
-  const have = new Set(committedSet().sentences.map((s) => normalise(s.text)));
+test("every requirement sentence in the repository's spec, fixture and golden files is in one of the labelled sets", () => {
+  const have = new Set([...committedSet().sentences, ...committedSet("sentences-v2.json").sentences].map((s) => normalise(s.text)));
   const found = requirementSentencesIn(ROOT);
   assert.ok(found.length >= 60, `only ${found.length} sentences found in the repository`);
   const left = found.filter((f) => !have.has(normalise(f.text)));
