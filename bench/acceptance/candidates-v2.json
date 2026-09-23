@@ -1,0 +1,39 @@
+{
+  "what": "The candidates examined for a case with a defect in a sibling of the change (issue #37, ADR 0005), in the order they were examined, with the verdict on each condition and the reason. The rules below were committed before any candidate was opened and are not changed after; a change makes a new version.",
+  "tool": {
+    "repo": "yottayoshida/jev-intent-review",
+    "commit": "722ad62",
+    "why": "The tool as shipped when these rules were written. Its selection code (src/plan, src/review, src/change, src/discovery) is the same as at f4971ff, the merge of the siblings (PR #65)."
+  },
+  "examined": "A candidate counts as examined once its issue or pull request text is read. Titles screened out by the rules below are not counted.",
+  "sources": {
+    "pool": "The two GitHub searches of #36's candidates.json, run again on 2026-09-23: `gh search prs --language rust --merged --limit 100 -- \"propagate error instead of silently\"` and `gh search prs --language rust --merged --limit 100 -- \"error treated as success\"`, merged into one list and taken newest merge first. Every candidate of candidates.json (#36's 40) is skipped. Kept: licensed MIT or Apache-2.0, text naming a failure that was dropped, skipped or turned into a success.",
+    "titleScreen": "As in candidates.json: titles naming a refactor, documentation, a test harness, packaging or labels are screened out without reading."
+  },
+  "conditions": {
+    "a": "As in candidates.json: the requirement can be written as 'a failure must reach the caller as an error, not as a success, an empty value or an absence'. Judged from the issue and pull request text only, and written down before the fix's diff is opened.",
+    "s": "At the pull request's head, the place S below is found by the rule `placeS`, from the repository's text and `git grep`, without running this tool.",
+    "d": "The requirement of (a) governs S: the function S returns a failure of its call to the seed to its own caller in the sense of (a). Judged from S's text and written down, with the reason, before this tool is run on the candidate.",
+    "c": "As in candidates.json: the behaviour difference of defect-S (below) can be observed in a throwaway clone, with no network and no credentials, through one crate's test or example."
+  },
+  "placeS": {
+    "what": "The rule that fixes the place S of a sibling's defect before this tool is run, written in the terms of src/plan/siblings.ts so that 'the tool did not list S' is a finding about the tool and not about this rule. Where the tool settles a call by reading more than this rule does (which definition a call reaches), that is left to the tool, and is what the measurement tests.",
+    "outsideTests": "A path is outside tests when `isTestPath` of src/discovery/discover.ts at the tool commit does not hold of it (as written there: a tests?/, spec/, __tests__/, testdata/ or fixtures/ directory, or a name ending .test.*, -spec.*, _test.* and the like — examples/ and benches/ are outside tests), it is not under the default ignore (src/config/config.ts), and the function is not inside a `#[cfg(test)]` module.",
+    "changedFunctions": "The Rust functions `bench/acceptance/changed-functions.ts` gives for base..head, outside tests.",
+    "seeds": "Names called in the changed functions — on lines the change kept, added or removed — of at least 3 characters, with exactly one `fn` of that name outside tests, whose return type (after `->`, not a parameter's type) names `Result`, that is not a changed function, used in at most 20 Rust files outside tests. Ordered: called on a changed line first, then called from more changed functions, then used in fewer files, then by name. The first 8.",
+    "sFunction": "For each seed in that order, `git grep -w` its name; among the functions outside tests that are not changed functions, that call no changed function by name, whose return type names `Result`, that make at most 40 calls, and that call the seed as a free function or by a path (`seed(…)`, `module::seed(…)`, `Type::seed(…)` — a method call `x.seed(…)` does not count, and is recorded as such), the first by file path, then by line. If (d) does not hold of it, the next, with the reason recorded.",
+    "target": "In the function S, the first call to the seed. Its expression must occur exactly once in S's function at every version (`occurrences`)."
+  },
+  "versions": {
+    "shipped": "The pull request's head. S is expected not listed.",
+    "defect-S": "At the target, a failure turned into a success, the difference observed by running it. Applied to both the base and the head, since a defect outside the diff is one the pull request did not fix; a patch that does not apply to both drops the candidate at (c).",
+    "rewrite-S": "The target's code written differently, behaviour unchanged. S is expected not listed.",
+    "notBuilt": "No hidden version: #36 measured a helper whose body is not sent only at place A, and what it says of a sibling is not measured."
+  },
+  "limits": {
+    "examined": 30,
+    "stop": "Stop at the first candidate that passes (a), (s), (d) and (c). At 30 examined with none, stop, report what was examined and which condition each failed, and leave #37 open."
+  },
+  "runs": "Three finished runs of each version whose target is inside a budget, by bench/acceptance/run.ts. A run is finished only when it exited 0, no request it recorded failed on the run's own limit, and no call inside the siblings' budget came back without an answer.",
+  "candidates": []
+}
