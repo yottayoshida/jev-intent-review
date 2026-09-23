@@ -67,8 +67,10 @@ the GitHub Action should act on it is #41's).
 ## What it asks
 
 For each requirement it takes the Rust functions the change touched and the functions that call
-them, one hop out, and every call inside those functions. Which of those calls can be asked about,
-and what is asked, is the requirement's form. Each askable call, up to a budget of 20 per
+them, one hop out, and every call inside those functions — and, last and under a budget of their
+own, the other callers of the repository functions the changed code calls (*The siblings of a
+change* below). Which of those calls can be asked about, and what is asked, is the requirement's
+form. Each askable call, up to a budget of 20 per
 requirement, gets two questions to Jev, in separate requests: whether the requirement requires
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
@@ -99,6 +101,47 @@ A request that fails without ending the run leaves its call unanswered and the r
 that reached the host and got no answer at all fails (exit 12). `--candidates-only`
 stops before the first question and prints which calls are inside the budget and which are not,
 with a reason each; it needs no credentials.
+
+### The siblings of a change
+
+The path a fix may have missed calls the same helper the fixed code calls, and calls nothing the
+change touched: it is neither a changed function nor one hop out (ADR 0005). After everything else
+the run asks — every requirement's calls and the changes' questions — it reads those functions and
+asks about their calls under a budget of its own, 10 per requirement:
+
+- **A seed** is a function of this repository that the changed code calls outside tests, on a line
+  it kept, added or removed: the call settles at one definition here (the reading of *Whether a
+  function returns a `Result`* and *Which definition a call reaches*), which returns a `Result` and
+  is not a changed function. A name only on a removed line is settled by its definitions at the head
+  commit; a helper the change deleted has none and is no seed. At most 8, called on a changed line
+  first, then called from more changed functions, then used in fewer files, then by name; a name
+  used in more than 20 files is not followed.
+- **A sibling** is a function outside tests that the change did not reach one hop out, with a call
+  that settles at a seed, that returns a `Result`, and none of whose calls settles inside a changed
+  function or, under a changed function's name, settles nowhere. A function whose calls were cut by
+  the per-function cap is not one. At most 20. Its calls are dealt one function at a time in seed
+  order, the calls that tied it first.
+- **Seeds and siblings are chosen by returning a `Result`,** under either form. A requirement that a
+  check pass before an action is asked about the same siblings, and a helper that returns `()` is no
+  seed for it (#39).
+- **Not reached:** a sibling that shares only a function outside the repository (`fs::…`), or only a
+  function written several times as one thing — a trait's method, a function per platform; two hops
+  out; a function whose call to a changed trait `impl` settles at the trait's versions, which can be
+  taken for a sibling.
+- Everything the siblings' pass could not use is in the notes, by reason: names that settle nowhere,
+  are outside the repository, return no `Result`, are changed functions, are only in tests, are too
+  common, or were over a cap; functions that also call a changed function, may call one, had their
+  calls cut, or return no `Result`.
+
+The first budget is the same set whether or not a sibling exists, and it is counted as before; the
+siblings are counted apart, in `--json` under `counts.siblings` and in the report in its own lines.
+Their calls carry `origin: shares_call` and `via`, the seed that tied them, and so does a finding in
+a sibling — a finding of the first budget carries neither, as before. The report's first line and
+the Action's check run count the siblings with everything else: a sibling's call read is a call
+read. A sibling's held and left-over calls are under *Not checked*, so the check run can be neutral
+where it was green, and a finding in a sibling is a finding for `policy.fail_on`.
+
+### The budget
 
 The budget is dealt one call per function at a time — the functions the change touched first, then
 their callers — so no single body takes it. Inside a function, the askable calls whose callee
@@ -702,6 +745,26 @@ Measured without a request, before and after, on the same 15 runs as the two par
   counterexample and are written in full instead (`std::env::var`, `std::io::copy`,
   `std::io::read_to_string`, `fs::File::metadata`); none was dropped. A scan that reads nothing
   finds no counterexample either, so it prints what it read.
+
+### The siblings of a change, measured
+
+What *The siblings of a change* adds, on the cases above, before any case with a defect in a
+sibling has been built (`#37` stays open for that):
+
+- **The first budget is the same set.** On the five branches of omamori `#468` under both of its
+  requirements and on every version of moltis-1064 and grovedb-500, the calls the first budget asks
+  about, as `--candidates-only` prints them, are the ones the tool before siblings printed
+  (`bench/logs/siblings-first-budget-v1.json`, `node bench/siblings-first-budget.ts --before
+  43d10d3`; no request sent). Siblings showed up on 9 of those 15 branches — omamori's five and
+  grovedb-500's four, 10 and 4 sibling calls inside their budget; moltis-1064 has none.
+- **Their questions are sent last.** Under a request limit, every requirement's first budget and
+  the changes' questions are sent before any sibling's, and the siblings are what a limit leaves
+  (`test/local-check-reach.test.ts`, through the command line with a recording provider).
+- **One run against real Jev**, omamori `#468`'s shipped branch (`bench/logs/siblings-jev-v1.json`):
+  112 requests, all answered, 54 s. Three siblings, `run_override_enable`, `run_config_command`
+  and `regenerate_hooks_with_verifier`; 9 of their calls read per requirement, every one as not
+  required of by the requirement, and nothing listed — on a branch with no defect, what that shows
+  is that the siblings added no false finding there, and nothing about finding one.
 
 ### What another push would not have to ask again
 

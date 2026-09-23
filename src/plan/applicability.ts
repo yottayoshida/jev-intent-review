@@ -385,6 +385,95 @@ async function narrow(discoverer: Discoverer, fn: FunctionCandidate, call: CallC
 }
 
 /**
+ * Whether the calling function returns a `Result`: the first half of `applicabilityOf`, and what a
+ * sibling must satisfy to be asked about (ADR 0005). `null` when it does.
+ */
+export async function targetOf(discoverer: Discoverer, fn: FunctionCandidate): Promise<Extract<Applicability, { ok: false }> | null> {
+  const target = await returnTypesFor(discoverer).at(fn.path, fn.startLine, fn.name);
+  if (target.kind === "not") {
+    return { ok: false, kind: "target_not_result", reason: `${fn.name} returns \`${quoted(target.type)}\` and does not return a Result, so "a success" and "an error" do not sort what it returns` };
+  }
+  if (target.kind === "unknown") {
+    return { ok: false, kind: "target_return_unknown", reason: `whether ${fn.name} returns a Result is not settled here: ${target.why}` };
+  }
+  return null;
+}
+
+/**
+ * Where a call's callee settled, whatever it returns. `repository` is one definition here;
+ * `versions` is several read as one thing (a trait's method, or a function written once per
+ * platform under `#[cfg(…)]`), named by the first; `outside` is a row of the table of functions
+ * outside the repository (ADR 0011). `null` when nothing settled it.
+ */
+export type CalleeLocation = { kind: "repository" | "versions"; path: string; line: number } | { kind: "outside"; row: string } | null;
+
+/**
+ * The second half of `applicabilityOf`: what the callee is and whether it returns a `Result`,
+ * read the same way whatever the calling function returns — so a call can be followed from a
+ * function that does not return one (the siblings of a change, ADR 0005). `result` is what
+ * `applicabilityOf` says of the call once the calling function returns a `Result`, word for word.
+ */
+export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<{ result: Applicability; at: CalleeLocation }> {
+  const reader = returnTypesFor(discoverer);
+  const bare = call.callee.split("::").pop()!;
+  const outside = outsideResult(call.callee);
+  // A call that writes `std::` says which library it means, and no definition here is that library.
+  if (outside && namesTheStandardLibrary(call.callee)) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
+  const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);
+  if (more) return { result: { ok: false, kind: "callee_return_unknown", reason: `the search for \`fn ${bare}\` stopped at its cap, so not every definition of ${bare} was seen` }, at: null };
+  if (found.length === 0) {
+    // Nothing here defines the name, and the path the call writes is one this tool knows from
+    // outside the repository (ADR 0011). Definitions compiled only for tests do not count against
+    // that: the docs say they are not the callee's definitions at all.
+    if (outside) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
+    // Definitions this repository compiles only for tests are not definitions this call reaches,
+    // and their absence is not the absence of a definition.
+    if (testOnly > 0) return { result: { ok: false, kind: "callee_ambiguous", reason: `every definition of ${bare} here (${testOnly}) is in a file declared under \`#[cfg(test)] mod\`, so what this call reaches outside tests is not established here` }, at: null };
+    return { result: { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` }, at: null };
+  }
+  const narrowed = await narrow(discoverer, fn, call, bare, found);
+  // Nothing here that this call can reach, and a path the table knows: the definitions found share
+  // the name with something else. `fs::rename(a, b)` meets a repository's `Session::rename(&mut
+  // self, …)` by name alone, and a module holds no method.
+  if (!narrowed.ok) {
+    const held = narrowed.held;
+    if (!held.ok && held.kind === "callee_unresolved" && outside) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
+    return { result: held, at: null };
+  }
+  const { definitions, sole } = narrowed;
+  const def = definitions[0]!;
+  const at = `${def.path}:${def.line}`;
+
+  if (definitions.length === 1) {
+    const named = sole ? `the one function named ${bare} in this repository (${at})` : `the definition of ${bare} this call reaches (${at})`;
+    const signature = await reader.signature(def.path, def.line, bare);
+    if (sole && signature.ok) {
+      const why = unreachable(call, signature.parameters);
+      if (why && outside) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
+      if (why) return { result: { ok: false, kind: "callee_unresolved", reason: `${named} ${why}, so this call does not reach it and what it returns is not established here` }, at: null };
+    }
+    const callee = await reader.readingOf(signature, def.path);
+    if (callee.kind === "not") {
+      return { result: { ok: false, kind: "callee_not_result", reason: `${named} returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` }, at: { kind: "repository", path: def.path, line: def.line } };
+    }
+    if (callee.kind === "unknown") {
+      return { result: { ok: false, kind: "callee_return_unknown", reason: `whether ${named} returns a Result is not settled here: ${callee.why}` }, at: { kind: "repository", path: def.path, line: def.line } };
+    }
+    return { result: { ok: true, calleeDefinedAt: at }, at: { kind: "repository", path: def.path, line: def.line } };
+  }
+
+  // Versions of one thing: which one runs is not settled, so all of them must return a Result.
+  const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
+  for (const [i, reading] of readings.entries()) {
+    if (reading.kind === "returns") continue;
+    const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
+    const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
+    return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: { kind: "versions", path: def.path, line: def.line } };
+  }
+  return { result: { ok: true, calleeDefinedAt: at }, at: { kind: "versions", path: def.path, line: def.line } };
+}
+
+/**
  * Whether `call_failure_not_returned_as_success` can be asked here.
  *
  * Both halves come from a signature, never from how a line looks (`result-type.ts`):
@@ -397,68 +486,5 @@ async function narrow(discoverer: Discoverer, fn: FunctionCandidate, call: CallC
  * the definition it read.
  */
 export async function applicabilityOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<Applicability> {
-  const reader = returnTypesFor(discoverer);
-  const target = await reader.at(fn.path, fn.startLine, fn.name);
-  if (target.kind === "not") {
-    return { ok: false, kind: "target_not_result", reason: `${fn.name} returns \`${quoted(target.type)}\` and does not return a Result, so "a success" and "an error" do not sort what it returns` };
-  }
-  if (target.kind === "unknown") {
-    return { ok: false, kind: "target_return_unknown", reason: `whether ${fn.name} returns a Result is not settled here: ${target.why}` };
-  }
-  const bare = call.callee.split("::").pop()!;
-  const outside = outsideResult(call.callee);
-  // A call that writes `std::` says which library it means, and no definition here is that library.
-  if (outside && namesTheStandardLibrary(call.callee)) return { ok: true, calleeDefinedAt: outside.path };
-  const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);
-  if (more) return { ok: false, kind: "callee_return_unknown", reason: `the search for \`fn ${bare}\` stopped at its cap, so not every definition of ${bare} was seen` };
-  if (found.length === 0) {
-    // Nothing here defines the name, and the path the call writes is one this tool knows from
-    // outside the repository (ADR 0011). Definitions compiled only for tests do not count against
-    // that: the docs say they are not the callee's definitions at all.
-    if (outside) return { ok: true, calleeDefinedAt: outside.path };
-    // Definitions this repository compiles only for tests are not definitions this call reaches,
-    // and their absence is not the absence of a definition.
-    if (testOnly > 0) return { ok: false, kind: "callee_ambiguous", reason: `every definition of ${bare} here (${testOnly}) is in a file declared under \`#[cfg(test)] mod\`, so what this call reaches outside tests is not established here` };
-    return { ok: false, kind: "callee_unresolved", reason: `${bare} has no definition in this repository, so what it returns is not established here` };
-  }
-  const narrowed = await narrow(discoverer, fn, call, bare, found);
-  // Nothing here that this call can reach, and a path the table knows: the definitions found share
-  // the name with something else. `fs::rename(a, b)` meets a repository's `Session::rename(&mut
-  // self, …)` by name alone, and a module holds no method.
-  if (!narrowed.ok) {
-    const held = narrowed.held;
-    if (!held.ok && held.kind === "callee_unresolved" && outside) return { ok: true, calleeDefinedAt: outside.path };
-    return held;
-  }
-  const { definitions, sole } = narrowed;
-  const def = definitions[0]!;
-  const at = `${def.path}:${def.line}`;
-
-  if (definitions.length === 1) {
-    const named = sole ? `the one function named ${bare} in this repository (${at})` : `the definition of ${bare} this call reaches (${at})`;
-    const signature = await reader.signature(def.path, def.line, bare);
-    if (sole && signature.ok) {
-      const why = unreachable(call, signature.parameters);
-      if (why && outside) return { ok: true, calleeDefinedAt: outside.path };
-      if (why) return { ok: false, kind: "callee_unresolved", reason: `${named} ${why}, so this call does not reach it and what it returns is not established here` };
-    }
-    const callee = await reader.readingOf(signature, def.path);
-    if (callee.kind === "not") {
-      return { ok: false, kind: "callee_not_result", reason: `${named} returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` };
-    }
-    if (callee.kind === "unknown") {
-      return { ok: false, kind: "callee_return_unknown", reason: `whether ${named} returns a Result is not settled here: ${callee.why}` };
-    }
-    return { ok: true, calleeDefinedAt: at };
-  }
-
-  // Versions of one thing: which one runs is not settled, so all of them must return a Result.
-  const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
-  for (const [i, reading] of readings.entries()) {
-    if (reading.kind === "returns") continue;
-    const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
-    const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
-    return { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` };
-  }
-  return { ok: true, calleeDefinedAt: at };
+  return (await targetOf(discoverer, fn)) ?? (await calleeOf(discoverer, fn, call)).result;
 }

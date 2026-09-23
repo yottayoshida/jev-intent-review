@@ -49,7 +49,7 @@ Suppose the PR correctly fixes one path, but an unchanged caller still converts 
 
 `jev-intent-review` is meant to surface that call even though the call itself is outside the diff.
 
-In v0.1 that is a goal, not yet a result. v0.1 lists the callers one hop out of the functions a change touched, so such a caller can be asked about — but among the real pull requests examined so far that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question: a `Result` alias, a callee signature wrapped past what v0.1 reads, and a per-function cap each stopped it first. See [what has been measured](docs/local-check-cli.md#what-has-been-measured).
+In v0.1.1 that is a goal, not yet a result. v0.1.1 lists the callers one hop out of the functions a change touched, and among the real pull requests examined that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question. Since then (unreleased), measured again on the same cases after `#45`, moltis#1064's defect in an unchanged caller was listed at its own call in three runs of three — on a case used to tune the tool by then — and the check also reads, past the callers, the other callers of what the changed code calls; a defect in such a function has not been measured on real code yet. See [what has been measured](docs/local-check-cli.md#what-has-been-measured).
 
 A finding contains the requirement, the relevant code, the assumed failure, and the typed judgments that caused it to be listed.
 
@@ -85,7 +85,7 @@ It currently supports:
 
 * Rust repositories — in any other language no function is read and no call is asked about; only the change question runs
 * two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action — which form a sentence read from an issue says is Jev's reading, measured on 72 sentences ([ADR 0008](docs/adr/0008-who-chooses-a-requirements-form.md))
-* functions touched by the change and callers one hop out
+* functions touched by the change and callers one hop out, and the other callers of the repository functions the changed code calls — the path a fix may have missed — chosen by returning a `Result`, last and under a budget of their own
 * requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](#intent))
 * Jev as the only judgment model
 
