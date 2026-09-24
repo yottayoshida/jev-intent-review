@@ -865,7 +865,7 @@ FAIL: every scored version meets its row in each of 3 runs
   its body; the guarded call is over the budget in every version, so nothing was sent for it. Whether
   Jev reads it is not measured.
 
-Measured again once the operation a requirement names takes its turn first in its function (ADR 0016;
+Measured again once a call whose own name meets the requirement's words takes its turn first in its function (ADR 0016;
 the same cases, patches and table; log `bench/logs/check-before-action-real-v2.json`, 684 requests),
 which puts moltis#1064's guarded call inside the budget in every version:
 

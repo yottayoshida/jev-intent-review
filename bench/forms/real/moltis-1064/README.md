@@ -50,6 +50,6 @@ moltis-1064 hidden   exit 0, requests 0; inside the budgets 29, could be asked 8
 
 (85 askable counts the callers' and the siblings' too; the log records only that nothing was sent.)
 
-Since the operation a requirement names takes its turn first in its function (ADR 0016), the target
+Since a call whose own name meets the requirement's words takes its turn first in its function (ADR 0016), the target
 is inside in every version, eighth of the 29 asked, and was measured against Jev
 (`bench/logs/check-before-action-real-v2.json`).
