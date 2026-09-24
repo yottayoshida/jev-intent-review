@@ -13,7 +13,7 @@
 // `testRegions` — so a candidate is a function by the same rule the evidence builder uses, and
 // test code is out for the same reason it is out of `realDefinitions`.
 
-import { blockEnd, definedName, testRegions } from "../change/blocks.ts";
+import { blockEnd, definedName, indentOf, testRegions } from "../change/blocks.ts";
 import { redact } from "../evidence/redact.ts";
 
 export interface FunctionCandidate {
@@ -76,7 +76,16 @@ export interface Candidates {
 }
 
 const MAX_FUNCTIONS = 60;
-const MAX_CALLS_PER_FUNCTION = 40;
+/**
+ * Calls read in one function, in line order, before the rest are counted and left out (#38).
+ *
+ * It was 40, which dropped calls before any budget ordered them: grovedb#500's unchanged caller
+ * `apply_chunk` calls the changed `finalize` past its 40th call. The largest function measured
+ * with no cap had 495 (moltis#1064's `send_impl`); this is a guard against generated code, not a
+ * limit a hand-written function is expected to reach. What it leaves out is still counted, and a
+ * function it cut is still not taken for a sibling.
+ */
+const MAX_CALLS_PER_FUNCTION = 1000;
 
 /**
  * `definedName` names anything a line defines, `let path = …` included — it is language-agnostic
@@ -94,6 +103,41 @@ function signatureAt(lines: readonly string[], startLine: number, endLine: numbe
     if (text.endsWith("{")) break;
   }
   return parts.join(" ").replace(/\s+/g, " ").slice(0, 300);
+}
+
+/** How far down a signature may run before its body opens; `result-type.ts` reads signatures as far. */
+const MAX_SIGNATURE_LINES = 30;
+
+/**
+ * The 0-based index of the line a function's body opens on: its first line, or, for a signature
+ * over several lines, the first line at the function's own indent that continues the signature
+ * (`)`, `>`, `where`, `{`) and ends in `{`. `blockEnd` reads a line at the function's own indent that
+ * starts with `)` and does not open anything as the end, and a signature whose body opens below it —
+ * a `where` clause, a return type over several lines, `{` on its own line — has one, so the whole
+ * body used to be missed and listed as no call at all (whatsapp-rust#759's fixed function, #38).
+ * Deeper lines are parameters and bounds, and any other line at that indent ends the search: a
+ * one-line function, a doc example or a declaration keeps its first line.
+ */
+function bodyOpens(lines: readonly string[], start: number): number {
+  const first = lines[start] ?? "";
+  // A body opened on the first line (`… {`, a one-line `fn f() { … }`, `fn f() {}`), or a first line
+  // that is itself a comment (a doc example, `/// # fn ex() {`): the first line, as before.
+  const code = first.replace(/\/\/.*$/, "").trim();
+  // A declaration (`fn f() -> u8;`) is its first line too; the stop below would also end it.
+  if (first.trim().startsWith("//") || code.includes("{") || code.endsWith(";")) return start;
+  const base = indentOf(first);
+  for (let j = start + 1; j < Math.min(lines.length, start + MAX_SIGNATURE_LINES); j++) {
+    const line = lines[j] ?? "";
+    const text = line.replace(/\/\/.*$/, "").trim();
+    // Parameters and a `where` clause's bounds sit deeper than the function; a `{` there opens a
+    // pattern (`Json(Session {`), not the body.
+    if (text === "" || indentOf(line) > base) continue;
+    // At the function's own indent only what continues a signature: `) -> T`, `where`, `>`, `{`.
+    if (!/^([)>{]|where\b)/.test(text)) return start;
+    if (text.endsWith("{")) return j;
+    if (text.endsWith(";")) return start;
+  }
+  return start;
 }
 
 export const isRustFunction = (line: string, name: string) => new RegExp(`\\bfn\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(<]`).test(line);
@@ -149,6 +193,8 @@ export function enumerate(path: string, source: string): Candidates {
   const inTest = (line: number) => tests.some((r) => line >= r.start && line <= r.end);
 
   const functions: FunctionCandidate[] = [];
+  /** The 1-based line each function's body opens on, by id. */
+  const bodyLine = new Map<string, number>();
   let omittedFunctions = 0;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
@@ -162,17 +208,20 @@ export function enumerate(path: string, source: string): Candidates {
     }
     // `blockEnd` indexes `lines` from 0 and answers from 0; `BlockIndex.enclosing` counts lines
     // from 1. Passing one to the other returns the line after the signature as the whole function.
-    const endLine = blockEnd(lines, startLine - 1) + 1;
-    functions.push({ id: `${path}:function-${functions.length + 1}`, path, name, startLine, endLine, signature: signatureAt(lines, startLine, endLine) });
+    const id = `${path}:function-${functions.length + 1}`;
+    const opens = bodyOpens(lines, startLine - 1);
+    const endLine = blockEnd(lines, opens) + 1;
+    bodyLine.set(id, opens + 1);
+    functions.push({ id, path, name, startLine, endLine, signature: signatureAt(lines, startLine, endLine) });
   }
 
   const calls: CallCandidate[] = [];
   let omittedCalls = 0;
   for (const fn of functions) {
     let taken = 0;
-    // From the line after the signature: a Rust signature calls nothing, and `pub(crate)` reads as
-    // a call to `pub` if it is scanned.
-    for (let l = fn.startLine + 1; l <= fn.endLine; l++) {
+    // From the line after the one the body opens on: a Rust signature calls nothing — `pub(crate)`
+    // reads as a call to `pub` if it is scanned, and so does a `where` clause's `Fn(…)`.
+    for (let l = (bodyLine.get(fn.id) ?? fn.startLine) + 1; l <= fn.endLine; l++) {
       const text = lines[l - 1] ?? "";
       const trimmed = text.trim();
       if (trimmed.startsWith("//") || trimmed.startsWith("///")) continue;

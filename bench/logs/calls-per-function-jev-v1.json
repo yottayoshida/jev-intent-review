@@ -1,0 +1,2834 @@
+{
+  "what": "grovedb#500 and whatsapp-rust#759 shipped, three runs each against Jev on Cloudflare, after the cap of calls a function went from 40 to 1,000 and a function whose body opens below a line of its own signature (a where clause, a return type over several lines, `{` on its own line) had its body read (#38, second part). \"newlyAsked\" marks a call the tool before (6b90087, --candidates-only, same commits) did not have inside any budget. Shipped is the fixed code, so a call listed is a candidate false listing, labelled below.",
+  "command": "node src/cli/main.ts --skip-change-check --base <before> --head <after> --intent-spec bench/acceptance/cases/<case>/spec.json --json (JEV_PROVIDER=cloudflare), revisions from bench/acceptance/precheck-shipped.json",
+  "tool": "src/ sha256 d216dbfd5c77f7612c7a56e807296bd23df431315bf886175be584bb98f36ea5",
+  "cases": {
+    "grovedb-500": {
+      "before": {
+        "tool": "6b90087",
+        "wouldAsk": 16
+      },
+      "runs": [
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 30,
+            "answered": 30,
+            "bytes": 188044
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 14
+            },
+            "calls": 280,
+            "applicable": 18,
+            "asked": 11,
+            "mapped": 11,
+            "governed": 4,
+            "overBudget": 0,
+            "notApplicable": 262,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 4,
+              "unknown": 0,
+              "aside": 7
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 18,
+                "applicable": 6,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 3,
+                "overBudget": 0,
+                "notApplicable": 12,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 24,
+                "functions": 14,
+                "calls": 262,
+                "applicable": 12,
+                "asked": 7,
+                "mapped": 7,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 250,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 6
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "rewrite_heights",
+                "load_base_root",
+                "verify_height"
+              ],
+              "functions": 2,
+              "calls": 8,
+              "applicable": 4,
+              "asked": 4,
+              "mapped": 4,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 4,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 4
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_success",
+              "probability": 0.66,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.97,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.91,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.89,
+              "newlyAsked": true
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.97,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            }
+          ],
+          "mappings": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.78
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "verdict": "applies",
+              "probability": 0.69
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "verdict": "does_not_apply",
+              "probability": 0.94
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "verdict": "does_not_apply",
+              "probability": 0.93
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.76
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.7
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.65
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.64
+            }
+          ],
+          "findings": [],
+          "budgetedNotAsked": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/operations/proof/verify.rs",
+              "function": "verify_commitment_tree_lower_layer",
+              "call": "Self::verify_bulk_append_lower_layer( bulk_proof_bytes, element, path, limit_left, result,",
+              "origin": "calls_changed",
+              "why": "the call does not close its parentheses within the scan, so it cannot be pointed at"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            }
+          ]
+        },
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 30,
+            "answered": 30,
+            "bytes": 188044
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 14
+            },
+            "calls": 280,
+            "applicable": 18,
+            "asked": 11,
+            "mapped": 11,
+            "governed": 4,
+            "overBudget": 0,
+            "notApplicable": 262,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 4,
+              "unknown": 0,
+              "aside": 7
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 18,
+                "applicable": 6,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 3,
+                "overBudget": 0,
+                "notApplicable": 12,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 24,
+                "functions": 14,
+                "calls": 262,
+                "applicable": 12,
+                "asked": 7,
+                "mapped": 7,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 250,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 6
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "rewrite_heights",
+                "load_base_root",
+                "verify_height"
+              ],
+              "functions": 2,
+              "calls": 8,
+              "applicable": 4,
+              "asked": 4,
+              "mapped": 4,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 4,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 4
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "cannot_determine",
+              "probability": 0.48,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.9299999999999999,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.82,
+              "newlyAsked": true
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.96,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            }
+          ],
+          "mappings": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.71
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "verdict": "applies",
+              "probability": 0.79
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "verdict": "does_not_apply",
+              "probability": 0.98
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "verdict": "does_not_apply",
+              "probability": 0.94
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.95
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "verdict": "does_not_apply",
+              "probability": 0.92
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.76
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.6
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.67
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.7
+            }
+          ],
+          "findings": [],
+          "budgetedNotAsked": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/operations/proof/verify.rs",
+              "function": "verify_commitment_tree_lower_layer",
+              "call": "Self::verify_bulk_append_lower_layer( bulk_proof_bytes, element, path, limit_left, result,",
+              "origin": "calls_changed",
+              "why": "the call does not close its parentheses within the scan, so it cannot be pointed at"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            }
+          ]
+        },
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 30,
+            "answered": 30,
+            "bytes": 188044
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 14
+            },
+            "calls": 280,
+            "applicable": 18,
+            "asked": 11,
+            "mapped": 11,
+            "governed": 4,
+            "overBudget": 0,
+            "notApplicable": 262,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 4,
+              "unknown": 0,
+              "aside": 7
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 18,
+                "applicable": 6,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 3,
+                "overBudget": 0,
+                "notApplicable": 12,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 24,
+                "functions": 14,
+                "calls": 262,
+                "applicable": 12,
+                "asked": 7,
+                "mapped": 7,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 250,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 6
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "rewrite_heights",
+                "load_base_root",
+                "verify_height"
+              ],
+              "functions": 2,
+              "calls": 8,
+              "applicable": 4,
+              "asked": 4,
+              "mapped": 4,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 4,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 4
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_success",
+              "probability": 0.65,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.88,
+              "newlyAsked": true
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.86,
+              "newlyAsked": true
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.95,
+              "newlyAsked": false
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "origin": "shares_call",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.96,
+              "newlyAsked": false
+            }
+          ],
+          "mappings": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to load base root during finalize\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "verify_height(grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.78
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "rewrite_heights(grove_version)",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "map_err(|_| { Error::ChunkRestoringError(ChunkError::InternalError( \"failed to reload base root after height rewrite\", )) })",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "finalize(grove_version)",
+              "verdict": "applies",
+              "probability": 0.76
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunk_ids)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "replication::utils::decode_global_chunk_id( iter_global_chunk_id.as_slice(), &self.app_hash, )",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(iter_packed_chunks.as_slice())",
+              "verdict": "does_not_apply",
+              "probability": 0.98
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "apply_inner_chunk( current_local_chunk_id.as_slice(), current_local_chunks.as_slice(), grove_version, )",
+              "verdict": "does_not_apply",
+              "probability": 0.93
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "discover_new_subtrees_metadata(&completed_path, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.95
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "set_new_transaction()",
+              "verdict": "does_not_apply",
+              "probability": 0.93
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.75
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "load_base_root(value_defined_cost_fn, grove_version)",
+              "verdict": "does_not_apply",
+              "probability": 0.76
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_standalone",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.67
+            },
+            {
+              "file": "merk/src/merk/open.rs",
+              "function": "open_base",
+              "call": "map_ok(|_| merk)",
+              "verdict": "does_not_apply",
+              "probability": 0.63
+            }
+          ],
+          "findings": [],
+          "budgetedNotAsked": [
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "merk/src/merk/restore.rs",
+              "function": "finalize",
+              "call": "load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )",
+              "origin": "changed",
+              "why": "`load_base_root( None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, )` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/operations/proof/verify.rs",
+              "function": "verify_commitment_tree_lower_layer",
+              "call": "Self::verify_bulk_append_lower_layer( bulk_proof_bytes, element, path, limit_left, result,",
+              "origin": "calls_changed",
+              "why": "the call does not close its parentheses within the scan, so it cannot be pointed at"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "unpack_nested_bytes(packed_global_chunks)",
+              "origin": "calls_changed",
+              "why": "`unpack_nested_bytes(packed_global_chunks)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "grovedb/src/replication/state_sync_session.rs",
+              "function": "apply_chunk",
+              "call": "prepare_sync_state_sessions(new_subtrees_metadata, grove_version)",
+              "origin": "calls_changed",
+              "why": "`prepare_sync_state_sessions(new_subtrees_metadata, grove_version)` appears 2 times here, so the condition does not say which"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "newlyAskedPerRun": [
+          3,
+          3,
+          3
+        ],
+        "newlyAskedListed": [
+          0,
+          0,
+          0
+        ],
+        "findings": [
+          0,
+          0,
+          0
+        ],
+        "requests": [
+          30,
+          30,
+          30
+        ]
+      }
+    },
+    "whatsapp-rust-759": {
+      "before": {
+        "tool": "6b90087",
+        "wouldAsk": 2
+      },
+      "runs": [
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 38,
+            "answered": 38,
+            "bytes": 174825
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 3,
+              "calls_changed": 6
+            },
+            "calls": 157,
+            "applicable": 32,
+            "asked": 19,
+            "mapped": 19,
+            "governed": 9,
+            "overBudget": 2,
+            "notApplicable": 125,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 8,
+              "unknown": 3,
+              "aside": 7
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 3,
+                "calls": 32,
+                "applicable": 8,
+                "asked": 6,
+                "mapped": 6,
+                "governed": 4,
+                "overBudget": 0,
+                "notApplicable": 24,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 22,
+                "functions": 6,
+                "calls": 125,
+                "applicable": 24,
+                "asked": 13,
+                "mapped": 13,
+                "governed": 5,
+                "overBudget": 2,
+                "notApplicable": 101,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 5,
+                  "unknown": 3,
+                  "aside": 5
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "process_patch_list"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "origin": "changed",
+              "outcome": "violates",
+              "observation": "returns_success",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.79,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.93,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.87,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.97,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_success",
+              "probability": 1,
+              "newlyAsked": true
+            }
+          ],
+          "mappings": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "verdict": "applies",
+              "probability": 0.88
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.94
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.81
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.94
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.92
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "verdict": "applies",
+              "probability": 0.64
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.54
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.59
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.85
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.78
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "verdict": "applies",
+              "probability": 0.51
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            }
+          ],
+          "findings": [
+            {
+              "requirementId": "R1",
+              "file": "wacore/src/appstate_sync.rs",
+              "lines": "216-254",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "quote": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+              "condition": "Execution reaches the call `download_external_blobs(&mut pl, download)` inside `process_patch_lists`. There, `download_external_blobs(&mut pl, download)` returns an error. Every other operation the function reaches succeeds.",
+              "property": "call_failure_not_returned_as_success",
+              "mapping": {
+                "verdict": "applies",
+                "probability": 0.88,
+                "probabilities": {
+                  "applies": 0.88,
+                  "does_not_apply": 0.1,
+                  "unknown": 0.02
+                },
+                "governs": true
+              },
+              "observation": "returns_success",
+              "probability": 0.99,
+              "why": "Jev answered `applies` (0.88) when asked whether the requirement requires this call's failure not to reach the caller as a success, and `returns_success` (0.99) when asked what `process_patch_lists` returns under that failure. Both are Jev's readings and neither checks the other."
+            }
+          ],
+          "budgetedNotAsked": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "process_patch_lists(patch_lists, &download, true)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "wacore::appstate::patch_decode::parse_patch_lists_ref(resp.get())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            }
+          ]
+        },
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 38,
+            "answered": 38,
+            "bytes": 174825
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 3,
+              "calls_changed": 6
+            },
+            "calls": 157,
+            "applicable": 32,
+            "asked": 19,
+            "mapped": 19,
+            "governed": 9,
+            "overBudget": 2,
+            "notApplicable": 125,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 8,
+              "unknown": 2,
+              "aside": 8
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 3,
+                "calls": 32,
+                "applicable": 8,
+                "asked": 6,
+                "mapped": 6,
+                "governed": 4,
+                "overBudget": 0,
+                "notApplicable": 24,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 22,
+                "functions": 6,
+                "calls": 125,
+                "applicable": 24,
+                "asked": 13,
+                "mapped": 13,
+                "governed": 5,
+                "overBudget": 2,
+                "notApplicable": 101,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 5,
+                  "unknown": 2,
+                  "aside": 6
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "process_patch_list"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "origin": "changed",
+              "outcome": "violates",
+              "observation": "returns_success",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.79,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.95,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.88,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_success",
+              "probability": 1,
+              "newlyAsked": true
+            }
+          ],
+          "mappings": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "verdict": "applies",
+              "probability": 0.9
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.94
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.75
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.94
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.9400000000000001
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "verdict": "applies",
+              "probability": 0.62
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.7
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "verdict": "applies",
+              "probability": 0.47
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.88
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.79
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "verdict": "does_not_apply",
+              "probability": 0.53
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            }
+          ],
+          "findings": [
+            {
+              "requirementId": "R1",
+              "file": "wacore/src/appstate_sync.rs",
+              "lines": "216-254",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "quote": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+              "condition": "Execution reaches the call `download_external_blobs(&mut pl, download)` inside `process_patch_lists`. There, `download_external_blobs(&mut pl, download)` returns an error. Every other operation the function reaches succeeds.",
+              "property": "call_failure_not_returned_as_success",
+              "mapping": {
+                "verdict": "applies",
+                "probability": 0.9,
+                "probabilities": {
+                  "unknown": 0.02,
+                  "does_not_apply": 0.08,
+                  "applies": 0.9
+                },
+                "governs": true
+              },
+              "observation": "returns_success",
+              "probability": 0.99,
+              "why": "Jev answered `applies` (0.90) when asked whether the requirement requires this call's failure not to reach the caller as a success, and `returns_success` (0.99) when asked what `process_patch_lists` returns under that failure. Both are Jev's readings and neither checks the other."
+            }
+          ],
+          "budgetedNotAsked": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "process_patch_lists(patch_lists, &download, true)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "wacore::appstate::patch_decode::parse_patch_lists_ref(resp.get())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            }
+          ]
+        },
+        {
+          "exitCode": 0,
+          "sent": {
+            "requests": 38,
+            "answered": 38,
+            "bytes": 174825
+          },
+          "host": "cloudflare",
+          "model": "typesafe/jev",
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 3,
+              "calls_changed": 6
+            },
+            "calls": 157,
+            "applicable": 32,
+            "asked": 19,
+            "mapped": 19,
+            "governed": 8,
+            "overBudget": 2,
+            "notApplicable": 125,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 7,
+              "unknown": 3,
+              "aside": 8
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 3,
+                "calls": 32,
+                "applicable": 8,
+                "asked": 6,
+                "mapped": 6,
+                "governed": 4,
+                "overBudget": 0,
+                "notApplicable": 24,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 3,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 22,
+                "functions": 6,
+                "calls": 125,
+                "applicable": 24,
+                "asked": 13,
+                "mapped": 13,
+                "governed": 4,
+                "overBudget": 2,
+                "notApplicable": 101,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 4,
+                  "unknown": 3,
+                  "aside": 6
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "process_patch_list"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "observed": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "origin": "changed",
+              "outcome": "violates",
+              "observation": "returns_success",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "origin": "changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 0.66,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "origin": "changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.95,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.83,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.99,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "origin": "calls_changed",
+              "outcome": "satisfies",
+              "observation": "returns_error",
+              "probability": 0.98,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "origin": "calls_changed",
+              "outcome": "unknown",
+              "observation": "returns_error",
+              "probability": 1,
+              "newlyAsked": true
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "outcome": "aside",
+              "observation": "returns_success",
+              "probability": 1,
+              "newlyAsked": true
+            }
+          ],
+          "mappings": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "download_external_blobs(&mut pl, &download)",
+              "verdict": "applies",
+              "probability": 0.99
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "verdict": "applies",
+              "probability": 0.87
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "download_external_blobs",
+              "call": "wa::SyncdMutations::decode(data.as_slice())",
+              "verdict": "applies",
+              "probability": 1
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_parsed_patch_list",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.92
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "process_patch_list(pl, validate_macs)",
+              "verdict": "does_not_apply",
+              "probability": 0.83
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "process_parsed_patch_list(pl, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.96
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.94
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "process_patch_lists(patch_lists, download, validate_macs)",
+              "verdict": "applies",
+              "probability": 0.93
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "process_parsed_patch_list(pl, &download, true)",
+              "verdict": "applies",
+              "probability": 0.57
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list_ref",
+              "call": "parse_patch_list_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.69
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_patch_list",
+              "call": "parse_patch_list(stanza_root)",
+              "verdict": "applies",
+              "probability": 0.51
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list_ref",
+              "call": "parse_patch_lists_ref(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.87
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "decode_multi_patch_list",
+              "call": "parse_patch_lists(stanza_root)",
+              "verdict": "does_not_apply",
+              "probability": 0.76
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_version(name.as_str())",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "send_iq(iq)",
+              "verdict": "does_not_apply",
+              "probability": 0.97
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+              "verdict": "does_not_apply",
+              "probability": 0.58
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "get_missing_key_ids(&list)",
+              "verdict": "does_not_apply",
+              "probability": 0.99
+            }
+          ],
+          "findings": [
+            {
+              "requirementId": "R1",
+              "file": "wacore/src/appstate_sync.rs",
+              "lines": "216-254",
+              "function": "process_patch_lists",
+              "call": "download_external_blobs(&mut pl, download)",
+              "quote": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+              "condition": "Execution reaches the call `download_external_blobs(&mut pl, download)` inside `process_patch_lists`. There, `download_external_blobs(&mut pl, download)` returns an error. Every other operation the function reaches succeeds.",
+              "property": "call_failure_not_returned_as_success",
+              "mapping": {
+                "verdict": "applies",
+                "probability": 0.87,
+                "probabilities": {
+                  "applies": 0.87,
+                  "does_not_apply": 0.1,
+                  "unknown": 0.03
+                },
+                "governs": true
+              },
+              "observation": "returns_success",
+              "probability": 0.99,
+              "why": "Jev answered `applies` (0.87) when asked whether the requirement requires this call's failure not to reach the caller as a success, and `returns_success` (0.99) when asked what `process_patch_lists` returns under that failure. Both are Jev's readings and neither checks the other."
+            }
+          ],
+          "budgetedNotAsked": [
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "wacore/src/appstate_sync.rs",
+              "function": "process_patch_lists",
+              "call": "get_version(pl.name.as_str())",
+              "origin": "changed",
+              "why": "`get_version(pl.name.as_str())` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "process_patch_lists(patch_lists, &download, true)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_version(name.as_str())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "send_iq(iq)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "wacore::appstate::patch_decode::parse_patch_lists_ref(resp.get())",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "process_app_state_sync_task",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "`download(ext)` appears 2 times here, so the condition does not say which"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "download(ext)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            },
+            {
+              "file": "src/client/app_state.rs",
+              "function": "sync_collections_batched_inner",
+              "call": "get_missing_key_ids(&list)",
+              "origin": "calls_changed",
+              "why": "the body of sync_collections_batched_inner did not fit the evidence limit, so an answer would be about part of it"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "newlyAskedPerRun": [
+          19,
+          19,
+          19
+        ],
+        "newlyAskedListed": [
+          1,
+          1,
+          1
+        ],
+        "findings": [
+          1,
+          1,
+          1
+        ],
+        "requests": [
+          38,
+          38,
+          38
+        ]
+      },
+      "labels": {
+        "what": "The one call listed, in every run: process_patch_lists \u2014 download_external_blobs(&mut pl, download). Labelled by three fresh subagents shown the requirement and the function body only, not the tool's answers (bench/acceptance/targets-fixed.json had already said this batched path marks a failed collection for retry and returns success by design, and is not scored). Labelled once, on the runs before the body search was narrowed; the function, the call and the reading are the same in these runs.",
+        "labels": [
+          {
+            "label": "violates",
+            "reason": "On Err it pushes (Vec::new(), state, pl) and returns Ok(results): a successful result with that collection's mutations empty; the failure is only a pl.error = Retry marker inside it."
+          },
+          {
+            "label": "does_not_violate",
+            "reason": "It sets pl.error = Retry and hands the entry back, so the caller gets the failure as an error value on that entry; a reader who takes \"as an error\" to mean only Err would call it a violation."
+          },
+          {
+            "label": "does_not_violate",
+            "reason": "The caller receives the failure as an error on the same pl.error path it uses for other collection errors; a strict reading that counts only Err would label it violates."
+          }
+        ],
+        "majority": "does_not_violate",
+        "verdict": "a false listing, by 2 to 1; the owner chose to ship with it written down (2026-09-23)"
+      }
+    }
+  }
+}

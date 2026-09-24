@@ -266,6 +266,17 @@ test("(c) a function tied by nothing, or only by a comment or a string, is not a
   assert.ok(found.has("load_profile"));
 });
 
+test("(e) a file read only for the siblings has its listing's cap counted, and the function it cut is no sibling", async () => {
+  // `huge` calls the seed and 1,004 other things: past the cap of calls a function, so what it calls
+  // is not fully known. Its file is opened for the siblings alone (#38).
+  const huge = `pub fn huge(dir: &Path) -> Result<(), AppError> {\n    let raw = read_blob(dir)?;\n${Array.from({ length: 1004 }, (_, i) => `    step_${i + 1}()?;`).join("\n")}\n    Ok(())\n}\n`;
+  const { r } = await run({ candidatesOnly: true }, after({ "src/huge.rs": huge }));
+  assert.ok(r.notes.includes("siblings: src/huge.rs: 5 calls were left out of the listing by its cap"), r.notes.join("\n"));
+  assert.match(noteWith(r.notes, /had their call list cut/) ?? "", /\bhuge\b/);
+  assert.ok(!siblingsOf(r).has("huge"), "the function the cap cut is not a sibling");
+  assert.ok(siblingsOf(r).has("load_profile"), "and the real one still is");
+});
+
 test("(d) names that cannot be seeds are counted with their reason", async () => {
   const { r } = await run({ candidatesOnly: true });
   const seeds = r.counts.siblings!.seeds;

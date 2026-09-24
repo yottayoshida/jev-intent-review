@@ -223,8 +223,8 @@ const collapse = (s: string) => s.replace(/\s+/g, "");
  *
  * ponytail: brace counting, not a parser — braces inside string and char literals are counted too.
  * It only has to find a function well enough to count one expression in it or to name it, and it
- * is kept apart from `enumerate` on purpose: `enumerate` stops at 60 functions a file and 40 calls a
- * function, and existence must not depend on those caps.
+ * is kept apart from `enumerate` on purpose: `enumerate` stops at 60 functions a file and 1,000 calls
+ * a function (40 until #38's second part), and existence must not depend on those caps.
  */
 export function functionSpans(source: string): [number, number, string][] {
   const lines = source.split("\n");

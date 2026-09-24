@@ -233,6 +233,8 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   const notResultSiblings: string[] = [];
   const overCap: string[] = [];
   const unreadable = new Set<string>();
+  /** Files read for the siblings whose listing's cap left calls out, with how many. */
+  const capped = new Map<string, number>();
   for (const seed of seeds) {
     const { hits } = await discoverer.search(seed.name);
     const lines = new Map<string, number[]>();
@@ -247,6 +249,9 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
         unreadable.add(path);
         continue;
       }
+      // The listing's own caps, counted here as the one-hop search counts them for its files: a file
+      // opened only for the siblings would otherwise be short without a word (#38).
+      if (listing.omitted.calls > 0) capped.set(path, listing.omitted.calls);
       for (const fn of listing.functions) {
         if (`${fn.path}:${fn.startLine}` === seed.definedAt || known.has(fn.id) || taken.has(fn.id) || turnedAway.has(fn.id)) continue;
         if (index.testRegions.some((r) => fn.startLine >= r.start && fn.startLine <= r.end)) continue;
@@ -305,6 +310,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   if (notResultSiblings.length > 0) notes.push(`siblings: ${named("functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked", notResultSiblings)}`);
   if (overCap.length > 0) notes.push(`siblings: ${named(`more siblings were found than the cap of ${MAX_SIBLINGS} allows`, overCap)}`);
   if (unreadable.size > 0) notes.push(`siblings: ${named("files mentioning a seed could not be read here", [...unreadable])}`);
+  for (const [path, n] of capped) notes.push(`siblings: ${path}: ${n} calls were left out of the listing by its cap`);
 
   return { seeds, siblings, notes };
 }

@@ -1,9 +1,10 @@
-// What giving the callers one hop out a budget of their own changes (ADR 0015), before and after, on
-// the acceptance pre-check's eight cases, every version of moltis#1064 and grovedb#500, and omamori
-// `#468`'s five branches — with the listing's caps as they are, and with every cap lifted, to see
-// whether the order holds as the set grows. No request is sent.
+// What a change to how calls are listed or chosen does, before and after, on the acceptance
+// pre-check's eight cases, every version of moltis#1064 and grovedb#500, and omamori `#468`'s five
+// branches — with the listing's caps as they are, and with every cap lifted, to see whether the
+// order holds as the set grows. No request is sent. v1 measured the callers' own budget (ADR 0015);
+// v2 the cap of calls a function (#38, second part).
 //
-//   node bench/budget-by-origin.ts --acceptance <dir> --omamori <clone> --before <rev> [--out <file>]
+//   node bench/budget-by-origin.ts --acceptance <dir> --omamori <clone> --before <rev> [--out <file>] [--only <case>]
 //
 // `--before` is the commit of this repository whose `src/` is "before"; it is taken out with
 // `git archive`. "After" is this tree's `src/`. Each is also copied with the caps of `enumerate` and
@@ -12,10 +13,14 @@
 //
 // Per run and tool it counts what the plan for #38 said it would: the known targets inside the
 // budget, the calls on a changed line left outside it, the changed functions that got no question,
-// and how many of the callers' calls are asked. The targets live here and not in `src/`.
+// and how many of the callers' calls are asked. It also runs each tool's command with
+// `--candidates-only` where a case has a spec, for the siblings (which `selectSites` does not reach)
+// and the wall time. The checks read the capped tools only: the uncapped copies replace the same
+// constants in both, so a change to one of those constants makes them the same tool, and they are
+// kept for reference. The targets live here and not in `src/`.
 
-import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { cpSync, existsSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -23,8 +28,9 @@ import { parseArgs } from "node:util";
 const HERE = resolve(import.meta.dirname, "..");
 const BUDGET = 20;
 const CALLER_BUDGET = 10;
-const { values } = parseArgs({ options: { acceptance: { type: "string" }, omamori: { type: "string" }, before: { type: "string" }, out: { type: "string" } } });
-if (!values.acceptance || !values.omamori || !values.before) throw new Error("usage: node bench/budget-by-origin.ts --acceptance <dir> --omamori <clone> --before <rev> [--out <file>]");
+// `--only <case>` runs one case, for checking the bench itself; a log is taken with every case.
+const { values } = parseArgs({ options: { acceptance: { type: "string" }, omamori: { type: "string" }, before: { type: "string" }, out: { type: "string" }, only: { type: "string" } } });
+if (!values.acceptance || !values.omamori || !values.before) throw new Error("usage: node bench/budget-by-origin.ts --acceptance <dir> --omamori <clone> --before <rev> [--out <file>] [--only <case>]");
 const ACC = resolve(values.acceptance);
 const OMA = resolve(values.omamori);
 const git = (dir: string, ...args: string[]) => execFileSync("git", ["-C", dir, ...args], { encoding: "utf8" }).trim();
@@ -71,12 +77,13 @@ async function toolAt(root: string) {
     pathFilter: (await import(join(root, "src/config/glob.ts"))).pathFilter,
   };
 }
-const TOOLS = {
-  "before, capped": await toolAt(copyOf("before", false)),
-  "after, capped": await toolAt(copyOf("after", false)),
-  "before, uncapped": await toolAt(copyOf("before", true)),
-  "after, uncapped": await toolAt(copyOf("after", true)),
+const ROOTS = {
+  "before, capped": copyOf("before", false),
+  "after, capped": copyOf("after", false),
+  "before, uncapped": copyOf("before", true),
+  "after, uncapped": copyOf("after", true),
 };
+const TOOLS = Object.fromEntries(await Promise.all(Object.entries(ROOTS).map(async ([name, root]) => [name, { ...(await toolAt(root)), root }] as const)));
 
 // ---- the runs ----
 
@@ -99,7 +106,8 @@ const add = (name: string, clone: string, versions: [string, string, string][], 
   for (const [version, base, head] of versions) runs.push({ case: name, version, clone: join(ACC, clone), base, head, targets });
 };
 // The targets of `bench/order-first-pass.ts`, and grovedb#500's unchanged caller, which the cap of
-// forty calls per function drops today: it is scored in the uncapped runs only.
+// forty calls per function dropped until #38's second part. It is scored everywhere: v1 excused it on
+// the capped tools, which let a tool that still dropped it pass.
 const MOLTIS_A = { tag: "A", file: "crates/gateway/src/session/title.rs", function: "generate_title_for_session", call: "moltis_agents::title::generate_title(provider, &chat_msgs)" };
 const MOLTIS_B = { tag: "B", file: "crates/gateway/src/channel_events/commands/dispatch.rs", function: "dispatch_command", call: "session_handlers::handle_title(state, &session_key)" };
 add("moltis-1064", "moltis", [
@@ -116,7 +124,7 @@ add("grovedb-500", "grovedb", [
   ["hidden-A", "ad3f80263ed21321bee9f450a854d0ee92356b8a", "549b1b679045e354e5b42fb2b0fd9d7241ffc3cd"],
 ], [
   { tag: "A", file: "merk/src/merk/restore.rs", function: "finalize", call: "rewrite_heights(grove_version)" },
-  { tag: "B (uncapped only)", file: "grovedb/src/replication/state_sync_session.rs", function: "apply_chunk", call: "finalize(grove_version)" },
+  { tag: "B", file: "grovedb/src/replication/state_sync_session.rs", function: "apply_chunk", call: "finalize(grove_version)" },
 ]);
 add("grovedb-501", "grovedb", [["shipped", "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5", "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e"]], [
   { tag: "fixed", file: "merk/src/merk/restore.rs", function: "process_chunk", call: "set_base_root_key(chunk_tree.key().map(|k| k.to_vec()))" },
@@ -152,7 +160,23 @@ interface S {
   fnOrigin: "changed" | "calls_changed";
 }
 
-async function measure(tool: Awaited<ReturnType<typeof toolAt>>, run: Run) {
+const SPEC = (name: string) => join(HERE, "bench/acceptance/cases", name, "spec.json");
+
+/** The command itself, set built only: the siblings and the wall time. `null` where the case has no spec. */
+function command(root: string, run: Run) {
+  const spec = SPEC(run.case);
+  if (!existsSync(spec)) return null;
+  const started = performance.now();
+  const out = spawnSync("node", [join(root, "src/cli/main.ts"), "--candidates-only", "--skip-change-check", "--base", run.base, "--head", run.head, "--intent-spec", spec, "--json"], { cwd: run.clone, encoding: "utf8", maxBuffer: 1 << 30 });
+  const seconds = Math.round((performance.now() - started) / 100) / 10;
+  if (out.status !== 0) throw new Error(`${root} on ${run.case} ${run.version}: exit ${out.status}: ${out.stderr.slice(0, 400)}`);
+  const report = JSON.parse(out.stdout) as { requirements: { counts: { siblings?: { functions: number; applicable: number } }; wouldAsk: { origin: string; function: string }[] }[] };
+  const r = report.requirements[0]!;
+  const siblings = r.wouldAsk.filter((w) => w.origin === "shares_call");
+  return { seconds, reportBytes: Buffer.byteLength(out.stdout), siblingFunctions: r.counts.siblings?.functions ?? 0, siblingApplicable: r.counts.siblings?.applicable ?? 0, siblingsInBudget: siblings.length, siblingNames: [...new Set(siblings.map((w) => w.function))].sort() };
+}
+
+async function measure(tool: (typeof TOOLS)[string], run: Run) {
   const repo = new tool.Git(run.clone);
   const head = git(run.clone, "rev-parse", run.head);
   const before = git(run.clone, "merge-base", run.base, head);
@@ -188,13 +212,14 @@ async function measure(tool: Awaited<ReturnType<typeof toolAt>>, run: Run) {
         return [t.tag, hits.length === 0 ? "not askable" : rank >= 0 ? `inside (${rank + 1} of ${budgeted.length})` : "outside"];
       }),
     ),
+    command: command(tool.root, run),
   };
 }
 
 // ---- the table ----
 
 const rows = [];
-for (const run of runs) {
+for (const run of runs.filter((r) => values.only === undefined || r.case === values.only)) {
   const row: Record<string, unknown> = { case: run.case, version: run.version };
   for (const [name, tool] of Object.entries(TOOLS)) row[name] = await measure(tool, run);
   rows.push(row);
@@ -204,23 +229,21 @@ for (const run of runs) {
 type M = Awaited<ReturnType<typeof measure>>;
 const checks = rows.map((row) => {
   const out: Record<string, unknown> = { case: row.case, version: row.version };
-  for (const cap of ["capped", "uncapped"] as const) {
-    const b = row[`before, ${cap}`] as M;
-    const a = row[`after, ${cap}`] as M;
-    out[cap] = {
-      callersNotFewer: a.callersAsked >= b.callersAsked,
-      changedLineLeftNotMore: a.changedLineLeft <= b.changedLineLeft,
-      changedFunctionsNotAskedNotMore: a.changedFunctionsNotAsked <= b.changedFunctionsNotAsked,
-      targetsInside: Object.entries(a.targets).every(([tag, v]) => (tag.includes("uncapped only") && cap === "capped") || (v as string).startsWith("inside")),
-      atMostBoth: a.budgeted <= BUDGET + CALLER_BUDGET,
-    };
-  }
+  const b = row["before, capped"] as M;
+  const a = row["after, capped"] as M;
+  out.capped = {
+    callersNotFewer: a.callersAsked >= b.callersAsked,
+    changedLineLeftNotMore: a.changedLineLeft <= b.changedLineLeft,
+    changedFunctionsNotAskedNotMore: a.changedFunctionsNotAsked <= b.changedFunctionsNotAsked,
+    targetsInside: Object.values(a.targets).every((v) => (v as string).startsWith("inside")),
+    atMostBoth: a.budgeted <= BUDGET + CALLER_BUDGET,
+  };
   return out;
 });
-const failed = checks.filter((c) => (["capped", "uncapped"] as const).some((cap) => Object.values(c[cap] as Record<string, boolean>).some((v) => !v)));
+const failed = checks.filter((c) => Object.values(c.capped as Record<string, boolean>).some((v) => !v));
 
 const result = {
-  what: "The selection before and after the callers got a budget of their own (ADR 0015), with the listing's caps and without them. No request sent.",
+  what: "The selection before and after a change to how calls are listed or chosen — v1 the callers' own budget (ADR 0015), v2 the cap of calls a function (#38, second part) — with the listing's caps and without them, the checks on the capped tools. No request sent.",
   budgets: { budget: BUDGET, callerBudget: CALLER_BUDGET },
   before: beforeRev,
   // A hash of every file under src/, since "after" is this tree and may be ahead of any commit.

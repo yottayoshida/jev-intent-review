@@ -36,6 +36,13 @@ used to fix anything becomes a regression case from then on and is never counted
 
 Used so far:
 
+- **The same 20 runs again, with grovedb-500 and whatsapp-rust-759 against Jev**, judged the cap of
+  calls a function (`#38`, second part; `docs/local-check-cli.md`, *The calls of a function,
+  measured*; `bench/logs/budget-by-origin-v2.json`, `bench/logs/calls-per-function-jev-v1.json`).
+  `candidates.json` says grovedb-500's `apply_chunk` "lists exactly 40" and whatsapp-rust-759's
+  fixed file hit the listing cap: both are true of the tool they were examined with, and the record
+  is not rewritten.
+
 - **kontor-385, again, with every case of the pre-check and omamori `#468`'s five branches**, chose
   how the budget is split (`#38`, ADR 0015; `docs/local-check-cli.md`, *The budget*): orders of one
   shared budget were compared on those 20 runs, with and without the listing's caps, by where the
