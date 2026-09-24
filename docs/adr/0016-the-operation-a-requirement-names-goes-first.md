@@ -38,6 +38,10 @@ marks none, so its order does not change. The callers' and the siblings' budgets
 
 - moltis#1064's guarded call is inside the budget in every version (eighth of 29); grovedb#500's
   keeps its place. Measured with no request (`bench/forms/real.ts precheck`).
+- "The operation the requirement names" is what the rule is for; what it tests is that a word of the
+  call's own name is a word of the requirement, and a noun meets it as well as a verb
+  (`values_to_chat_messages` meets "messages"). A named call that is not the operation takes a turn
+  early too; that shape is not measured either.
 - The rule was made for the case it is shown on. Its reason is the form's definition (a sentence of
   this form names the operation), not the case's names; the opposite shape — a defect in a call met
   only through a receiver, beside a named call — is not measured.

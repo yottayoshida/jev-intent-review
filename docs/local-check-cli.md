@@ -164,9 +164,10 @@ measured*).
 - **The functions the change touched** take their 20 one call per function at a time, so no single
   body takes it. Inside a function, the askable calls whose callee resolved to a function the change
   touched are asked before its other calls; under `check_before_action`, the calls whose own name
-  — the last part of their path — meets the requirement's words come next, **the operation the
-  requirement names taking its turn before a call that meets the words only through a receiver or
-  the rest of its path**; and the rest follow in the order they appear. The failure form marks no
+  — the last part of their path — meets the requirement's words come next, **a call whose own name
+  meets the words taking its turn before a call that meets them only through a receiver or the rest
+  of its path** — the operation a sentence of this form names is meant, and a noun in the name meets
+  the words as well as a verb; and the rest follow in the order they appear. The failure form marks no
   call named, so its order is the one before. When a
   function gets fewer questions than it has askable calls, that decides which calls they go to; when
   more functions hold an askable call than the budget, the functions late in the order get none, and

@@ -170,15 +170,16 @@ const intoChangedAt = (changedAt: ReadonlySet<string>) => (s: Site) => {
  * trait's declaration, which is not where the implementation the change touched is. A name nothing
  * settles resolves to nowhere, and a search cut at its cap settles nothing.
  *
- * Then, for a form that reads names (`check_before_action`), the calls whose own name is the
- * operation the requirement names, before those that meet its words only through a receiver or
- * the rest of their path (#39, ADR 0016). A form that reads no names (the failure form) marks none,
- * and its order is the one above.
+ * Then, for a form that reads names (`check_before_action`), the calls whose own name — the last
+ * part of their path — meets the requirement's words, before those that meet them only through a
+ * receiver or the rest of their path (#39, ADR 0016). A form that reads no names (the failure form)
+ * marks none, and its order is the one above.
  *
  * ponytail: the evidence that this order is better than line order is that one case, and it is
- * the case the order was chosen from; the same is true of the named calls' place (#39), and the
- * opposite shape — a defect in a call met only through a receiver, beside a named one — is untested. The opposite shape — a defect in a call to an unchanged
- * function, beside a call into a changed one — is untested. Measuring orders against each other
+ * the case the order was chosen from. The opposite shape — a defect in a call to an unchanged
+ * function, beside a call into a changed one — is untested. The same holds for the named calls'
+ * place (#39): it was made for moltis#1064, and a defect in a call met only through a receiver,
+ * beside a named one, is untested. Measuring orders against each other
  * across functions (#38) gave the callers a budget of their own instead (ADR 0015,
  * `callersInOrder`); inside a changed function this order stands.
  */
