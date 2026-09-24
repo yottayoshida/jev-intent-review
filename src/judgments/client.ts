@@ -58,6 +58,90 @@ const FIXED_URL: Readonly<Record<"typesafe" | "vercel", string>> = {
 
 const CLOUDFLARE_URL = /^https:\/\/api\.cloudflare\.com\/client\/v4\/accounts\/[0-9a-f]{32}\/ai\/run$/i;
 
+/**
+ * What a run can say about which Jev answered it (#84). `requested` is the name this tool sent, an
+ * alias for Jev rather than a version (`requestedIs`), whichever endpoint it went to; `returned`
+ * counts the responses by the version the host named in them. That name is the host's word, not a
+ * promise the model behind it never changes.
+ *
+ * - `notReturned`: responses that named no version, or named only one of Jev's aliases — a
+ *   gateway echoing a request's name has not said which model answered.
+ * - `unreadable`: responses whose version was not a plain name (not a string, too long, or
+ *   characters a report should not carry); counted, never printed.
+ * - `reusedFromEarlierRuns`: answers `--answers` kept from an earlier run and used instead of being
+ *   sent. Their version is not known. A repeat within this run is not among them: the response it
+ *   repeats was counted.
+ * - `named`: `all` when every response named a version, `some` when some did, `none` when none
+ *   did, `no_responses` when nothing readable came back, and `not_recorded` when the run's
+ *   transport kept no count (a caller that supplied its own).
+ */
+export interface ModelIdentity {
+  host: Host;
+  requested: string;
+  requestedIs: "floating";
+  returned: { model: string; responses: number }[];
+  notReturned: number;
+  unreadable: number;
+  reusedFromEarlierRuns: number;
+  named: "all" | "some" | "none" | "no_responses" | "not_recorded";
+}
+
+/** The counts a transport keeps, before a run adds what it reused. */
+export interface ReturnedModels {
+  returned: ReadonlyMap<string, number>;
+  notReturned: number;
+  unreadable: number;
+}
+
+/** A version name fit to put in a report: short, and nothing that could forge a line or a link. */
+const VERSION_NAME = /^[A-Za-z0-9._:/@+-]{1,100}$/;
+
+/**
+ * The version a host named in a response, if it named a readable one. TypeSafe and Vercel put
+ * `model` at the top level; Cloudflare, measured on 2026-09-25, as
+ * `{ result: { result: { model: "jev-1.13.0" } } }`. The trace and the run's count read it the same way.
+ */
+export function unwrapModel(payload: unknown): string | undefined {
+  const named = modelNamedIn(payload);
+  return named.kind === "version" ? named.model : undefined;
+}
+
+/** Every `model` from the top down, as found: a value that is not a non-empty string is kept as it is. */
+function modelsIn(payload: unknown): unknown[] {
+  const found: unknown[] = [];
+  let node: unknown = payload;
+  for (let depth = 0; depth < 5 && node && typeof node === "object"; depth++) {
+    const obj = node as Record<string, unknown>;
+    if (Object.hasOwn(obj, "model") && obj.model !== "" && obj.model !== null) found.push(obj.model);
+    node = obj.result;
+  }
+  return found;
+}
+
+/** Jev's names on every host: a response naming one of them has named the alias, not a version. */
+const ALIASES: ReadonlySet<string> = new Set(Object.values(HOSTS).map((h) => h.model));
+
+/**
+ * What a response said about its version: the first `model` that is not one of Jev's aliases, or
+ * `none` when it named nothing else.
+ */
+function modelNamedIn(payload: unknown): { kind: "version"; model: string } | { kind: "unreadable" | "none" } {
+  const version = modelsIn(payload).find((m) => !(typeof m === "string" && ALIASES.has(m)));
+  if (version === undefined) return { kind: "none" };
+  return typeof version === "string" && VERSION_NAME.test(version) ? { kind: "version", model: version } : { kind: "unreadable" };
+}
+
+/** The identity of a run from a transport's counts; `tally` absent means none was kept. */
+export function modelIdentityOf(host: Host, tally: ReturnedModels | undefined, reusedFromEarlierRuns = 0): ModelIdentity {
+  const base = { host, requested: jevModel(host), requestedIs: "floating" as const, reusedFromEarlierRuns };
+  if (tally === undefined) return { ...base, returned: [], notReturned: 0, unreadable: 0, named: "not_recorded" };
+  const returned = [...tally.returned].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([model, responses]) => ({ model, responses }));
+  const unnamed = tally.notReturned + tally.unreadable;
+  const answered = returned.reduce((sum, r) => sum + r.responses, 0);
+  const named = answered + unnamed === 0 ? "no_responses" : unnamed === 0 ? "all" : answered === 0 ? "none" : "some";
+  return { ...base, returned, notReturned: tally.notReturned, unreadable: tally.unreadable, named };
+}
+
 /** Jev's name on `host`: the one model a request to it may ask for. */
 export function jevModel(host: Host): string {
   return HOSTS[host].model;
@@ -260,6 +344,9 @@ export class JevClient {
   // and a queue behind them.
   #stopped: ProviderError | undefined;
   #answered = 0; // answers that could be read, not merely HTTP 200s
+  readonly #returned = new Map<string, number>();
+  #notReturned = 0;
+  #unreadable = 0;
   #unusable = 0; // answers that could not, while none has been read
   readonly #fetch: typeof fetch;
   readonly #timeoutMs: number;
@@ -307,6 +394,19 @@ export class JevClient {
     const query = new URL(this.#endpoint.url).search;
     const cleaned = query === "" ? text : text.split(query).join("?[REDACTED QUERY]");
     return fromEndpoint(cleaned, this.#endpoint.token, limit);
+  }
+
+  /** One response's version, counted where every request of a run passes (#84). */
+  #count(payload: unknown): void {
+    const named = modelNamedIn(payload);
+    if (named.kind === "version") this.#returned.set(named.model, (this.#returned.get(named.model) ?? 0) + 1);
+    else if (named.kind === "unreadable") this.#unreadable += 1;
+    else this.#notReturned += 1;
+  }
+
+  /** Which versions answered this client's requests so far, by the host's own word. */
+  identity(): ReturnedModels {
+    return { returned: new Map(this.#returned), notReturned: this.#notReturned, unreadable: this.#unreadable };
   }
 
   /** The errors that make every later request pointless, thrown from then on without sending. */
@@ -418,6 +518,7 @@ export class JevClient {
         throw unusable("bad_response", `${this.where} reported failure: ${say(errors?.[0]?.message ?? "no message")}`, response.status);
       }
       this.#answered += 1;
+      this.#count(json);
       return json;
     }
   }

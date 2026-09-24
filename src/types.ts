@@ -1,7 +1,7 @@
 // Shapes shared across stages. `ReviewReport` is what `--json` prints, so a change here is a
 // change to the tool's output contract.
 
-import type { Host } from "./judgments/client.ts";
+import type { Host, ModelIdentity } from "./judgments/client.ts";
 import type { LocalCheckResult } from "./review/local-check-run.ts";
 
 export const REQUIREMENT_KINDS = [
@@ -173,6 +173,8 @@ export interface ReviewReport {
     base: string;
     head: string;
     model: string;
+    /** Which Jev answered: the alias sent and the versions the host named, counted (#84). */
+    modelIdentity: ModelIdentity;
     questionsHash: string;
     configSource: string;
     notes: string[];

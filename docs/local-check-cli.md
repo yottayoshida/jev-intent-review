@@ -409,6 +409,24 @@ requirement? — and listed under *Changes no requirement asked for* when Jev is
 `--skip-change-check` leaves that out. With `--json`, `sent.requests` is what was sent and
 `sent.answered` what Jev answered, in the same unit (an observation request carries two questions).
 
+Which Jev answered is `metadata.modelIdentity`. `metadata.model` is the name this tool sent, and
+on every host it is an alias that moves (`typesafe/jev`, `jev-latest`, `typesafe-ai/jev`), so two
+runs under the same name may have been answered by different versions. The host names the version
+in each response (Cloudflare wrote `jev-1.13.0` on 2026-09-25), and the run counts responses by it:
+`returned` is `[{model, responses}]` in name order, `notReturned` counts responses that named no
+version or only an alias, `unreadable` those whose version was not a plain name (at
+most 100 of `A-Z a-z 0-9 . _ : / @ + -`, or not a string; never printed), and
+`reusedFromEarlierRuns` the answers `--answers` kept from an earlier run, whose version is not known
+(a repeat within the run is not among them: the response it repeats was counted). `named` is `all`,
+`some`, `none`, `no_responses` (a skipped run, or nothing readable came back) or `not_recorded`.
+`requestedIs` is `floating`: what this tool sends is its table's name for Jev, never a version,
+whichever endpoint it goes to. A response naming any host's name for Jev — the one sent or another —
+has named an alias, not a version, and a level that names only an alias does not hide a version
+named below it. These count responses, not
+answers — a response the report could not read is counted too — and the version is what the host
+said, not a promise that the model behind that name does not change. The report prints the same
+after the model's name: ``model `typesafe/jev` (answered as `jev-1.13.0` ×12)``.
+
 "Nothing listed" means no call met the conditions for being listed — both answers over the bar and
 disagreeing. It covers calls whose mapping or whose behaviour came back undetermined, below the
 bar, or unanswered, as well as calls that agreed. What was not reached is under *Not checked*, and
