@@ -21,7 +21,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { JUDGMENT_ENV } from "../src/judgments/client.ts";
-import { codeBlock, counts, plural, renderMarkdown, resultKind, type ResultKind } from "../src/report/markdown.ts";
+import { codeBlock, leftParts, plural, renderMarkdown, resultKind, type ResultKind } from "../src/report/markdown.ts";
 import { EXIT, type ReviewReport, type SkipKind } from "../src/types.ts";
 
 export const CHECK_NAME = "jev-intent-review result";
@@ -39,15 +39,8 @@ export interface Outcome {
   checked: boolean;
 }
 
-/** Calls asked about that came back without an answer: the budget, the time or the host. */
-export function withoutAnswer(report: ReviewReport): number {
-  let n = 0;
-  for (const r of report.requirements) {
-    const unanswered = new Set(r.mappings.filter((m) => m.verdict === "no_answer").map((m) => m.callId));
-    n += r.observed.filter((o) => o.result.observation === "withheld" || unanswered.has(o.callId)).length;
-  }
-  return n;
-}
+// What a run left is counted once, in the report's module, for its first line and this title (#38).
+export { withoutAnswer } from "../src/report/markdown.ts";
 
 /**
  * Why the run asked nothing, in the title's words. Read from `skipKind`, never from the wording of
@@ -85,10 +78,7 @@ function titleOf(report: ReviewReport, kind: ResultKind, exitCode: number): stri
       return kind.notChecked > 0 ? `No call was read: ${kind.notChecked} not checked` : "No call was read";
     case "read": {
       const parts = [kind.worthChecking > 0 ? `${plural(kind.worthChecking, "call")} worth checking of ${kind.read} read` : `${plural(kind.read, "call")} read, none worth checking`];
-      const notChecked = counts(report).notChecked;
-      if (notChecked > 0) parts.push(`${notChecked} not checked`);
-      const none = withoutAnswer(report);
-      if (none > 0) parts.push(`${none} without an answer`);
+      parts.push(...leftParts(report));
       if (report.unexpectedChanges.length > 0) parts.push(`${plural(report.unexpectedChanges.length, "change")} no requirement asked for`);
       return parts.join(", ");
     }
@@ -107,7 +97,8 @@ export function conclude(report: ReviewReport | undefined, exitCode: number): Ou
   const title = titleOf(report, kind, exitCode);
   if (exitCode !== EXIT.ok) return { conclusion: "failure", title, checked };
   if (kind.kind !== "read") return { conclusion: "neutral", title, checked };
-  const clean = kind.worthChecking === 0 && counts(report).notChecked === 0 && withoutAnswer(report) === 0 && report.unexpectedChanges.length === 0;
+  // Nothing left: no call not checked, none without an answer, no note on what was not read (#38).
+  const clean = kind.worthChecking === 0 && leftParts(report).length === 0 && report.unexpectedChanges.length === 0;
   return { conclusion: clean ? "success" : "neutral", title, checked };
 }
 

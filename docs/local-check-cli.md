@@ -346,6 +346,29 @@ declaration is therefore not sorted first by that order.
 - **Why it is listed**: … Both are Jev's readings and neither checks the other.
 ```
 
+**A requirement's section states how many of the calls that could be asked were read and how many
+were left, and a run that left calls never reads as having checked everything** — in the report and
+in the Action's check run (#38). Right below the functions reached, one line:
+
+```
+Of the 22 calls that could be asked: 15 read and answered, 7 held before their question. 266 more calls could not be asked. 4 notes under *Notes* say what was not read.
+```
+
+(grovedb#500 as shipped, against Jev: seven budgeted calls appear twice in their function or do not
+close their parentheses, so none of them could be pointed at.) "Could be asked" is the calls the
+budgets chose from: those taken and those over. A call asked about and left without an answer — the
+request limit, the time or the host — is counted apart from those read and answered, and the first
+line and the check run's title say how many there were. "Held before their question" is a budgeted
+call whose body did not fit, or that could not be pointed at in it; a run that sent nothing
+(`--candidates-only`) says what was inside the budgets instead. The line says "All … were read and
+answered" only when that is every call and none could not be asked. A note says what was not read
+when something was not read or not followed — a listing's cap, a file that could not be read, a
+search not followed — and not when it only explains, as "do not return a Result" does. When a run
+left anything, the report's first line says how many calls were not checked, how many came back
+without an answer and how many notes say what was not read, in the same numbers as the check run's
+title, and the check run is not green. `--json` carries the counts these are drawn from, and per
+requirement `unreached`: the notes, of `notes`, that say something was not read.
+
 Each requirement's section names its form and, after the counts, how the calls read came out. Every
 call read is in exactly one of the first four sections; the label of the function's answer
 (`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and

@@ -63,6 +63,12 @@ export interface SiblingSet {
   seeds: Seed[];
   siblings: Sibling[];
   notes: string[];
+  /**
+   * The notes that say something was not read or not followed — a cap, a file that could not be
+   * read, a search that was refused — as against those that only explain (#38). A run with one
+   * never reads as having checked everything.
+   */
+  unreached: string[];
 }
 
 /** A function the change touched, by where it is: a callee settled inside one is a changed function. */
@@ -99,6 +105,11 @@ function named(count: string, names: readonly string[]): string {
  */
 export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, change: ChangeAnalysis, changedSites: readonly ChangedSite[], known: ReadonlySet<string>): Promise<SiblingSet> {
   const notes: string[] = [];
+  const unreached: string[] = [];
+  const left = (note: string) => {
+    notes.push(note);
+    unreached.push(note);
+  };
   const spans: ChangedSpan[] = [];
   const changedNames = new Set<string>();
   const removedNames = new Set<string>();
@@ -212,16 +223,16 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   const seeds = candidates.slice(0, MAX_SEEDS);
   const leftOut = candidates.slice(MAX_SEEDS).map((s) => s.name);
 
-  if (unsettled.length > 0) notes.push(`siblings: ${named("names the changed code calls settle at no one definition here, so what they reach is not established", unsettled)}`);
-  if (outside.length > 0) notes.push(`siblings: ${named("names the changed code calls are functions outside this repository, whose other callers are not read", outside)}`);
-  if (versions.length > 0) notes.push(`siblings: ${named("names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings", versions)}`);
+  if (unsettled.length > 0) left(`siblings: ${named("names the changed code calls settle at no one definition here, so what they reach is not established", unsettled)}`);
+  if (outside.length > 0) left(`siblings: ${named("names the changed code calls are functions outside this repository, whose other callers are not read", outside)}`);
+  if (versions.length > 0) left(`siblings: ${named("names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings", versions)}`);
   if (notResult.length > 0) notes.push(`siblings: ${named("names the changed code calls do not return a Result, or what they return is not settled here", notResult)}`);
   if (changedFns.length > 0) notes.push(`siblings: ${named("names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes)", changedFns)}`);
   if (onlyInTests.length > 0) notes.push(`siblings: ${named("names are called only in the change's tests", onlyInTests)}`);
-  if (common.length > 0) notes.push(`siblings: ${named(`names are used in more than ${COMMON_FILES} files and were not followed`, common)}`);
-  if (beyondSearch.length > 0) notes.push(`siblings: ${named("names have more references than the search returns and were not followed", beyondSearch)}`);
-  if (refused.length > 0) notes.push(`siblings: ${named("names could not be searched", refused)}`);
-  if (leftOut.length > 0) notes.push(`siblings: ${named(`seeds over the cap of ${MAX_SEEDS} were not followed`, leftOut)}`);
+  if (common.length > 0) left(`siblings: ${named(`names are used in more than ${COMMON_FILES} files and were not followed`, common)}`);
+  if (beyondSearch.length > 0) left(`siblings: ${named("names have more references than the search returns and were not followed", beyondSearch)}`);
+  if (refused.length > 0) left(`siblings: ${named("names could not be searched", refused)}`);
+  if (leftOut.length > 0) left(`siblings: ${named(`seeds over the cap of ${MAX_SEEDS} were not followed`, leftOut)}`);
 
   const siblings: Sibling[] = [];
   const taken = new Set<string>();
@@ -305,12 +316,12 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   }
 
   if (callsChanged.length > 0) notes.push(`siblings: ${named("functions call a seed and also call a changed function, so they are not siblings; they are read one hop out unless that search's own caps left them out (see its notes)", callsChanged)}`);
-  if (mayCallChanged.length > 0) notes.push(`siblings: ${named("functions call a seed and also call a changed function's name that settles nowhere here, so whether they call it is not known and they are not siblings", mayCallChanged)}`);
-  if (cut.length > 0) notes.push(`siblings: ${named("functions mention a seed but had their call list cut, so whether they call it is not known", cut)}`);
+  if (mayCallChanged.length > 0) left(`siblings: ${named("functions call a seed and also call a changed function's name that settles nowhere here, so whether they call it is not known and they are not siblings", mayCallChanged)}`);
+  if (cut.length > 0) left(`siblings: ${named("functions mention a seed but had their call list cut, so whether they call it is not known", cut)}`);
   if (notResultSiblings.length > 0) notes.push(`siblings: ${named("functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked", notResultSiblings)}`);
-  if (overCap.length > 0) notes.push(`siblings: ${named(`more siblings were found than the cap of ${MAX_SIBLINGS} allows`, overCap)}`);
-  if (unreadable.size > 0) notes.push(`siblings: ${named("files mentioning a seed could not be read here", [...unreadable])}`);
-  for (const [path, n] of capped) notes.push(`siblings: ${path}: ${n} calls were left out of the listing by its cap`);
+  if (overCap.length > 0) left(`siblings: ${named(`more siblings were found than the cap of ${MAX_SIBLINGS} allows`, overCap)}`);
+  if (unreadable.size > 0) left(`siblings: ${named("files mentioning a seed could not be read here", [...unreadable])}`);
+  for (const [path, n] of capped) left(`siblings: ${path}: ${n} calls were left out of the listing by its cap`);
 
-  return { seeds, siblings, notes };
+  return { seeds, siblings, notes, unreached };
 }

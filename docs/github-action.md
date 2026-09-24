@@ -89,9 +89,11 @@ is no such limit; `limits.max_requests` still holds each run.
 
 **How a run reads at a glance.** The check run is green only when at least one call was read and
 nothing is left to look at; red when the command did not exit 0; and neutral — grey — for everything
-else: a run that was skipped, found no requirement, asked nothing, read no call, left a call without
-an answer, met a change no requirement asked for, or listed a call worth checking while
-`policy.fail_on` leaves the exit code at 0 (the common one).
+else: a run that was skipped, found no requirement, asked nothing, read no call, left a call not
+checked or without an answer, noted something the listing did not read (a cap, a file it could not
+read, a search it did not follow — on a real repository nearly every run), met a change no
+requirement asked for, or listed a call worth checking while `policy.fail_on` leaves the exit code at
+0.
 Its title says which. A neutral check run does not block a required check, and the job itself stays
 green, so a run that checked nothing is told apart by the check run, not by the job's own mark.
 Without `checks: write` — a workflow that does not grant it, Dependabot, or a fork's run if you drop

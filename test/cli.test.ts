@@ -104,7 +104,7 @@ test("the CLI reads the calls of the functions the change touched, lists the one
 
     const markdown = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", RUST_SPEC], markdown.value, fakeDeps()), EXIT.ok);
-    assert.match(markdown.out(), /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* No requirement verdict is stated\./);
+    assert.match(markdown.out(), /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* 2 not checked, 1 note on what was not read, for the reasons under each requirement\. No requirement verdict is stated\./);
     assert.match(markdown.out(), /#### src\/integrity\.rs:\d+-\d+ · read_baseline — `crate::atomic_file::read_capped\(&path, MAX\)`/);
     for (const word of ["VERIFIED", "VIOLATION", "UNKNOWN"]) assert.ok(!markdown.out().includes(word), `${word} is not in the report`);
   } finally {
