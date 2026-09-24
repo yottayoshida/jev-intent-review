@@ -700,6 +700,58 @@ node bench/acceptance/replay.ts bench/logs/acceptance-v2.json
 A test compares the table above with that output byte for byte, and fails if either is committed
 without the other.
 
+### The acceptance set after `#38`
+
+The same two cases measured again with the tool after `#38`'s three parts and `#74`
+(`bench/logs/acceptance-v4.json`, written by `node bench/acceptance/run.ts measure <case> <clone>
+<limit> again`; the rules are the same). **Every defect placed where the run reads — in a function
+the change touched (A) or in an unchanged caller of one (B) — was asked about inside the default
+budget, and both of its questions came back answered, in three runs of three**: moltis-1064's
+defect-A and defect-B and grovedb-500's defect-A (`node bench/acceptance/answered.ts
+bench/logs/acceptance-v4.json`). Whether a call is inside the budget is settled by the commit
+before any request is sent — the pre-check says so — so what three runs add is that both questions
+came back each time, and what Jev read.
+
+It is a regression check, not an unseen measurement, and less than that for the budget: both cases
+were used to tune the tool, and how the budget is split (ADR 0015) was chosen by where these cases'
+targets fell. What it shows is that nothing since `#45` moved them out.
+
+<!-- acceptance-v4:begin -->
+Measured again with the tool at 2682809: 2 requirements from 2 repositories. Used to tune the tool before this measurement: moltis-1064, grovedb-500.
+
+| case | role | version | target | expected | reach | readings (mapping / behaviour) | result |
+|---|---|---|---|---|---|---|---|
+| moltis-1064 | regression | shipped | A `generate_title_for_session` | not listed | asked | applies 1.00 / returns_error 1.00; applies 0.99 / returns_error 0.99; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| moltis-1064 | regression | shipped | B `dispatch_command` | not listed | asked | applies 0.88 / returns_error 0.93; applies 0.85 / returns_error 0.98; applies 0.88 / returns_error 0.96 | 3/3 agrees |
+| moltis-1064 | regression | shipped | C `generate_title` | not listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+| moltis-1064 | regression | defect-A | A `generate_title_for_session` | listed | asked | applies 0.98 / returns_success 1.00 · listed; applies 0.98 / returns_success 1.00 · listed; applies 0.98 / returns_success 1.00 · listed | 3/3 agrees |
+| moltis-1064 | regression | rewrite-A | A `generate_title_for_session` | not listed | asked | applies 0.99 / returns_error 1.00; applies 0.99 / returns_error 1.00; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| moltis-1064 | regression | hidden-A | A `generate_title_for_session` | no confident reading | asked | applies 0.98 / returns_error 0.92; applies 0.99 / returns_error 0.93; applies 0.98 / returns_error 0.91 | 0/3 differs |
+| moltis-1064 | regression | defect-B | B `dispatch_command` | listed | asked | applies 0.97 / returns_success 1.00 · listed; applies 0.97 / returns_success 1.00 · listed; applies 0.96 / returns_success 1.00 · listed | 3/3 agrees |
+| moltis-1064 | regression | defect-C | C `generate_title` | listed | not enumerated (a cap fired; cap or structure) | — | not reached |
+| grovedb-500 | regression | shipped | A `finalize` | not listed | asked | applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 0.99; applies 1.00 / returns_error 0.99 | 3/3 agrees |
+| grovedb-500 | regression | defect-A | A `finalize` | listed | asked | applies 0.99 / returns_success 0.91 · listed; applies 0.99 / returns_success 0.91 · listed; applies 0.99 / returns_success 0.92 · listed | 3/3 agrees |
+| grovedb-500 | regression | rewrite-A | A `finalize` | not listed | asked | applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 1.00; applies 1.00 / returns_error 1.00 | 3/3 agrees |
+| grovedb-500 | regression | hidden-A | A `finalize` | no confident reading | asked | applies 1.00 / returns_error 0.95; applies 1.00 / returns_error 0.95; applies 1.00 / returns_error 0.94 | 0/3 differs |
+
+Calls other than the targets that were listed in these runs, not scored: 0. Requests sent to Jev: 786, over 27 runs.
+<!-- acceptance-v4:end -->
+
+- **Every cell reads as it did after `#45`.** The eight that agreed three of three agree again, and
+  hidden-A still gets a confident `returns_error` (0.91–0.95) where no confident reading was expected.
+- **moltis-1064's defect-C is still not reached**: it sits in a function that neither changed nor
+  calls one that did, which the run does not read (`#37`). The acceptance set's claim is about A and
+  B; C is `#37`'s.
+- 786 requests over 27 runs, where the measurement after `#45` sent 708: a run of moltis sent 28, one
+  of grovedb 30 to 32.
+
+```sh
+node bench/acceptance/replay.ts bench/logs/acceptance-v4.json
+```
+
+A test compares the table above with that output byte for byte, and fails if either is committed
+without the other.
+
 ### The case v0.1 was tuned on
 
 One repository (omamori `#468` / PR `#476`), two requirements that state how a failure must be

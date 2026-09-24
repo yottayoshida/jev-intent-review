@@ -307,6 +307,33 @@ test("the re-run's table in docs/local-check-cli.md is exactly what acceptance-v
   assert.equal(block, render(loadCases(), log, candidates));
 });
 
+test("the table after #38 in docs/local-check-cli.md is exactly what acceptance-v4.json produces, and every A and B defect in it was answered three of three", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- acceptance-v4:begin -->\n";
+  const end = "\n<!-- acceptance-v4:end -->";
+  const logged = existsSync(new URL("../bench/logs/acceptance-v4.json", import.meta.url));
+  assert.equal(doc.split(begin).length - 1, logged ? 1 : 0, logged ? "exactly one acceptance-v4:begin marker" : "no table for a measurement that is not committed");
+  if (!logged) return;
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = read<AcceptanceLog>("../bench/logs/acceptance-v4.json");
+  const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
+  assert.equal(log.conditions.claim, undefined, "v4 is the set measured again, not a sibling's claim");
+  assert.equal(block, render(loadCases(), log, candidates));
+  // What docs says of it: every defect at A or B asked and answered in three finished runs of three.
+  let defects = 0;
+  for (const c of loadCases().filter((x) => log.cases[x.id] !== undefined)) {
+    for (const [versionId, version] of Object.entries(c.versions)) {
+      if (version.place !== "A" && version.place !== "B") continue;
+      for (const r of answeredRuns(c, versionId, log.cases[c.id]!.versions[versionId]!)) {
+        if (version.expected[r.targetKey] !== "listed") continue;
+        defects += 1;
+        assert.deepEqual([r.answered, r.finished], [3, 3], `${c.id} ${versionId} ${r.targetKey}`);
+      }
+    }
+  }
+  assert.equal(defects, 3);
+});
+
 test("a target is asked and answered only when the mapping and the observation both came back (#38)", () => {
   const mapped = { ...T, verdict: "applies", probability: 0.9, governs: true };
   const answered = run({ mappings: [mapped], observed: [{ ...T, result: { observation: "returns_success", probability: 0.8 } }] });
