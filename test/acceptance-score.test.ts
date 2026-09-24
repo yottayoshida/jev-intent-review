@@ -344,6 +344,10 @@ test("a target is asked and answered only when the mapping and the observation b
   assert.equal(readRun(T, withheld).stage, "answered");
   assert.equal(askedAndAnswered(T, withheld), false);
   assert.equal(askedAndAnswered(T, unmapped), false);
+  // An observation with no mapping recorded is not both answers, though `readRun` reads it as answered.
+  const observedOnly = run({ observed: [{ ...T, result: { observation: "returns_success", probability: 0.8 } }] });
+  assert.equal(readRun(T, observedOnly).stage, "answered");
+  assert.equal(askedAndAnswered(T, observedOnly), false);
   assert.equal(askedAndAnswered(T, run()), false);
   const c = oneCase("x", "r", { "defect-A": { ...version({ A: "listed" }), place: "A" } });
   const at = (runs: RunRecord[]): VersionLog => ({ base: "b", head: "h", enumeration: { wouldAsk: [T], unchecked: [], notes: [] }, runs });

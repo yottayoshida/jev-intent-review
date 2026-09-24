@@ -167,7 +167,7 @@ export function readRun(target: Target, run: RunRecord): RunReading {
  */
 export function askedAndAnswered(target: Target, run: RunRecord): boolean {
   const reading = readRun(target, run);
-  return reading.stage === "answered" && reading.observation !== undefined && reading.observation.observation !== "withheld";
+  return reading.stage === "answered" && reading.mapping !== undefined && reading.observation !== undefined && reading.observation.observation !== "withheld";
 }
 
 /**

@@ -709,8 +709,9 @@ the change touched (A) or in an unchanged caller of one (B) — was asked about 
 budget, and both of its questions came back answered, in three runs of three**: moltis-1064's
 defect-A and defect-B and grovedb-500's defect-A (`node bench/acceptance/answered.ts
 bench/logs/acceptance-v4.json`). Whether a call is inside the budget is settled by the commit
-before any request is sent — the pre-check says so — so what three runs add is that both questions
-came back each time, and what Jev read.
+before any request is sent, and so is whether a budgeted call is held before its question (a body
+that does not fit, a call that cannot be pointed at); what three runs add is that each target was
+in fact asked, both questions came back each time, and what Jev read.
 
 It is a regression check, not an unseen measurement, and less than that for the budget: both cases
 were used to tune the tool, and how the budget is split (ADR 0015) was chosen by where these cases'
@@ -741,7 +742,10 @@ Calls other than the targets that were listed in these runs, not scored: 0. Requ
   hidden-A still gets a confident `returns_error` (0.91–0.95) where no confident reading was expected.
 - **moltis-1064's defect-C is still not reached**: it sits in a function that neither changed nor
   calls one that did, which the run does not read (`#37`). The acceptance set's claim is about A and
-  B; C is `#37`'s.
+  B; C is `#37`'s — and reaching it is not all it takes: its call's callee is not settled at one
+  definition here (`callee_ambiguous` in its `case.json`), so read, it would be held before its
+  question. The table's "a cap fired" for it is a note that the callers of another function were
+  not followed, not a cap on C's own file.
 - 786 requests over 27 runs, where the measurement after `#45` sent 708: a run of moltis sent 28, one
   of grovedb 30 to 32.
 
