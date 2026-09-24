@@ -37,6 +37,13 @@ export type Askability =
        * form does; the order inside a function reads it (`callsIntoChangedFirst`).
        */
       calleeDefinedAt?: string;
+      /**
+       * Whether the call's own name — the last part of its path — is what the requirement names,
+       * when the form reads names (`check_before_action`): the order inside a changed function
+       * gives such a call its turn before one that meets the words only through a receiver or the
+       * rest of the path (#39). Absent is not named.
+       */
+      names?: boolean;
     }
   | { ok: false; kind: string; reason: string };
 
@@ -163,21 +170,28 @@ const intoChangedAt = (changedAt: ReadonlySet<string>) => (s: Site) => {
  * trait's declaration, which is not where the implementation the change touched is. A name nothing
  * settles resolves to nowhere, and a search cut at its cap settles nothing.
  *
+ * Then, for a form that reads names (`check_before_action`), the calls whose own name is the
+ * operation the requirement names, before those that meet its words only through a receiver or
+ * the rest of their path (#39, ADR 0016). A form that reads no names (the failure form) marks none,
+ * and its order is the one above.
+ *
  * ponytail: the evidence that this order is better than line order is that one case, and it is
- * the case the order was chosen from. The opposite shape — a defect in a call to an unchanged
+ * the case the order was chosen from; the same is true of the named calls' place (#39), and the
+ * opposite shape — a defect in a call met only through a receiver, beside a named one — is untested. The opposite shape — a defect in a call to an unchanged
  * function, beside a call into a changed one — is untested. Measuring orders against each other
  * across functions (#38) gave the callers a budget of their own instead (ADR 0015,
  * `callersInOrder`); inside a changed function this order stands.
  */
 export function callsIntoChangedFirst(sites: readonly Site[], changedAt: ReadonlySet<string>): Site[] {
   const intoChanged = intoChangedAt(changedAt);
+  const named = (s: Site) => !intoChanged(s) && s.applicability?.ok === true && s.applicability.names === true;
   const byFunction = new Map<string, Site[]>();
   for (const s of sites) {
     const list = byFunction.get(s.fn.id) ?? [];
     list.push(s);
     byFunction.set(s.fn.id, list);
   }
-  return [...byFunction.values()].flatMap((list) => [...list.filter(intoChanged), ...list.filter((s) => !intoChanged(s))]);
+  return [...byFunction.values()].flatMap((list) => [...list.filter(intoChanged), ...list.filter(named), ...list.filter((s) => !intoChanged(s) && !named(s))]);
 }
 
 /**

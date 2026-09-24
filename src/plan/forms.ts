@@ -141,7 +141,10 @@ const checkBeforeAction: Form = {
     // read as making the forbidden call in every run of the shipped code.
     const inside = await readHere(call.callee.split("::").pop()!);
     if (inside) return { ok: false, kind: "callee_read_here", reason: `\`${inside.name}\` (${inside.path}:${inside.startLine}) is read on its own in this run, so a check before what it does is asked about inside it` };
-    return { ok: true };
+    // The operation a sentence of this form names is the call's own name: a call that meets the
+    // words only through a receiver or the rest of its path takes its turn after a named one (#39).
+    const names = [...calleeNameTerms(call)].some((c) => [...wanted].some((w) => termsMeet(c, w)));
+    return { ok: true, names };
   },
   mappingQuestion: (fn, call) => ({
     requirement_governs: {
@@ -295,6 +298,11 @@ function receivers(call: CallCandidate): string[] {
   const callee = call.callee.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const chain = new RegExp(`((?:[A-Za-z_][\\w$]*\\s*\\.\\s*)+)${callee}\\s*\\(`).exec(call.text);
   return chain ? chain[1]!.split(".").map((s) => s.trim()).filter((s) => s !== "") : [];
+}
+
+/** The words of the call's own name: the last part of its path (`save` of `store::save`). */
+export function calleeNameTerms(call: CallCandidate): Set<string> {
+  return new Set(identifierWords(call.callee.split("::").pop() ?? ""));
 }
 
 export function callTerms(call: CallCandidate): Set<string> {
