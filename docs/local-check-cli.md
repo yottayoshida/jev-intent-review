@@ -163,7 +163,11 @@ measured*).
 
 - **The functions the change touched** take their 20 one call per function at a time, so no single
   body takes it. Inside a function, the askable calls whose callee resolved to a function the change
-  touched are asked before its other calls, and the rest follow in the order they appear. When a
+  touched are asked before its other calls; under `check_before_action`, the calls whose own name
+  — the last part of their path — meets the requirement's words come next, **the operation the
+  requirement names taking its turn before a call that meets the words only through a receiver or
+  the rest of its path**; and the rest follow in the order they appear. The failure form marks no
+  call named, so its order is the one before. When a
   function gets fewer questions than it has askable calls, that decides which calls they go to; when
   more functions hold an askable call than the budget, the functions late in the order get none, and
   each of the others gets one, for its first call. This is the order they had when they shared the
@@ -195,7 +199,9 @@ is (*Which definition a call reaches*), and for a call into a function this repo
 define, the table's row (`fs::read_to_string`), which is nowhere in this repository and so is never
 a changed function. A name nothing settles is not asked about and resolves to nowhere. The
 `check_before_action` form resolves no callee for a call it asks about — a call whose callee is a
-function this run reads is not askable there — so its calls keep the order they appear in. A
+function this run reads is not askable there — so none of its calls goes first for that; what orders
+them is whether their own name is what the requirement names (#39, ADR 0016). That order is in the
+changed functions' budget only: the callers' and the siblings' budgets keep their order. A
 changed function the listing's caps left out (see *Notes*) is not counted as one.
 
 ### Whether a function returns a `Result`
@@ -858,6 +864,45 @@ FAIL: every scored version meets its row in each of 3 runs
   its body; the guarded call is over the budget in every version, so nothing was sent for it. Whether
   Jev reads it is not measured.
 
+Measured again once the operation a requirement names takes its turn first in its function (ADR 0016;
+the same cases, patches and table; log `bench/logs/check-before-action-real-v2.json`, 684 requests),
+which puts moltis#1064's guarded call inside the budget in every version:
+
+<!-- check-before-action-real-v2:begin -->
+```
+grovedb-500 scored:
+  shipped  3/3
+  defect   2/3
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+  rewrite  3/3
+grovedb-500 recorded, not scored:
+  hidden   3/3
+moltis-1064 scored:
+  shipped  3/3
+  defect   3/3
+  rewrite  3/3
+moltis-1064 recorded, not scored:
+  hidden   0/3
+      generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs): satisfies, expected unknown
+      generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs): satisfies, expected unknown
+      generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs): satisfies, expected unknown
+FAIL: every scored version meets its row in each of 3 runs
+```
+<!-- check-before-action-real-v2:end -->
+
+- **moltis#1064 reads as the table says in every scored run**: the shipped code and the rewrite as
+  holding (applies 0.97–0.99, `does_not_reach` 0.98–1.00), the removed check listed at its call
+  (applies 0.95–0.96, `reaches_it` 0.95–0.97). In the defect the call just above it,
+  `values_to_chat_messages(&history)`, is listed too, in every run — with the check removed it also
+  runs for a session with too few messages; it is read as holding in every other version.
+- **The hidden check is read confidently as holding** on moltis#1064 (`does_not_reach` 1.00), the
+  constructed case's miss — and as `cannot_determine` on grovedb#500 (0.50–0.53), as before.
+- **grovedb#500 reads as it did**: the shipped code and the rewrite as holding every time, the defect
+  listed in two runs of three (applies 0.61–0.62); in the other the mapping came back at 0.54.
+- So on the code of both pull requests, the form separates the removed check from the shipped code
+  and a rewrite in 17 of 18 scored runs; a check hidden in a helper it is not shown is, as for the
+  failure form, not something it can see.
+
 ### The order inside a function
 
 The calls into a function the change touched go first in their function (see *What it asks*). What
@@ -892,6 +937,17 @@ The two calls the order swaps in omamori `#468`'s `run_override_disable` — the
 the order was chosen — were asked of Jev three times on every branch under both requirements
 (`bench/logs/order-first-pass-jev-v1.json`, 120 questions): neither was listed in any run. The
 swaps in the other four functions have not been asked of Jev.
+
+Under `check_before_action`, the calls named by the requirement come next (ADR 0016). This too rests
+on one case, the one it was made for: moltis#1064's guarded call, `generate_title`, sits in its
+function below five calls that meet the sentence's words only through a receiver (`session_store`,
+`session_metadata`, `session_model`) and one named by it (`values_to_chat_messages`), and since the cap of calls a
+function is 1,000 (#38) that function gets six of the changed functions' 20 turns — the guarded call
+was seventh, outside the budget in every version (`bench/logs/check-before-action-real-v1.json`). With the order it is inside in every version, eighth of the 29 asked, and
+grovedb#500's guarded call keeps its place (fourth, or third). The reason for the rule is the
+form's own definition — a sentence of this form names the operation — and not moltis#1064's names;
+the evidence that it helps is the case it was made for, and the opposite shape, a defect in a call
+met only through a receiver beside a named one, is not in any case measured.
 
 ### The callers' budget, measured
 
