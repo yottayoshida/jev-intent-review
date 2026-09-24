@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { loadCases, render, type AcceptanceLog } from "../bench/acceptance/replay.ts";
-import { cutShort, occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
+import { answeredRuns, askedAndAnswered, cutShort, occurrences, reachOf, readRun, scoreListed, scoreVersion, ScoringError, type CaseFile, type RunRecord, type Target, type VersionLog } from "../bench/acceptance/score.ts";
 
 const read = <T>(path: string): T => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8")) as T;
 
@@ -305,4 +305,55 @@ test("the re-run's table in docs/local-check-cli.md is exactly what acceptance-v
   const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
   assert.ok(Object.values(log.cases).every((c) => c.role !== undefined), "every case of the re-run records its role");
   assert.equal(block, render(loadCases(), log, candidates));
+});
+
+test("the table after #38 in docs/local-check-cli.md is exactly what acceptance-v4.json produces, and every A and B defect in it was answered three of three", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- acceptance-v4:begin -->\n";
+  const end = "\n<!-- acceptance-v4:end -->";
+  const logged = existsSync(new URL("../bench/logs/acceptance-v4.json", import.meta.url));
+  assert.equal(doc.split(begin).length - 1, logged ? 1 : 0, logged ? "exactly one acceptance-v4:begin marker" : "no table for a measurement that is not committed");
+  if (!logged) return;
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = read<AcceptanceLog>("../bench/logs/acceptance-v4.json");
+  const candidates = read<Parameters<typeof render>[2]>("../bench/acceptance/candidates.json");
+  assert.equal(log.conditions.claim, undefined, "v4 is the set measured again, not a sibling's claim");
+  assert.equal(block, render(loadCases(), log, candidates));
+  // What docs says of it: every defect at A or B asked and answered in three finished runs of three.
+  let defects = 0;
+  for (const c of loadCases().filter((x) => log.cases[x.id] !== undefined)) {
+    for (const [versionId, version] of Object.entries(c.versions)) {
+      if (version.place !== "A" && version.place !== "B") continue;
+      for (const r of answeredRuns(c, versionId, log.cases[c.id]!.versions[versionId]!)) {
+        if (version.expected[r.targetKey] !== "listed") continue;
+        defects += 1;
+        assert.deepEqual([r.answered, r.finished], [3, 3], `${c.id} ${versionId} ${r.targetKey}`);
+      }
+    }
+  }
+  assert.equal(defects, 3);
+});
+
+test("a target is asked and answered only when the mapping and the observation both came back (#38)", () => {
+  const mapped = { ...T, verdict: "applies", probability: 0.9, governs: true };
+  const answered = run({ mappings: [mapped], observed: [{ ...T, result: { observation: "returns_success", probability: 0.8 } }] });
+  const withheld = run({ mappings: [mapped], observed: [{ ...T, result: { observation: "withheld", probability: 0 } }] });
+  const unmapped = run({ mappings: [{ ...mapped, verdict: "no_answer", governs: false }], observed: [{ ...T, result: { observation: "returns_success", probability: 0.8 } }] });
+  assert.equal(askedAndAnswered(T, answered), true);
+  // `readRun` calls the withheld one answered: the mapping came back. The observation did not.
+  assert.equal(readRun(T, withheld).stage, "answered");
+  assert.equal(askedAndAnswered(T, withheld), false);
+  assert.equal(askedAndAnswered(T, unmapped), false);
+  // An observation with no mapping recorded is not both answers, though `readRun` reads it as answered.
+  const observedOnly = run({ observed: [{ ...T, result: { observation: "returns_success", probability: 0.8 } }] });
+  assert.equal(readRun(T, observedOnly).stage, "answered");
+  assert.equal(askedAndAnswered(T, observedOnly), false);
+  assert.equal(askedAndAnswered(T, run()), false);
+  const c = oneCase("x", "r", { "defect-A": { ...version({ A: "listed" }), place: "A" } });
+  const at = (runs: RunRecord[], head = "h".repeat(40)): VersionLog => ({ base: "b".repeat(40), head, enumeration: { wouldAsk: [T], unchecked: [], notes: [] }, runs });
+  // A log taken at other commits than case.json names is refused, as the table refuses it.
+  assert.throws(() => answeredRuns(c, "defect-A", at([answered], "x".repeat(40))), ScoringError);
+  assert.deepEqual(answeredRuns(c, "defect-A", at([answered, answered, answered])), [{ targetKey: "A", answered: 3, finished: 3, attempted: 3 }]);
+  // One run whose observation question failed: two of three, and a run that did not finish is not counted.
+  assert.deepEqual(answeredRuns(c, "defect-A", at([answered, withheld, { ...answered, finished: false }, answered])), [{ targetKey: "A", answered: 2, finished: 3, attempted: 4 }]);
 });

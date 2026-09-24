@@ -35,6 +35,12 @@ The same requirement on another function does not count as a second requirement.
 used to fix anything becomes a regression case from then on and is never counted as unseen again.
 
 Used so far:
+- **moltis-1064 and grovedb-500, measured again after `#38`** (`bench/logs/acceptance-v4.json`,
+  `docs/local-check-cli.md`, *The acceptance set after `#38`*): the check that every defect at A or
+  B is asked about inside the default budget and answered in three runs of three. How the budget is
+  split (ADR 0015) was chosen by where these cases' targets fell, so this is a regression check of
+  it, not evidence for it. `run.ts measure` names its log since: `sibling` writes v3, whose claim is
+  one sibling's defect (`#37`), and `again` writes v4.
 
 - **The same 20 runs again, with grovedb-500 and whatsapp-rust-759 against Jev**, judged the cap of
   calls a function (`#38`, second part; `docs/local-check-cli.md`, *The calls of a function,

@@ -100,34 +100,88 @@
     "shipped": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 1,
-          "calls_changed": 13
+          "calls_changed": 14
         },
-        "calls": 215,
-        "applicable": 12,
+        "calls": 280,
+        "applicable": 18,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 203,
+        "notApplicable": 262,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 1,
+            "calls": 18,
+            "applicable": 6,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 12,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 24,
+            "functions": 14,
+            "calls": 262,
+            "applicable": 12,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 250,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "rewrite_heights",
+            "load_base_root",
+            "verify_height"
+          ],
+          "functions": 2,
+          "calls": 8,
+          "applicable": 4,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 4,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
-        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
         "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
-        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
-        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
-        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
-        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
-        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "18 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 5 names the changed code calls settle at no one definition here, so what they reach is not established: ChunkRestoringError, InternalError, is_empty, is_err, verify",
+        "siblings: 1 names have more references than the search returns and were not followed: map_err"
       ],
       "targets": {
         "A": {
@@ -141,34 +195,88 @@
     "defect-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 1,
-          "calls_changed": 13
+          "calls_changed": 14
         },
-        "calls": 215,
-        "applicable": 12,
+        "calls": 280,
+        "applicable": 18,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 203,
+        "notApplicable": 262,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 1,
+            "calls": 18,
+            "applicable": 6,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 12,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 24,
+            "functions": 14,
+            "calls": 262,
+            "applicable": 12,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 250,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "load_base_root",
+            "rewrite_heights",
+            "verify_height"
+          ],
+          "functions": 2,
+          "calls": 8,
+          "applicable": 4,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 4,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
-        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
         "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
-        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
-        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
-        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
-        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
-        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "18 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 5 names the changed code calls settle at no one definition here, so what they reach is not established: ChunkRestoringError, InternalError, is_empty, is_err, verify",
+        "siblings: 1 names have more references than the search returns and were not followed: map_err"
       ],
       "targets": {
         "A": {
@@ -182,34 +290,88 @@
     "rewrite-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 1,
-          "calls_changed": 13
+          "calls_changed": 14
         },
-        "calls": 215,
-        "applicable": 12,
+        "calls": 280,
+        "applicable": 18,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 203,
+        "notApplicable": 262,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 1,
+            "calls": 18,
+            "applicable": 6,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 12,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 24,
+            "functions": 14,
+            "calls": 262,
+            "applicable": 12,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 250,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "rewrite_heights",
+            "load_base_root",
+            "verify_height"
+          ],
+          "functions": 2,
+          "calls": 8,
+          "applicable": 4,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 4,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
-        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
         "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
-        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
-        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
-        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
-        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
-        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "18 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 5 names the changed code calls settle at no one definition here, so what they reach is not established: ChunkRestoringError, InternalError, is_empty, is_err, verify",
+        "siblings: 1 names have more references than the search returns and were not followed: map_err"
       ],
       "targets": {
         "A": {
@@ -223,34 +385,89 @@
     "hidden-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 1,
-          "calls_changed": 13
+          "calls_changed": 14
         },
-        "calls": 216,
-        "applicable": 13,
+        "calls": 281,
+        "applicable": 19,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
         "overBudget": 0,
-        "notApplicable": 203,
+        "notApplicable": 262,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 1,
+            "calls": 19,
+            "applicable": 7,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 12,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 23,
+            "functions": 14,
+            "calls": 262,
+            "applicable": 12,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 250,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "rewrite_heights",
+            "step_outcome",
+            "load_base_root",
+            "verify_height"
+          ],
+          "functions": 2,
+          "calls": 8,
+          "applicable": 4,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 4,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "merk/src/merk/restore.rs: 38 calls were left out of the listing by its cap",
-        "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs: 1 calls were left out of the listing by its cap",
         "grovedb/src/batch/mod.rs: 13 functions were left out of the listing by its cap",
-        "grovedb/src/batch/mod.rs: 28 calls were left out of the listing by its cap",
-        "grovedb/src/operations/proof/verify.rs: 145 calls were left out of the listing by its cap",
-        "grovedb/src/replication/state_sync_session.rs: 50 calls were left out of the listing by its cap",
-        "merk/src/tree/mod.rs: 33 calls were left out of the listing by its cap",
-        "19 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "18 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 5 names the changed code calls settle at no one definition here, so what they reach is not established: ChunkRestoringError, InternalError, is_empty, is_err, verify",
+        "siblings: 1 names have more references than the search returns and were not followed: map_err"
       ],
       "targets": {
         "A": {
