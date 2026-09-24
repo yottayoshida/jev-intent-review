@@ -154,6 +154,13 @@ up to 1,000 before any budget orders them, and what that cap leaves out is count
 (*The calls of a function, measured*). A function whose calls the cap did cut is still not taken
 for a sibling.
 
+**A line in the body of a function whose body opens below its signature is read as that function's,
+by the listing and by the evidence and the changes' question alike — up to the 300 lines a block is
+read whole, as for any function** (#74). The two read a function's end from one place: the line
+its body opens on, and the closing brace at the function's own indent — so a `where {` written at
+column 0 opens the method's body and does not take the `impl` around it (*The calls of a function,
+measured*).
+
 - **The functions the change touched** take their 20 one call per function at a time, so no single
   body takes it. Inside a function, the askable calls whose callee resolved to a function the change
   touched are asked before its other calls, and the rest follow in the order they appear. When a
@@ -861,6 +868,49 @@ constant in both, so for the cap they are one tool, and they are kept for refere
   pybun#428 is 821 KB where it was 153 KB, most of it *Not checked*. The Action's check run keeps the
   first 64 KB of the report, so what a long report pushes past that is in the artifact and in the
   marks on the lines, not in the summary — as it already was for any report over 64 KB.
+
+`BlockIndex.enclosing`, which the changes' question, the siblings' spans and the evidence read
+functions through, got the same reading afterwards (#74), with three more shapes it missed before:
+a bare `{ … }` block just inside such a body, a `where … {` on one line, and a function declared
+`pub(in path)`. Measured without a request on the tracked `.rs`, `.ts`, `.tsx`, `.js`, `.jsx`, `.py`,
+`.swift`, `.sql` and `.go` files of moltis, whatsapp-rust, grovedb, Kontor and pybun
+(`bench/enclosing-lines.ts`, log `bench/logs/enclosing-lines-v1.json`):
+
+- **Every body line of every function whose body opens below its signature is read as that
+  function's**, checked against the bodies found by counting brackets rather than by the tool's own
+  reading: 125,144 lines of 4,292 such functions, none read as anything wider; 1,859 more are in
+  functions over the 300 lines a block is read whole, and are read as a window. Read by indent as in
+  any function, and counted apart: 634 lines inside a string literal, and 56 lines of one moltis
+  function that follow a string literal's closing line at column 0 (`"#,`). The listing ends six such
+  functions early, each at a line of a string literal written at column 0 (a plist, an SVG, a Python
+  script): a function's end is read by indent, before #74 and after.
+- Against the tool before, no line outside Rust reads differently on these repositories. Of the Rust
+  lines that do: 7,779 in such a body, read as the function's where they were read as the `impl`
+  around it or as nothing; 188 in an `impl … where` block, whose nameless region now starts at the
+  `impl` line; 2,178 in such a function whose end moved down to its closing brace; 64 its signature's
+  own lines; 40 in a block now read whole and over 300 lines, read as a window; and 118 in functions
+  over 300 lines, read as the bare block they are in where they were read as the block around it or
+  a window. A Go table test's `{` rows would read as blocks of their own the same way, inside a
+  function over 300 lines only; none changed here. A TypeScript return type that wraps to `> {`, and
+  a JSX `>{…=> {`, would read differently too; neither occurs in these repositories.
+- **A Rust function named `new`, `switch` or `with` is a function**: the names kept from reading
+  JavaScript's `new Foo(` as a definition kept every `fn new` out of the listing. Of the functions
+  above outside test code, in files under the listing's cap, 98 were not listed, each a `fn new`, and
+  none is now; 6,600 lines keep their span and get the function's name, where they had none or a
+  wrong one (`pub`, `Into`).
+- The regions the changes' question asks about (`bench/change-regions.ts`, log
+  `bench/logs/change-regions-v1.json`, 21 runs): 421 before, 418 after, 410 the same —
+  whatsapp-rust#759's five nameless pieces, and the signature `download_external_blobs` was read as,
+  are its three functions, and omamori `#468`'s nameless one is `mutate_config`; every other case is
+  unchanged. A region whose span or name moved, here or in an `impl … where` block, is a packet a
+  kept answer no longer covers, once (ADR 0013).
+- The evidence the calls are asked with does not change: its callers and callees are read only above
+  a `max_related_chars` of 0, which no run uses.
+
+grovedb writes one method's `where {` at column 0: it opens that method's body, and the body ends
+at the closing brace at the method's own indent, where #73's listing took the whole `impl` and
+`enclosing` a window. A body line that starts with `*` — a dereference — is still read as a comment's continuation, in
+functions of either shape; that is older than #73 and outside #74.
 
 The benches that send a whole listing to a model (`bench/candidate-set-check.ts`,
 `bench/selection-materials-check.ts`, `bench/typed-plan-check.ts`) read `enumerate` through
