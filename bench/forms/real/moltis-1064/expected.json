@@ -1,0 +1,25 @@
+{
+  "about": "What a right reading is, per version, written before any request was sent (#39). `real.ts` records this file's sha256 at the head of the log and refuses to add to a log started under another one. Keys are `function · call` as the report prints them. `not_violates` is any outcome but violates; `*` is every other call read in that run.",
+  "requirement": "R1",
+  "prediction": "The sentence's check is 'fewer messages than the minimum' is not the case; the observation question assumes the check does not pass, i.e. the session has fewer messages. One negation to read through.",
+  "scored": {
+    "shipped": {
+      "generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs)": "satisfies",
+      "*": "not_violates"
+    },
+    "defect": {
+      "generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs)": "violates"
+    },
+    "rewrite": {
+      "generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs)": "satisfies",
+      "*": "not_violates"
+    }
+  },
+  "recorded": {
+    "hidden": {
+      "generate_title_for_session · moltis_agents::title::generate_title(provider, &chat_msgs)": "unknown",
+      "why": "The check is in a helper whose body is not sent and does not check. No confident reading is right; the constructed case predicts a confident `satisfies` (0/3), the same miss the failure form has with a helper it is not shown. Recorded to see whether real code reads the same, not scored."
+    }
+  },
+  "passes": "Every scored version meets its row in each of three runs; a version whose target is not inside the budgets is not reached, and does not pass."
+}
