@@ -14,7 +14,7 @@ The check in the shipped code is the match guard `Ok(h) if h.len() >= MIN_MESSAG
 | hidden | `hidden.base-helper.patch` on the base, `hidden.head.patch` on the head | `has_enough_messages(&h)`, whose body returns `true` |
 
 The behaviour, observed before any request (`probe.patch` adds one test: a session with one message,
-the existing mock provider; `probe.sh`, `cargo test -p moltis-gateway --lib acceptance_probe_one_message`,
+the existing mock provider; `probe.sh`, `cargo test -p moltis-gateway --no-default-features --features voice --lib acceptance_probe_one_message -- --nocapture`,
 2026-09-24):
 
 | version | `generate_title_for_session` on one message |
@@ -43,6 +43,9 @@ the target is **not inside the budgets** on any version: since the cap of calls 
 
 ```
 moltis-1064 shipped  exit 0, requests 0; inside the budgets 29, could be asked 85; target NOT inside
+moltis-1064 defect   exit 0, requests 0; inside the budgets 29, could be asked 85; target NOT inside
+moltis-1064 rewrite  exit 0, requests 0; inside the budgets 29, could be asked 85; target NOT inside
+moltis-1064 hidden   exit 0, requests 0; inside the budgets 29, could be asked 85; target NOT inside
 ```
 
 (85 askable counts the callers' and the siblings' too; the log records only that nothing was sent.)

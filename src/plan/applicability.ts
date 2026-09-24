@@ -14,7 +14,7 @@
 // purpose: this check is for calls whose definitions are in the repository being read.
 //
 // A name defined more than once used to be held with it. Three things narrow it now: the path the
-// call writes (`State::load`), the form of the call (a method call reaches nothing that
+// call writes (`Store::open`), the form of the call (a method call reaches nothing that
 // takes no `self`), and definitions that are versions of one thing (a trait's method, a function
 // written once per platform), where every version must return a `Result`. What none of them
 // settles is still held — and "not narrowed" is never reported as "not defined here", because a
@@ -268,8 +268,8 @@ async function selfType(reader: ReturnTypes, fn: FunctionCandidate): Promise<str
 }
 
 /**
- * The definitions written under the path the call names (`State::load`, `handlers::run`,
- * `Self::path`), or "unread" when the writing could not be read and nothing should be narrowed by it.
+ * The definitions written under the path the call names (`Store::open`, `handlers::run`,
+ * `Self::build`), or "unread" when the writing could not be read and nothing should be narrowed by it.
  *
  * An empty list is not "the callee is not defined here": a `Renamed::new` can be `impl Error` under a
  * `use … as Renamed`, and a `module::helper` can be written in another file of the module and

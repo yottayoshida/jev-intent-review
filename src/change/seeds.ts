@@ -1,7 +1,7 @@
 // What the change touched, as search seeds (spec §11). This stage never decides review scope.
 //
 // The seed that finds missed paths is a call made *around* the changed lines, not on them. A pull
-// request that adds `if (user.disabledAt) throw ...` to one login function does not mention
+// request that adds `if (!account.active) throw ...` to one sign-in function does not mention
 // the call it guards on the added line, but the function it edited calls it; every other caller of
 // that call is a place the same check may be missing.
 
@@ -108,7 +108,7 @@ export function identifiers(text: string): Set<string> {
   return names;
 }
 
-/** `disabledAt` → disabled, at; `session_ttl` → session, ttl. Words of four letters or more. */
+/** `activeSince` → active, since; `order_total` → order, total. Words of four letters or more. */
 export function splitWords(name: string): string[] {
   return name
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")

@@ -13,8 +13,8 @@
 // for every form, and a form cannot carry a rule of its own: part 4 is two lists of answer names.
 //
 // `failure_propagation` is v0.1's questions, condition and words, unchanged byte for byte — the
-// measurements in `docs/local-check-cli.md` were taken with them. `check_before_action` is new and
-// has been measured only on the constructed cases in `bench/forms/`.
+// measurements in `docs/local-check-cli.md` were taken with them. `check_before_action` is newer, and
+// measured on less: a constructed case and one real pull request's code (`bench/forms/`).
 
 import { STOP_WORDS } from "../discovery/discover.ts";
 import { redact } from "../evidence/redact.ts";
@@ -265,8 +265,8 @@ export const FORMS_FINGERPRINT: Readonly<{ forms: Record<RequirementForm, { mapp
 //
 // A call is asked about when its name and the requirement share a word. Both sides are split the
 // same way, so `write_record` written in a requirement and `write_record(…)` in code meet, and
-// so do `writeRecord` and "record". The call's side is its whole path (`Session::new` gives
-// `session`) and the receivers right before it (`self.sessions.insert` gives `sessions`).
+// so do `writeRecord` and "record". The call's side is its whole path (`Ledger::new` gives
+// `ledger`) and the receivers right before it (`self.ledgers.insert` gives `ledgers`).
 //
 // There is no five-letter floor here: `send`, `save`, `open` and `pay` are the names of actions.
 // Words under three letters are dropped, and so are common English words and the words every Rust
@@ -290,7 +290,7 @@ export function requirementTerms(requirement: Pick<Requirement, "text" | "search
   return new Set(tokens.filter((t) => t !== "").flatMap(identifierWords));
 }
 
-/** The receivers before the callee on its line: `self.sessions.insert(` gives `self`, `sessions`. */
+/** The receivers before the callee on its line: `self.ledgers.insert(` gives `self`, `ledgers`. */
 function receivers(call: CallCandidate): string[] {
   const callee = call.callee.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const chain = new RegExp(`((?:[A-Za-z_][\\w$]*\\s*\\.\\s*)+)${callee}\\s*\\(`).exec(call.text);
@@ -305,8 +305,8 @@ export function callTerms(call: CallCandidate): Set<string> {
  * Whether two words are the same word: equal; one is the other with one letter more (`key` /
  * `keys`, `send` / `sends`); or they share their first five letters (`create` / `creation`,
  * `rewrite` / `rewritten`). A short name that merely begins a longer word is not the same word:
- * `res` is not `restore`, `gen` is not `generate` — measured, `res.as_bytes()` was asked about
- * under a sentence about a restore (bench/forms/reach/).
+ * `res` is not `restore`, `gen` is not `generate`: a call on a short name would otherwise be asked
+ * about under any sentence whose words it begins.
  *
  * Five letters is a line, not a stemmer: `write` and `written` share four and do not meet, while
  * `general` and `generate` share five and do. `searchHints` is where a requirement names the exact
