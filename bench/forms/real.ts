@@ -22,7 +22,9 @@ import { join, resolve } from "node:path";
 import { meets, once, type Distilled, type Row } from "./common.ts";
 
 const HERE = new URL("./real/", import.meta.url).pathname;
-const LOG = new URL("../logs/check-before-action-real-v1.json", import.meta.url).pathname;
+// v1 is the measurement with the tool before calls named by the requirement took their turns first
+// (#39, ADR 0016); a later tool writes a later version.
+const LOG = new URL("../logs/check-before-action-real-v2.json", import.meta.url).pathname;
 const VERSIONS = ["shipped", "defect", "rewrite", "hidden"] as const;
 type Version = (typeof VERSIONS)[number];
 

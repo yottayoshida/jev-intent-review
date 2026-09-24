@@ -62,3 +62,15 @@ test("the table in docs/local-check-cli.md is exactly what check-before-action-r
   const log = JSON.parse(readFileSync(new URL("../bench/logs/check-before-action-real-v1.json", import.meta.url), "utf8")) as Parameters<typeof score>[0];
   assert.equal(block, score(log, 3).join("\n"));
 });
+
+test("the table after ADR 0016 in docs/local-check-cli.md is exactly what check-before-action-real-v2.json scores to", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- check-before-action-real-v2:begin -->\n```\n";
+  const end = "\n```\n<!-- check-before-action-real-v2:end -->";
+  assert.equal(doc.split(begin).length - 1, 1, "exactly one table");
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = JSON.parse(readFileSync(new URL("../bench/logs/check-before-action-real-v2.json", import.meta.url), "utf8")) as Parameters<typeof score>[0];
+  assert.equal(block, score(log, 3).join("\n"));
+  // Every version of both cases was asked this time: none is settled by the listing.
+  for (const c of Object.values(log.cases)) for (const v of Object.values(c)) assert.ok(v && !v.notInside && v.runs.length === 3);
+});

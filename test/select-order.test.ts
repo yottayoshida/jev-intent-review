@@ -232,7 +232,7 @@ test("through the failure form the CLI uses, the order still moves the call", as
 });
 
 test("a form that resolves no callee keeps each function's own line order, in the callers' budget too", async () => {
-  // `check_before_action` answers `{ ok: true }` with no place: there is nothing to move by.
+  // A form that answers `{ ok: true }` with no place and no name has nothing to move by.
   const sel = await selectSites([source(["changed_one", "changed_two", "plain"], ["caller"])], async () => ({ ok: true }), 4, 1);
   assert.equal(firstIn(sel.budgeted, "changed_one"), "outside_first()");
   assert.equal(firstIn(sel.budgeted, "caller"), "outside_second()");
