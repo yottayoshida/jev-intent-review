@@ -1,7 +1,7 @@
 // The functions and calls that exist at a pinned commit, each with an id.
 //
 // `#20` let the model write a function name and an operation as prose. It wrote
-// `fs::read_to_string` for a function that calls `read_to_string_capped`, and named the callee
+// a standard library function for a function that calls a wrapper of it, and named the callee
 // rather than the function the requirement governs — and `#21` then measured what that plan does
 // when it runs: the same answer on the shipped and the mutated branch, because it is looking
 // somewhere the mutation does not reach.
@@ -54,7 +54,7 @@ export interface CallCandidate {
   /** The name being called, as written. */
   callee: string;
   /**
-   * The call itself, from the callee through its closing parenthesis — `read_to_string_capped(&path, MAX)`.
+   * The call itself, from the callee through its closing parenthesis — `read_limited(&path, MAX)`.
    *
    * The callee alone is not enough to say which call is meant. Two calls to the same function in
    * one body are one propagating and one swallowing often enough that it is the interesting case,

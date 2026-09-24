@@ -24,6 +24,25 @@ the existing mock provider; `probe.sh`, `cargo test -p moltis-gateway --lib acce
 | rewrite | `None` |
 | hidden | `Some("Probe Title")` |
 
-With the tool at `7703ab9` the target is **not inside the budgets** on any version: since the cap of
-calls a function went from 40 to 1,000 (#38, second part), the changed functions have 76 askable calls
-for a budget of 20, and `generate_title_for_session`'s six turns go to calls before it in its body.
+`probe.sh`, as it printed:
+
+```
+shipped test_rc=0 acceptance-probe: one message -> None
+defect test_rc=0 acceptance-probe: one message -> Some("Probe Title")
+rewrite test_rc=0 acceptance-probe: one message -> None
+hidden test_rc=0 acceptance-probe: one message -> Some("Probe Title")
+```
+
+With the tool the measurement ran (`14ec498`, whose source differs from `7703ab9` in comments only)
+the target is **not inside the budgets** on any version: since the cap of calls a function went from
+40 to 1,000 (#38, second part), the changed functions have 76 askable calls for a budget of 20, and
+`generate_title_for_session`'s six turns go to calls before it in its body — the six are
+`as_ref()` twice, `read(session_key)`, `as_deref()` twice and
+`moltis_agents::model::values_to_chat_messages(&history)`. `node bench/forms/real.ts precheck
+<acceptance dir>`, sending nothing, printed for every version:
+
+```
+moltis-1064 shipped  exit 0, requests 0; inside the budgets 29, could be asked 85; target NOT inside
+```
+
+(85 askable counts the callers' and the siblings' too; the log records only that nothing was sent.)

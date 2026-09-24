@@ -5,11 +5,11 @@
 // characters of the target). On real pull requests it said "does not return a Result" of functions
 // that do:
 //
-//   - a function returns `ChannelResult<String>`, and its file says
-//     `use some_crate::{…, Result as ChannelResult}`;
+//   - a function returns `AliasResult<String>`, and its file says
+//     `use some_crate::{…, Result as AliasResult}`;
 //   - a function has its `-> Result<…>` on the fifth line of its signature;
-//   - a function returns `CostResult<(), Error>`, and the repository says
-//     `type CostResult<T, E> = CostContext<Result<T, E>>`.
+//   - a function returns `Wrapped<(), Error>`, and the repository says
+//     `type Wrapped<T, E> = Context<Result<T, E>>`.
 //
 // (Each measured on a real pull request: docs/local-check-cli.md, *Reading whole signatures*.)
 //

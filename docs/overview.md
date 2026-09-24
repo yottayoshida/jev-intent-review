@@ -80,7 +80,7 @@ v0.1 is an experimental implementation of the broader intent-review model.
 It currently supports:
 
 * Rust repositories — in any other language no function is read and no call is asked about; only the change question runs
-* two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured only on a constructed case) that a check passes before an action — which form a sentence read from an issue says is Jev's reading, measured on 72 sentences ([ADR 0008](adr/0008-who-chooses-a-requirements-form.md))
+* two forms of requirement, read by one rule: how failures must propagate, and (experimental, measured on a constructed case and on one real pull request's code) that a check passes before an action — which form a sentence read from an issue says is Jev's reading, measured on 72 sentences ([ADR 0008](adr/0008-who-chooses-a-requirements-form.md))
 * functions touched by the change and callers one hop out, and the other callers of the repository functions the changed code calls — the path a fix may have missed — chosen by returning a `Result`, last and under a budget of their own
 * requirements written in a documented form — an intent spec, a requirements section, or a `Property:` paragraph (see [Intent](usage.md#intent))
 * Jev as the only judgment model

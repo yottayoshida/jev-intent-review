@@ -94,7 +94,7 @@ async function precheck(acceptance: string) {
     for (const v of VERSIONS) {
       const r = await once(join(acceptance, c.clone), resolve(dir, c.spec), commits[v].base, commits[v].head, true);
       const at = r.wouldAsk.indexOf(target);
-      console.log(`${c.id} ${v.padEnd(8)} exit ${r.exit}, requests ${r.requests}; inside the budgets ${r.wouldAsk.length}, could be asked ${r.counts ? r.counts.applicable + (r.counts.siblings?.applicable ?? 0) : "?"}; target ${at >= 0 ? `${at + 1}th inside` : "NOT inside"}`);
+      console.log(`${c.id} ${v.padEnd(8)} exit ${r.exit}, requests ${r.requests}; inside the budgets ${r.wouldAsk.length}, could be asked ${r.counts ? r.counts.applicable + (r.counts.siblings?.applicable ?? 0) : "?"}; target ${at >= 0 ? `inside, position ${at + 1}` : "NOT inside"}`);
     }
   }
 }

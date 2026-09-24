@@ -27,5 +27,24 @@ finalize, where `restore_single_chunk_20`'s is not:
 | rewrite | 0 times |
 | hidden | 1 time |
 
+`probe.sh`, as it printed:
+
+```
+shipped test_rc=0 rewrite_heights_ran=0 test result: ok. 1 passed; 0 failed
+defect test_rc=0 rewrite_heights_ran=1 test result: ok. 1 passed; 0 failed
+rewrite test_rc=0 rewrite_heights_ran=0 test result: ok. 1 passed; 0 failed
+hidden test_rc=0 rewrite_heights_ran=1 test result: ok. 1 passed; 0 failed
+```
+
+Which restore tests end with the heights right was measured on the shipped code by printing
+`verify_height`'s result at `finalize` (`cargo test -p grovedb-merk --lib restore -- --nocapture
+--test-threads=1`, not kept as a patch): `ok=true` in `restore_multi_chunk_20_no_limit` and
+`test_process_multi_chunk_no_limit`, `ok=false` in the seven others that finalize, among them
+`restore_single_chunk_20` — where the first probe ran and every version, the shipped one included,
+rewrote the heights.
+
+`node bench/forms/real.ts precheck <acceptance dir>`, sending nothing: the target inside the budgets
+on every version, at position 4 of 18 (shipped, rewrite) and 3 of 17 (defect, hidden).
+
 Rewriting heights that are right gives the same heights: the test passes on every version, and a user
 sees no difference but the work. The defect is a check skipped, not a wrong result.

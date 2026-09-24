@@ -2,8 +2,8 @@
 //
 // The seed that finds missed paths is a call made *around* the changed lines, not on them. A pull
 // request that adds `if (user.disabledAt) throw ...` to one login function does not mention
-// `createSession` on the added line, but the function it edited calls it; every other caller of
-// `createSession` is a place the same check may be missing.
+// the call it guards on the added line, but the function it edited calls it; every other caller of
+// that call is a place the same check may be missing.
 
 import type { Git } from "../repository/git.ts";
 import { BlockIndex, definedName, looksLikeHeader, type Block } from "./blocks.ts";
