@@ -350,7 +350,9 @@ test("a target is asked and answered only when the mapping and the observation b
   assert.equal(askedAndAnswered(T, observedOnly), false);
   assert.equal(askedAndAnswered(T, run()), false);
   const c = oneCase("x", "r", { "defect-A": { ...version({ A: "listed" }), place: "A" } });
-  const at = (runs: RunRecord[]): VersionLog => ({ base: "b", head: "h", enumeration: { wouldAsk: [T], unchecked: [], notes: [] }, runs });
+  const at = (runs: RunRecord[], head = "h".repeat(40)): VersionLog => ({ base: "b".repeat(40), head, enumeration: { wouldAsk: [T], unchecked: [], notes: [] }, runs });
+  // A log taken at other commits than case.json names is refused, as the table refuses it.
+  assert.throws(() => answeredRuns(c, "defect-A", at([answered], "x".repeat(40))), ScoringError);
   assert.deepEqual(answeredRuns(c, "defect-A", at([answered, answered, answered])), [{ targetKey: "A", answered: 3, finished: 3, attempted: 3 }]);
   // One run whose observation question failed: two of three, and a run that did not finish is not counted.
   assert.deepEqual(answeredRuns(c, "defect-A", at([answered, withheld, { ...answered, finished: false }, answered])), [{ targetKey: "A", answered: 2, finished: 3, attempted: 4 }]);

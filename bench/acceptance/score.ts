@@ -177,6 +177,9 @@ export function askedAndAnswered(target: Target, run: RunRecord): boolean {
 export function answeredRuns(caseFile: CaseFile, versionId: string, log: VersionLog): { targetKey: string; answered: number; finished: number; attempted: number }[] {
   const version = caseFile.versions[versionId];
   if (!version) throw new ScoringError(`${caseFile.id} has no version ${versionId}`);
+  if (log.base !== version.base || log.head !== version.head) {
+    throw new ScoringError(`${caseFile.id} ${versionId}: the log ran ${log.base.slice(0, 7)}..${log.head.slice(0, 7)}, case.json says ${version.base.slice(0, 7)}..${version.head.slice(0, 7)}`);
+  }
   const finished = log.runs.filter((r) => r.finished).slice(0, RUNS);
   return Object.entries(version.targets).map(([targetKey, target]) => ({
     targetKey,

@@ -18,7 +18,7 @@ if (!path) {
 }
 const log = JSON.parse(readFileSync(path, "utf8")) as AcceptanceLog;
 let all = true;
-let lines = 0;
+let counted = 0;
 for (const c of loadCases()) {
   const measured = log.cases[c.id];
   if (!measured) continue;
@@ -32,15 +32,15 @@ for (const c of loadCases()) {
       continue;
     }
     for (const r of answeredRuns(c, versionId, v).filter((x) => version.expected[x.targetKey] === "listed")) {
-      lines += 1;
+      counted += 1;
       const ok = r.finished === RUNS && r.answered === RUNS;
       all &&= ok;
       console.log(`${c.id} ${versionId} (place ${version.place}) ${r.targetKey}: asked and answered in ${r.answered} of ${r.finished} finished runs (${r.attempted} attempted)${ok ? "" : " — not three of three"}`);
     }
   }
 }
-// A log with no A or B defect in it — empty, or missing a case — is not a pass.
-const counted = lines;
+// The cases counted are the ones the log measured (omamori-468 has A defects and is not part of
+// this set), each named on its own line above; a log with no A or B defect in it is not a pass.
 if (counted === 0) all = false;
 console.log(all ? `every A and B defect: three of three (${counted})` : `not every A and B defect is three of three (${counted} counted)`);
 process.exitCode = all ? 0 : 1;
