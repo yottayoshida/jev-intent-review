@@ -52,6 +52,8 @@ const KINDS: Record<string, ReviewReport> = {
   unexpected: report({ requirements: [clean()], unexpectedChanges: [{ id: "C1", location: { path: "src/x.rs", startLine: 1, endLine: 2 }, excerpt: "x", judgment: "unrequested", mappedRequirements: [], confidence: 0.9, notes: [] }] }),
   hostCustom: report({ sent: { requests: 4, bytes: 1, answered: 4, reused: 0, reusedFromEarlierRuns: 0, endpoint: "https://jev.example", host: "custom" } }),
   prAuthor: report({ metadata: { ...report().metadata, pullRequestAuthor: "alice" } }),
+  // A requirement whose notes say what the listing did not read (#38).
+  unread: report({ requirements: [{ ...localCheckResult(), unreached: localCheckResult().notes }] }),
 };
 
 test("the check run concludes from the report's first line: success only when calls were read and nothing is left to look at", () => {

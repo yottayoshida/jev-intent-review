@@ -35,7 +35,7 @@ test("code spans and blocks survive text with 200,000 backtick runs", () => {
 /** One requirement as the local check reports it: one call worth checking, one holding, one held. */
 test("the Markdown report leads with a result line drawn from the counts alone, and states no verdict", () => {
   const text = renderMarkdown(report());
-  assert.match(text, /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* No requirement verdict is stated\./);
+  assert.match(text, /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* 1 not checked, for the reasons under each requirement\. No requirement verdict is stated\./);
   assert.match(renderMarkdown(report({ skipReason: "No credentials." })), /\*\*Result: skipped\.\*\* No credentials\./);
   assert.match(renderMarkdown(report({ requirements: [] })), /\*\*Result: nothing was checked\.\*\*/);
   const unread = { ...localCheckResult(), observed: [], findings: [], mappings: [], counts: { ...localCheckResult().counts, asked: 0, mapped: 0, governed: 0, outcomes: { violates: 0, satisfies: 0, unknown: 0, aside: 0 } } };

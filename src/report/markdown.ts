@@ -137,6 +137,78 @@ export function formOrigin(r: Pick<LocalCheckResult, "formBy" | "formReading" | 
   return `the default: Jev's reading of \`${reading.verdict}\` was under the bar, ${reading.probability.toFixed(2)}`;
 }
 
+/** A call asked about that came back without an answer — the budget, the time or the host. */
+function unansweredIn(r: LocalCheckResult): number {
+  const unanswered = new Set(r.mappings.filter((m) => m.verdict === "no_answer").map((m) => m.callId));
+  return r.observed.filter((o) => o.result.observation === "withheld" || unanswered.has(o.callId)).length;
+}
+
+/** Calls asked about that came back without an answer: the budget, the time or the host. */
+export function withoutAnswer(report: ReviewReport): number {
+  return report.requirements.reduce((n, r) => n + unansweredIn(r), 0);
+}
+
+/** The notes, over every requirement, that say something was not read or not followed. */
+function unreachedNotes(report: ReviewReport): number {
+  return new Set(report.requirements.flatMap((r) => r.unreached ?? [])).size;
+}
+
+/** "1 note under *Notes* says" / "2 notes under *Notes* say". */
+const notesSay = (n: number) => `${plural(n, "note")} under *Notes* ${n === 1 ? "says" : "say"} what was not read`;
+
+/**
+ * What a run that read calls left, in the words the report's first line and the Action's check run
+ * title both use, so the two cannot disagree (#38): the calls not checked, those asked about that
+ * came back without an answer, and the notes that say what the listing did not read — a cap, a file
+ * that could not be read. Empty only when nothing was left, which is also the one run the check run
+ * calls a success.
+ */
+export function leftParts(report: ReviewReport): string[] {
+  const parts: string[] = [];
+  const notChecked = counts(report).notChecked;
+  if (notChecked > 0) parts.push(`${notChecked} not checked`);
+  const none = withoutAnswer(report);
+  if (none > 0) parts.push(`${none} without an answer`);
+  const unread = unreachedNotes(report);
+  if (unread > 0) parts.push(`${plural(unread, "note")} on what was not read`);
+  return parts;
+}
+
+/**
+ * One line of what a requirement's section rests on (#38): of the calls that could be asked — the
+ * changed functions', their callers' and the siblings' together — how many were read and answered,
+ * read without an answer, held before their question, or over the budgets; and how many could not be
+ * asked at all. "All … were read and answered" only when that is every call and none could not be
+ * asked, so a requirement that left calls never reads as checked in full.
+ */
+export function coverageLine(r: LocalCheckResult, context: { nothingSent?: boolean } = {}): string {
+  const c = r.counts;
+  const s = c.siblings;
+  const couldAsk = c.applicable + (s?.applicable ?? 0);
+  const asked = c.asked + (s?.asked ?? 0);
+  const over = c.overBudget + (s?.overBudget ?? 0);
+  const cannot = c.notApplicable + (s?.notApplicable ?? 0);
+  const none = unansweredIn(r);
+  // `wouldAsk` holds every call a budget took, siblings' too, and a run asks every one of them or
+  // holds it before its question with a reason; a record without it reads as none held.
+  const budgeted = r.wouldAsk?.length ?? 0;
+  const held = Math.max(0, budgeted - asked);
+  const cannotPart = cannot > 0 ? ` ${plural(cannot, "more call")} could not be asked.` : "";
+  const unread = r.unreached?.length ?? 0;
+  const notes = unread > 0 ? ` ${notesSay(unread)}.` : "";
+  if (couldAsk === 0) return `No call could be asked.${cannotPart}${notes}`;
+  if (context.nothingSent) {
+    const parts = [`${budgeted} inside the budgets, nothing asked`, ...(over > 0 ? [`${over} over the budgets`] : [])];
+    return `Of the ${plural(couldAsk, "call")} that could be asked: ${parts.join(", ")}.${cannotPart}${notes}`;
+  }
+  if (asked - none === couldAsk && cannot === 0 && unread === 0) return `All ${plural(couldAsk, "call")} that could be asked were read and answered.${notes}`;
+  const parts = [`${asked - none} read and answered`];
+  if (none > 0) parts.push(`${none} without an answer`);
+  if (held > 0) parts.push(`${held} held before their question`);
+  if (over > 0) parts.push(`${over} over the budgets`);
+  return `Of the ${plural(couldAsk, "call")} that could be asked: ${parts.join(", ")}.${cannotPart}${notes}`;
+}
+
 /**
  * One requirement's section: what is worth checking, then what was read and how each call came out,
  * then what was not checked and why.
@@ -156,6 +228,7 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
   lines.push(`## ${r.requirementId}`, "", `> ${codeSpan(redact(r.requirementText).text)}`, "");
   lines.push(`Form: \`${r.form ?? DEFAULT_FORM}\` (${formOrigin(r)}). ${context.nothingSent ? `Nothing was asked; the form would ask this. ${form.words.intro}` : form.words.intro}`, "");
   lines.push(`Functions reached: ${c.functions.changed} the change touched, ${c.functions.calls_changed} calling one of those.`);
+  lines.push(coverageLine(r, context));
   // One line per budget (ADR 0015). A record from before the callers had one says it in one line.
   const o = c.byOrigin;
   if (o) {
@@ -295,8 +368,11 @@ function resultLine(report: ReviewReport): string {
       return `**Result: the set was built and nothing was asked.** ${plural(r.inBudget, "call")} inside the budget, ${plural(r.notChecked, "call")} not checked, for the reasons under each requirement.`;
     case "none_read":
       return `**Result: no call was read.** ${plural(r.notChecked, "call")} not checked, for the reasons under each requirement. No requirement verdict is stated.`;
-    case "read":
-      return `**Result: ${plural(r.worthChecking, "call")} worth checking of ${r.read} read.** No requirement verdict is stated.`;
+    case "read": {
+      const left = leftParts(report);
+      const said = left.length > 0 ? ` ${left.join(", ")}, for the reasons under each requirement.` : "";
+      return `**Result: ${plural(r.worthChecking, "call")} worth checking of ${r.read} read.**${said} No requirement verdict is stated.`;
+    }
   }
 }
 

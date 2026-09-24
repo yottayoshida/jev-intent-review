@@ -232,6 +232,11 @@ export interface LocalCheckResult {
     siblings?: SiblingCounts;
   };
   notes: string[];
+  /**
+   * The notes that say something was not read or not followed (#38): a record from before it had
+   * none, and reads as having none.
+   */
+  unreached?: string[];
 }
 
 /** What one budget found, could ask, asked and left, in the same terms as the counts above. */
@@ -584,6 +589,7 @@ export async function runLocalCheck(
       counts: countsOf({ selection, into, tally }),
       // A file both the change and the requirement's words reached has its cap counted twice.
       notes: [...new Set(notes)],
+      unreached: [...new Set(fromChange.unreached)],
     });
     passes.push({ requirement, form, quote, result: out[out.length - 1]! });
   }
@@ -647,6 +653,7 @@ export async function runLocalCheck(
         outcomes: Object.fromEntries(OUTCOMES.map((o) => [o, into.observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>,
       };
       result.notes = [...new Set([...result.notes, ...siblings.notes])];
+      result.unreached = [...new Set([...(result.unreached ?? []), ...siblings.unreached])];
     }
     return { reached: callers.reached + hostReached - reachedBefore, answered: callers.answered + answered - answeredBefore };
   };

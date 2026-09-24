@@ -55,6 +55,12 @@ export interface ChangeSites {
   sources: Map<string, SiteSource>;
   /** What was not followed, and why. Never a silent cap. */
   notes: string[];
+  /**
+   * The notes that say something was not read or not followed — a cap, a file that could not be
+   * read, a search that was refused — as against those that only explain (#38). A run with one
+   * never reads as having checked everything.
+   */
+  unreached: string[];
 }
 
 export const isRust = (path: string) => path.endsWith(".rs");
@@ -69,6 +75,12 @@ export const isRust = (path: string) => path.endsWith(".rs");
 export async function sitesFromChange(files: CandidateFiles, discoverer: Discoverer, changedLines: ReadonlyMap<string, ReadonlySet<number>>): Promise<ChangeSites> {
   const sources = new Map<string, SiteSource>();
   const notes: string[] = [];
+  const unreached: string[] = [];
+  // Every note this path writes says something was not read or not followed.
+  const left = (note: string) => {
+    notes.push(note);
+    unreached.push(note);
+  };
 
   const sourceFor = async (path: string): Promise<SiteSource | null> => {
     const existing = sources.get(path);
@@ -78,8 +90,8 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
     // `enumerate`'s own caps. They are counted there and were read nowhere: a listing short by
     // twenty calls looks exactly like a file that has twenty fewer.
     const { functions: fnCap, calls: callCap } = candidates.omitted;
-    if (fnCap > 0) notes.push(`${path}: ${fnCap} functions were left out of the listing by its cap`);
-    if (callCap > 0) notes.push(`${path}: ${callCap} calls were left out of the listing by its cap`);
+    if (fnCap > 0) left(`${path}: ${fnCap} functions were left out of the listing by its cap`);
+    if (callCap > 0) left(`${path}: ${callCap} calls were left out of the listing by its cap`);
     const fresh: SiteSource = { candidates, changed: [], callsChanged: [] };
     sources.set(path, fresh);
     return fresh;
@@ -112,9 +124,9 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
       changedFunctions.push({ name: fn.name, path: fn.path });
     }
   }
-  if (notRust > 0) notes.push(`${notRust} changed files are not Rust and were not read for candidates (this path reads Rust)`);
-  if (unreadable > 0) notes.push(`${unreadable} changed files could not be read at this commit`);
-  if (overCap > 0) notes.push(`${overCap} more changed functions were found than the cap of ${MAX_CHANGED_FUNCTIONS} allows`);
+  if (notRust > 0) left(`${notRust} changed files are not Rust and were not read for candidates (this path reads Rust)`);
+  if (unreadable > 0) left(`${unreadable} changed files could not be read at this commit`);
+  if (overCap > 0) left(`${overCap} more changed functions were found than the cap of ${MAX_CHANGED_FUNCTIONS} allows`);
 
   // One hop: the functions that call a changed one.
   let callers = 0;
@@ -124,19 +136,19 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
   const names = [...new Map(changedFunctions.map((f) => [f.name, f])).values()];
   for (const [i, fn] of names.entries()) {
     if (i >= MAX_HOP_NAMES) {
-      notes.push(`only the first ${MAX_HOP_NAMES} of ${names.length} changed functions had their callers looked up`);
+      left(`only the first ${MAX_HOP_NAMES} of ${names.length} changed functions had their callers looked up`);
       break;
     }
     const refused = refuseWord(fn.name, 3);
     if (refused) {
-      notes.push(`the callers of ${fn.name} could not be searched (${refused})`);
+      left(`the callers of ${fn.name} could not be searched (${refused})`);
       continue;
     }
     const { hits, more } = await discoverer.search(fn.name);
     const outside = hits.filter((h) => !isTestPath(h.path) && isRust(h.path));
     const spread = new Set(outside.map((h) => h.path)).size;
     if (more || spread > COMMON_FILES) {
-      notes.push(`the callers of ${fn.name} were not followed (${more ? "more references than the search returns" : `referenced from ${spread} files outside tests`})`);
+      left(`the callers of ${fn.name} were not followed (${more ? "more references than the search returns" : `referenced from ${spread} files outside tests`})`);
       continue;
     }
     for (const hit of outside) {
@@ -163,9 +175,9 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
       callers += 1;
     }
   }
-  if (dropped > 0) notes.push(`${dropped} more callers were found than the cap of ${MAX_CALLER_FUNCTIONS} functions allows`);
-  if (outsideAnyFunction > 0) notes.push(`${outsideAnyFunction} references to a changed function are in no function this reads (a use line, an impl method, a macro body)`);
-  if (unreadableCallers.size > 0) notes.push(`${unreadableCallers.size} files referencing a changed function could not be read here: ${[...unreadableCallers].slice(0, 5).join(", ")}`);
+  if (dropped > 0) left(`${dropped} more callers were found than the cap of ${MAX_CALLER_FUNCTIONS} functions allows`);
+  if (outsideAnyFunction > 0) left(`${outsideAnyFunction} references to a changed function are in no function this reads (a use line, an impl method, a macro body)`);
+  if (unreadableCallers.size > 0) left(`${unreadableCallers.size} files referencing a changed function could not be read here: ${[...unreadableCallers].slice(0, 5).join(", ")}`);
 
-  return { sources, notes };
+  return { sources, notes, unreached };
 }
