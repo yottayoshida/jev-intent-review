@@ -151,10 +151,10 @@ const intoChangedAt = (changedAt: ReadonlySet<string>) => (s: Site) => {
  *
  * When a function gets fewer turns than it has askable calls, this decides which calls they go
  * to; with more functions holding an askable call than the budget, a function reached at all gets
- * one, its first. In line order that is whatever comes first in the body. On Kontor#385, once more
- * calls can be asked about (#45), a query into a file the pull request never touched comes first
- * and takes the turn of `batch_to_decided(b)`, the decode the pull request changed, six lines
- * further down. A call into a changed function is where the change reaches the body, and it is
+ * one, its first. In line order that is whatever comes first in the body. Measured once more calls
+ * could be asked about (#45), a query into a file the pull request never touched came first and took
+ * the turn of the call into the decode the pull request changed, six lines further down
+ * (docs/local-check-cli.md, *The order inside a function*). A call into a changed function is where the change reaches the body, and it is
  * also why a caller one hop out is in the set at all.
  *
  * "Into a changed function" is decided by where the callee resolved to, as the check that decides

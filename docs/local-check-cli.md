@@ -511,8 +511,9 @@ Not guaranteed:
 
 ## What has been measured
 
-Everything below is about `failure_propagation` except two parts: the one measurement of
-`check_before_action`, and, last, how Jev reads which form a sentence has.
+Everything below is about `failure_propagation` except three parts: `check_before_action` on a
+constructed case, the same form on the code of the acceptance set's pull requests, and, last, how Jev
+reads which form a sentence has.
 
 ### Cases that were not used to tune anything
 
@@ -777,7 +778,7 @@ check and does not count as unseen. The same targets asked under PR `#476`'s own
 **not** pass — Jev read the refusal itself as the governed call, not the functions that receive it
 (`bench/logs/jev-only-v1.json`). Nothing yet measures a second language.
 
-### The one measurement of `check_before_action`
+### `check_before_action` on a constructed case
 
 A constructed case, not an unseen one: one function, `open_session`, in five versions whose names
 were chosen so the sentence "A disabled API key must never create a session." meets its calls
@@ -803,8 +804,59 @@ How far the words reach on real code, with no request (`bench/forms/reach/`): a
 check-before-action sentence written for the changed function of each acceptance case put the
 guarded call inside the budget on both — grovedb#500's `rewrite_heights` 10th of 17 askable calls
 among 215, moltis#1064's `generate_title` 18th of 20 among 170 (two left over). Since the callers
-have a budget of their own (*The budget*), 4th of 17 and 11th of 22, with none left over. Whether
-Jev reads those right is not measured.
+have a budget of their own (*The budget*), 4th of 17 and 11th of 22, with none left over. Since the
+cap of calls a function is 1,000 (#38, second part), moltis#1064's is outside the budget — below.
+
+### `check_before_action` on the code of the acceptance set's pull requests
+
+The same form measured on real code the way the failure form was (#39): each of the two pull requests
+of the acceptance set in four versions — the shipped code, the check removed, the same check written
+another way, and the check moved into a helper whose body does not check — with the table of right
+readings committed before the first request, and three runs against Jev on Cloudflare of each version
+whose guarded call is inside the budget: grovedb#500's four; none of moltis#1064's (below)
+(`bench/forms/real/`, log `bench/logs/check-before-action-real-v1.json`, 396 requests). The defect's
+behaviour difference was observed first, by one test in a throwaway clone: moltis#1064's function
+gives a one-message session a title with the check removed and none without it; grovedb#500's
+`finalize` runs `rewrite_heights` on a restore whose heights are right with the check removed and does
+not without it (the rewrite is idempotent: a user sees only the work).
+
+What it does not claim, as against the failure form's measurement: its place is the changed function
+(A) only, with no defect outside the diff; it is measured with `bench/forms/real.ts`, not the
+acceptance set's own table; both pull requests tuned the tool, and both sentences were written after
+reading the fixed functions, with words that meet their names — so that the target is asked about is
+no evidence. The table was fixed with a prediction: grovedb#500's sentence puts its check as "verifying
+the heights has failed", so the assumption the question makes (the check does not pass) is a double
+negative, and a reading of it the other way would list the shipped code.
+
+<!-- check-before-action-real:begin -->
+```
+grovedb-500 scored:
+  shipped  3/3
+  defect   2/3
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+  rewrite  3/3
+grovedb-500 recorded, not scored:
+  hidden   3/3
+moltis-1064 scored:
+  shipped  not reached: the target is not inside the budgets, nothing sent
+  defect   not reached: the target is not inside the budgets, nothing sent
+  rewrite  not reached: the target is not inside the budgets, nothing sent
+moltis-1064 recorded, not scored:
+  hidden   not reached: the target is not inside the budgets, nothing sent
+FAIL: every scored version meets its row in each of 3 runs
+```
+<!-- check-before-action-real:end -->
+
+- **grovedb#500 reads as the table says in eight of nine scored runs.** The shipped code and the rewrite
+  are read as holding every time (applies 0.77–0.85, `does_not_reach` 0.73–0.80): the double negative
+  was not read the other way. The defect is listed in two runs (applies 0.65, `reaches_it` 0.94–0.95);
+  in the third the mapping came back at 0.59, under the bar of 0.6, so it is not settled.
+- **The hidden check is not read confidently** — `cannot_determine` at 0.49–0.52 in every run, which is
+  what the table calls right, where the constructed case drew a confident `satisfies`.
+- **moltis#1064 is not reached.** With the cap of calls a function at 1,000, its changed functions have
+  76 calls that can be asked about for a budget of 20, and the function's turns go to calls earlier in
+  its body; the guarded call is over the budget in every version, so nothing was sent for it. Whether
+  Jev reads it is not measured.
 
 ### The order inside a function
 

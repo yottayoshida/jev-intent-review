@@ -1,7 +1,7 @@
 // The functions and calls that exist at a pinned commit, each with an id.
 //
 // `#20` let the model write a function name and an operation as prose. It wrote
-// `fs::read_to_string` for a function that calls `read_to_string_capped`, and named the callee
+// a standard library function for a function that calls a wrapper of it, and named the callee
 // rather than the function the requirement governs — and `#21` then measured what that plan does
 // when it runs: the same answer on the shipped and the mutated branch, because it is looking
 // somewhere the mutation does not reach.
@@ -54,7 +54,7 @@ export interface CallCandidate {
   /** The name being called, as written. */
   callee: string;
   /**
-   * The call itself, from the callee through its closing parenthesis — `read_to_string_capped(&path, MAX)`.
+   * The call itself, from the callee through its closing parenthesis — `read_limited(&path, MAX)`.
    *
    * The callee alone is not enough to say which call is meant. Two calls to the same function in
    * one body are one propagating and one swallowing often enough that it is the interesting case,
@@ -79,9 +79,9 @@ const MAX_FUNCTIONS = 60;
 /**
  * Calls read in one function, in line order, before the rest are counted and left out (#38).
  *
- * It was 40, which dropped calls before any budget ordered them: grovedb#500's unchanged caller
- * `apply_chunk` calls the changed `finalize` past its 40th call. The largest function measured
- * with no cap had 495 (moltis#1064's `send_impl`); this is a guard against generated code, not a
+ * It was 40, which dropped calls before any budget ordered them: a measured unchanged caller calls
+ * the changed function past its 40th call. The largest function measured with no cap had 495
+ * (docs/local-check-cli.md, *The calls of a function, measured*); this is a guard against generated code, not a
  * limit a hand-written function is expected to reach. What it leaves out is still counted, and a
  * function it cut is still not taken for a sibling.
  */

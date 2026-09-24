@@ -1,0 +1,17 @@
+diff --git a/crates/gateway/src/session/title.rs b/crates/gateway/src/session/title.rs
+index 4a6347b7..94832c73 100644
+--- a/crates/gateway/src/session/title.rs
++++ b/crates/gateway/src/session/title.rs
+@@ -70,11 +70,7 @@ pub(crate) async fn generate_title_for_session(
+     };
+ 
+     let history = match session_store.read(session_key).await {
+-        Ok(h) if h.len() >= MIN_MESSAGES_FOR_TITLE => h,
+-        Ok(_) => {
+-            debug!("auto-title: too few messages, skipping");
+-            return Ok(None);
+-        },
++        Ok(h) => h,
+         Err(e) => {
+             warn!(error = %e, "auto-title: failed to read session history");
+             return Err(e).context("failed to read session history");

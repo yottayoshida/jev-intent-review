@@ -1,0 +1,32 @@
+{
+  "id": "grovedb-500",
+  "clone": "grovedb",
+  "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+  "head": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+  "target": {
+    "function": "finalize",
+    "call": "rewrite_heights(grove_version)"
+  },
+  "spec": "../../reach/grovedb-500.spec.json",
+  "versions": {
+    "shipped": {},
+    "defect": {
+      "head": [
+        "defect.head.patch"
+      ]
+    },
+    "rewrite": {
+      "head": [
+        "rewrite.head.patch"
+      ]
+    },
+    "hidden": {
+      "base": [
+        "hidden.base-helper.patch"
+      ],
+      "head": [
+        "hidden.head.patch"
+      ]
+    }
+  }
+}

@@ -101,7 +101,7 @@ export function locationKey(l: Location): string {
 export interface Candidate extends Location {
   symbol?: string;
   changed: boolean; // the pull request changed lines inside this region
-  reasons: string[]; // why discovery picked it, e.g. "calls createSession"
+  reasons: string[]; // why discovery picked it, e.g. "calls open_account"
   windowed?: boolean; // no enclosing function was found; a fixed window of lines stands in for it
 }
 

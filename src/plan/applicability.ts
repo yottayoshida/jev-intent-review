@@ -14,7 +14,7 @@
 // purpose: this check is for calls whose definitions are in the repository being read.
 //
 // A name defined more than once used to be held with it. Three things narrow it now: the path the
-// call writes (`SyncState::load_strict`), the form of the call (a method call reaches nothing that
+// call writes (`Store::open`), the form of the call (a method call reaches nothing that
 // takes no `self`), and definitions that are versions of one thing (a trait's method, a function
 // written once per platform), where every version must return a `Result`. What none of them
 // settles is still held — and "not narrowed" is never reported as "not defined here", because a
@@ -75,7 +75,7 @@ export async function definitionsOf(discoverer: Discoverer, name: string): Promi
  * are reached; when it still is, `more` says so and nothing is settled from what was seen.
  *
  * `definedName` is not asked: it declines names that read as keywords elsewhere (`new` among
- * them), and pybun's 36 `fn new` then read as no definition at all.
+ * them), and a repository's `fn new` then read as no definition at all (36 of them in one).
  */
 export async function functionDefinitionsOf(discoverer: Discoverer, name: string): Promise<{ found: Definition[]; more: boolean; testOnly: number }> {
   const { hits, more } = await discoverer.search(`fn ${name}`);
@@ -104,10 +104,10 @@ const testOnlyFiles = new WeakMap<Discoverer, Map<string, Promise<boolean>>>();
  * Whether a file is compiled only for tests because a module file declares it
  * `#[cfg(test)] mod x;`.
  *
- * `isTestPath` reads names, and Kontor#385's `reactor_cluster_tests.rs` is source by its name: the
- * only `impl ReactorCluster` in that repository is inside it, so a call to `ReactorCluster::start`
- * would resolve to a definition that no shipped code reaches, and the budget would be spent asking
- * about test code.
+ * `isTestPath` reads names, and a file of tests whose name does not say so (a `…_tests.rs` beside
+ * source) is source by its name: when the only `impl` of a type is inside it, a call to one of its
+ * methods would resolve to a definition that no shipped code reaches, and the budget would be spent
+ * asking about test code.
  */
 export function declaredForTestsOnly(discoverer: Discoverer, path: string): Promise<boolean> {
   let answers = testOnlyFiles.get(discoverer);
@@ -268,13 +268,12 @@ async function selfType(reader: ReturnTypes, fn: FunctionCandidate): Promise<str
 }
 
 /**
- * The definitions written under the path the call names (`SyncState::load_strict`,
- * `control_handlers::handle_sandbox`, `Self::path`), or "unread" when the writing could not be
- * read and nothing should be narrowed by it.
+ * The definitions written under the path the call names (`Store::open`, `handlers::run`,
+ * `Self::build`), or "unread" when the writing could not be read and nothing should be narrowed by it.
  *
- * An empty list is not "the callee is not defined here": `ChannelError::invalid_input` is
- * `impl Error` under a `use … as ChannelError`, and `model::values_to_chat_messages` is written in
- * `model/convert.rs` and re-exported. Neither is followed, so the call is held, not judged.
+ * An empty list is not "the callee is not defined here": a `Renamed::new` can be `impl Error` under a
+ * `use … as Renamed`, and a `module::helper` can be written in another file of the module and
+ * re-exported. Neither is followed, so the call is held, not judged.
  */
 async function underQualifier(reader: ReturnTypes, fn: FunctionCandidate, qualifier: string, definitions: Definition[]): Promise<Definition[] | "unread"> {
   if (!/^[A-Z]/.test(qualifier)) {

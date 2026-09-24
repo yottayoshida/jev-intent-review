@@ -1,0 +1,25 @@
+diff --git a/merk/src/merk/restore.rs b/merk/src/merk/restore.rs
+index 25676f4f..7dadc177 100644
+--- a/merk/src/merk/restore.rs
++++ b/merk/src/merk/restore.rs
+@@ -520,7 +520,7 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+             })?;
+ 
+         // if height values are wrong, rewrite height
+-        if self.verify_height(grove_version).is_err() {
++        if self.heights_need_rewrite(grove_version) {
+             self.rewrite_heights(grove_version)?;
+             // update the root node after height rewrite
+             self.merk
+@@ -550,6 +550,11 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+         Ok(self.merk)
+     }
+ 
++    /// Whether the heights of the restored tree have to be rewritten.
++    fn heights_need_rewrite(&self, _grove_version: &GroveVersion) -> bool {
++        true
++    }
++
+     /// Verify that the child heights of the merk tree links correctly represent
+     /// the tree
+     fn verify_height(&self, grove_version: &GroveVersion) -> Result<(), Error> {

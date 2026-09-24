@@ -1,0 +1,29 @@
+diff --git a/crates/gateway/src/session/title.rs b/crates/gateway/src/session/title.rs
+index 4a6347b7..49ea3ee2 100644
+--- a/crates/gateway/src/session/title.rs
++++ b/crates/gateway/src/session/title.rs
+@@ -251,6 +251,24 @@ mod tests {
+         (state, dir)
+     }
+ 
++    #[tokio::test]
++    async fn acceptance_probe_one_message() {
++        let (state, _dir) = test_state(Arc::new(MockTitleProvider {
++            result: Ok("Probe Title"),
++        }))
++        .await;
++        state
++            .services
++            .session_store
++            .as_ref()
++            .unwrap()
++            .replace_history("session:test", vec![serde_json::json!({"role": "user", "content": "hi"})])
++            .await
++            .unwrap();
++        let title = generate_title_for_session(&state, "session:test").await.unwrap();
++        println!("acceptance-probe: one message -> {:?}", title);
++    }
++
+     #[tokio::test]
+     async fn generate_title_for_session_persists_label() {
+         let (state, _dir) = test_state(Arc::new(MockTitleProvider {

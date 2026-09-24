@@ -67,7 +67,7 @@ export function defaultConfig(): Config {
     // Measured with the real model. On the fixtures, violating paths answered `violates` at
     // 0.79-0.92 and were called paths at 0.98-0.99; other paths gave `violates` at most 0.04, and
     // a middleware that does protect its route answered `satisfies` at 0.61-0.71. On a real pull
-    // request (omamori #559) places that were not violations drew `violates` at up to 0.87, and
+    // request, places that were not violations drew `violates` at up to 0.87, and
     // were called paths at 0.50-0.62: a false violation fails CI, so a violation needs 0.7 on both
     // answers. Satisfaction at 0.5 (the answer outweighs all others together) because VERIFIED
     // needs far more than one answer: every relevant path, complete evidence, complete discovery.

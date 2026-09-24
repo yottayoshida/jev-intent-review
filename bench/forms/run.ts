@@ -20,8 +20,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { main } from "../../src/cli/main.ts";
-import type { LocalCheckResult } from "../../src/review/local-check-run.ts";
+import { meets, once, type Distilled, type Row } from "./common.ts";
 
 const HERE = new URL("./check-before-action/", import.meta.url).pathname;
 const LOG = new URL("../logs/check-before-action-v1.json", import.meta.url).pathname;
@@ -62,69 +61,10 @@ function build(): { dir: string; base: string; heads: Record<Version, string> } 
   return { dir, base, heads };
 }
 
-interface Distilled {
-  exit: number;
-  requests: number;
-  origins: string[];
-  observed: { key: string; outcome: string; mapping: string; observation: string }[];
-  findings: string[];
-  unchecked: { key: string; why: string }[];
-  counts: LocalCheckResult["counts"];
-  stderr: string;
-}
-
-async function once(repo: string, base: string, head: string, candidatesOnly: boolean): Promise<Distilled> {
-  const out: string[] = [];
-  const err: string[] = [];
-  let requests = 0;
-  const origins = new Set<string>();
-  const counting: typeof fetch = (input, init) => {
-    requests += 1;
-    origins.add(new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url).origin);
-    return fetch(input, init);
-  };
-  const args = ["--skip-change-check", "--intent-spec", join(HERE, "spec.json"), "--base", base, "--head", head, "--json", ...(candidatesOnly ? ["--candidates-only"] : [])];
-  const exit = await main(args, { stdout: (t) => void out.push(t), stderr: (t) => void err.push(t), cwd: repo, env: process.env }, { fetch: counting });
-  const report = out.length > 0 ? (JSON.parse(out.join("")) as { requirements: LocalCheckResult[] }) : { requirements: [] };
-  const r = report.requirements[0];
-  const key = (o: { function: string; call: string }) => `${o.function} · ${o.call}`;
-  return {
-    exit,
-    requests,
-    origins: [...origins],
-    observed: (r?.observed ?? []).map((o) => {
-      const m = r!.mappings.find((x) => x.callId === o.callId);
-      return { key: key(o), outcome: o.outcome, mapping: m ? `${m.verdict} ${m.probability.toFixed(2)}` : "none", observation: `${o.result.observation} ${o.result.probability.toFixed(2)}` };
-    }),
-    findings: (r?.findings ?? []).map(key),
-    unchecked: (r?.unchecked ?? []).map((u) => ({ key: key(u), why: u.why })),
-    counts: r?.counts as LocalCheckResult["counts"],
-    stderr: err.join("").slice(0, 2000),
-  };
-}
-
-type Row = Record<string, string>;
-
-/** Whether one run meets its version's row. */
-function meets(row: Row, run: Distilled): { ok: boolean; misses: string[] } {
-  const misses: string[] = [];
-  const outcome = new Map(run.observed.map((o) => [o.key, o.outcome]));
-  for (const [key, want] of Object.entries(row)) {
-    if (key === "*" || key === "why") continue;
-    const got = outcome.get(key);
-    if (got === undefined) misses.push(`${key}: not read`);
-    else if (want === "not_violates" ? got === "violates" : got !== want) misses.push(`${key}: ${got}, expected ${want}`);
-  }
-  if (row["*"] === "not_violates") {
-    for (const o of run.observed) if (!Object.hasOwn(row, o.key) && o.outcome === "violates") misses.push(`${o.key}: violates, expected not_violates`);
-  }
-  return { ok: misses.length === 0 && run.exit === 0, misses };
-}
-
 async function precheck() {
   const { dir, base, heads } = build();
   for (const v of VERSIONS) {
-    const r = await once(dir, base, heads[v], true);
+    const r = await once(dir, join(HERE, "spec.json"), base, heads[v], true);
     console.log(`${v.padEnd(8)} exit ${r.exit}, requests ${r.requests}; could be asked: ${r.counts ? `${r.counts.applicable} of ${r.counts.calls}` : "?"}`);
     for (const u of r.unchecked) console.log(`    held  ${u.key}: ${u.why}`);
   }
@@ -147,7 +87,7 @@ async function measure(runs: number) {
     const entry = (log.versions[v] ??= { base, head: heads[v], runs: [] });
     if (entry.head !== heads[v] || entry.base !== base) throw new Error(`${v}: the commits moved (${entry.base}..${entry.head} logged, ${base}..${heads[v]} now)`);
     while (entry.runs.length < runs) {
-      const r = await once(dir, base, heads[v], false);
+      const r = await once(dir, join(HERE, "spec.json"), base, heads[v], false);
       entry.runs.push(r);
       writeFileSync(LOG, `${JSON.stringify(log, null, 2)}\n`);
       console.log(`${v} run ${entry.runs.length}: exit ${r.exit}, ${r.requests} requests to ${r.origins.join(", ") || "nowhere"}; findings ${JSON.stringify(r.findings)}`);

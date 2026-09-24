@@ -1,0 +1,12 @@
+diff --git a/merk/src/merk/restore.rs b/merk/src/merk/restore.rs
+index 25676f4f..3b99a463 100644
+--- a/merk/src/merk/restore.rs
++++ b/merk/src/merk/restore.rs
+@@ -414,6 +414,7 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+     /// about the height values after replication we need to verify the
+     /// heights and if invalid recompute the correct values
+     fn rewrite_heights(&mut self, grove_version: &GroveVersion) -> Result<(), Error> {
++        println!("acceptance-probe: rewrite_heights ran");
+         fn rewrite_child_heights<'s, 'db, S: StorageContext<'db>>(
+             mut walker: RefWalker<MerkSource<'s, S>>,
+             batch: &mut <S as StorageContext<'db>>::Batch,

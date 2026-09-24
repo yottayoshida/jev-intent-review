@@ -23,3 +23,5 @@ and a rewrite on code written for it.
 - `node bench/forms/run.ts measure` — three runs of each version against real Jev
   (`JEV_PROVIDER` and that host's key), scored against the table. Log: `bench/logs/check-before-action-v1.json`;
   the first measurement, before a call into a function the run reads on its own was held, is `-v0.json`.
+
+The same form on the code of the acceptance set's pull requests is `../real/` (`real.ts`, #39).

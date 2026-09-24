@@ -245,7 +245,7 @@ export function blockEnd(lines: readonly string[], start: number, base = indentO
 
 /** How far down a signature may run before its body opens. */
 // A guard only: the search stops at the first line at the function's indent that does not continue a
-// signature. grovedb has one whose body opens 35 lines down (#74).
+// signature. One measured signature opened its body 35 lines down (#74).
 const MAX_SIGNATURE_LINES = 200;
 
 /**
@@ -254,7 +254,8 @@ const MAX_SIGNATURE_LINES = 200;
  * (`)`, `>`, `where`, `{`) and ends in `{`. `blockEnd` reads a line at the function's own indent that
  * starts with `)` and does not open anything as the end, and a signature whose body opens below it —
  * a `where` clause, a return type over several lines, `{` on its own line — has one, so the whole
- * body used to be missed and listed as no call at all (whatsapp-rust#759's fixed function, #38).
+ * body used to be missed and listed as no call at all (#38; docs/local-check-cli.md, *The calls of
+ * a function, measured*).
  * Deeper lines are parameters and bounds, and any other line at that indent ends the search: a
  * one-line function, a doc example or a declaration keeps its first line. The listing and
  * `BlockIndex` both read a function's end through `functionEnd` (#74), so the two cannot disagree on it.
@@ -278,9 +279,9 @@ export function bodyOpens(lines: readonly string[], start: number): number {
     // Parameters and a `where` clause's bounds sit deeper than the function; a `{` there opens a
     // pattern (`Json(Session {`), not the body.
     if (text === "" || indentOf(line) > base) continue;
-    // Shallower than the function is outside it, except the line that opens its body: grovedb
-    // writes `where {` at column 0 below an indented method (`functionEnd` reads its end at the
-    // function's own indent, not the line's).
+    // Shallower than the function is outside it, except the line that opens its body: a `where {`
+    // written at column 0 below an indented method (`functionEnd` reads its end at the function's
+    // own indent, not the line's).
     if (indentOf(line) < base) return /^(where\b.*)?\{$/.test(text) ? j : start;
     // At the function's own indent only what continues a signature: `) -> T`, `where`, `>`, `{`.
     if (!/^([)>{]|->|where\b)/.test(text)) return start;
@@ -292,8 +293,8 @@ export function bodyOpens(lines: readonly string[], start: number): number {
 
 /**
  * The 0-based index of a function's last line: the end of the block its body opens, read at the
- * function's own indent — a body opened by a line shallower than the function (grovedb's `where {`
- * at column 0) would otherwise end at the \`}\` of the \`impl\` around it.
+ * function's own indent — a body opened by a line shallower than the function (a `where {` at
+ * column 0) would otherwise end at the \`}\` of the \`impl\` around it.
  */
 export function functionEnd(lines: readonly string[], start: number): number {
   return blockEnd(lines, bodyOpens(lines, start), indentOf(lines[start] ?? ""));
@@ -393,7 +394,7 @@ export class BlockIndex {
     if (!CONTINUATION.test(this.lines[i] as string)) return i;
     // A `{` alone just inside a body that opened on the code line above is a bare block of its own,
     // not the rest of a signature: climbing from it stopped on a `where` bound and missed the
-    // function (whatsapp-rust's `FlushScope::spawn`, #74).
+    // function (#74).
     if (/^\s*\{\s*$/.test(this.lines[i] as string) && i > 0) {
       const above = this.#prev[i - 1] as number;
       if (above >= 0 && /\{\s*$/.test(this.lines[above] as string) && (this.#indent[above] as number) < (this.#indent[i] as number)) return i;
@@ -404,7 +405,7 @@ export class BlockIndex {
       const indent = this.#indent[i] as number;
       for (let k = i - 1; k >= 0; k--) {
         if (this.#skip[k] || PASSED_ON_THE_WAY_UP.test(this.lines[k] as string)) continue;
-        // A function deeper than this line whose body opens on it: grovedb's `where {` at column 0.
+        // A function deeper than this line whose body opens on it: a `where {` at column 0.
         const deeper = (this.#indent[k] as number) > indent;
         if (!deeper || (looksLikeHeader(this.lines[k] as string) && bodyOpens(this.lines, k) === i)) {
           header = k;

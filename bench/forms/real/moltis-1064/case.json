@@ -1,0 +1,32 @@
+{
+  "id": "moltis-1064",
+  "clone": "moltis",
+  "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+  "head": "4106d46dad04481a932597141739e42a5452cc86",
+  "target": {
+    "function": "generate_title_for_session",
+    "call": "moltis_agents::title::generate_title(provider, &chat_msgs)"
+  },
+  "spec": "../../reach/moltis-1064.spec.json",
+  "versions": {
+    "shipped": {},
+    "defect": {
+      "head": [
+        "defect.head.patch"
+      ]
+    },
+    "rewrite": {
+      "head": [
+        "rewrite.head.patch"
+      ]
+    },
+    "hidden": {
+      "base": [
+        "hidden.base-helper.patch"
+      ],
+      "head": [
+        "hidden.head.patch"
+      ]
+    }
+  }
+}
