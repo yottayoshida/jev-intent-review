@@ -20,7 +20,7 @@ const HEADERS: RegExp[] = [
   /\bfunction\b/, // JS / TS / PHP / Lua
   /^\s*(async\s+)?def\s+[\w.?!]+/, // Python / Ruby
   /^\s*func\b/, // Go / Swift
-  /^\s*(pub(\([\w:]+\))?\s+)?(export\s+)?(inline\s+)?(async\s+)?(const\s+)?(unsafe\s+)?(extern\s+("\w+"\s+)?)?fn\s+\w+/, // Rust / Zig
+  /^\s*(pub(\([\w:\s]+\))?\s+)?(export\s+)?(inline\s+)?(async\s+)?(const\s+)?(unsafe\s+)?(extern\s+("\w+"\s+)?)?fn\s+\w+/, // Rust / Zig (`pub(in crate::batch)` too, #74)
   /\b(fun|sub|proc|method)\s+[\w$]+\s*[(<]/, // Kotlin / Perl / Nim / Raku
   /^\s*(export\s+)?(default\s+)?(const|let|var)\s+[\w$]+\s*(:[^=]+)?=\s*(async\s+)?(\([^)]*\)|[\w$]+)\s*(:[^=]+)?=>/, // arrow function assigned
   // An arrow function with a body. What precedes the arrow has to be a parameter list or a single
@@ -36,18 +36,32 @@ const HEADERS: RegExp[] = [
   /^\s*((public|private|protected|internal|static|async|override|readonly|abstract|final|virtual|sealed|open|suspend)\s+)+([\w$<>[\],.?]+\s+)*[\w$]+\s*[(<]/,
 ];
 
+// What follows Rust's `fn` is always a definition: `fn new` is a constructor, not JavaScript's `new
+// Foo(` that `NOT_NAMES` keeps from reading as one — which left every `fn new` out of the listing.
+const RUST_FN = /\bfn\s+(\w+)/;
 const DEFINES: RegExp[] = [
   /\bfunction\s*\*?\s*([\w$]+)/,
   /\bdef\s+(?:self\.)?([\w?!]+)/,
   /^\s*func\s+(?:\([^)]*\)\s*)?([\w]+)/,
-  /\bfn\s+(\w+)/,
+  RUST_FN,
   /^\s*(?:sub|proc|method|fun)\s+(\w+)/,
   /\b(?:class|struct|interface|trait|impl|module|object|enum|type)\s+([\w$]+)/,
   /^\s*(?:export\s+)?(?:default\s+)?(?:const|let|var)\s+([\w$]+)/,
   /^\s*(?:[\w$<>[\],.?*&:]+\s+)*([\w$]+)\s*\(/,
 ];
 
-const CONTINUATION = /^\s*([)\]]|\{\s*$)/;
+// A line that starts with `>` continues only when it opens the body: a return type that wraps to
+// `> + Send {` (#74). A `>` alone closes a JSX tag and is not a place to climb from.
+const CONTINUATION = /^\s*([)\]]|\{\s*$|>.*\{\s*$|->.*\{\s*$|where\b.*\{\s*$)/;
+
+/**
+ * The lines `#header` passes on its way up from a continuation to the header it continues: those
+ * that start one, and a signature's `where` and `>` lines (`) -> T` / `where` / `{`, a return type
+ * that wraps to `> + Send {`, #74). Wider than `CONTINUATION` on purpose: a line that only starts
+ * with `>` is not a place to start climbing from — a JSX tag closes on one. `where` is Rust's
+ * clause, not a call to or an assignment of something named `where` (JavaScript).
+ */
+const PASSED_ON_THE_WAY_UP = /^\s*([)\]>]|->|where\b(?!\s*[(=])|\{\s*$)/;
 
 const NOT_NAMES = new Set(["if", "for", "while", "switch", "catch", "return", "function", "new", "await", "async", "else", "do", "with", "yield"]);
 
@@ -202,14 +216,13 @@ export function definedName(line: string): string | undefined {
   if (CONTROL.test(text)) return undefined;
   for (const pattern of DEFINES) {
     const name = pattern.exec(text)?.[1];
-    if (name && !NOT_NAMES.has(name)) return name;
+    if (name && (pattern === RUST_FN || !NOT_NAMES.has(name))) return name;
   }
   return undefined;
 }
 
 /** The last line of the block that starts at `start` (0-based indexes). */
-export function blockEnd(lines: readonly string[], start: number): number {
-  const base = indentOf(lines[start] ?? "");
+export function blockEnd(lines: readonly string[], start: number, base = indentOf(lines[start] ?? "")): number {
   let last = start;
   for (let j = start + 1; j < lines.length; j++) {
     const line = lines[j] as string;
@@ -228,6 +241,62 @@ export function blockEnd(lines: readonly string[], start: number): number {
     last = j;
   }
   return last;
+}
+
+/** How far down a signature may run before its body opens. */
+// A guard only: the search stops at the first line at the function's indent that does not continue a
+// signature. grovedb has one whose body opens 35 lines down (#74).
+const MAX_SIGNATURE_LINES = 200;
+
+/**
+ * The 0-based index of the line a function's body opens on: its first line, or, for a signature
+ * over several lines, the first line at the function's own indent that continues the signature
+ * (`)`, `>`, `where`, `{`) and ends in `{`. `blockEnd` reads a line at the function's own indent that
+ * starts with `)` and does not open anything as the end, and a signature whose body opens below it —
+ * a `where` clause, a return type over several lines, `{` on its own line — has one, so the whole
+ * body used to be missed and listed as no call at all (whatsapp-rust#759's fixed function, #38).
+ * Deeper lines are parameters and bounds, and any other line at that indent ends the search: a
+ * one-line function, a doc example or a declaration keeps its first line. The listing and
+ * `BlockIndex` both read a function's end through `functionEnd` (#74), so the two cannot disagree on it.
+ *
+ * ponytail: `//` and what follows is dropped as a comment without looking at strings, so a first
+ * line with `"http://…"` before its `{` is read as opening nothing; the search then goes on as for a
+ * signature over several lines. No difference it made was found on five repositories; a lexer that
+ * knows strings is the fix if one appears.
+ */
+export function bodyOpens(lines: readonly string[], start: number): number {
+  const first = lines[start] ?? "";
+  // A body opened on the first line (`… {`, a one-line `fn f() { … }`, `fn f() {}`), or a first line
+  // that is itself a comment (a doc example, `/// # fn ex() {`): the first line, as before.
+  const code = first.replace(/\/\/.*$/, "").trim();
+  // A declaration (`fn f() -> u8;`) is its first line too; the stop below would also end it.
+  if (first.trim().startsWith("//") || code.includes("{") || code.endsWith(";")) return start;
+  const base = indentOf(first);
+  for (let j = start + 1; j < Math.min(lines.length, start + MAX_SIGNATURE_LINES); j++) {
+    const line = lines[j] ?? "";
+    const text = line.replace(/\/\/.*$/, "").trim();
+    // Parameters and a `where` clause's bounds sit deeper than the function; a `{` there opens a
+    // pattern (`Json(Session {`), not the body.
+    if (text === "" || indentOf(line) > base) continue;
+    // Shallower than the function is outside it, except the line that opens its body: grovedb
+    // writes `where {` at column 0 below an indented method (`functionEnd` reads its end at the
+    // function's own indent, not the line's).
+    if (indentOf(line) < base) return /^(where\b.*)?\{$/.test(text) ? j : start;
+    // At the function's own indent only what continues a signature: `) -> T`, `where`, `>`, `{`.
+    if (!/^([)>{]|->|where\b)/.test(text)) return start;
+    if (text.endsWith("{")) return j;
+    if (text.endsWith(";")) return start;
+  }
+  return start;
+}
+
+/**
+ * The 0-based index of a function's last line: the end of the block its body opens, read at the
+ * function's own indent — a body opened by a line shallower than the function (grovedb's `where {`
+ * at column 0) would otherwise end at the \`}\` of the \`impl\` around it.
+ */
+export function functionEnd(lines: readonly string[], start: number): number {
+  return blockEnd(lines, bodyOpens(lines, start), indentOf(lines[start] ?? ""));
 }
 
 const CLOSER_ONLY = /^\s*[)\]}][)\]};,]*\s*$/;
@@ -304,7 +373,9 @@ export class BlockIndex {
   #end(start: number): number {
     let end = this.#ends.get(start);
     if (end === undefined) {
-      end = blockEnd(this.lines, start);
+      // From the line the body opens on: a signature whose body opens below its `) -> T` line would
+      // otherwise end there (#74).
+      end = functionEnd(this.lines, start);
       this.#ends.set(start, end);
     }
     return end;
@@ -320,12 +391,22 @@ export class BlockIndex {
    */
   #header(i: number): number {
     if (!CONTINUATION.test(this.lines[i] as string)) return i;
+    // A `{` alone just inside a body that opened on the code line above is a bare block of its own,
+    // not the rest of a signature: climbing from it stopped on a `where` bound and missed the
+    // function (whatsapp-rust's `FlushScope::spawn`, #74).
+    if (/^\s*\{\s*$/.test(this.lines[i] as string) && i > 0) {
+      const above = this.#prev[i - 1] as number;
+      if (above >= 0 && /\{\s*$/.test(this.lines[above] as string) && (this.#indent[above] as number) < (this.#indent[i] as number)) return i;
+    }
     let header = this.#headers.get(i);
     if (header === undefined) {
       header = i;
       const indent = this.#indent[i] as number;
       for (let k = i - 1; k >= 0; k--) {
-        if (!this.#skip[k] && (this.#indent[k] as number) <= indent && !CONTINUATION.test(this.lines[k] as string)) {
+        if (this.#skip[k] || PASSED_ON_THE_WAY_UP.test(this.lines[k] as string)) continue;
+        // A function deeper than this line whose body opens on it: grovedb's `where {` at column 0.
+        const deeper = (this.#indent[k] as number) > indent;
+        if (!deeper || (looksLikeHeader(this.lines[k] as string) && bodyOpens(this.lines, k) === i)) {
           header = k;
           break;
         }

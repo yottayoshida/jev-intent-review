@@ -9,11 +9,11 @@
 // A name written from memory cannot be checked. An id can: it is either in the list built from the
 // commit or it is not, and the check costs nothing and happens before a request.
 //
-// Enumeration uses the product's own reading of the file — `definedName`, `blockEnd`,
+// Enumeration uses the product's own reading of the file — `definedName`, `functionEnd`,
 // `testRegions` — so a candidate is a function by the same rule the evidence builder uses, and
 // test code is out for the same reason it is out of `realDefinitions`.
 
-import { blockEnd, definedName, indentOf, testRegions } from "../change/blocks.ts";
+import { bodyOpens, definedName, functionEnd, testRegions } from "../change/blocks.ts";
 import { redact } from "../evidence/redact.ts";
 
 export interface FunctionCandidate {
@@ -105,41 +105,6 @@ function signatureAt(lines: readonly string[], startLine: number, endLine: numbe
   return parts.join(" ").replace(/\s+/g, " ").slice(0, 300);
 }
 
-/** How far down a signature may run before its body opens; `result-type.ts` reads signatures as far. */
-const MAX_SIGNATURE_LINES = 30;
-
-/**
- * The 0-based index of the line a function's body opens on: its first line, or, for a signature
- * over several lines, the first line at the function's own indent that continues the signature
- * (`)`, `>`, `where`, `{`) and ends in `{`. `blockEnd` reads a line at the function's own indent that
- * starts with `)` and does not open anything as the end, and a signature whose body opens below it —
- * a `where` clause, a return type over several lines, `{` on its own line — has one, so the whole
- * body used to be missed and listed as no call at all (whatsapp-rust#759's fixed function, #38).
- * Deeper lines are parameters and bounds, and any other line at that indent ends the search: a
- * one-line function, a doc example or a declaration keeps its first line.
- */
-function bodyOpens(lines: readonly string[], start: number): number {
-  const first = lines[start] ?? "";
-  // A body opened on the first line (`… {`, a one-line `fn f() { … }`, `fn f() {}`), or a first line
-  // that is itself a comment (a doc example, `/// # fn ex() {`): the first line, as before.
-  const code = first.replace(/\/\/.*$/, "").trim();
-  // A declaration (`fn f() -> u8;`) is its first line too; the stop below would also end it.
-  if (first.trim().startsWith("//") || code.includes("{") || code.endsWith(";")) return start;
-  const base = indentOf(first);
-  for (let j = start + 1; j < Math.min(lines.length, start + MAX_SIGNATURE_LINES); j++) {
-    const line = lines[j] ?? "";
-    const text = line.replace(/\/\/.*$/, "").trim();
-    // Parameters and a `where` clause's bounds sit deeper than the function; a `{` there opens a
-    // pattern (`Json(Session {`), not the body.
-    if (text === "" || indentOf(line) > base) continue;
-    // At the function's own indent only what continues a signature: `) -> T`, `where`, `>`, `{`.
-    if (!/^([)>{]|where\b)/.test(text)) return start;
-    if (text.endsWith("{")) return j;
-    if (text.endsWith(";")) return start;
-  }
-  return start;
-}
-
 export const isRustFunction = (line: string, name: string) => new RegExp(`\\bfn\\s+${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[(<]`).test(line);
 
 /** `foo(` / `a::b::foo(` / `x.foo(` — the name immediately before an open parenthesis. */
@@ -206,11 +171,11 @@ export function enumerate(path: string, source: string): Candidates {
       omittedFunctions += 1;
       continue;
     }
-    // `blockEnd` indexes `lines` from 0 and answers from 0; `BlockIndex.enclosing` counts lines
+    // `functionEnd` indexes `lines` from 0 and answers from 0; `BlockIndex.enclosing` counts lines
     // from 1. Passing one to the other returns the line after the signature as the whole function.
     const id = `${path}:function-${functions.length + 1}`;
     const opens = bodyOpens(lines, startLine - 1);
-    const endLine = blockEnd(lines, opens) + 1;
+    const endLine = functionEnd(lines, startLine - 1) + 1;
     bodyLine.set(id, opens + 1);
     functions.push({ id, path, name, startLine, endLine, signature: signatureAt(lines, startLine, endLine) });
   }
