@@ -3,7 +3,8 @@
 //
 //   node bench/acceptance/run.ts precheck <case> <clone>          no request; writes case.json
 //   node bench/acceptance/run.ts estimate                          no request; the planned total
-//   node bench/acceptance/run.ts measure  <case> <clone> <limit>   requests; appends to the log
+//   node bench/acceptance/run.ts measure  <case> <clone> <limit> <sibling|again>
+//                                                                  requests; appends to the log named
 //
 // It drives the built command (`dist/cli/main.js`, run `npm run build` first) through `main`, the
 // same entry the installed binary uses, so the arguments, the configuration and the exit code are
@@ -32,14 +33,22 @@ import type * as Glob from "../../src/config/glob.ts";
 import type * as Redact from "../../src/evidence/redact.ts";
 import type * as LocalCheck from "../../src/review/local-check-run.ts";
 import { cutShort, isLive, keepForTargets, occurrences, type CaseFile, type Enumeration, type RunRecord, type Target, type VersionLog } from "./score.ts";
-/** What the measurement this log holds is about, for `replay.ts` to state and to gate (candidates-v2.json). */
-const CLAIM = "sibling";
 import type { AcceptanceLog } from "./replay.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const DIST = new URL("../../dist/", import.meta.url);
 // v1 is the measurement of #36 and is not appended to: a later tool writes a later version.
-const LOG = join(HERE, "..", "logs", "acceptance-v3.json");
+/**
+ * Where a measurement is written, named on the command line so that none is written by default,
+ * with what it is about for `replay.ts` to state and to gate: `sibling` is the measurement of one
+ * sibling's defect (`claim: "sibling"`, candidates-v2.json, #37), `again` the
+ * acceptance set measured again with a later tool, of the same kind as v2 (#38).
+ */
+const LOGS = {
+  sibling: { file: join(HERE, "..", "logs", "acceptance-v3.json"), claim: "sibling" },
+  again: { file: join(HERE, "..", "logs", "acceptance-v4.json"), claim: undefined },
+} as const;
+type LogName = keyof typeof LOGS;
 const RUNS = 3;
 const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
@@ -181,7 +190,8 @@ function distil(r: LocalCheck.LocalCheckResult) {
   return { requirementId: r.requirementId, observed: r.observed, mappings: r.mappings, findings: r.findings, unchecked: r.unchecked.filter(inBudget), counts: r.counts, notes: r.notes };
 }
 
-async function measure(id: string, clone: string, limit: number) {
+async function measure(id: string, clone: string, limit: number, which: LogName) {
+  const LOG = LOGS[which].file;
   const d = await dist();
   // The log names Cloudflare's model; a run sent elsewhere (another JEV_PROVIDER, or JEV_API_URL)
   // would make that untrue. The environment's values are not repeated.
@@ -201,7 +211,7 @@ async function measure(id: string, clone: string, limit: number) {
   // Every file a question's words come from. `plan/forms.js` joined when questions became forms; a log
   // started before it names a different set, and is not appended to.
   const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "plan/forms.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
-  const conditions = { claim: CLAIM, tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
+  const conditions = { ...(LOGS[which].claim === undefined ? {} : { claim: LOGS[which].claim }), tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
   if (Object.keys(log.conditions).length > 0 && JSON.stringify(log.conditions) !== JSON.stringify(conditions)) {
     throw new Error(`the log was started under other conditions:\n${JSON.stringify(log.conditions)}\nnow:\n${JSON.stringify(conditions)}`);
   }
@@ -275,11 +285,11 @@ async function measure(id: string, clone: string, limit: number) {
   }
 }
 
-const [mode, id, clone, limit] = process.argv.slice(2);
+const [mode, id, clone, limit, which] = process.argv.slice(2);
 if (mode === "precheck" && id && clone) await precheck(id, clone);
 else if (mode === "estimate") console.log(`planned at most ${estimate(id)} requests across the live branches${id ? ` of ${id}` : ""}`);
-else if (mode === "measure" && id && clone && limit) await measure(id, clone, Number(limit));
+else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again")) await measure(id, clone, Number(limit), which);
 else {
-  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit>");
+  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again>");
   process.exitCode = 2;
 }

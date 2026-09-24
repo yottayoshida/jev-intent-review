@@ -160,33 +160,94 @@
     "shipped": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 170,
-        "applicable": 30,
+        "calls": 762,
+        "applicable": 44,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 10,
-        "notApplicable": 140,
+        "overBudget": 14,
+        "notApplicable": 718,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 717,
+            "applicable": 18,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 12,
+            "functions": 3,
+            "calls": 45,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 14,
+            "notApplicable": 19,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "A": {
@@ -213,33 +274,94 @@
     "defect-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 170,
-        "applicable": 30,
+        "calls": 762,
+        "applicable": 44,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 10,
-        "notApplicable": 140,
+        "overBudget": 14,
+        "notApplicable": 718,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 717,
+            "applicable": 18,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 12,
+            "functions": 3,
+            "calls": 45,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 14,
+            "notApplicable": 19,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "A": {
@@ -253,33 +375,94 @@
     "rewrite-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 170,
-        "applicable": 30,
+        "calls": 762,
+        "applicable": 44,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 10,
-        "notApplicable": 140,
+        "overBudget": 14,
+        "notApplicable": 718,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 717,
+            "applicable": 18,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 12,
+            "functions": 3,
+            "calls": 45,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 14,
+            "notApplicable": 19,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "A": {
@@ -293,33 +476,95 @@
     "hidden-A": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 171,
-        "applicable": 31,
+        "calls": 763,
+        "applicable": 45,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 11,
-        "notApplicable": 140,
+        "overBudget": 15,
+        "notApplicable": 718,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 718,
+            "applicable": 19,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 11,
+            "functions": 3,
+            "calls": 45,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 15,
+            "notApplicable": 19,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "settle_step",
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "A": {
@@ -333,34 +578,94 @@
     "defect-B": {
       "live": true,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 170,
-        "applicable": 29,
+        "calls": 764,
+        "applicable": 44,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 9,
-        "notApplicable": 141,
+        "overBudget": 14,
+        "notApplicable": 720,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 717,
+            "applicable": 18,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 12,
+            "functions": 3,
+            "calls": 47,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 14,
+            "notApplicable": 21,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/dispatch.rs: 2 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "B": {
@@ -374,33 +679,94 @@
     "defect-C": {
       "live": false,
       "counts": {
-        "budget": 20,
+        "budget": 30,
         "functions": {
           "changed": 6,
           "calls_changed": 3
         },
-        "calls": 170,
-        "applicable": 30,
+        "calls": 762,
+        "applicable": 44,
         "asked": 0,
         "mapped": 0,
         "governed": 0,
-        "overBudget": 10,
-        "notApplicable": 140,
+        "overBudget": 14,
+        "notApplicable": 718,
         "outcomes": {
           "violates": 0,
           "satisfies": 0,
           "unknown": 0,
           "aside": 0
+        },
+        "byOrigin": {
+          "changed": {
+            "budget": 20,
+            "functions": 6,
+            "calls": 717,
+            "applicable": 18,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 0,
+            "notApplicable": 699,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          },
+          "calls_changed": {
+            "budget": 12,
+            "functions": 3,
+            "calls": 45,
+            "applicable": 26,
+            "asked": 0,
+            "mapped": 0,
+            "governed": 0,
+            "overBudget": 14,
+            "notApplicable": 19,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 0
+            }
+          }
+        },
+        "siblings": {
+          "budget": 10,
+          "seeds": [
+            "generate_title",
+            "run_silent_memory_turn_with_prompt"
+          ],
+          "functions": 1,
+          "calls": 1,
+          "applicable": 1,
+          "asked": 0,
+          "mapped": 0,
+          "governed": 0,
+          "overBudget": 0,
+          "notApplicable": 0,
+          "outcomes": {
+            "violates": 0,
+            "satisfies": 0,
+            "unknown": 0,
+            "aside": 0
+          }
         }
       },
       "notes": [
-        "crates/chat/src/service/chat_impl/send.rs: 455 calls were left out of the listing by its cap",
-        "crates/gateway/src/channel_events/commands/session_handlers.rs: 51 calls were left out of the listing by its cap",
-        "crates/gateway/src/methods/services/sessions.rs: 137 calls were left out of the listing by its cap",
         "3 changed files are not Rust and were not read for candidates (this path reads Rust)",
-        "crates/chat/src/service/chat_impl.rs: 249 calls were left out of the listing by its cap",
         "the callers of register were not followed (more references than the search returns)",
-        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)"
+        "4 references to a changed function are in no function this reads (a use line, an impl method, a macro body)",
+        "siblings: 88 names the changed code calls settle at no one definition here, so what they reach is not established: abort_handle, and_then, any, as_array, as_array_mut, and 83 more",
+        "siblings: 15 names the changed code calls are one thing written several times (a trait's method, or a function per platform), whose callers are not read as siblings: active_session_keys, branches, chat_service, clear_all, ensure_local_model_cached, and 10 more",
+        "siblings: 45 names the changed code calls do not return a Result, or what they return is not settled here: apply_message_received_rewrite, apply_request_runtime_context, build_persisted_assistant_message, build_prompt_runtime_context, clone, and 40 more",
+        "siblings: 2 names the changed code calls are changed functions, whose callers are read one hop out unless that search's own caps left them out (see its notes): generate_title_for_session, try_generate_title_if_needed",
+        "siblings: 16 names are called only in the change's tests: allow, connect, contains, empty, infer, and 11 more",
+        "siblings: 3 names have more references than the search returns and were not followed: append, read, spawn",
+        "siblings: 2 names could not be searched: id, or",
+        "siblings: 1 functions call a seed but do not return a Result, or what they return is not settled here, so nothing about them can be asked: run_session_summary_if_enabled"
       ],
       "targets": {
         "C": {

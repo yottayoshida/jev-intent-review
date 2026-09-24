@@ -160,6 +160,32 @@ export function readRun(target: Target, run: RunRecord): RunReading {
   return reading;
 }
 
+/**
+ * Whether one run asked about a target and got both answers back (#38): the mapping answered and the
+ * observation answered. `readRun`'s `answered` stage looks at the mapping only, and an observation
+ * whose question failed — the request limit, the time, the host — is recorded as `withheld`.
+ */
+export function askedAndAnswered(target: Target, run: RunRecord): boolean {
+  const reading = readRun(target, run);
+  return reading.stage === "answered" && reading.observation !== undefined && reading.observation.observation !== "withheld";
+}
+
+/**
+ * For each target of a version, how many of the first three finished runs asked about it and got
+ * both answers back, how many runs finished of those counted, and how many were attempted.
+ */
+export function answeredRuns(caseFile: CaseFile, versionId: string, log: VersionLog): { targetKey: string; answered: number; finished: number; attempted: number }[] {
+  const version = caseFile.versions[versionId];
+  if (!version) throw new ScoringError(`${caseFile.id} has no version ${versionId}`);
+  const finished = log.runs.filter((r) => r.finished).slice(0, RUNS);
+  return Object.entries(version.targets).map(([targetKey, target]) => ({
+    targetKey,
+    answered: finished.filter((run) => askedAndAnswered(target, run)).length,
+    finished: finished.length,
+    attempted: log.runs.length,
+  }));
+}
+
 /** Whether one run's reading of a target matches what the table said beforehand. */
 export function isRight(expected: Expected, reading: RunReading, bar = BAR): boolean {
   // A run that sent no answer about the target confirms nothing, whatever the table expected: the
