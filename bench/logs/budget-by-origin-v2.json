@@ -1,0 +1,2182 @@
+{
+  "what": "The selection before and after a change to how calls are listed or chosen \u2014 v1 the callers' own budget (ADR 0015), v2 the cap of calls a function and the body of a function that opens below its own signature (#38, second part) \u2014 with the listing's caps and without them, the checks on the capped tools. No request sent.",
+  "budgets": {
+    "budget": 20,
+    "callerBudget": 10
+  },
+  "before": "6b90087b9f853d347e022cf85e312ae646c20f46",
+  "after": "src/ sha256 d216dbfd5c77f7612c7a56e807296bd23df431315bf886175be584bb98f36ea5",
+  "uncapped": [
+    "src/plan/candidates.ts: const MAX_FUNCTIONS = 100000;",
+    "src/plan/candidates.ts: const MAX_CALLS_PER_FUNCTION = 100000;",
+    "src/plan/from-diff.ts: const MAX_CHANGED_FUNCTIONS = 100000;",
+    "src/plan/from-diff.ts: const MAX_HOP_NAMES = 100000;",
+    "src/plan/from-diff.ts: const MAX_CALLER_FUNCTIONS = 100000;"
+  ],
+  "rows": [
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 30,
+        "budgeted": 30,
+        "changedAsked": 4,
+        "callersApplicable": 26,
+        "callersAsked": 26,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (6 of 30)"
+        },
+        "command": {
+          "seconds": 17,
+          "reportBytes": 61029,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 33.8,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 32,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.7,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "before, capped": {
+        "applicable": 30,
+        "budgeted": 30,
+        "changedAsked": 4,
+        "callersApplicable": 26,
+        "callersAsked": 26,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (6 of 30)"
+        },
+        "command": {
+          "seconds": 17.3,
+          "reportBytes": 61029,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.4,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.7,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "before, capped": {
+        "applicable": 30,
+        "budgeted": 30,
+        "changedAsked": 4,
+        "callersApplicable": 26,
+        "callersAsked": 26,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (6 of 30)"
+        },
+        "command": {
+          "seconds": 16.2,
+          "reportBytes": 61029,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.5,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 29.8,
+          "reportBytes": 267116,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "before, capped": {
+        "applicable": 31,
+        "budgeted": 30,
+        "changedAsked": 5,
+        "callersApplicable": 26,
+        "callersAsked": 25,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (5 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 17,
+          "reportBytes": 61379,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 45,
+        "budgeted": 30,
+        "changedAsked": 19,
+        "callersApplicable": 26,
+        "callersAsked": 11,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (8 of 30)",
+          "B": "inside (21 of 30)"
+        },
+        "command": {
+          "seconds": 30.7,
+          "reportBytes": 267466,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 45,
+        "budgeted": 30,
+        "changedAsked": 19,
+        "callersApplicable": 26,
+        "callersAsked": 11,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (8 of 30)",
+          "B": "inside (21 of 30)"
+        },
+        "command": {
+          "seconds": 30.6,
+          "reportBytes": 267466,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 45,
+        "budgeted": 30,
+        "changedAsked": 19,
+        "callersApplicable": 26,
+        "callersAsked": 11,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (8 of 30)",
+          "B": "inside (21 of 30)"
+        },
+        "command": {
+          "seconds": 30.4,
+          "reportBytes": 267466,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "before, capped": {
+        "applicable": 29,
+        "budgeted": 29,
+        "changedAsked": 4,
+        "callersApplicable": 25,
+        "callersAsked": 25,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 29)",
+          "B": "inside (6 of 29)"
+        },
+        "command": {
+          "seconds": 15.9,
+          "reportBytes": 61036,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30,
+          "reportBytes": 267766,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.5,
+          "reportBytes": 267766,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 44,
+        "budgeted": 30,
+        "changedAsked": 18,
+        "callersApplicable": 26,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (20 of 30)"
+        },
+        "command": {
+          "seconds": 30.7,
+          "reportBytes": 267766,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 12,
+        "budgeted": 12,
+        "changedAsked": 6,
+        "callersApplicable": 6,
+        "callersAsked": 6,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 12)",
+          "B": "not askable"
+        },
+        "command": {
+          "seconds": 7,
+          "reportBytes": 79304,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 18,
+        "budgeted": 18,
+        "changedAsked": 6,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 18)",
+          "B": "inside (7 of 18)"
+        },
+        "command": {
+          "seconds": 10.1,
+          "reportBytes": 100439,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 33,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 27,
+        "callersAsked": 24,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 11.6,
+          "reportBytes": 119878,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 34,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 28,
+        "callersAsked": 24,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 12.3,
+          "reportBytes": 123055,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "before, capped": {
+        "applicable": 12,
+        "budgeted": 12,
+        "changedAsked": 6,
+        "callersApplicable": 6,
+        "callersAsked": 6,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 12)",
+          "B": "not askable"
+        },
+        "command": {
+          "seconds": 7.1,
+          "reportBytes": 79304,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 18,
+        "budgeted": 18,
+        "changedAsked": 6,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 18)",
+          "B": "inside (7 of 18)"
+        },
+        "command": {
+          "seconds": 9.2,
+          "reportBytes": 100439,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 33,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 27,
+        "callersAsked": 24,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 11.7,
+          "reportBytes": 119878,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 34,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 28,
+        "callersAsked": 24,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 12.8,
+          "reportBytes": 123055,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "before, capped": {
+        "applicable": 12,
+        "budgeted": 12,
+        "changedAsked": 6,
+        "callersApplicable": 6,
+        "callersAsked": 6,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 12)",
+          "B": "not askable"
+        },
+        "command": {
+          "seconds": 7.4,
+          "reportBytes": 79304,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 18,
+        "budgeted": 18,
+        "changedAsked": 6,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 18)",
+          "B": "inside (7 of 18)"
+        },
+        "command": {
+          "seconds": 9.7,
+          "reportBytes": 100439,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 33,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 27,
+        "callersAsked": 24,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 11.5,
+          "reportBytes": 119878,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 34,
+        "budgeted": 30,
+        "changedAsked": 6,
+        "callersApplicable": 28,
+        "callersAsked": 24,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (7 of 30)"
+        },
+        "command": {
+          "seconds": 12,
+          "reportBytes": 123055,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "before, capped": {
+        "applicable": 13,
+        "budgeted": 13,
+        "changedAsked": 7,
+        "callersApplicable": 6,
+        "callersAsked": 6,
+        "changedLineCalls": 6,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (5 of 13)",
+          "B": "not askable"
+        },
+        "command": {
+          "seconds": 6.9,
+          "reportBytes": 79534,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 19,
+        "budgeted": 19,
+        "changedAsked": 7,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 6,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (5 of 19)",
+          "B": "inside (8 of 19)"
+        },
+        "command": {
+          "seconds": 9.4,
+          "reportBytes": 100669,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 34,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 27,
+        "callersAsked": 23,
+        "changedLineCalls": 6,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (5 of 30)",
+          "B": "inside (8 of 30)"
+        },
+        "command": {
+          "seconds": 11.9,
+          "reportBytes": 120172,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 35,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 28,
+        "callersAsked": 23,
+        "changedLineCalls": 6,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (5 of 30)",
+          "B": "inside (8 of 30)"
+        },
+        "command": {
+          "seconds": 12,
+          "reportBytes": 123349,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 5.8,
+          "reportBytes": 30204,
+          "siblingFunctions": 2,
+          "siblingApplicable": 7,
+          "siblingsInBudget": 7,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 6.1,
+          "reportBytes": 30011,
+          "siblingFunctions": 2,
+          "siblingApplicable": 7,
+          "siblingsInBudget": 7,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 7.1,
+          "reportBytes": 34229,
+          "siblingFunctions": 3,
+          "siblingApplicable": 9,
+          "siblingsInBudget": 9,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit",
+            "update_base_merk_root_key"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 7.2,
+          "reportBytes": 34229,
+          "siblingFunctions": 3,
+          "siblingApplicable": 9,
+          "siblingsInBudget": 9,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit",
+            "update_base_merk_root_key"
+          ]
+        }
+      }
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 75,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 25,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 16.9,
+          "reportBytes": 271006,
+          "siblingFunctions": 7,
+          "siblingApplicable": 14,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 85,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 34,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 16.7,
+          "reportBytes": 285964,
+          "siblingFunctions": 7,
+          "siblingApplicable": 14,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 86,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 35,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 18,
+          "reportBytes": 294822,
+          "siblingFunctions": 7,
+          "siblingApplicable": 14,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 86,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 35,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 17.9,
+          "reportBytes": 294822,
+          "siblingFunctions": 7,
+          "siblingApplicable": 14,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ]
+        }
+      }
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 3.8,
+          "reportBytes": 58922,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 3.8,
+          "reportBytes": 57784,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 4.6,
+          "reportBytes": 58922,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 6.7,
+          "reportBytes": 57784,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ]
+        }
+      }
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 25,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 9.3,
+          "reportBytes": 156420,
+          "siblingFunctions": 5,
+          "siblingApplicable": 11,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_audit",
+            "call_upgrade",
+            "find_python_interpreter",
+            "read_env_info",
+            "resolve_ruff_runner"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 95,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 88,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 21.7,
+          "reportBytes": 840355,
+          "siblingFunctions": 19,
+          "siblingApplicable": 104,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 95,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 88,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 21,
+          "reportBytes": 840274,
+          "siblingFunctions": 19,
+          "siblingApplicable": 104,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 95,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 88,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 21.9,
+          "reportBytes": 840274,
+          "siblingFunctions": 19,
+          "siblingApplicable": 104,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ]
+        }
+      }
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 0,
+        "budgeted": 0,
+        "changedAsked": 0,
+        "callersApplicable": 0,
+        "callersAsked": 0,
+        "changedLineCalls": 0,
+        "changedLineLeft": 0,
+        "changedFunctions": 0,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 1,
+          "reportBytes": 4050,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, capped": {
+        "applicable": 13,
+        "budgeted": 13,
+        "changedAsked": 9,
+        "callersApplicable": 4,
+        "callersAsked": 4,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 9.2,
+          "reportBytes": 192442,
+          "siblingFunctions": 9,
+          "siblingApplicable": 35,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "after_executed",
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "route_retried_job",
+            "run"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 0,
+        "budgeted": 0,
+        "changedAsked": 0,
+        "callersApplicable": 0,
+        "callersAsked": 0,
+        "changedLineCalls": 0,
+        "changedLineLeft": 0,
+        "changedFunctions": 0,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 1.3,
+          "reportBytes": 4233,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 13,
+        "budgeted": 13,
+        "changedAsked": 9,
+        "callersApplicable": 4,
+        "callersAsked": 4,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 8.7,
+          "reportBytes": 229688,
+          "siblingFunctions": 12,
+          "siblingApplicable": 48,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "release_next_blocked_job",
+            "route_retried_job",
+            "run",
+            "try_consume_rate_for_candidate",
+            "unblock_next_job"
+          ]
+        }
+      }
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 0,
+        "budgeted": 0,
+        "changedAsked": 0,
+        "callersApplicable": 0,
+        "callersAsked": 0,
+        "changedLineCalls": 0,
+        "changedLineLeft": 0,
+        "changedFunctions": 0,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 2.5,
+          "reportBytes": 6472,
+          "siblingFunctions": 2,
+          "siblingApplicable": 2,
+          "siblingsInBudget": 2,
+          "siblingNames": [
+            "download_from_params",
+            "download_to_file"
+          ]
+        }
+      },
+      "after, capped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 6.5,
+          "reportBytes": 51671,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      },
+      "before, uncapped": {
+        "applicable": 0,
+        "budgeted": 0,
+        "changedAsked": 0,
+        "callersApplicable": 0,
+        "callersAsked": 0,
+        "changedLineCalls": 0,
+        "changedLineLeft": 0,
+        "changedFunctions": 0,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 7.7,
+          "reportBytes": 45516,
+          "siblingFunctions": 4,
+          "siblingApplicable": 18,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "download_from_params",
+            "download_to_file",
+            "process_app_state_sync_task",
+            "sync_collections_batched_inner"
+          ]
+        }
+      },
+      "after, uncapped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 6.9,
+          "reportBytes": 51671,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": []
+        }
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "before, capped": {
+        "applicable": 56,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 32,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 81,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 54,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 137,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 113,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 145,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 118,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "before, capped": {
+        "applicable": 56,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 32,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 81,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 54,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 137,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 113,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 145,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 118,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "before, capped": {
+        "applicable": 55,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 32,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 80,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 54,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 136,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 113,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 144,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 118,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "before, capped": {
+        "applicable": 56,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 32,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 81,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 54,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 137,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 113,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 145,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 118,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "before, capped": {
+        "applicable": 56,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 32,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 81,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 54,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 137,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 113,
+        "callersAsked": 10,
+        "changedLineCalls": 12,
+        "changedLineLeft": 0,
+        "changedFunctions": 12,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (12 of 30)",
+          "R2": "inside (10 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 145,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 118,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": false,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "capped": {
+        "callersNotFewer": false,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "capped": {
+        "callersNotFewer": false,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "capped": {
+        "callersNotFewer": false,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "capped": {
+        "callersNotFewer": false,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    }
+  ],
+  "failed": [
+    "moltis-1064 shipped",
+    "moltis-1064 defect-A",
+    "moltis-1064 rewrite-A",
+    "moltis-1064 hidden-A",
+    "moltis-1064 defect-B"
+  ]
+}

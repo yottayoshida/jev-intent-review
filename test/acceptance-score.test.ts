@@ -111,8 +111,9 @@ test("(h) a target that is not in its file once is refused, not reported as unre
 });
 
 test("existence is counted in the text of the target's own function, whatever the tool's caps", () => {
-  // Forty-one calls before the target: the tool's listing stops at forty, the text does not.
-  const filler = Array.from({ length: 41 }, (_, i) => `    step_${i}(&x)?;`).join("\n");
+  // More calls before the target than the tool's listing reads in a function (1,000 since #38's
+  // second part; it was 40): the listing stops there, the text does not.
+  const filler = Array.from({ length: 1001 }, (_, i) => `    step_${i}(&x)?;`).join("\n");
   const source = `fn apply_chunk(x: u8) -> Result<(), E> {\n${filler}\n    prefix_data.restorer\n        .finalize(grove_version)?;\n    Ok(())\n}\n\nfn other() -> Result<(), E> {\n    finalize(grove_version)?;\n    Ok(())\n}\n`;
   assert.equal(occurrences(source, "apply_chunk", "finalize(grove_version)"), 1);
   assert.equal(occurrences(source, "other", "finalize(grove_version)"), 1);

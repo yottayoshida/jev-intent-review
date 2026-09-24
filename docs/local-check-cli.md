@@ -148,6 +148,12 @@ per requirement, and at least 10 plus what the first leaves — and in the calle
 into a function the change touched are asked first, whichever caller they are in** (ADR 0015).
 Together the two ask at most 30 calls a requirement; the siblings' 10 are apart from both.
 
+**Every function the run reads — changed, a caller one hop out, or a sibling — has its calls listed
+up to 1,000 before any budget orders them, and what that cap leaves out is counted in the notes**
+(#38). It was 40, and a call past the fortieth in its function was gone before either order saw it
+(*The calls of a function, measured*). A function whose calls the cap did cut is still not taken
+for a sibling.
+
 - **The functions the change touched** take their 20 one call per function at a time, so no single
   body takes it. Inside a function, the askable calls whose callee resolved to a function the change
   touched are asked before its other calls, and the rest follow in the order they appear. When a
@@ -623,8 +629,10 @@ iota#10136 (not run through the tool in `#36` either: a 470 MB monorepo), and wi
   counts once any call its pull request fixed is inside the budget, as condition (b) counted it:
   instruckt-tauri#9 (5 of its 5 fixed calls), grovedb#501, cce-rust#168 (2 of 3), dataprof#370 and
   agentflare#229 (2 of 7, both `std::fs::set_permissions`) joined moltis#1064, Kontor#385 and
-  grovedb#500. Still outside: whatsapp-rust#759's, which the cap of calls per function drops before
-  anything is decided; quebec#136's, whose change is inside a generic function the tool reports as
+  grovedb#500. Still outside then: whatsapp-rust#759's, which this count put down to the cap of calls
+  per function — the cause was that its function's signature ends in a `where` clause, and the listing
+  read the function as ending before its body; since #38's second part it is read and asked (*The calls
+  of a function, measured*); quebec#136's, whose change is inside a generic function the tool reports as
   touching no Rust function (both are in their file once, so they are not written differently);
   pybun#428's `entry.file_type()` and agentflare#229's four `flush()` and `sync_all()`, method calls
   the tool does not resolve outside the repository (*Functions this repository does not define*).
@@ -634,7 +642,8 @@ iota#10136 (not run through the tool in `#36` either: a 470 MB monorepo), and wi
 - **The unchanged callers' calls**: moltis#1064's and grovedb#501's can be asked about and are
   inside the budget. **Kontor#385's can be asked about and was outside the budget of 20**, so it
   was not asked; since the callers have a budget of their own (`#38`, *The callers' budget,
-  measured*) it is inside theirs. grovedb#500's is past its function's cap of 40 calls, as before.
+  measured*) it is inside theirs. grovedb#500's was past its function's cap of 40 calls; since that
+  cap is 1,000 it is listed and inside the budget (*The calls of a function, measured*).
 - The same run with the tool of `#36` (`bench/logs/precheck-vs-529b30a.json`) gives 3 of 11, and
   its count of calls inside the budget equals what that tool's `--candidates-only` printed in
   `#36` (`bench/acceptance/precheck-shipped.json`, applicable less over the budget), in all eight
@@ -767,7 +776,7 @@ the same 20 runs, capped and uncapped (`bench/logs/budget-by-origin-v1.json`,
   moltis#1064's and grovedb#500's in every version, grovedb#501's fixed call and its caller,
   Kontor#385's fixed call and **Kontor#385's unchanged caller, 22nd of 30: second in the callers'
   budget, where it was outside the shared one**. grovedb#500's unchanged caller (`apply_chunk` →
-  `finalize`), which the cap of forty calls per function drops, is 7th of 30 when the caps are
+  `finalize`), which the cap of forty calls per function dropped (until #38's second part), is 7th of 30 when the caps are
   lifted.
 - **The callers are asked no less in any run**: 16 to 26 calls on moltis#1064's shipped code,
   1 to 10 on Kontor#385, 8 to 10 on omamori; the same where they fitted before (grovedb#500 capped,
@@ -798,6 +807,64 @@ counts the calls inside the budget, which can be 30 where it was 20.
 With more callers than their budget, the calls into a changed function take all of it: a defect in a
 caller's other calls — the opposite shape the order inside a function left untested — is further
 from a question in the callers than it was.
+
+### The calls of a function, measured
+
+The cap of calls a function was 40 and is 1,000, and a function whose body opens below a line of
+its own signature — a `where` clause, a return type over several lines, `{` on a line of its own —
+has its body read (*The budget*). The second was found while checking the first: the listing took
+the line `) -> Result<…>` at the function's indent for the function's end, so the whole body was read
+as no call at all, and nothing said so — whatsapp-rust#759's fixed function, quebec#136's changed
+one and omamori `#468`'s `mutate_config` are written that way. The line the body opens on is looked
+for at the function's own indent only, so a one-line function, a doc example and a pattern in the
+parameters (`Json(Session {`) are read as before; on the `.rs` files of five of these repositories no
+function's range narrowed, and every one that widened has its body opening below its signature. Measured without a request, the tool before (`6b90087`) against the tool
+with both, on the same 20 runs as *The callers' budget, measured*
+(`bench/logs/budget-by-origin-v2.json`, `node bench/budget-by-origin.ts --before 6b90087`), with the
+command itself run set-built-only on the acceptance cases for the siblings and the time. The checks
+read the tools with the other caps as they are; the copies with every cap lifted replace the same
+constant in both, so for the cap they are one tool, and they are kept for reference.
+
+- **Four walls moved.** grovedb#500's unchanged caller (`apply_chunk` → the changed `finalize`, past
+  its fortieth call) is inside the budget in all four versions (7th of 18; 8th of 19 in hidden-A).
+  whatsapp-rust#759's fixed function is read: its changed functions have 8 askable calls where they
+  had none, and its callers 22. quebec#136's change, reported before as touching no Rust function, is
+  read too: 13 askable calls where there were none, its fixed call
+  `get_concurrency_constraint(args_ref, …)` among the ones asked. omamori `#468` reaches 13 changed
+  functions where it reached 12, on every branch: `mutate_config`'s changed call was not listed at all.
+- **Every other known target stays inside**, and no call on a changed line and no changed function
+  lost its question in any run.
+- **The check fixed beforehand that the callers are asked no less failed on moltis#1064, in all five
+  versions**: its changed functions had askable calls past their fortieth (`send_impl` has 495), so
+  they ask 18 or 19 where they asked 4 or 5, and the callers, who get 10 and what the changed
+  functions leave, ask 11 or 12 where they asked 25 or 26. The total is 30 either way; that the diff's
+  own calls go first is the split ADR 0015 chose, and the owner chose to keep it here. moltis#1064's
+  unchanged caller's call (`dispatch_command` → `handle_title`) is 20th of 30 where it was 6th
+  (21st where it was 7th in hidden-A) — second in the callers' budget, with less room than it had.
+- **The siblings move**: a function the cap cut is not taken for a sibling, and fewer are cut now,
+  while a changed function now read can make a sibling a caller. pybun#428 has 19 siblings where it
+  had 5, quebec#136 9 where it had none, whatsapp-rust#759 none where it had 2. Their budget is still
+  10, and a file read only for them has its cap counted in the notes as the others' files are.
+- **Against Jev**, three runs each on the shipped code (`bench/logs/calls-per-function-jev-v1.json`):
+  grovedb#500's unchanged caller's call was asked in every run and read as holding (`returns_error`
+  1.00), the right reading for fixed code; of 3 calls a run newly asked there, none was listed.
+  whatsapp-rust#759's fixed call was asked in every run and read as holding (1.00). Of its 19 calls a
+  run newly asked, one was listed in every run: `download_external_blobs(&mut pl, download)` in
+  `process_patch_lists`, which on a failed download marks the collection for a retry and returns
+  `Ok` with that collection's mutations empty. Three fresh subagents, shown the requirement and the
+  function and not the tool's answers, labelled it not violating two to one — all three said that
+  reading "as an error" as `Err` alone makes it one. The case's own record had set this path aside
+  when it was built (`bench/acceptance/targets-fixed.json`). It is counted as a false listing, and the
+  owner chose to ship with it written down.
+- **The command takes longer and prints more**: moltis#1064 30–34 s where it took 16–17, pybun#428
+  22 s where it took 9, quebec#136 9 s where it took 1, the rest within a few seconds; the report of
+  pybun#428 is 821 KB where it was 153 KB, most of it *Not checked*. The Action's check run keeps the
+  first 64 KB of the report, so what a long report pushes past that is in the artifact and in the
+  marks on the lines, not in the summary — as it already was for any report over 64 KB.
+
+The benches that send a whole listing to a model (`bench/candidate-set-check.ts`,
+`bench/selection-materials-check.ts`, `bench/typed-plan-check.ts`) read `enumerate` through
+`bench/code-candidates.ts`, so run again they send other listings than their logs record.
 
 ### Reading whole signatures
 
