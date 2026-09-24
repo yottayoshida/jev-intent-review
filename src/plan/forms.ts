@@ -76,6 +76,12 @@ export interface Form {
     observed: string;
     /** The assumption the observation was asked under, for this call. */
     assumed(fn: FunctionCandidate, call: CallCandidate): string;
+    /**
+     * The same case without what it says of every other operation, for the question whether the code
+     * sent settles the answer (`evidenceQuestion`, ADR 0017). "Every other operation succeeds" would
+     * read as fixing what a helper whose body was not sent does, which is what that question asks.
+     */
+    case(fn: FunctionCandidate, call: CallCandidate): string;
     /** Why an observation reads as it does, by answer. `cannot_determine` covers any other answer. */
     reading: Readonly<Record<string, string>>;
     /** Why a call is listed, assembled from the two answers. */
@@ -103,6 +109,10 @@ const failurePropagation: Form = {
     assumed: (fn, call) => {
       const c = conditionFor(fn, call);
       return `${c.setup} ${c.occurrence}, ${c.operation} returns ${c.yields}. ${c.others}`;
+    },
+    case: (fn, call) => {
+      const c = conditionFor(fn, call);
+      return `${c.setup} ${c.occurrence}, ${c.operation} returns ${c.yields}.`;
     },
     reading: {
       returns_success: "the failed call is returned to the caller as a success",
@@ -177,6 +187,7 @@ const checkBeforeAction: Form = {
     asks: "Jev, on whether the function still makes the call",
     observed: "in a case the requirement forbids it",
     assumed: (fn, call) => `\`${fn.name}\` is called in a case where the requirement says \`${named(call)}\` must not be made, because the check it asks for does not pass.`,
+    case: (fn, call) => `\`${fn.name}\` is called in a case where the requirement says \`${named(call)}\` must not be made, because the check it asks for does not pass.`,
     reading: {
       reaches_it: "the call is made in a case the requirement forbids it",
       does_not_reach: "the call is not made in a case the requirement forbids it",
@@ -195,6 +206,36 @@ export const FORMS: Readonly<Record<RequirementForm, Form>> = {
 };
 
 export const formOf = (requirement: Requirement): Form => FORMS[requirement.form ?? DEFAULT_FORM];
+
+// --- Whether the code sent settles it (ADR 0017) --------------------------------------------------
+//
+// The local check sends a function's body and nothing it calls. Asked what the function does, Jev
+// answers as if it had read what it was not sent: a decision moved into a helper whose body was not
+// sent was read as holding at 0.91–0.96 in every run (#36, #82). This question asks apart from the
+// behaviour whether what was sent is enough. It is one question for every form — it takes the form's
+// `words.case` and nothing else from the form — and is sent in the same request as the observation.
+// Its answer names are read by the rule (`review/outcome.ts`), so they are fixed here.
+
+export const EVIDENCE_KEY = "evidence_settles";
+export const SETTLED = "settled_by_code_sent";
+export const NOT_SENT = "turns_on_code_not_sent";
+
+export function evidenceQuestion(form: Form, fn: FunctionCandidate, call: CallCandidate): Questions {
+  return {
+    [EVIDENCE_KEY]: {
+      type: "choice",
+      instructions:
+        `\`code\` is the body of \`${fn.name}\`. Only what is shown here was sent: a function \`code\` calls was sent only if its body is under \`evidence.related\`, which may be empty. ` +
+        `Take this case: ${form.words.case(fn, call)} ` +
+        `In that case, can what \`${fn.name}\` does about the call \`${named(call)}\` — what it returns, or whether it goes on to make the call — be worked out from what was sent?`,
+      criteria: {
+        [SETTLED]: "Yes. Every function it turns on was sent, or what that function does in this case is fixed by the case above or by the language and its standard library.",
+        [NOT_SENT]: "No. It turns on what a function that was not sent returns or does, and the case above does not fix it.",
+        cannot_determine: "It cannot be told from what was sent whether it does.",
+      },
+    },
+  };
+}
 
 // --- Which form a sentence says (ADR 0008) --------------------------------------------------------
 //
@@ -257,10 +298,10 @@ export function chooseForm(answer: ChoiceAnswer | undefined): FormChoice {
  * asked (`QUESTIONS_HASH`). Change a criterion or a template and the fingerprint moves; change
  * nothing and it does not.
  */
-export const FORMS_FINGERPRINT: Readonly<{ forms: Record<RequirementForm, { mapping: Questions; observation: Questions }>; choice: Questions }> = (() => {
+export const FORMS_FINGERPRINT: Readonly<{ forms: Record<RequirementForm, { mapping: Questions; observation: Questions; evidence: Questions }>; choice: Questions }> = (() => {
   const fn = { id: "f", path: "src/f.rs", name: "f", startLine: 1, endLine: 1, signature: "fn f() -> Result<(), E>" } as FunctionCandidate;
   const call = { id: "src/f.rs:call-1", functionId: "f", line: 1, text: "g(x)?;", callee: "g", expression: "g(x)", expressionComplete: true } as CallCandidate;
-  const forms = Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, { mapping: form.mappingQuestion(fn, call), observation: form.observationQuestions(fn, call) }])) as Record<RequirementForm, { mapping: Questions; observation: Questions }>;
+  const forms = Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, { mapping: form.mappingQuestion(fn, call), observation: form.observationQuestions(fn, call), evidence: evidenceQuestion(form, fn, call) }])) as Record<RequirementForm, { mapping: Questions; observation: Questions; evidence: Questions }>;
   return { forms, choice: FORM_QUESTION };
 })();
 
