@@ -5,11 +5,13 @@
 // characters of the target). On real pull requests it said "does not return a Result" of functions
 // that do:
 //
-//   - moltis#1064's `dispatch_command` returns `ChannelResult<String>`, and the file says
-//     `use moltis_channels::{…, Result as ChannelResult}`;
-//   - Kontor#385's `get_decided_from_anchor` has its `-> Result<…>` on the fifth line;
-//   - grovedb#501's `set_base_root_key` returns `CostResult<(), Error>`, and the repository says
+//   - a function returns `ChannelResult<String>`, and its file says
+//     `use some_crate::{…, Result as ChannelResult}`;
+//   - a function has its `-> Result<…>` on the fifth line of its signature;
+//   - a function returns `CostResult<(), Error>`, and the repository says
 //     `type CostResult<T, E> = CostContext<Result<T, E>>`.
+//
+// (Each measured on a real pull request: docs/local-check-cli.md, *Reading whole signatures*.)
 //
 // So the return type is taken from the signature itself — past the generics and the parameter
 // list, up to the body, a `;` or `where` — and every name in it is resolved: a rename in the same

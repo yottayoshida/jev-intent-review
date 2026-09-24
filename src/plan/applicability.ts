@@ -75,7 +75,7 @@ export async function definitionsOf(discoverer: Discoverer, name: string): Promi
  * are reached; when it still is, `more` says so and nothing is settled from what was seen.
  *
  * `definedName` is not asked: it declines names that read as keywords elsewhere (`new` among
- * them), and pybun's 36 `fn new` then read as no definition at all.
+ * them), and a repository's `fn new` then read as no definition at all (36 of them in one).
  */
 export async function functionDefinitionsOf(discoverer: Discoverer, name: string): Promise<{ found: Definition[]; more: boolean; testOnly: number }> {
   const { hits, more } = await discoverer.search(`fn ${name}`);
@@ -104,10 +104,10 @@ const testOnlyFiles = new WeakMap<Discoverer, Map<string, Promise<boolean>>>();
  * Whether a file is compiled only for tests because a module file declares it
  * `#[cfg(test)] mod x;`.
  *
- * `isTestPath` reads names, and Kontor#385's `reactor_cluster_tests.rs` is source by its name: the
- * only `impl ReactorCluster` in that repository is inside it, so a call to `ReactorCluster::start`
- * would resolve to a definition that no shipped code reaches, and the budget would be spent asking
- * about test code.
+ * `isTestPath` reads names, and a file of tests whose name does not say so (a `…_tests.rs` beside
+ * source) is source by its name: when the only `impl` of a type is inside it, a call to one of its
+ * methods would resolve to a definition that no shipped code reaches, and the budget would be spent
+ * asking about test code.
  */
 export function declaredForTestsOnly(discoverer: Discoverer, path: string): Promise<boolean> {
   let answers = testOnlyFiles.get(discoverer);

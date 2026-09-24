@@ -79,9 +79,9 @@ const MAX_FUNCTIONS = 60;
 /**
  * Calls read in one function, in line order, before the rest are counted and left out (#38).
  *
- * It was 40, which dropped calls before any budget ordered them: grovedb#500's unchanged caller
- * `apply_chunk` calls the changed `finalize` past its 40th call. The largest function measured
- * with no cap had 495 (moltis#1064's `send_impl`); this is a guard against generated code, not a
+ * It was 40, which dropped calls before any budget ordered them: a measured unchanged caller calls
+ * the changed function past its 40th call. The largest function measured with no cap had 495
+ * (docs/local-check-cli.md, *The calls of a function, measured*); this is a guard against generated code, not a
  * limit a hand-written function is expected to reach. What it leaves out is still counted, and a
  * function it cut is still not taken for a sibling.
  */

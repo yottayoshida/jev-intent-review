@@ -12,7 +12,7 @@
 // second reading here would take seeds that one does not ask about, and drop ones it does.
 // Seeds are taken in this order: called on a changed line, called from more changed functions,
 // used in fewer files, then by name. Rarest first — the ordinary review's order — cannot reach a
-// shared helper, which by definition is used in many files: measured on omamori PR #476, the
+// shared helper, which by definition is used in many files: measured on a real pull request, the
 // helper came 83rd of 125.
 //
 // A sibling is a function outside tests, not already read, whose own call list has a call that

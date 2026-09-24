@@ -264,8 +264,8 @@ export const FORMS_FINGERPRINT: Readonly<{ forms: Record<RequirementForm, { mapp
 // --- Words, for `check_before_action` -------------------------------------------------------------
 //
 // A call is asked about when its name and the requirement share a word. Both sides are split the
-// same way, so `create_session` written in a requirement and `create_session(…)` in code meet, and
-// so do `createSession` and "session". The call's side is its whole path (`Session::new` gives
+// same way, so `write_record` written in a requirement and `write_record(…)` in code meet, and
+// so do `writeRecord` and "record". The call's side is its whole path (`Session::new` gives
 // `session`) and the receivers right before it (`self.sessions.insert` gives `sessions`).
 //
 // There is no five-letter floor here: `send`, `save`, `open` and `pay` are the names of actions.
@@ -305,8 +305,8 @@ export function callTerms(call: CallCandidate): Set<string> {
  * Whether two words are the same word: equal; one is the other with one letter more (`key` /
  * `keys`, `send` / `sends`); or they share their first five letters (`create` / `creation`,
  * `rewrite` / `rewritten`). A short name that merely begins a longer word is not the same word:
- * `res` is not `restore`, `gen` is not `generate` — measured on grovedb#500, `res.as_bytes()` was
- * asked about under a sentence about a restore.
+ * `res` is not `restore`, `gen` is not `generate` — measured, `res.as_bytes()` was asked about
+ * under a sentence about a restore (bench/forms/reach/).
  *
  * Five letters is a line, not a stemmer: `write` and `written` share four and do not meet, while
  * `general` and `generate` share five and do. `searchHints` is where a requirement names the exact
