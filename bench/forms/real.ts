@@ -152,8 +152,10 @@ function tableOf(dir: string, c: RealCase, log: Log): { scored: Record<string, R
   const recorded = log.conditions.files?.[c.id]?.["expected.json"];
   const names = ["expected.json", ...readdirSync(dir).filter((n) => /^expected-v\d+\.json$/.test(n))];
   const name = names.find((n) => sha256(readFileSync(join(dir, n), "utf8")) === recorded);
-  // A log that names no table here — one written by hand, or a table replaced without its
-  // `expected-v<n>.json` kept — is scored under the current one, and says so rather than passing quietly.
+  // A log whose recorded table matches none kept here — a table replaced without its
+  // `expected-v<n>.json` kept — is scored under the current one, and says so rather than passing
+  // quietly. A log that records no table at all (one written by hand, in a test) is scored under
+  // the current one without a word: it has nothing to match.
   if (name === undefined && recorded !== undefined) console.error(`${c.id}: the log's expected.json (${recorded.slice(0, 12)}…) matches no table in ${dir}; scoring under the current one`);
   return JSON.parse(readFileSync(join(dir, name ?? "expected.json"), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
 }

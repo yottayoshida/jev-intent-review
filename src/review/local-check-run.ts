@@ -3,7 +3,7 @@
 // What the ordinary run does is ask, for each place discovery offers, whether the requirement
 // holds there. Measured over ten real pull requests that never produced a VERIFIED. This path asks
 // something smaller and answerable instead, about one call at a time — **when this call fails, does
-// this function return a success?**, or **in a case the requirement forbids it, is this call still
+// this function return a success?**, or **in the case the requirement forbids it, is this call still
 // made?** Which of those is the requirement's form (`plan/forms.ts`, docs/adr/0006). The bench that
 // settled the first wording is in `docs/`; what is new here is that a run can reach it from a pull
 // request rather than from a person naming a function and a call.

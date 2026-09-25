@@ -104,7 +104,7 @@ takes `_history` / `_grove_version` / `_record`, an underscore that says the par
 a cue a reader could go by without the body (the hidden versions were measured with it before this
 probe and are not rebuilt) — so hidden and helper are told apart by the helper, not by the function.
 
-- **Version 1** (275 requests, 15 targets, three arms): arm 1 met every line — the three hidden
+- **Version 1** (at least 276 requests — the log keeps the last answer of a retried request — 15 targets, three arms): arm 1 met every line — the three hidden
   versions read as reaching the call (0.79–0.99), the three helpers as not (0.88–1.00), every
   shipped, rewrite and defect as before. Arm 2 read ten of eleven check values right and one
   wrong: grovedb#500's hidden `heights_need_rewrite`, whose body is `true`, as `false` three

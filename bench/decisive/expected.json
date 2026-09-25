@@ -1,7 +1,7 @@
 {
   "about": "#82 (ADR 0019, ADR 0020): what the rules that name the code a reading turns on, and the questions that read it, must do. Version 1 was written from the source before the implementation was run on any case and before any request. Version 2 (2026-09-25) was written after check-before-action-real-v3.json and check-before-action-v2.json were seen — the hidden versions of the two real cases still read as holding or not settled with the check's body sent, and grovedb-500's defect's mapping came back 0.53–0.54 on a packet identical to the one that read 0.61–0.62 the day before. What changed and why is under `version2`. Nothing else is changed after a result is seen; a change is a new version.",
   "version2": {
-    "adds": "the `helper` version of each case (the check moved into a helper that checks; the same call sites as `hidden`, the helper's body the only difference), scored as holding, so that a check-value question answering the same thing every time fails one of hidden and helper",
+    "adds": "the `helper` version of each case (the check moved into a helper that checks; the same call sites as `hidden`, the helper the only difference — its body, and its parameter's name, since hidden's helper takes an underscored parameter, a cue a reader could go by without the body), scored as holding, so that a check-value question answering the same thing every time fails one of hidden and helper",
     "changes": "grovedb-500's defect row is split into the observation's line (this plan's) and the outcome (recorded): its mapping question is unchanged by #82 and its reading moved between 2026-09-24 and 2026-09-25 on an unchanged packet",
     "keeps": "check1 and check2 as version 1 had them; the hidden rows as violates 3/3"
   },

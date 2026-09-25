@@ -16,6 +16,8 @@ The check in the shipped code is `if self.verify_height(grove_version).is_err()`
 | hidden | `hidden.base-helper.patch` on the base, `hidden.head.patch` on the head | `self.heights_need_rewrite(..)`, whose body returns `true` |
 | helper | `helper.base-helper.patch` on the base, `helper.head.patch` on the head | `self.heights_need_rewrite(..)`, whose body is `self.verify_height(gv).is_err()` — the same call sites as `hidden` |
 
+`expected.json` is version 2 (2026-09-25): `hidden` scored as the defect it is and `helper` as holding. Its `about` says the check's value "is read from it by a question of its own" — the two-step ADR 0020 was drafted for, which was measured and not adopted; under the words adopted the check's body goes with the packet and the case is assumed, and no value is read apart. The file is not rewritten, since the logs record its sha256; `expected-v1.json` is the table the earlier logs were scored under.
+
 The behaviour, observed before any request (`probe.patch` prints a line when `rewrite_heights` runs;
 `probe.sh`, `cargo test -p grovedb-merk --lib restore_multi_chunk_20_no_limit`, 2026-09-24). That
 test is a restore that ends with the heights right — measured: `verify_height` is `Ok` at its
