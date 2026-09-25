@@ -1,0 +1,34 @@
+{
+  "about": "#82 (ADR 0018): what the rule that names the code a reading turns on must do, written from the source before the implementation was run on any of it and before any request. The checks each case's rule finds and their definitions were read on 2026-09-25 with a throwaway script over the clones (condition position, own name meets the requirement, no capital, not the target's name; `fn <name>` outside tests and benches). Nothing here is changed after a result is seen; a change is a new version.",
+  "check1": {
+    "what": "The failure form, no request: the rule applied to every call bench/logs/acceptance-v4.json read with a confident outcome (satisfies or violates in at least one run), at that version's head.",
+    "held": [
+      { "case": "grovedb-500", "version": "hidden-A", "function": "finalize", "call": "rewrite_heights(grove_version)", "through": "step_outcome" },
+      { "case": "moltis-1064", "version": "hidden-A", "function": "generate_title_for_session", "call": "moltis_agents::title::generate_title(provider, &chat_msgs)", "through": "settle_step" }
+    ],
+    "line": "exactly these two are held, and no other confident reading of v4 is",
+    "caveat": "These cases were read while the rule was written: passing is not new evidence. Check 2 is."
+  },
+  "check2": {
+    "what": "No request: both rules applied to every call `--candidates-only` lists as askable in the shipped version of five pull requests the rules were not written on.",
+    "cases": ["whatsapp-rust-759", "pybun-428", "quebec-136", "instruckt-tauri-9", "kontor-385"],
+    "failure": "held on at most 10% of the askable calls, and every held call read by hand: its failure does pass to the repository's own function before it is returned (one that does not fails the check)",
+    "check": "with each call's own name standing in for the requirement's words (a check-before-action sentence naming that operation), held — a check with more than one definition or too long — on at most 10% of the askable calls",
+    "chance": "A rule that holds nothing passes; this check measures only holding too much. What holds is measured by checks 1 and 3."
+  },
+  "check3": {
+    "what": "check_before_action against Jev on Cloudflare, three runs of every version: bench/forms/real/ (grovedb-500, moltis-1064) and bench/forms/check-before-action/ (the constructed case). The rows are the outcome of the target call; `not checked` in any run of a row that is not expected to be held fails.",
+    "checks_read_from_source": {
+      "grovedb-500": { "shipped": ["verify_height"], "defect": [], "rewrite": ["verify_height"], "hidden": ["heights_need_rewrite"] },
+      "moltis-1064": { "shipped": [], "defect": [], "rewrite": [], "hidden": ["has_enough_messages"] },
+      "constructed": { "shipped": ["is_disabled"], "defect": ["is_disabled"], "rewrite": ["is_disabled"], "hidden": ["reject_disabled"] }
+    },
+    "rows": {
+      "grovedb-500": { "shipped": "satisfies 3/3", "defect": "violates in at least 2 of 3 (v2: 2/3; the third's mapping came back under the bar)", "rewrite": "satisfies 3/3", "hidden": "violates 3/3" },
+      "moltis-1064": { "shipped": "satisfies 3/3", "defect": "violates 3/3", "rewrite": "satisfies 3/3", "hidden": "violates 3/3" },
+      "constructed": { "shipped": "satisfies 3/3", "defect": "violates 3/3", "rewrite": "satisfies 3/3", "hidden": "violates 3/3" }
+    },
+    "why_hidden_violates": "Each hidden check does nothing: grovedb's `heights_need_rewrite` returns true, moltis's `has_enough_messages` returns true, the constructed case's `reject_disabled` returns Ok(()). Sent, the body says the call is made in the case the requirement forbids.",
+    "chance": "On main the hidden versions of moltis and the constructed case read as holding in every run, and grovedb's as not settled: all three fail. A rule that finds no check cannot make them violate; one that names too much holds a shipped version and fails."
+  }
+}
