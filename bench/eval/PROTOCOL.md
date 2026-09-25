@@ -1,4 +1,4 @@
-# The evaluation protocol, version 2 (issues #80, #88)
+# The evaluation protocol, version 3 (issues #80, #88, #89)
 
 **Through `bench/eval/run.ts`, a sealed evaluation sends no request until the line that opens it has
 been committed to main. The sealed set has no case yet, and the rule by which the second batch chooses
@@ -13,6 +13,15 @@ its own version, and the count of openings (below) runs across versions.
 repository gets a defect in a changed function (A) and, where one exists, in an unchanged caller of one (B),
 and the gates count both. Version 1 had one defect of any place. Nothing was measured under version 1.
 
+**Version 3** (#89, before any sealed case was built or opened) added a second way into the sealed
+set: the retrospective measurement's own search and rule (`RETRO.md`, "Candidates"). Its repositories
+are none of this set's — a repository on the split or in this set's `search-v1.json` is left out of its
+search (`retro/search-v1.json`), and a repository in that search is left out of this set's (rule 1) —
+they are placed by the same `sideOf` with its own salt, and a sealed retrospective case is opened by
+`run.ts --set sealed open` on a line of its own, with `#89` in the reason, once `run.ts` can open one
+measurement's repositories alone (`RETRO.md`, "Where records live"). Nothing here changed for this
+set's cases. No sealed case was built or opened under version 2.
+
 ## Files
 
 | file | what it is |
@@ -26,6 +35,7 @@ and the gates count both. Version 1 had one defect of any place. Nothing was mea
 | `run.ts` | the one entry: `--set dev` and `--set sealed` |
 | `drift.ts`, `drift/` | Jev's drift on the dev set: its questions frozen, sent again, and compared with a baseline taken on two days (`#87`, rule in `drift/README.md`). Dev only; a sealed replay is a sealed opening |
 | `BASELINE.md`, `baseline.ts`, `compare.ts` | the comparison with a frontier model (`#88`): a baseline given the same bytes in one request, scored the same way, and the gate on the difference |
+| `RETRO.md`, `retro/` | the retrospective measurement (`#89`): real defects that escaped review, their original pull requests found, requirements rewritten from what existed before the merge by isolated annotators, and the gate on the detection rate. Its sealed cases live with this set's, outside this repository |
 
 ## Dev and sealed
 
@@ -38,8 +48,9 @@ dev set may be run and read as often as work needs.
 **The sealed set is new repositories only.** It is chosen by the second batch, by this rule:
 
 1. The candidates are `search-v1.json`'s rows, in its order, skipping a repository already in
-   `pool.json`. If they run out before the stop below, one query is added and recorded in a new
-   `search-v2.json` before any of its results is read.
+   `pool.json` or in the retrospective's search (`retro/search-v1.json`, version 3). If they run out
+   before the stop below, one query is added and recorded in a new `search-v2.json` before any of its
+   results is read.
 2. A candidate is examined once its pull request or issue text is read. It is kept when (a) its
    requirement can be written as "a failure must reach the caller as an error, not as a success, an
    empty value or an absence", and (c) the behaviour difference of a defect can be observed in a
@@ -172,7 +183,7 @@ Cost is reported per case: requests, bytes sent and runs. Reused answers and tim
 [0, 0.2), [0.2, 0.4), [0.4, 0.6), [0.6, 0.8), [0.8, 1] — 0.6 is an edge — Brier score, and the ECE of
 those bins. Below 100 labelled judgments or 17 repositories in a family, the result is *insufficient
 sample size* and nothing else. The 100 rests on nothing better than a round number, and is revised,
-in version 2, once the second batch shows what a family actually gets. `metrics.ts` computes it
+in a later version, once the second batch shows what a family actually gets. `metrics.ts` computes it
 (`calibration`); the report does not call it yet — no family is near the floor — and does with the
 first sealed case.
 
