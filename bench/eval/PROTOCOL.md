@@ -1,4 +1,4 @@
-# The evaluation protocol, version 1 (issue #80)
+# The evaluation protocol, version 2 (issues #80, #88)
 
 **Through `bench/eval/run.ts`, a sealed evaluation sends no request until the line that opens it has
 been committed to main. The sealed set has no case yet, and the rule by which the second batch chooses
@@ -6,8 +6,12 @@ its cases is written here first.** Nothing stops a sealed case from being run an
 on a pull request in the sandbox, or the command by hand; that is a rule people keep (*Contamination*).
 
 Everything below was committed before any sealed result exists. Changing a metric, a threshold, the
-interval, the split or the rules makes version 2; a sealed result is compared only with results of
+interval, the split or the rules makes a new version; a sealed result is compared only with results of
 its own version, and the count of openings (below) runs across versions.
+
+**Version 2** (#88, before any sealed case was built or opened) changed rule 5 below: a sealed
+repository gets a defect in a changed function (A) and, where one exists, in an unchanged caller of one (B),
+and the gates count both. Version 1 had one defect of any place. Nothing was measured under version 1.
 
 ## Files
 
@@ -51,8 +55,13 @@ dev set may be run and read as often as work needs.
    allows, nor that the salt is the *first* merge commit with the verdicts rather than a later one —
    the rule rests on merging through pull requests and on the batch's own record of its commit. Three in four go to sealed because dev
    already has more than ten repositories. `build-pool.ts` keeps these entries when it rebuilds the split.
-5. Every sealed repository gets a `defect`, a `shipped` and a `rewrite` version, so recall and false
-   listing have the same repositories.
+5. Every sealed repository gets a `defect-A` — the defect in a function the pull request changed — and,
+   where a function the pull request did not change calls one it did, a `defect-B` in that caller; one
+   `shipped`, and a `rewrite` for each defect's target (`rewrite-A`, `rewrite-B`): at most five versions.
+   Places A and B are those of `bench/acceptance/README.md`. **The gates below count every version of
+   both places** (owner, 2026-09-25): the tool says it looks beyond the diff, and B is where that is
+   tested — which makes the gates stricter than version 1's, since B is where the tool has been weakest
+   (#36). The frontier-model comparison (`BASELINE.md`) reads the two places apart as well as together.
 6. Stop when sealed holds 17 repositories and 17 requirements, or when 400 candidates have been
    examined; at 400, stop and say how far it got. From the pass rates so far — (a) about 27 %, (c) two
    of four — 17 sealed repositories need about 200 to 300 candidates, and `search-v1.json` has 238.
