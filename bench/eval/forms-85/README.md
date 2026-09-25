@@ -71,3 +71,17 @@ swallowing a failure, a form whose sentence forbids swallowing is expected to be
 it is weak evidence (the plan's second review). It measures whether a sentence can be written, not
 whether the tool reaches the call; that is measured with cases, later. Falling short of it is written in
 the ADR as "not even the sentences increased".
+
+## Result (2026-09-25)
+
+`node bench/eval/forms-85/count.ts` on `../forms-85.json`:
+
+- main (Rust, `swallows_as_success`): 37 rows, 23 repositories — (a) 21 (56.8 %, mean 52.7 %); (a) or (a′) 28 (75.7 %, mean 64.9 %)
+- side (failure handling): 67 rows, 35 repositories — (a) 32 (47.8 %, mean 48.5 %); (a) or (a′) 43 (64.2 %, mean 56.4 %)
+- the line: crossed (a record, not a gate)
+- agreement: (a) unanimous 72, two to one 18, split 1; (a′) unanimous 81, two to one 10; the annotators' (a) and `verdicts.a` agree on 57 of 70
+
+The six annotators ran as subagents in one directory, which one of them (an (a) annotator) used for its
+working notes. Every other annotator's quotes match those notes on 14 to 31 rows of 91 and its answers
+on 72 to 78: what quoting the same sentence of a pull request would give, and not a proof that none
+read the notes.

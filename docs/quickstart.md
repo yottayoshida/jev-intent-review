@@ -7,8 +7,8 @@ it does not, first:
 >   runs, and no call is read.
 > - **Requirements in two shapes.** A requirements section (`## Acceptance criteria`, `## Done when`, …)
 >   or a `Property:` paragraph, in the pull request or an issue it closes. Prose is not read.
-> - **Two things it can ask of a call**: how a failure must reach the caller, or that a check passes
->   before an action.
+> - **Two things it can ask of a call** of a requirement in a pull request or an issue: how a failure
+>   must reach the caller, or that a check passes before an action. (A third is for specs only.)
 > - **No verdict.** A call *worth checking* is a candidate for a person to look at, not a failing test.
 > - **Pull requests from forks are not reviewed**: GitHub gives them no secrets.
 

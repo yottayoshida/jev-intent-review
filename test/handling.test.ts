@@ -76,3 +76,13 @@ test("a function that returns nothing is asked about when its callee can fail, a
   const failure = await FORMS.failure_propagation.askable(context("write_entry"));
   assert.equal(!failure.ok && failure.kind, "target_not_result");
 });
+
+test("the probe's log meets both of its lines, as docs/local-check-cli.md says", async () => {
+  const { score } = await import("../bench/handling/probe.ts");
+  const plan = JSON.parse(readFileSync(new URL("../bench/handling/probe.json", import.meta.url), "utf8"));
+  const log = JSON.parse(readFileSync(new URL("../bench/logs/handling-probe-v1.json", import.meta.url), "utf8"));
+  const lines = score(plan, log.records);
+  assert.ok(lines.some((l) => l.startsWith("pairs: PASS")), lines.join("\n"));
+  assert.ok(lines.some((l) => l.startsWith("no false listing: PASS")), lines.join("\n"));
+  assert.equal(log.records.filter((r: { answer?: unknown }) => r.answer).length, plan.targets.length * plan.runs, "every request answered");
+});

@@ -54,7 +54,10 @@ The default, failure_propagation: whether the requirement requires that a failur
 not reach the caller as a success, and what the function returns when it does. The other,
 check_before_action: whether the requirement requires a check to pass before the call, and
 whether the function still makes the call in the case the requirement forbids it, with the
-bodies of the checks named above the call sent along. A spec names a
+bodies of the checks named above the call sent along. A third, failure_handling, used only
+when a spec names it: whether the requirement requires that a failure of the call not be turned
+silently into a success, and what the function does with the failure — returns it, leaves a
+trace of it, or goes on without one — in any function whose callee returns a Result. A spec names a
 requirement's form; one read from an issue, a pull request, --intent or --intent-file is first
 asked of Jev, once, which form its sentence says, and is read under that form when Jev is sure
 (0.6), else under the default. One rule reads each call as holding, worth checking, not

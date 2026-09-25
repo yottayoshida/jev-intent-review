@@ -1,0 +1,3645 @@
+{
+  "what": "#85: could each labelled row's requirement be written in failure_propagation (a) or failure_handling (b); three annotators each, fixed by README.md",
+  "rows": [
+    {
+      "id": "yottayoshida/omamori#556",
+      "label": "records_or_handles_locally",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a line whose chain_version is unrecognized and whose seq is not a number fails the peek, falls through to result.torn_lines += 1, and verification continues as if the line were a torn write"
+          },
+          {
+            "answer": "yes",
+            "quote": "A typed struct fails as a whole when any field it names has the wrong JSON type, so a line whose chain_version is unrecognized and whose seq is not a number fails the peek, falls through to result.torn_lines += 1, and verification continues as if the line were a torn write."
+          },
+          {
+            "answer": "yes",
+            "quote": "a line whose chain_version is unrecognized and whose seq is not a number fails the peek, falls through to result.torn_lines += 1, and verification continues as if the line were a torn write."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a line whose chain_version is unrecognized and whose seq is not a number fails the peek, falls through to result.torn_lines += 1, and verification continues as if the line were a torn write."
+          },
+          {
+            "answer": "yes",
+            "quote": "The second line is the first with one field's type changed. Both are shapes a future chain format could produce... | `{\"chain_version\":999,\"seq\":\"seven\",\"entry_hash\":\"x\"}` | exit 0, \"no entries to verify.\" |"
+          },
+          {
+            "answer": "yes",
+            "quote": "so a line whose `chain_version` is unrecognized **and** whose `seq` is not a number fails the peek, falls through to `result.torn_lines += 1`, and verification continues as if the line were a torn write."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#461",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "unclear",
+        "votes": [
+          {
+            "answer": "unclear",
+            "quote": "Left open — this issue exists so the concern isn't lost, not to prescribe the fix."
+          },
+          {
+            "answer": "no",
+            "quote": "the next verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace."
+          },
+          {
+            "answer": "yes",
+            "quote": "If omamori audit verify reports exit 4 (an entry with an unrecognized chain_version present), and the retention-days auto-prune trigger fires and happens to prune past that entry, the next verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the next verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace."
+          },
+          {
+            "answer": "yes",
+            "quote": "Auto-prune silently \"heals\" an unverifiable chain state... the fact that a chunk of the chain was once unverifiable leaves no trace."
+          },
+          {
+            "answer": "yes",
+            "quote": "a store reporting exit 4 before an auto-prune reported exit 0 after it"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#514",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The predicate it added asks whether the audit log can be read. One state gets the reassuring sentence anyway and should not."
+          },
+          {
+            "answer": "no",
+            "quote": "The predicate it added asks whether the audit log can be read. One state gets the reassuring sentence anyway and should not."
+          },
+          {
+            "answer": "no",
+            "quote": "The predicate it added asks whether the audit log can be read. One state gets the reassuring sentence anyway and should not."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The predicate it added asks whether the audit log can be read. One state gets the reassuring sentence anyway and should not."
+          },
+          {
+            "answer": "no",
+            "quote": "The predicate it added asks whether the audit log can be **read**. One state gets the reassuring sentence anyway and should not."
+          },
+          {
+            "answer": "no",
+            "quote": "the prompt prints: All bypassed executions will be logged to the audit chain. and every append then fails."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#490",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "verify_chain writes the HWM with let _ = write_hwm(...), and the CLI then tells the operator it happened"
+          },
+          {
+            "answer": "yes",
+            "quote": "write_hwm refuses a symlinked path... Pinned by write_hwm_rejects_symlink. The error is discarded."
+          },
+          {
+            "answer": "yes",
+            "quote": "3. write_hwm refuses a symlinked path... The error is discarded. 4. The CLI prints \"It has been reset\" and exits 3 — every run, forever, because nothing was reset."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "write_hwm refuses a symlinked path... The error is discarded... the CLI prints \"It has been reset\" and exits 3 — every run, forever, because nothing was reset."
+          },
+          {
+            "answer": "yes",
+            "quote": "`verify_chain` writes the HWM with `let _ = write_hwm(...)`... **The error is discarded.** ... The CLI prints \"It has been reset\" and exits 3 — every run, forever, because nothing was reset."
+          },
+          {
+            "answer": "yes",
+            "quote": "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521`... The error is discarded."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#483",
+      "label": "falls_back_or_degrades",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The obvious fix is to skip the append, the way the rotation path does. That was evaluated and rejected"
+          },
+          {
+            "answer": "no",
+            "quote": "So the fix is not \"make everyone match rotation\". It is a decision about the recording policy itself, and it needs its own design pass."
+          },
+          {
+            "answer": "no",
+            "quote": "chmod 700. omamori audit verify returns exit 2, and keeps returning exit 2. ADR-0007 forbids rewriting existing entries, so that one line pins the store at cannot-verify permanently"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "SECURITY.md's Forensic semantics states \"the absence of a row in those provider paths implies Allow\". Dropping deny records inverts what a reader concludes from a missing row."
+          },
+          {
+            "answer": "no",
+            "quote": "`omamori config add ...` succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`... Restore `chmod 700`. `omamori audit verify` returns exit 2, and keeps returning exit 2."
+          },
+          {
+            "answer": "no",
+            "quote": "So the fix is not \"make everyone match rotation\". It is a decision about the recording policy itself, and it needs its own design pass."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#506",
+      "label": "propagates",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          },
+          {
+            "answer": "no",
+            "quote": "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          },
+          {
+            "answer": "no",
+            "quote": "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          },
+          {
+            "answer": "yes",
+            "quote": "#470 established that an *authentication* failure must not suppress it, and fixed the two halt states inside `verify_chain`... Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          },
+          {
+            "answer": "no",
+            "quote": "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#487",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "omamori: no audit secret found — nothing to rotate — reads as \"there was nothing to do\""
+          },
+          {
+            "answer": "yes",
+            "quote": "Unavailable.needs_attention() returns false, which is what keeps the line out of [Risk signals]."
+          },
+          {
+            "answer": "no",
+            "quote": "So an operator following the printed text concludes \"the rotation failed but nothing is broken\". The store is one append away from a permanent cannot-verify."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "So an operator following the printed text concludes \"the rotation failed but nothing is broken\". The store is one append away from a permanent cannot-verify."
+          },
+          {
+            "answer": "yes",
+            "quote": "an operator following the printed text concludes \"the rotation failed but nothing is broken\"... `omamori doctor` risk signals stay **quiet**."
+          },
+          {
+            "answer": "yes",
+            "quote": "An interrupted key rotation is reported as 'nothing to rotate' and doctor stays quiet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#391",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Canonicalize the parent directory chain (walking up until an existing ancestor is found) rather than requiring the full path to exist"
+          },
+          {
+            "answer": "no",
+            "quote": "canonicalize() fails entirely (not partially) and the code treats a canonicalize failure as \"we'll catch it at runtime\": // If canonicalize fails (path doesn't exist yet), we'll catch it at runtime; true"
+          },
+          {
+            "answer": "no",
+            "quote": "A nonexistent subdirectory under a blocked prefix (e.g. /etc/made-up-name) silently passes this check, because canonicalize() fails entirely (not partially) and the code treats a canonicalize failure as \"we'll catch it at runtime\""
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the code treats a canonicalize failure as \"we'll catch it at runtime\": true"
+          },
+          {
+            "answer": "yes",
+            "quote": "```rust\n// If canonicalize fails (path doesn't exist yet), we'll catch it at runtime\ntrue\n```"
+          },
+          {
+            "answer": "yes",
+            "quote": "the code treats a canonicalize failure as \"we'll catch it at runtime\": true"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#114",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "update_baseline_silent() lib.rs:580 | Explicitly ignores errors | Baseline drift undetected"
+          },
+          {
+            "answer": "yes",
+            "quote": "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+          },
+          {
+            "answer": "yes",
+            "quote": "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+          },
+          {
+            "answer": "yes",
+            "quote": "Several error paths silently swallow failures, potentially masking tampering or misconfiguration... Remove `_silent` pattern — all failures logged with context."
+          },
+          {
+            "answer": "yes",
+            "quote": "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#111",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "malformed input → raw string → allowed ... Malformed JSON → exit 2 (block) with stderr warning"
+          },
+          {
+            "answer": "yes",
+            "quote": "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open). Security tools should deny on parse failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "the current implementation falls through to allow (fail-open). Security tools should deny on parse failure... Malformed JSON → exit 2 (block) with stderr warning."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open)."
+          },
+          {
+            "answer": "yes",
+            "quote": "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open). Security tools should deny on parse failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open)."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#99",
+      "label": "propagates",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "verify_chain() maps all read_secret() errors to AuditError::SecretUnavailable, discarding the specific symlink information"
+          },
+          {
+            "answer": "no",
+            "quote": "verify_chain() maps all read_secret() errors to AuditError::SecretUnavailable, discarding the specific symlink information."
+          },
+          {
+            "answer": "no",
+            "quote": "verify_chain() maps all read_secret() errors to AuditError::SecretUnavailable, discarding the specific symlink information. The CLI then shows only \"HMAC secret unavailable\" with no indication of symlink attack."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "verify_chain() maps all read_secret() errors to AuditError::SecretUnavailable, discarding the specific symlink information. The CLI then shows only \"HMAC secret unavailable\" with no indication of symlink attack."
+          },
+          {
+            "answer": "no",
+            "quote": "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information. The CLI then shows only \"HMAC secret unavailable\" with no indication of symlink attack."
+          },
+          {
+            "answer": "no",
+            "quote": "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#75",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "JSON パースに失敗すると allow レスポンスを返す ... malformed payload に対して deny を返す"
+          },
+          {
+            "answer": "yes",
+            "quote": "omamori cursor-hook は stdin の JSON パースに失敗すると allow レスポンスを返す。セキュリティ境界は fail-close が原則であり、parse failure 時に保護が無効化されるのは危険。"
+          },
+          {
+            "answer": "yes",
+            "quote": "omamori cursor-hook は stdin の JSON パースに失敗すると allow レスポンスを返す。セキュリティ境界は fail-close が原則... malformed payload に対して deny を返す"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "omamori cursor-hook は stdin の JSON パースに失敗すると allow レスポンスを返す。セキュリティ境界は fail-close が原則であり、parse failure 時に保護が無効化されるのは危険。"
+          },
+          {
+            "answer": "yes",
+            "quote": "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。セキュリティ境界は fail-close が原則であり、parse failure 時に保護が無効化されるのは危険。"
+          },
+          {
+            "answer": "yes",
+            "quote": "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#60",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "if let Ok(exe) = std::env::current_exe() { ... } // No else — silent skip"
+          },
+          {
+            "answer": "no",
+            "quote": "Add eprintln!(\"omamori warning: ...\") in the Err branch."
+          },
+          {
+            "answer": "no",
+            "quote": "if let Ok(exe) = std::env::current_exe() { // ... } // No else — silent skip"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "The user gets no warning that the cursor snippet was not updated."
+          },
+          {
+            "answer": "yes",
+            "quote": "if let Ok(exe) = std::env::current_exe() {\n    // ...\n}\n// No else — silent skip\n... The user gets no warning that the cursor snippet was not updated."
+          },
+          {
+            "answer": "yes",
+            "quote": "if `std::env::current_exe()` fails, the cursor hooks snippet is silently not regenerated... The user gets no warning that the cursor snippet was not updated."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#323",
+      "label": "falls_back_or_degrades",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Make state_file_path() and staging_dir() return Option/error and refuse to operate when HOME is unavailable ... returning None is fail-closed"
+          },
+          {
+            "answer": "no",
+            "quote": "break-glass: no state file = no bypass — already the safe default, so returning None is fail-closed."
+          },
+          {
+            "answer": "no",
+            "quote": "When HOME is unset, staging_dir() and state_file_path() fall back to \".\" — scattering security-state files into the process CWD"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "When HOME is unset, staging_dir() and state_file_path() fall back to \".\" — scattering security-state files into the process CWD (typically the AI agent's project directory)."
+          },
+          {
+            "answer": "yes",
+            "quote": "`staging_dir()` and `state_file_path()` fall back to \"...\" ... Correct precedent — `heartbeat_path()`... returns `None` when HOME absent. The codebase is inconsistent."
+          },
+          {
+            "answer": "yes",
+            "quote": "Make `state_file_path()` and `staging_dir()` return `Option`/error and refuse to operate when HOME is unavailable, matching `heartbeat_path()`"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#182",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "完全未知 tool + unknown input structure → stderr に1行 hint、audit 記録、allow。これは従来の silent fail-open より observable、security は厳密には強化されない"
+          },
+          {
+            "answer": "no",
+            "quote": "これは従来の silent fail-open より観察可能、security は厳密には強化されないが visibility は大幅改善 ... 該当なし → observable fail-open ... allow()"
+          },
+          {
+            "answer": "no",
+            "quote": "HookInput::UnknownTool branch が未認識 tool 名を受け取ると無条件で allow 応答を返している。"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "未認識 tool 名を受け取ると無条件で allow 応答を返している。Layer 2 protection が forward-compat fail-open として事実上無効化される。"
+          },
+          {
+            "answer": "yes",
+            "quote": "`HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している... observable fail-open: stderr hint 1 行... audit log に UnknownTool event 記録（全件、漏らさない）"
+          },
+          {
+            "answer": "yes",
+            "quote": "`HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#271",
+      "label": "logs_or_warns",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)"
+          },
+          {
+            "answer": "no",
+            "quote": "Every block event logs: omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)"
+          },
+          {
+            "answer": "no",
+            "quote": "Codex shell session does not have ~/.omamori/shim before /usr/bin in PATH... Layer 1 (PATH shim) defense is bypassed in Codex environment."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Layer 1 (PATH shim) defense is bypassed in Codex environment."
+          },
+          {
+            "answer": "no",
+            "quote": "Every block event logs:\n```\nomamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)\n```"
+          },
+          {
+            "answer": "no",
+            "quote": "Every block event logs: omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#387",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "there is no corresponding omamori-audit-* Phase 2 backstop rule in default_rules()"
+          },
+          {
+            "answer": "no",
+            "quote": "there is no corresponding omamori-audit-* Phase 2 backstop rule in default_rules() — confirmed via grep ... returning zero matches."
+          },
+          {
+            "answer": "no",
+            "quote": "there is no corresponding omamori-audit-* Phase 2 backstop rule in default_rules()"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "omamori audit key rotate has the same class of gap: ... there is no corresponding omamori-audit-* Phase 2 backstop rule in default_rules()."
+          },
+          {
+            "answer": "no",
+            "quote": "there is no corresponding `omamori-audit-*` Phase 2 backstop rule in `default_rules()`... `env -i omamori audit key rotate` would rotate the HMAC audit-signing key while defeating the runtime env-var guard"
+          },
+          {
+            "answer": "no",
+            "quote": "there is no corresponding `omamori-audit-*` Phase 2 backstop rule in `default_rules()`"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oxidezap/whatsapp-rust#759",
+      "label": "logs_or_warns",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently"
+          },
+          {
+            "answer": "yes",
+            "quote": "download_external_blobs logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations — and the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently."
+          },
+          {
+            "answer": "yes",
+            "quote": "download_external_blobs logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations — and the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently."
+          },
+          {
+            "answer": "yes",
+            "quote": "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations — and the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently."
+          },
+          {
+            "answer": "yes",
+            "quote": "download_external_blobs logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations — and the caller then advanced and persisted the collection version, so the blob's mutations were silently dropped and lost permanently."
+          }
+        ]
+      }
+    },
+    {
+      "id": "moltis-org/moltis#1064",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning label: null on failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning label: null on failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+          }
+        ]
+      }
+    },
+    {
+      "id": "KontorProtocol/Kontor#385",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent filter_map/ok()/unwrap_or_default() paths ... with explicit error propagation and contextual anyhow messages"
+          },
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent filter_map/ok()/unwrap_or_default() paths in the indexer reactor/consensus code with explicit error propagation and contextual anyhow messages, so failures ... no longer get silently dropped."
+          },
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent filter_map/ok()/unwrap_or_default() paths in the indexer reactor/consensus code with explicit error propagation and contextual anyhow messages, so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent filter_map/ok()/unwrap_or_default() paths in the indexer reactor/consensus code with explicit error propagation and contextual anyhow messages, so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped."
+          },
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent `filter_map`/`ok()`/`unwrap_or_default()` paths in the indexer reactor/consensus code with **explicit error propagation and contextual `anyhow` messages**, so failures... no longer get silently dropped."
+          },
+          {
+            "answer": "yes",
+            "quote": "Replaces several silent `filter_map`/`ok()`/`unwrap_or_default()` paths in the indexer reactor/consensus code with explicit error propagation and contextual `anyhow` messages, so failures... no longer get silently dropped."
+          }
+        ]
+      }
+    },
+    {
+      "id": "Naoray/instruckt-tauri#9",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Replace unwrap_or_default() on JSON serialization in MCP server handlers with proper error propagation ... so clients receive an error response instead of empty content"
+          },
+          {
+            "answer": "yes",
+            "quote": "Replace unwrap_or_default() on JSON serialization in MCP server handlers with proper error propagation via McpError::internal_error, so clients receive an error response instead of empty content"
+          },
+          {
+            "answer": "yes",
+            "quote": "Replace unwrap_or_default() on JSON serialization in MCP server handlers with proper error propagation via McpError::internal_error, so clients receive an error response instead of empty content"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Replace unwrap_or_default() on JSON serialization in MCP server handlers with proper error propagation via McpError::internal_error, so clients receive an error response instead of empty content"
+          },
+          {
+            "answer": "yes",
+            "quote": "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content"
+          },
+          {
+            "answer": "yes",
+            "quote": "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dashpay/grovedb#501",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the call to self.merk.set_base_root_key(...) returned a CostResult<(), Error> that was silently discarded via let _ ="
+          },
+          {
+            "answer": "yes",
+            "quote": "the call to self.merk.set_base_root_key(...) returned a CostResult<(), Error> that was silently discarded via let _ =. If set_base_root_key fails ..., the restorer would continue operating on corrupt state without any indication of failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "the call to self.merk.set_base_root_key(...) returned a CostResult<(), Error> that was silently discarded via let _ = ... This fix extracts the inner Result via .value and propagates errors with ?"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "If set_base_root_key fails (e.g., due to a storage error), the restorer would continue operating on corrupt state without any indication of failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "the call to `self.merk.set_base_root_key(...)` returned a `CostResult<(), Error>` that was silently discarded via `let _ =`. If `set_base_root_key` fails..., the restorer would continue operating on corrupt state without any indication of failure."
+          },
+          {
+            "answer": "yes",
+            "quote": "If `set_base_root_key` fails (e.g., due to a storage error), the restorer would continue operating on corrupt state without any indication of failure."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dashpay/grovedb#500",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "three let _ = patterns that silently discarded errors from load_base_root and rewrite_heights. Replace all three ... with proper error propagation"
+          },
+          {
+            "answer": "yes",
+            "quote": "Restorer::finalize() ... had three let _ = patterns that silently discarded errors ... failures during finalization ... are reported to callers instead of being swallowed, preventing silent data corruption."
+          },
+          {
+            "answer": "yes",
+            "quote": "Restorer::finalize() in merk/src/merk/restore.rs had three let _ = patterns that silently discarded errors from load_base_root and rewrite_heights... failures during finalization ... are reported to callers instead of being swallowed"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed, preventing silent data corruption."
+          },
+          {
+            "answer": "yes",
+            "quote": "`Restorer::finalize()`... had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`... failures during finalization... are reported to callers instead of being swallowed, preventing silent data corruption."
+          },
+          {
+            "answer": "yes",
+            "quote": "This ensures that failures during finalization (loading the root node or rewriting tree heights) are reported to callers instead of being swallowed, preventing silent data corruption."
+          }
+        ]
+      }
+    },
+    {
+      "id": "TyRoXx/NonlocalityOS#433",
+      "label": "cannot_label",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          },
+          {
+            "answer": "unclear",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          },
+          {
+            "answer": "no",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          },
+          {
+            "answer": "no",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          },
+          {
+            "answer": "no",
+            "quote": "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+          }
+        ]
+      }
+    },
+    {
+      "id": "iotaledger/iota#10136",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "we just return None [for BCS serialization failures]. Investigate if it is necessary to propagate useful information to the user instead of returning None."
+          },
+          {
+            "answer": "yes",
+            "quote": "Properly propagates errors instead of silently swallowing them with .ok()"
+          },
+          {
+            "answer": "yes",
+            "quote": "Properly propagates errors instead of silently swallowing them with .ok()"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "We have lots of silent data absence in current design for other endpoints without propagating errors, like for the BCS serialization failures for all of our endpoints we just return None."
+          },
+          {
+            "answer": "yes",
+            "quote": "Properly propagates errors instead of silently swallowing them with `.ok()`... like for the BCS serialization failures for all of our endpoints we just return `None`."
+          },
+          {
+            "answer": "yes",
+            "quote": "We have lots of silent data absence in current design for other endpoints without propagating errors, like for the BCS serialization failures for all of our endpoints we just return `None`."
+          }
+        ]
+      }
+    },
+    {
+      "id": "armaxri/termiHub#2751",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "fireAndForget(promise, reason, level?) ... attaches a .catch that routes any rejection to the LogViewer ... and returns void"
+          },
+          {
+            "answer": "yes",
+            "quote": "attaches a .catch that routes any rejection to the LogViewer (WARN by default, ERROR for leak-risk teardown paths) tagged with the caller-supplied reason, and returns void. A best-effort async call is now auditable instead of an untraceable empty catch."
+          },
+          {
+            "answer": "no",
+            "quote": "attaches a .catch that routes any rejection to the LogViewer (WARN by default, ERROR for leak-risk teardown paths) tagged with the caller-supplied reason, and returns void."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "A best-effort async call is now auditable instead of an untraceable empty catch."
+          },
+          {
+            "answer": "yes",
+            "quote": "finishes the \"no silent failures\" cleanup by handling the remaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites... A best-effort async call is now auditable instead of an untraceable empty catch."
+          },
+          {
+            "answer": "yes",
+            "quote": "finishes the \"no silent failures\" cleanup by handling the remaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites"
+          }
+        ]
+      }
+    },
+    {
+      "id": "armaxri/termiHub#2732",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a .catch(() => {}) ... made a failed destructive action look like it succeeded. Failures now route through the new frontendError ERROR channel ... and a user-visible toast.error"
+          },
+          {
+            "answer": "yes",
+            "quote": "Failures now route through the new frontendError ERROR channel (LogViewer, added in #2727) and a user-visible toast.error, and the optimistic UI is reconciled so the user is never misled that a still-live connection is gone."
+          },
+          {
+            "answer": "no",
+            "quote": "Failures now route through the new frontendError ERROR channel (LogViewer, added in #2727) and a user-visible toast.error, and the optimistic UI is reconciled"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a .catch(() => {}) (often paired with an optimistic row removal) made a failed destructive action look like it succeeded. Failures now route through the new frontendError ERROR channel ... and a user-visible toast.error"
+          },
+          {
+            "answer": "yes",
+            "quote": "a `.catch(() => {})` (often paired with an optimistic row removal) made a failed destructive action look like it succeeded. Failures now route through the new `frontendError` ERROR channel... **and** a user-visible `toast.error`"
+          },
+          {
+            "answer": "yes",
+            "quote": "a `.catch(() => {})` (often paired with an optimistic row removal) made a failed destructive action look like it succeeded."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ratazzi/quebec#136",
+      "label": "falls_back_or_degrades",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes"
+          },
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes"
+          },
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes"
+          },
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs. Propagate these errors before enqueue hooks or database writes"
+          },
+          {
+            "answer": "yes",
+            "quote": "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs."
+          }
+        ]
+      }
+    },
+    {
+      "id": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping the entry ... Now propagated as a BuildCacheError::Read"
+          },
+          {
+            "answer": "no",
+            "quote": "Never leave catch/if let Ok blocks empty; at minimum log the error, and where user-facing, surface it as a diagnostic with a hint."
+          },
+          {
+            "answer": "yes",
+            "quote": "entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Multiple modules silently discard error information instead of propagating it or logging it, making failures invisible and harder to diagnose."
+          },
+          {
+            "answer": "yes",
+            "quote": "entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping the entry from the build cache-key hash. Now propagated as a BuildCacheError::Read."
+          },
+          {
+            "answer": "yes",
+            "quote": "entry.file_type() failures in collect_inputs_recursive were mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping the entry from the build cache-key hash."
+          }
+        ]
+      }
+    },
+    {
+      "id": "beboite/boite-legacy#187",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Twelve commits off master, from a full read of the repo. Each one is a thing that was measurably wrong, not a preference."
+          },
+          {
+            "answer": "no",
+            "quote": "Twelve commits off master, from a full read of the repo. Each one is a thing that was measurably wrong, not a preference."
+          },
+          {
+            "answer": "no",
+            "quote": "may_create_project_at and may_create_project_in canonicalized the candidate path but compared it against a root that was left textual, so the two sides were not the same kind of string... a project under a perfectly legitimate root was refused."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Fix what the audit found: cross-platform project roots, swallowed errors, advisory gate"
+          },
+          {
+            "answer": "no",
+            "quote": "Twelve commits off `master`, from a full read of the repo... `may_create_project_at` and `may_create_project_in` canonicalized the candidate path but compared it against a root that was left textual... [plus] `chore(i18n)`... `chore(deps)`... `ci`... `build(docker)`"
+          },
+          {
+            "answer": "no",
+            "quote": "Twelve commits off `master`, from a full read of the repo. Each one is a thing that was measurably wrong, not a preference."
+          }
+        ]
+      }
+    },
+    {
+      "id": "Diogo-Esteves/polyVocal#60",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Three related audio-pipeline bugs."
+          },
+          {
+            "answer": "no",
+            "quote": "fix: audio pipeline drops speech, buffers unboundedly, swallows errors — three related audio-pipeline bugs (#45 inference blocking the consumer task, #47 unbounded segment buffering, #49 swallowed callback errors)."
+          },
+          {
+            "answer": "no",
+            "quote": "The channel holds ~1s of audio and the producer uses try_send, so speech spoken while a previous utterance was transcribing was silently dropped."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Three related audio-pipeline bugs."
+          },
+          {
+            "answer": "no",
+            "quote": "**#47 — Speech segments had no length cap.** `SpeechSegmenter` buffered until trailing silence arrived, so a speaker who never paused grew the buffer and the emit latency without bound."
+          },
+          {
+            "answer": "no",
+            "quote": "Three related audio-pipeline bugs."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cavi-ai/bobby-browser#163",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Continuation of the gap audit (#160, #161). Six findings, each verified in source before fixing"
+          },
+          {
+            "answer": "no",
+            "quote": "fix: six more gap-audit findings (validation stub, leak paths, swallowed errors) — Continuation of the gap audit (#160, #161). Six findings, each verified in source before fixing"
+          },
+          {
+            "answer": "no",
+            "quote": "the session was unregistered before its worker was released, so a failed release leaked the browser with no API handle left. Release runs first; on failure the session stays registered for retry."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Continuation of the gap audit (#160, #161). Six findings, each verified in source before fixing"
+          },
+          {
+            "answer": "no",
+            "quote": "Six findings, each verified in source before fixing: **vision-proxy `validate_extract` was a no-op stub**... **checkpoint-store lock map growth**... **firefox-companion prompt/cookie hygiene**"
+          },
+          {
+            "answer": "no",
+            "quote": "Continuation of the gap audit (#160, #161). Six findings, each verified in source before fixing"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dolang-org/dolang#337",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "unclear",
+        "votes": [
+          {
+            "answer": "unclear",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          },
+          {
+            "answer": "yes",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          },
+          {
+            "answer": "unclear",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          },
+          {
+            "answer": "yes",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          },
+          {
+            "answer": "yes",
+            "quote": "Avoid swallowing error output from unknown docker errors"
+          }
+        ]
+      }
+    },
+    {
+      "id": "TumbleOwlee/ferrowl#127",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "An implementation audit (issue #117) surfaced three small robustness/hygiene clusters: non-exhaustive matching on an async shutdown path, backend start/stop failures discarded in the module views, and over-broad #[allow(dead_code)] masking"
+          },
+          {
+            "answer": "yes",
+            "quote": "OC-R-102 — an OCPP view stop/(re)start failure shall be reported at Error, not discarded. ... a failure of that stop or start shall be reported in the module message log at Error level rather than silently discarded."
+          },
+          {
+            "answer": "no",
+            "quote": "a failure of that stop or start shall be reported in the module message log at Error level rather than silently discarded."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a failure of that stop or start shall be reported in the module message log at Error level rather than silently discarded."
+          },
+          {
+            "answer": "yes",
+            "quote": "**OC-R-102** — an OCPP view stop/(re)start failure shall be reported at Error, not discarded... Two new requirements (C2 is observable; C1/C3 are non-normative)"
+          },
+          {
+            "answer": "yes",
+            "quote": "OC-R-102 — an OCPP view stop/(re)start failure shall be reported at Error, not discarded."
+          }
+        ]
+      }
+    },
+    {
+      "id": "MarshalX/python-libipld#117",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Fix decode error handling: PyList leak, unbounded preallocation, and swallowed errors in decode_dag_cbor_multi"
+          },
+          {
+            "answer": "no",
+            "quote": "Fix decode error handling: PyList leak, unbounded preallocation, and swallowed errors in decode_dag_cbor_multi"
+          },
+          {
+            "answer": "unclear",
+            "quote": "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Fix decode error handling: PyList leak, unbounded preallocation, and swallowed errors in decode_dag_cbor_multi"
+          },
+          {
+            "answer": "no",
+            "quote": "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`"
+          },
+          {
+            "answer": "no",
+            "quote": "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`"
+          }
+        ]
+      }
+    },
+    {
+      "id": "getappz/agentflare#229",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "A dropped sync_all means the \"durable\" write may never reach disk ... These now propagate via ?."
+          },
+          {
+            "answer": "yes",
+            "quote": "A dropped sync_all means the \"durable\" write may never reach disk; a dropped set_permissions means a credential file the doc explicitly wants at 0600 can silently be left world-readable. These now propagate via ?."
+          },
+          {
+            "answer": "yes",
+            "quote": "run() did std::fs::read_to_string(&profile).ok(), collapsing a real read error into None. write_managed_block then treats None as empty content and overwrites the file... Now only NotFound maps to None; any other error aborts with a message"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises."
+          },
+          {
+            "answer": "yes",
+            "quote": "A dropped `sync_all` means the \"durable\" write may never reach disk; a dropped `set_permissions` means a credential file... can silently be left world-readable. These now propagate via `?`."
+          },
+          {
+            "answer": "yes",
+            "quote": "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dsx-ai-factory/infra-controller#3469",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the ipmitool reset dropped its result with .ok() while the counter ticked regardless. A shared record_bmc_reset_outcome now increments only on success and logs the failure"
+          },
+          {
+            "answer": "yes",
+            "quote": "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all, including a rack health-report persist failure discarded with Err(_) => { /* will retry */ }. Every one now logs, and the one whose failure rate is worth watching also counts."
+          },
+          {
+            "answer": "no",
+            "quote": "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all... Every one now logs, and the one whose failure rate is worth watching also counts."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all, including a rack health-report persist failure discarded with Err(_) => { /* will retry */ }. Every one now logs"
+          },
+          {
+            "answer": "yes",
+            "quote": "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all, including a rack health-report persist failure discarded with `Err(_) => { /* will retry */ }`. Every one now logs"
+          },
+          {
+            "answer": "yes",
+            "quote": "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all, including a rack health-report persist failure discarded with `Err(_) => { /* will retry */ }`."
+          }
+        ]
+      }
+    },
+    {
+      "id": "Davidslv/cce-rust#168",
+      "label": "falls_back_or_degrades",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a hand-edited/corrupt workspace.yml was never reported ... doctor exited 0 with a clean bill of health while every member store went unchecked"
+          },
+          {
+            "answer": "yes",
+            "quote": "cmd_doctor's Err(_) arm on Manifest::load conflates 'no workspace manifest' with 'manifest exists but is invalid', silently degrading to single-directory mode so member stores are never checked and the manifest corruption itself is never reported."
+          },
+          {
+            "answer": "yes",
+            "quote": "SyncState::load's .ok() mapped a present-but-corrupt .cce/synced.json to None, indistinguishable from \"never pulled\"... The guard now loads through a new SyncState::load_strict: Ok(None) only for a genuinely absent marker, Err (naming --force) for a corrupt one."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "cmd_doctor's Manifest::load Err(_) arm conflated an ABSENT manifest with a PRESENT-but-corrupt one, silently degrading to single-directory mode. So a hand-edited/corrupt workspace.yml was never reported and ... doctor exited 0 with a clean bill of health"
+          },
+          {
+            "answer": "yes",
+            "quote": "cmd_doctor's `Err(_)` arm on Manifest::load conflated an ABSENT manifest... with a PRESENT-but-corrupt one, silently degrading to single-directory mode... doctor exited 0 with a clean bill of health while every member store went unchecked"
+          },
+          {
+            "answer": "yes",
+            "quote": "`cmd_doctor`'s `Manifest::load` `Err(_)` arm conflated an ABSENT manifest (simply not a workspace) with a PRESENT-but-corrupt one, silently degrading to single-directory mode."
+          }
+        ]
+      }
+    },
+    {
+      "id": "liveask/liveask#127",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "fix swallowing error on fetch"
+          },
+          {
+            "answer": "yes",
+            "quote": "fix swallowing error on fetch"
+          },
+          {
+            "answer": "unclear",
+            "quote": "fix swallowing error on fetch"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "fix swallowing error on fetch"
+          },
+          {
+            "answer": "yes",
+            "quote": "fix swallowing error on fetch"
+          },
+          {
+            "answer": "yes",
+            "quote": "fix swallowing error on fetch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AndreaBozzo/dataprof#370",
+      "label": "falls_back_or_degrades",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "removes silent fallback behavior that could turn malformed input into plausible profile values ... decode paths surface errors instead of folding them into default values"
+          },
+          {
+            "answer": "yes",
+            "quote": "an error is discarded and silently becomes \"missing data.\" A profiler that reports absence instead of failure is worse than one that crashes, because the wrong number is indistinguishable from a right one."
+          },
+          {
+            "answer": "yes",
+            "quote": "an error is discarded and silently becomes \"missing data.\" A profiler that reports absence instead of failure is worse than one that crashes... the error means \"we do not know\" → propagate it, or represent it as Option/None distinct from the empty case"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "an error is discarded and silently becomes \"missing data.\" A profiler that reports absence instead of failure is worse than one that crashes, because the wrong number is indistinguishable from a right one."
+          },
+          {
+            "answer": "yes",
+            "quote": "an error is discarded and silently becomes \"missing data.\" A profiler that reports absence instead of failure is worse than one that crashes, because the wrong number is indistinguishable from a right one."
+          },
+          {
+            "answer": "yes",
+            "quote": "an error is discarded and silently becomes \"missing data.\" A profiler that reports absence instead of failure is worse than one that crashes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#465",
+      "label": "falls_back_or_degrades",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "A sufficiently large amount of non-JSON content appended after a planted unrecognized-version entry can push it out of that window, letting appends resume"
+          },
+          {
+            "answer": "no",
+            "quote": "This mirrors read_chain_state's pre-existing genesis-fallback behavior for any unparseable tail and is not new in #177."
+          },
+          {
+            "answer": "yes",
+            "quote": "A sufficiently large amount of non-JSON content appended after a planted unrecognized-version entry can push it out of that window, letting appends resume — the refusal is a property of the current tail, not a permanent latch on the file."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "the refusal is a property of the current tail, not a permanent latch on the file... A sufficiently large amount of non-JSON content appended after a planted unrecognized-version entry can push it out of that window, letting appends resume."
+          },
+          {
+            "answer": "yes",
+            "quote": "A sufficiently large amount of non-JSON content appended after a planted unrecognized-version entry can push it out of that window, letting appends resume — the refusal is a property of the current tail, not a permanent latch on the file."
+          },
+          {
+            "answer": "yes",
+            "quote": "A sufficiently large amount of non-JSON content appended after a planted unrecognized-version entry can push it out of that window, letting appends resume — the refusal is a property of the current tail, not a permanent latch on the file."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#468",
+      "label": "other",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "audit show exits 0 with no output — indistinguishable from an empty log — and omamori status reports [ok] Layer 3 (audit) enabled"
+          },
+          {
+            "answer": "yes",
+            "quote": "With a FIFO at audit.jsonl: audit verify reports Operation not supported (os error 45), audit show exits 0 with no output — indistinguishable from an empty log — and omamori status reports [ok] Layer 3 (audit) enabled."
+          },
+          {
+            "answer": "no",
+            "quote": "hook-check hanging is the serious case: it stops before printing its deny verdict, so the outcome is decided by the host's hook-timeout policy rather than by omamori."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "hook-check hanging is the serious case: it stops before printing its deny verdict, so the outcome is decided by the host's hook-timeout policy rather than by omamori."
+          },
+          {
+            "answer": "no",
+            "quote": "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict... Where it no longer hangs, it misleads instead. With a FIFO at `audit.jsonl`: ... `omamori status` reports `[ok] Layer 3 (audit) enabled`."
+          },
+          {
+            "answer": "no",
+            "quote": "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the outcome is decided by the host's hook-timeout policy rather than by omamori."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#470",
+      "label": "propagates",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Result: exit 2, \"cannot verify from entry #1\", and no mention of the deleted tail at all."
+          },
+          {
+            "answer": "no",
+            "quote": "Result: exit 2, \"cannot verify from entry #1\", and no mention of the deleted tail at all. Control: deleting the tail alone gives exit 3 with WARNING: audit log tail may have been truncated."
+          },
+          {
+            "answer": "no",
+            "quote": "Result: exit 2, \"cannot verify from entry #1\", and no mention of the deleted tail at all. Control: deleting the tail alone gives exit 3 with WARNING: audit log tail may have been truncated."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Result: exit 2, \"cannot verify from entry #1\", and no mention of the deleted tail at all."
+          },
+          {
+            "answer": "yes",
+            "quote": "Edit one entry's `key_id` to name a key that does not exist → halt... Delete any number of lines from the tail. Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted tail at all**."
+          },
+          {
+            "answer": "no",
+            "quote": "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted tail at all**."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#474",
+      "label": "propagates",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "doctor's cannot-verify line packs diagnosis and remedy into ~150 characters"
+          },
+          {
+            "answer": "no",
+            "quote": "doctor's cannot-verify line packs diagnosis and remedy into ~150 characters ... Four small ones, none blocking."
+          },
+          {
+            "answer": "no",
+            "quote": "doctor's cannot-verify line packs diagnosis and remedy into ~150 characters... Every other line in [Risk signals] is short and scannable"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Split out of #457 / PR #469 (Phase 8 UX review). Four small ones, none blocking."
+          },
+          {
+            "answer": "no",
+            "quote": "`doctor`'s cannot-verify line packs diagnosis and remedy into ~150 characters... The exit-code asymmetry is out of scope by decision... but the *headline wording* is a separate question from the exit code"
+          },
+          {
+            "answer": "no",
+            "quote": "The headline is computed from the integrity `CheckItem`s only; `print_risk_signals_section` is display-only."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#477",
+      "label": "falls_back_or_degrades",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "When read_dir fails, max_index() returns 0, so rotation targets slot .1.retired and reports retired_key_id = \"default\" ... regardless of the store's real epoch"
+          },
+          {
+            "answer": "yes",
+            "quote": "When read_dir fails, max_index() returns 0, so rotation targets slot .1.retired and reports retired_key_id = \"default\" / new_key_id = \"key-2\" regardless of the store's real epoch."
+          },
+          {
+            "answer": "yes",
+            "quote": "When read_dir fails, max_index() returns 0, so rotation targets slot .1.retired and reports retired_key_id = \"default\" / new_key_id = \"key-2\" regardless of the store's real epoch... Make the scan result impossible to use blindly — KeyDirScan::max_index() returning Option<u32> forces all three call sites to state a policy, and rotation would then refuse rather than guess."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "When read_dir fails, max_index() returns 0, so rotation targets slot .1.retired and reports retired_key_id = \"default\" / new_key_id = \"key-2\" regardless of the store's real epoch."
+          },
+          {
+            "answer": "yes",
+            "quote": "When `read_dir` fails, `max_index()` returns 0, so rotation targets slot `.1.retired` and reports `retired_key_id = \"default\"` / `new_key_id = \"key-2\"` regardless of the store's real epoch."
+          },
+          {
+            "answer": "yes",
+            "quote": "`rotate_key_locked` computes `let max_retired = scan_key_dir(&secret_path).max_index();` and discards `KeyDirScan.unreadable` entirely."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#482",
+      "label": "falls_back_or_degrades",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "rotate_key_locked proceeds anyway (it takes scan_key_dir(..).max_index() without branching on the scan having failed"
+          },
+          {
+            "answer": "yes",
+            "quote": "When the key directory cannot be enumerated, rotate_key_locked proceeds anyway (it takes scan_key_dir(..).max_index() without branching on the scan having failed — see #477)."
+          },
+          {
+            "answer": "yes",
+            "quote": "When the key directory cannot be enumerated, rotate_key_locked proceeds anyway (it takes scan_key_dir(..).max_index() without branching on the scan having failed"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "When the key directory cannot be enumerated, rotate_key_locked proceeds anyway (it takes scan_key_dir(..).max_index() without branching on the scan having failed"
+          },
+          {
+            "answer": "yes",
+            "quote": "`rotate_key_locked` proceeds anyway (it takes `scan_key_dir(..).max_index()` without branching on the scan having failed... Fixing #477 — refusing to rotate when the directory cannot be listed, before any filesystem side effect — makes this path unreachable."
+          },
+          {
+            "answer": "yes",
+            "quote": "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway (it takes `scan_key_dir(..).max_index()` without branching on the scan having failed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#485",
+      "label": "swallows_as_success",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "A host whose staging directory became unreadable, or whose volume detached, gets \"staging is empty and healthy\" from omamori doctor."
+          },
+          {
+            "answer": "yes",
+            "quote": "That is a positive assertion about a directory that could not be read, and unlike the key directory there is no anomaly channel — nothing is printed at all. A host whose staging directory became unreadable ... gets \"staging is empty and healthy\" from omamori doctor."
+          },
+          {
+            "answer": "yes",
+            "quote": "gather_staging_info returns StagingInfo::default() on four different failures and skips per-entry errors with continue. print_staging_section then turns file_count == 0 into: [Staging] empty. That is a positive assertion about a directory that could not be read."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "skipping the failed entry does not drop one name: it drops everything after it, silently, as a result that looks complete"
+          },
+          {
+            "answer": "yes",
+            "quote": "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips per-entry errors with `continue`... [Staging] empty ... unlike the key directory there is **no anomaly channel** — nothing is printed at all."
+          },
+          {
+            "answer": "yes",
+            "quote": "A host whose staging directory became unreadable, or whose volume detached, gets \"staging is empty and healthy\" from `omamori doctor`."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#494",
+      "label": "logs_or_warns",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Have SigningKey carry warnings and AuditLogger::from_config return them, letting each caller decide where they go."
+          },
+          {
+            "answer": "no",
+            "quote": "So hook-check --json-error gives up the audit entry for a blocked command because this function prints."
+          },
+          {
+            "answer": "no",
+            "quote": "load_signing_key_locked ... prints operator prose with eprintln! from the key-store layer... hook-check --json-error gives up the audit entry for a blocked command because this function prints."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a blocked command in a --json-error run leaves no trace."
+          },
+          {
+            "answer": "yes",
+            "quote": "So `hook-check --json-error` **gives up the audit entry for a blocked command** because this function prints... a blocked command in a `--json-error` run leaves no trace."
+          },
+          {
+            "answer": "no",
+            "quote": "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer... so we trade the audit row for a clean single-JSON contract."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#526",
+      "label": "not_failure_handling",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "A developer who runs CI's form locally on a machine that runs omamori gets a red result that is not about their change"
+          },
+          {
+            "answer": "no",
+            "quote": "test-isolation-canary: FAIL — a test wrote outside its own isolated_home()/with_test_home() override."
+          },
+          {
+            "answer": "no",
+            "quote": "test-isolation-canary.sh ... exits 1 on a development machine that has omamori installed, while every test result: line inside the run is ok."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "./scripts/test-isolation-canary.sh -- cargo test --locked — the exact command CI's test job runs — exits 1 on a development machine that has omamori installed, while every test result: line inside the run is ok."
+          },
+          {
+            "answer": "no",
+            "quote": "`./scripts/test-isolation-canary.sh -- cargo test --locked` — the exact command CI's `test` job runs — exits 1 on a development machine that has omamori installed, while every `test result:` line inside the run is `ok`."
+          },
+          {
+            "answer": "no",
+            "quote": "A developer who runs CI's form locally on a machine that runs omamori gets a red result that is not about their change"
+          }
+        ]
+      }
+    },
+    {
+      "id": "risingwavelabs/risingwave#26399",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "value_encoding decode reports (rate-limited) when it reads an out-of-range timestamptz instead of erroring: rows written before validation existed stay readable"
+          },
+          {
+            "answer": "no",
+            "quote": "value_encoding decode reports (rate-limited) when it reads an out-of-range timestamptz instead of erroring: rows written before validation existed stay readable — and deletable, which a hard decode error would prevent"
+          },
+          {
+            "answer": "no",
+            "quote": "value_encoding decode reports (rate-limited) when it reads an out-of-range timestamptz instead of erroring: rows written before validation existed stay readable — and deletable... CDC INCLUDE TIMESTAMP yields NULL instead of unwrapping on a bad upstream source.ts_ms."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Operations that could previously store a timestamptz value outside the representable range ... now return an out-of-range error at the point of computation or decode, instead of accepting a value that crashed the compute node the first time it was read."
+          },
+          {
+            "answer": "no",
+            "quote": "Constructors disagreed on whether that is allowed; this PR makes representability a construction-time invariant... `from_micros` returns `Option`, validating like its siblings"
+          },
+          {
+            "answer": "no",
+            "quote": "every calendar operation (formatting, `AT TIME ZONE`, `extract`, …) converts through `chrono::DateTime` and panics on values chrono cannot represent... this PR makes representability a construction-time invariant."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mandubian/autonoetic#901",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "target_session_id queued to any bound session and returned {\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1} ... Both agent_message_deliveries rows still show delivered_at IS NULL"
+          },
+          {
+            "answer": "yes",
+            "quote": "target_agent_id correctly skipped finished sessions; target_session_id queued to any bound session and returned {\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}."
+          },
+          {
+            "answer": "yes",
+            "quote": "target_session_id queued to any bound session and returned {\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}... a finished session never wakes... Now gated on both, with a distinct target_session_finished status"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Both observations from your live run are real defects."
+          },
+          {
+            "answer": "yes",
+            "quote": "`target_agent_id` correctly skipped finished sessions; `target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`... This PR makes the failure *honest and correctly diagnosed* rather than silently swallowed."
+          },
+          {
+            "answer": "no",
+            "quote": "The existence check used a filesystem-only `AgentRepository::new(agents_dir).get_sync()`... so it reported missing, while `agent_list` / `agent_inspect` resolve through the alias registry and showed it present."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vybestack/llxprt-jefe#416",
+      "label": "records_or_handles_locally",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Reap orphaned Windows worker trees on dead psmux panes"
+          },
+          {
+            "answer": "no",
+            "quote": "a dead pane with validated live descendants routes to reap-then-Dead instead of Recoverable; the reconcile pass reaps the orphan tree + kills the stale session before marking Dead"
+          },
+          {
+            "answer": "no",
+            "quote": "a dead pane with validated live descendants routes to reap-then-Dead instead of Recoverable; the reconcile pass reaps the orphan tree + kills the stale session before marking Dead"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "A dead pane with live descendants must never be treated as reattachable. Jefe must deterministically reap the validated orphan process tree and stale session before allowing"
+          },
+          {
+            "answer": "no",
+            "quote": "a dead pane with live descendants must never be treated as reattachable. Jefe must deterministically reap the validated orphan process tree and stale session before allowing relaunch."
+          },
+          {
+            "answer": "no",
+            "quote": "exiting/rebuilding the Jefe dashboard can kill the psmux pane leader... while leaving the descendant LLxprt process tree alive."
+          }
+        ]
+      }
+    },
+    {
+      "id": "SG-devel/tailtriage#1097",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Consolidate overlapping live tracing intake surfaces into one coherent session-oriented API to reduce confusion and maintenance surface area."
+          },
+          {
+            "answer": "no",
+            "quote": "Consolidate overlapping live tracing intake surfaces into one coherent session-oriented API to reduce confusion and maintenance surface area."
+          },
+          {
+            "answer": "no",
+            "quote": "Replace public TracingIntakeSession/TracingTokioSession/TracingRecorder exports with a single public TracingSession + TracingSessionBuilder"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Consolidate overlapping live tracing intake surfaces into one coherent session-oriented API to reduce confusion and maintenance surface area."
+          },
+          {
+            "answer": "no",
+            "quote": "Replace public `TracingIntakeSession`/`TracingTokioSession`/`TracingRecorder` exports with a single public `TracingSession` + `TracingSessionBuilder`"
+          },
+          {
+            "answer": "no",
+            "quote": "Consolidate overlapping live tracing intake surfaces into one coherent session-oriented API to reduce confusion and maintenance surface area."
+          }
+        ]
+      }
+    },
+    {
+      "id": "Extra-Chill/homeboy#9526",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The detector flags get_head_commit as \"duplicates helper head_sha\" and advises \"call head_sha instead.\" That advice is wrong"
+          },
+          {
+            "answer": "no",
+            "quote": "The detector flags get_head_commit as \"duplicates helper head_sha\" and advises \"call head_sha instead.\" That advice is wrong"
+          },
+          {
+            "answer": "no",
+            "quote": "command_wrapper_bypass (issue #9498, 52 findings) matches raw calls to a canonical helper purely by byte-identical arg-vector, ignoring the return contract. So a legitimate sibling thin wrapper around the same command gets flagged"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The detector flags get_head_commit as \"duplicates helper head_sha\" and advises \"call head_sha instead.\" That advice is wrong"
+          },
+          {
+            "answer": "no",
+            "quote": "`command_wrapper_bypass` (issue #9498, 52 findings) matches raw calls to a canonical helper purely by **byte-identical arg-vector**, ignoring the return contract. So a legitimate **sibling thin wrapper**... gets flagged"
+          },
+          {
+            "answer": "no",
+            "quote": "`command_wrapper_bypass` (issue #9498, 52 findings) matches raw calls to a canonical helper purely by byte-identical arg-vector, ignoring the return contract."
+          }
+        ]
+      }
+    },
+    {
+      "id": "edge-toolkit/core#84",
+      "label": "cannot_label",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Clarified best-effort handling during process, thread, and channel shutdown."
+          },
+          {
+            "answer": "no",
+            "quote": "Improved error reporting when telemetry logger initialization fails. ... Clarified best-effort handling during process, thread, and channel shutdown. ... Standardized environment variable access and ignored-result handling."
+          },
+          {
+            "answer": "no",
+            "quote": "Logger initialization errors now propagate, while shutdown, process, thread, and stderr results are captured without changing best-effort teardown behavior."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "shutdown, process, thread, and stderr results are captured without changing best-effort teardown behavior."
+          },
+          {
+            "answer": "no",
+            "quote": "Clarified best-effort handling during process, thread, and channel shutdown... Standardized environment variable access and ignored-result handling."
+          },
+          {
+            "answer": "no",
+            "quote": "shutdown, process, thread, and stderr results are captured without changing best-effort teardown behavior."
+          }
+        ]
+      }
+    },
+    {
+      "id": "thedoublejay/gather-step#67",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          },
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          },
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          },
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          },
+          {
+            "answer": "no",
+            "quote": "v5.11.0 — an additive release delivering the unblocked query-quality items from the v5.10 plan plus the genuinely-new telemetry diagnostics from the v6 plan."
+          }
+        ]
+      }
+    },
+    {
+      "id": "git-ai-project/git-ai#1717",
+      "label": "falls_back_or_degrades",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Centralizing opens makes the memory cap automatic and keeps future connection sites from bypassing it."
+          },
+          {
+            "answer": "no",
+            "quote": "Centralizing opens makes the memory cap automatic and keeps future connection sites from bypassing it."
+          },
+          {
+            "answer": "no",
+            "quote": "Routed runtime DBs, fallback DBs, test DB setup, and read-only transcript DB opens through helpers that immediately apply PRAGMA cache_size=-2000."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "In-memory SQLite fallback connections can grow without the file-backed limits we rely on elsewhere. Centralizing opens makes the memory cap automatic"
+          },
+          {
+            "answer": "no",
+            "quote": "In-memory SQLite fallback connections can grow without the file-backed limits we rely on elsewhere. Centralizing opens makes the memory cap automatic"
+          },
+          {
+            "answer": "no",
+            "quote": "Routed runtime DBs, fallback DBs, test DB setup, and read-only transcript DB opens through helpers that immediately apply `PRAGMA cache_size=-2000`."
+          }
+        ]
+      }
+    },
+    {
+      "id": "pnpm/pnpm#12506",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds optional pnpr OSV protection backed by a local npm OSV dump instead of live API calls in the resolver hot path."
+          }
+        ]
+      }
+    },
+    {
+      "id": "iii-hq/workers#292",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds telegram-bot, a Telegram surface for the harness agent stack."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds telegram-bot, a Telegram surface for the harness agent stack."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds telegram-bot, a Telegram surface for the harness agent stack. Inbound chat messages become harness::send turns; assistant output streams back as live Telegram edits"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds telegram-bot, a Telegram surface for the harness agent stack."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds **telegram-bot**, a Telegram surface for the harness agent stack."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds telegram-bot, a Telegram surface for the harness agent stack."
+          }
+        ]
+      }
+    },
+    {
+      "id": "qdrant/qdrant#9429",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "refactor Gridstore::iter method to use batching"
+          },
+          {
+            "answer": "no",
+            "quote": "refactor Gridstore::iter method to use batching."
+          },
+          {
+            "answer": "no",
+            "quote": "What this PR ultimately does, is refactor Gridstore::iter method to use batching."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "What this PR ultimately does, is refactor Gridstore::iter method to use batching."
+          },
+          {
+            "answer": "no",
+            "quote": "refactor `Gridstore::iter` method to use batching... `iter` is used when building payload indexes, and it was not yet optimized."
+          },
+          {
+            "answer": "no",
+            "quote": "refactor `Gridstore::iter` method to use batching."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vox-foundation/vox#346",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Env-var SSOT design doc — a 7-phase TDD plan for a single source of truth covering ALL environment variables"
+          },
+          {
+            "answer": "no",
+            "quote": "This PR extends the config guardrails work from PR #333 in two directions: Env-var SSOT design doc ... config-hygiene serde refactor ... Contract surface updates ... Embedded contracts ... Dead code removal ... RAG chunk size"
+          },
+          {
+            "answer": "no",
+            "quote": "Env-var SSOT design doc — a 7-phase TDD plan for a single source of truth covering ALL environment variables... config-hygiene serde refactor — replaces the fragile YAML line-grep registry parser with proper serde deserialization"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "This PR extends the config guardrails work from PR #333 in two directions"
+          },
+          {
+            "answer": "no",
+            "quote": "**config-hygiene serde refactor** — replaces the fragile YAML line-grep registry parser with proper `serde` deserialization... `parse_registry_file()` propagates errors instead of silently returning an empty set."
+          },
+          {
+            "answer": "no",
+            "quote": "Env-var SSOT design doc — a 7-phase TDD plan for a single source of truth covering ALL environment variables (not just VOX_*)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ng/yggdrasil#103",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself"
+          },
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself."
+          },
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself. This took down agents mid-task."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself. This took down agents mid-task."
+          },
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself... `setsid` — puts `claude` in its own session so a SIGTERM aimed at a timed-out child's process group cannot propagate up to the agent."
+          },
+          {
+            "answer": "no",
+            "quote": "the bash tool SIGTERM'd the command — and the signal propagated up and killed the agent itself."
+          }
+        ]
+      }
+    },
+    {
+      "id": "andrewdavidmackenzie/flow#2680",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: run_wasm writes output back to the input buffer — when output exceeds input size ... memory corruption occurs"
+          },
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: run_wasm writes output back to the input buffer — when output exceeds input size (e.g. seed string → 2D grid), memory corruption occurs."
+          },
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: run_wasm writes output back to the input buffer — when output exceeds input size... memory corruption occurs. Increased MAX_RESULT_SIZE from 1KB to 64KB"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: run_wasm writes output back to the input buffer — when output exceeds input size (e.g. seed string → 2D grid), memory corruption occurs."
+          },
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: `run_wasm` writes output back to the input buffer — when output exceeds input size... memory corruption occurs. Increased `MAX_RESULT_SIZE` from 1KB to 64KB"
+          },
+          {
+            "answer": "no",
+            "quote": "Fix WASM buffer overflow: `run_wasm` writes output back to the input buffer — when output exceeds input size (e.g. seed string → 2D grid), memory corruption occurs."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ben1009/mini-lsm#76",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          },
+          {
+            "answer": "no",
+            "quote": "Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          },
+          {
+            "answer": "no",
+            "quote": "Phase 1 of key-value separation implementation. Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Phase 1 of key-value separation implementation. Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          },
+          {
+            "answer": "no",
+            "quote": "Phase 1 of key-value separation implementation. Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          },
+          {
+            "answer": "no",
+            "quote": "Phase 1 of key-value separation implementation. Adds the value log (vLog) module — the core infrastructure for storing large values separately from the LSM tree."
+          }
+        ]
+      }
+    },
+    {
+      "id": "snowflakedb/drivers#911",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "C++",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "spec-required error conditions (HY019, HY020, HY009, HY090) were silently ignored. This change brings the driver into full compliance with the ODBC specification"
+          },
+          {
+            "answer": "yes",
+            "quote": "accumulate_put_data now returns OdbcResult<()> and propagates errors instead of silently proceeding. ... spec-required error conditions (HY019, HY020, HY009, HY090) were silently ignored."
+          },
+          {
+            "answer": "no",
+            "quote": "The previous implementation did not validate SQLPutData inputs or enforce ODBC state transitions correctly. Errors during put_data left the statement in an inconsistent state, and spec-required error conditions (HY019, HY020, HY009, HY090) were silently ignored."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Hardened SQLPutData input validation and ODBC state machine correctness, adding proper error handling for HY019, HY020, HY009, and HY090 conditions."
+          },
+          {
+            "answer": "yes",
+            "quote": "spec-required error conditions (HY019, HY020, HY009, HY090) were silently ignored... `accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding."
+          },
+          {
+            "answer": "no",
+            "quote": "The previous implementation did not validate `SQLPutData` inputs or enforce ODBC state transitions correctly."
+          }
+        ]
+      }
+    },
+    {
+      "id": "zeroclaw-labs/zeroclaw#6512",
+      "label": "swallows_as_success",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The email channel had three issues affecting usability"
+          },
+          {
+            "answer": "no",
+            "quote": "The email channel had three issues affecting usability: 1. Wrong default subject ... 2. Markdown sent as plain text ... 3. Attachment file paths not resolved ... 4. Email threading broken"
+          },
+          {
+            "answer": "no",
+            "quote": "Wrong default subject — hardcoded \"ZeroClaw Message\" default was unhelpful and undocumented... Markdown sent as plain text... Email threading broken — inbound Message-ID was captured... but never forwarded to SendMessage"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The email channel had three issues affecting usability"
+          },
+          {
+            "answer": "no",
+            "quote": "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)... Wrong default subject... Markdown sent as plain text... Email threading broken"
+          },
+          {
+            "answer": "no",
+            "quote": "Wrong default subject — hardcoded \"ZeroClaw Message\" default was unhelpful and undocumented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AgentWorkforce/burn#426",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? }) to @relayburn/sdk ... for launchers that know the session id up front"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? }) to @relayburn/sdk and relayburn_sdk for launchers that know the session id up front"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? }) to @relayburn/sdk and relayburn_sdk for launchers that know the session id up front"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? }) to @relayburn/sdk and relayburn_sdk for launchers that know the session id up front"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds `writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? })` to `@relayburn/sdk`... for launchers that know the session id up front"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds `writeStamp({ sessionId | messageId, enrichment, ts?, ledgerHome? })` to `@relayburn/sdk` and `relayburn_sdk` for launchers that know the session id up front"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kennguy3n/knowledge#32",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan."
+          },
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan."
+          },
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan. Each workstream has its own commit, plus a follow-up commit addressing all Devin Review findings."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan."
+          },
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan... WS1 — Body-store cryptographic forgetting... WS4 — CI hardening... WS6 — Public API polish"
+          },
+          {
+            "answer": "no",
+            "quote": "Full implementation of the six-workstream production-readiness plan."
+          }
+        ]
+      }
+    },
+    {
+      "id": "shubhattin/lipilekhika#127",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+          },
+          {
+            "answer": "yes",
+            "quote": "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+          },
+          {
+            "answer": "yes",
+            "quote": "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+          },
+          {
+            "answer": "yes",
+            "quote": "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+          },
+          {
+            "answer": "no",
+            "quote": "core package now uses Error Enum"
+          }
+        ]
+      }
+    },
+    {
+      "id": "BoundaryML/baml#3464",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458. LSP is broken."
+          },
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458. LSP is broken."
+          },
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458. LSP is broken. Two known bugs: Spacebar doesn't work, fetch no longer works in llm functions"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458. LSP is broken."
+          },
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458\n\nLSP is broken."
+          },
+          {
+            "answer": "no",
+            "quote": "Reverts BoundaryML/baml#3458. LSP is broken."
+          }
+        ]
+      }
+    },
+    {
+      "id": "Jonathangadeaharder/pytest-linter#17",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          },
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          },
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          },
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          },
+          {
+            "answer": "no",
+            "quote": "Implements all 39 remaining work items across Epics E1–E9 in a single PR."
+          }
+        ]
+      }
+    },
+    {
+      "id": "nilesh32236/vector-mcp-rust#29",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "integrate vector quantization using TurboQuantizer and scaffold Next.js frontend project"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a Next.js SPA frontend and build script, integrates quantization and turbo-search into embeddings/search pipeline"
+          },
+          {
+            "answer": "no",
+            "quote": "Server now falls back to an available port if the configured port is in use."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "integrate vector quantization using TurboQuantizer and scaffold… Next.js frontend project"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a Next.js SPA frontend and build script, integrates quantization and turbo-search into embeddings/search pipeline"
+          },
+          {
+            "answer": "no",
+            "quote": "integrate vector quantization using TurboQuantizer and scaffold… Next.js frontend project"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dobesv/harnx#353",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          },
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          },
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          },
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          },
+          {
+            "answer": "no",
+            "quote": "Add a new harnx-mcp-history crate that provides git-backed local history and non-destructive rollback for harnx-mcp-fs and harnx-mcp-bash."
+          }
+        ]
+      }
+    },
+    {
+      "id": "oxicrab/oxicrab#155",
+      "label": "falls_back_or_degrades",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Phase A of the 2026-04-16 codebase audit — 13 HIGH findings, one commit per theme"
+          },
+          {
+            "answer": "no",
+            "quote": "Phase A of the 2026-04-16 codebase audit — 13 HIGH findings, one commit per theme."
+          },
+          {
+            "answer": "no",
+            "quote": "Phase A of the 2026-04-16 codebase audit — 13 HIGH findings, one commit per theme."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Phase A of the 2026-04-16 codebase audit — 13 HIGH findings, one commit per theme."
+          },
+          {
+            "answer": "no",
+            "quote": "13 HIGH findings, one commit per theme. **Providers**: OpenAI `cached_tokens`... **Channels**: Discord TTL... **Browser**: `--disable-features=...` **Gateway**: webhook template sanitizes"
+          },
+          {
+            "answer": "no",
+            "quote": "Phase A of the 2026-04-16 codebase audit — 13 HIGH findings, one commit per theme."
+          }
+        ]
+      }
+    },
+    {
+      "id": "infraweave-io/infraweave#307",
+      "label": "swallows_as_success",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Allow infraweave destroy to accept a claim file path in addition to a deployment ID."
+          },
+          {
+            "answer": "no",
+            "quote": "Allow infraweave destroy to accept a claim file path in addition to a deployment ID. When a file is provided, all deployment manifests in the YAML are parsed and destroyed in sequence."
+          },
+          {
+            "answer": "no",
+            "quote": "Allow infraweave destroy to accept a claim file path in addition to a deployment ID. When a file is provided, all deployment manifests in the YAML are parsed and destroyed in sequence."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Allow infraweave destroy to accept a claim file path in addition to a deployment ID."
+          },
+          {
+            "answer": "no",
+            "quote": "Allow `infraweave destroy` to accept a claim file path in addition to a deployment ID... Improve error handling in plan/apply: propagate errors instead of silently continuing when all claims fail"
+          },
+          {
+            "answer": "no",
+            "quote": "Allow `infraweave destroy` to accept a claim file path in addition to a deployment ID."
+          }
+        ]
+      }
+    },
+    {
+      "id": "bindreams/skuld#33",
+      "label": "other",
+      "verdictA": "pass",
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok()) — the old behavior could silently swallow SQLITE_BUSY mid-iteration"
+          },
+          {
+            "answer": "yes",
+            "quote": "Now errors propagate through the existing outer retry loop. ... can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok()) — the old behavior could silently swallow SQLITE_BUSY mid-iteration"
+          },
+          {
+            "answer": "yes",
+            "quote": "coordinate() panicked when busy_timeout expired on BEGIN EXCLUSIVE under heavy contention... Now errors propagate through the existing outer retry loop... can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok())"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "coordinate() panicked when busy_timeout expired on BEGIN EXCLUSIVE under heavy contention ... Now errors propagate through the existing outer retry loop."
+          },
+          {
+            "answer": "no",
+            "quote": "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE` under heavy contention... Now errors propagate through the existing outer retry loop."
+          },
+          {
+            "answer": "no",
+            "quote": "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE` under heavy contention (customer reported 5519 ms / 100+ parallel writers). Now errors propagate through the existing outer retry loop."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ChainSafe/forest#6788",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "get_state_sequence scans messages included in the current tipset to find the true highest nonce, rather than relying solely on actor.sequence which can lag."
+          },
+          {
+            "answer": "no",
+            "quote": "Changes introduced in this pull request: - Nonce calculation ... - Nonce serialization ... - Nonce gap enforcement ... - CLI: forest-wallet list now shows a Nonce column"
+          },
+          {
+            "answer": "no",
+            "quote": "get_state_sequence scans messages included in the current tipset to find the true highest nonce, rather than relying solely on actor.sequence which can lag."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "get_state_sequence scans messages included in the current tipset to find the true highest nonce, rather than relying solely on actor.sequence which can lag."
+          },
+          {
+            "answer": "no",
+            "quote": "`get_state_sequence` scans messages included in the current tipset to find the true highest nonce, rather than relying solely on `actor.sequence` which can lag."
+          },
+          {
+            "answer": "no",
+            "quote": "`get_state_sequence` scans messages included in the current tipset to find the true highest nonce, rather than relying solely on `actor.sequence` which can lag."
+          }
+        ]
+      }
+    },
+    {
+      "id": "insight-platform/savant-rs#293",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for retina_rtsp and makes backend selection configurable per RTSP group"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for retina_rtsp and makes backend selection configurable per RTSP group"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for retina_rtsp and makes backend selection configurable per RTSP group"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for retina_rtsp and makes backend selection configurable per RTSP group"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for `retina_rtsp` and makes backend selection configurable per RTSP group"
+          },
+          {
+            "answer": "no",
+            "quote": "Adds a GStreamer-based backend for `retina_rtsp` and makes backend selection configurable per RTSP group (`Retina` vs `Gstreamer`)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "navicore/anz#5",
+      "label": "not_failure_handling",
+      "verdictA": "fail",
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Client secret support ... Groups claim ... Docs"
+          },
+          {
+            "answer": "no",
+            "quote": "Client secret support ... Groups claim ... Docs"
+          },
+          {
+            "answer": "no",
+            "quote": "Client secret support ... Groups claim ... Both DB changes are additive migrations — existing databases upgrade automatically on startup"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Client secret support ... Groups claim ... Docs"
+          },
+          {
+            "answer": "no",
+            "quote": "Client secret support... Groups claim... DB: client_secret_hash column added to clients table (additive migration)"
+          },
+          {
+            "answer": "no",
+            "quote": "Client secret support... Groups claim... Docs"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#551",
+      "label": "not_failure_handling",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The canary now removes omamori's own shim directories from PATH for the whole run, and attributes a failure to a test only when a throwaway sentinel changed"
+          },
+          {
+            "answer": "no",
+            "quote": "The canary now removes omamori's own shim directories from PATH for the whole run, and attributes a failure to a test only when a throwaway sentinel changed"
+          },
+          {
+            "answer": "no",
+            "quote": "Tests in src/context.rs spawn git through PATH ... on a host with omamori installed that git is ~/.omamori/shim/git ... The canary now removes omamori's own shim directories from PATH for the whole run"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "attributes a failure to a test only when a throwaway sentinel changed — a change to a real file alone can also come from another process on the host, and the final line now says that instead."
+          },
+          {
+            "answer": "no",
+            "quote": "The canary now removes omamori's own shim directories from `PATH` for the whole run, and attributes a failure to a test only when a throwaway sentinel changed"
+          },
+          {
+            "answer": "no",
+            "quote": "The canary now removes omamori's own shim directories from `PATH` for the whole run, and attributes a failure to a test only when a throwaway sentinel changed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#553",
+      "label": "swallows_as_success",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Before this PR, gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... Otherwise it says [Staging] cannot read: …"
+          },
+          {
+            "answer": "yes",
+            "quote": "Before this PR, gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... Every way of not reading the directory in full ... is reported, each with its own reason word."
+          },
+          {
+            "answer": "yes",
+            "quote": "gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... the section then asserted \"empty\" ... Every way of not reading the directory in full ... is reported, each with its own reason word."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... and the section then asserted \"empty\""
+          },
+          {
+            "answer": "yes",
+            "quote": "`gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`... the section then asserted \"empty\"... Otherwise it says `[Staging] cannot read: ...`"
+          },
+          {
+            "answer": "yes",
+            "quote": "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`... and the section then asserted \"empty\""
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#554",
+      "label": "logs_or_warns",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "a core that returns warnings, a wrapper that prints them"
+          },
+          {
+            "answer": "no",
+            "quote": "Before this PR the mode skipped the audit row. ... a core that returns warnings, a wrapper that prints them"
+          },
+          {
+            "answer": "no",
+            "quote": "hook-check --json-error gives up the audit entry for a blocked command because this function prints ... a blocked command in a --json-error run leaves no trace."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Before this PR the mode skipped the audit row."
+          },
+          {
+            "answer": "yes",
+            "quote": "Before this PR the mode skipped the audit row... a blocked command in a `--json-error` run leaves no trace... a shell command blocked by `hook-check --json-error`... is recorded in the audit chain exactly as in text mode"
+          },
+          {
+            "answer": "no",
+            "quote": "Before this PR the mode skipped the audit row."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#557",
+      "label": "falls_back_or_degrades",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "It now walks backwards from the end of the file one line at a time ... refusing rather than restarting when no chain entry starts inside them"
+          },
+          {
+            "answer": "yes",
+            "quote": "It now walks backwards from the end of the file one line at a time, reads past everything that does not carry a chain_version, and stops at the first line that does — within the last 64 MiB, refusing rather than restarting when no chain entry starts inside them."
+          },
+          {
+            "answer": "yes",
+            "quote": "read_chain_state used to take the last line inside a 64 KB tail window that parsed as a JSON object, and restart the chain from genesis at seq 0 whenever it found none or found one that was not a chain entry."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "It now walks backwards from the end of the file... within the last 64 MiB, refusing rather than restarting when no chain entry starts inside them."
+          },
+          {
+            "answer": "yes",
+            "quote": "`read_chain_state` used to take the last line inside a 64 KB tail window... and restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain entry... It now... refus[es] rather than restarting when no chain entry starts inside them."
+          },
+          {
+            "answer": "yes",
+            "quote": "`read_chain_state` used to take the last line inside a 64 KB tail window that parsed as a JSON object, and restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain entry."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#558",
+      "label": "propagates",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "It used to stop these two checks with it, and neither needs a key, so deleting a run of entries and renaming one key_id put the removal out of view."
+          },
+          {
+            "answer": "no",
+            "quote": "A halt stops authentication. It used to stop these two checks with it, and neither needs a key, so deleting a run of entries and renaming one key_id put the removal out of view."
+          },
+          {
+            "answer": "no",
+            "quote": "a break in the seq/prev_hash continuity between two readable chain entries ... is reported as its own finding, separately from the authenticated broken_at, and no exit code moves"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "a break in the seq/prev_hash continuity between two readable chain entries ... is reported as its own finding, separately from the authenticated broken_at, and no exit code moves"
+          },
+          {
+            "answer": "yes",
+            "quote": "a break in the `seq`/`prev_hash` continuity between two readable chain entries... is reported as its own finding... A halt stops authentication. It used to stop these two checks with it, and neither needs a key"
+          },
+          {
+            "answer": "no",
+            "quote": "A halt stops authentication. It used to stop these two checks with it, and neither needs a key, so deleting a run of entries and renaming one `key_id` put the removal out of view."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#594",
+      "label": "not_failure_handling",
+      "verdictA": null,
+      "language": "Zig",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "Each word of a Bash command, each path key and a Glob's pattern is now resolved against the candidate directories"
+          },
+          {
+            "answer": "no",
+            "quote": "The implementation is one substring test: if repo in text or \"/.claude/\" in text or \"~/.claude\" in text ... a relative walk out of it ... all reach the same files and none of them matches."
+          },
+          {
+            "answer": "no",
+            "quote": "The channel voided an input that held the repo's absolute path... as a substring, so cat ../../<repo>/BUILDLOG.md ... each came back clean. Each word of a Bash command, each path key and a Glob's pattern is now resolved against the candidate directories"
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "a run that read the repository's answers through a relative path comes back clean"
+          },
+          {
+            "answer": "no",
+            "quote": "Filed-under: wrong-verdict — a run that read the repository's answers through a relative path comes back clean"
+          },
+          {
+            "answer": "yes",
+            "quote": "The channel voided an input that held the repo's absolute path, `/.claude/` or `~/.claude` as a substring, so `cat ../../<repo>/BUILDLOG.md`... each came back `clean`."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#602",
+      "label": "not_failure_handling",
+      "verdictA": null,
+      "language": "Zig",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "if the agent-built binary rewrites the replay report, its rc, or the functional gate's status or export, the judge refuses rather than judging"
+          },
+          {
+            "answer": "no",
+            "quote": "The eval container ran the agent-built timew as uid 0 beside the files the judge read. A child it left behind could rewrite all four for as long as the container lived"
+          },
+          {
+            "answer": "no",
+            "quote": "A child it left behind could rewrite all four for as long as the container lived ... Those values now arrive on the container's own stdout, put there by the process that made them"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "A timew that forks a process before it exits, sleeps until sideeye has written its report, and rewrites run-replay.json with \"verdict\": \"PASS\" ... would have the judge read a verdict the subject supplied."
+          },
+          {
+            "answer": "no",
+            "quote": "Filed-under: wrong-verdict — the eval container's replay report is written where the agent-built binary can overwrite it before the judge reads it, so `loop_closed` could rest on a verdict the subject supplied."
+          },
+          {
+            "answer": "no",
+            "quote": "A child it left behind could rewrite all four for as long as the container lived — and did not have to win a race to do it, because a child in a loop is always the last writer."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#609",
+      "label": "propagates",
+      "verdictA": null,
+      "language": "Zig",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "a run refused oracle_missed_operation names that mode in its own next_step ... together with where that mode's hazards are written"
+          },
+          {
+            "answer": "no",
+            "quote": "when a Linux run under --observe wrappers refuses oracle_missed_operation, next_step names re-running under --observe syscalls, together with where that mode's hazards are written"
+          },
+          {
+            "answer": "no",
+            "quote": "when a Linux run under --observe wrappers refuses oracle_missed_operation, next_step names re-running under --observe syscalls, together with where that mode's hazards are written"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The step names no action that reaches the real cause, and the one that does — re-measuring under --observe syscalls — is not mentioned."
+          },
+          {
+            "answer": "no",
+            "quote": "Not claimed: that wrappers mode should *judge* this target. The refusal is correct and fail-closed... What is wrong is only which cause the report sends the reader to."
+          },
+          {
+            "answer": "no",
+            "quote": "when `next_step` names re-running under `--observe syscalls`, together with where that mode's hazards are written"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#626",
+      "label": "cannot_label",
+      "verdictA": null,
+      "language": "Zig",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "a failing run of spike/thread-kill-lands.sh prints the report's message and next_step and the transcript's opening lines, copies its report, transcript and world directory under failed/"
+          },
+          {
+            "answer": "no",
+            "quote": "Actions ANDs an implicit success() onto any condition naming no status function — so it would have been skipped exactly when it was wanted."
+          },
+          {
+            "answer": "no",
+            "quote": "a failing run of spike/thread-kill-lands.sh prints the report's message and next_step and the transcript's opening lines, copies its report, transcript and world directory under failed/"
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The script prints verdict, crash-point count and reason for a failing run and nothing else; the report's message ... and the world's transcript stay in the runner's work directory, which CI does not upload."
+          },
+          {
+            "answer": "no",
+            "quote": "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step`... copies its report, transcript and world directory under `failed/`... each time refusing `kill_did_not_land`... each time green on re-run."
+          },
+          {
+            "answer": "no",
+            "quote": "Pattern: a CI step whose failure is diagnosed only from a summary line, with its evidence in a temp path nothing uploads."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#627",
+      "label": "not_failure_handling",
+      "verdictA": null,
+      "language": "Zig",
+      "a": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "sideeye_explore_config takes an optional observe ... so a refusal whose next_step names --observe syscalls can be followed through this server"
+          },
+          {
+            "answer": "no",
+            "quote": "The MCP surface could not carry it, so an agent received a correct next step from the engine and had no way to execute it: the loop explore → named refusal → next_step → retry → verdict broke at the retry."
+          },
+          {
+            "answer": "no",
+            "quote": "The MCP surface could not carry it, so an agent received a correct next step from the engine and had no way to execute it: the loop explore → named refusal → next_step → retry → verdict broke at the retry."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "The MCP surface could not carry it, so an agent received a correct next step from the engine and had no way to execute it: the loop explore → named refusal → next_step → retry → verdict broke at the retry."
+          },
+          {
+            "answer": "no",
+            "quote": "Filed-under: product surface — the engine can recommend and execute the next step, but the agent-facing surface cannot currently carry it."
+          },
+          {
+            "answer": "no",
+            "quote": "`sideeye_explore_config` takes an optional `observe`... so a refusal whose `next_step` names `--observe syscalls` can be followed through this server."
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#468",
+      "label": "other",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "audit show exits 0 with no output — indistinguishable from an empty log — and omamori status reports [ok] Layer 3 (audit) enabled"
+          },
+          {
+            "answer": "yes",
+            "quote": "With a FIFO at audit.jsonl: audit verify reports Operation not supported (os error 45), audit show exits 0 with no output — indistinguishable from an empty log — and omamori status reports [ok] Layer 3 (audit) enabled."
+          },
+          {
+            "answer": "no",
+            "quote": "hook-check hanging is the serious case: it stops before printing its deny verdict, so the outcome is decided by the host's hook-timeout policy rather than by omamori."
+          }
+        ]
+      },
+      "b": {
+        "decided": "no",
+        "votes": [
+          {
+            "answer": "no",
+            "quote": "hook-check hanging is the serious case: it stops before printing its deny verdict, so the outcome is decided by the host's hook-timeout policy rather than by omamori."
+          },
+          {
+            "answer": "no",
+            "quote": "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict... Where it no longer hangs, it misleads instead."
+          },
+          {
+            "answer": "no",
+            "quote": "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#553",
+      "label": "swallows_as_success",
+      "verdictA": null,
+      "language": "Rust",
+      "a": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "Before this PR, gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... Otherwise it says [Staging] cannot read: …"
+          },
+          {
+            "answer": "yes",
+            "quote": "Before this PR, gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... Every way of not reading the directory in full ... is reported, each with its own reason word."
+          },
+          {
+            "answer": "yes",
+            "quote": "gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... the section then asserted \"empty\" ... Every way of not reading the directory in full ... is reported, each with its own reason word."
+          }
+        ]
+      },
+      "b": {
+        "decided": "yes",
+        "votes": [
+          {
+            "answer": "yes",
+            "quote": "gather_staging_info returned an empty result on four different failures and skipped per-entry errors with continue ... and the section then asserted \"empty\""
+          },
+          {
+            "answer": "yes",
+            "quote": "`gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`... Otherwise it says `[Staging] cannot read: ...`"
+          },
+          {
+            "answer": "yes",
+            "quote": "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`"
+          }
+        ]
+      }
+    }
+  ]
+}
