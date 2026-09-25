@@ -1547,7 +1547,7 @@ returning an empty title (*logged*), and *silent* takes those two away.
 Both lines hold: every version that is not shipped or rewritten got its expected answer at the bar in
 three runs of three, and no shipped or rewritten version was answered `continues_silently`. What this
 does not show: how it answers in a function that returns `()` — all four functions here return a
-`Result`, and the form asks in one that does not, which the probe did not reach —, how the form does on pull requests it was not built on, its mapping question (not sent
+`Result`, and the form asks in one that does not, which the probe did not reach — nor how the form does on pull requests it was not built on, its mapping question (not sent
 by the probe), or how often it lists a call that is not a defect there. Two repositories and four
 places are the whole of it; the form is used only where a spec names it.
 
