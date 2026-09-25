@@ -3,7 +3,7 @@
 T=${ACCEPTANCE_DIR:?set to the directory holding the clones}; C=$T/moltis; CARGO=/opt/homebrew/bin/cargo; W=$T/cba-moltis
 D=$(cd "$(dirname "$0")" && pwd)
 git -C "$T/moltis" worktree add -q --detach "$W" 4106d46dad04481a932597141739e42a5452cc86 2>/dev/null || true
-for v in shipped defect rewrite hidden; do
+for v in shipped defect rewrite hidden helper; do
   git -C $W checkout -q -- . ; git -C $W checkout -q --detach 4106d46dad04481a932597141739e42a5452cc86
   [ $v != shipped ] && git -C $W apply $D/$v.head.patch
   git -C $W apply $D/probe.patch

@@ -4,7 +4,7 @@
 T=${ACCEPTANCE_DIR:?set to the directory holding the clones}; CARGO=/opt/homebrew/bin/cargo; W=$T/cba-grovedb
 D=$(cd "$(dirname "$0")" && pwd)
 git -C "$T/grovedb" worktree add -q --detach "$W" c0e02819ac99a545e70a858208f2095c5fb461c7 2>/dev/null || true
-for v in shipped defect rewrite hidden; do
+for v in shipped defect rewrite hidden helper; do
   git -C $W checkout -q -- . ; git -C $W checkout -q --detach c0e02819ac99a545e70a858208f2095c5fb461c7
   python3 - "$W/Cargo.toml" <<'PY'
 import re,sys

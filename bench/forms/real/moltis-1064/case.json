@@ -27,6 +27,14 @@
       "head": [
         "hidden.head.patch"
       ]
+    },
+    "helper": {
+      "base": [
+        "helper.base-helper.patch"
+      ],
+      "head": [
+        "helper.head.patch"
+      ]
     }
   }
 }
