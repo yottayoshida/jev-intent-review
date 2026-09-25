@@ -126,6 +126,20 @@ const named = (call: CallCandidate) => redact(call.expression).text.replace(/`/g
  */
 const UNTOLD = (call: CallCandidate) => `\`${named(call)}\` could not be told apart from another call of the same text in the body, so the code its reading turns on could not be named`;
 
+/**
+ * The code a failure form's reading turns on (ADR 0019): a call it cannot tell from another is held;
+ * a failure passed to this repository's own function before anything else is done with it is that
+ * function's to handle, and is held with the form's own reason; otherwise the body sent is all.
+ */
+const failurePassedOn =
+  (why: (wrapper: string) => string) =>
+  async ({ body, call, defined }: DecisiveContext): Promise<Decisive> => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
+    const wrapper = wrapperOf(body, call);
+    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
+    return { hold: why(wrapper) };
+  };
+
 const failurePropagation: Form = {
   name: "failure_propagation",
   property: MAPPING_PROPERTY,
@@ -134,12 +148,7 @@ const failurePropagation: Form = {
   askable: ({ fn, call, resultOf }) => resultOf(fn, call),
   // The failure decides the reading. Passed to this repository's own code before it is returned, what
   // the function returns is that code's to say, and its body is not sent: the call is not asked about.
-  decisive: async ({ body, call, defined }) => {
-    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
-    const wrapper = wrapperOf(body, call);
-    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
-    return { hold: `its failure is passed to \`${wrapper}\` before it is returned, and \`${wrapper}\` is this repository's own function, whose body is not sent: what the function returns is \`${wrapper}\`'s to say` };
-  },
+  decisive: failurePassedOn((wrapper) => `its failure is passed to \`${wrapper}\` before it is returned, and \`${wrapper}\` is this repository's own function, whose body is not sent: what the function returns is \`${wrapper}\`'s to say`),
   mappingQuestion: (fn, call) => mappingQuestionFor(fn, call, named(call)),
   observationKey: "on_error_result",
   observationQuestions: (fn, call) => questionsFor(conditionFor(fn, call)),
@@ -269,12 +278,7 @@ const failureHandling: Form = {
   askable: ({ fn, call, calleeResultOf }) => calleeResultOf(fn, call),
   // As `failure_propagation`: passed to this repository's own code, what happens to the failure is
   // that code's to say, and its body is not sent — said in this form's terms.
-  decisive: async ({ body, call, defined }) => {
-    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
-    const wrapper = wrapperOf(body, call);
-    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
-    return { hold: `its failure is passed to \`${wrapper}\` before anything else is done with it, and \`${wrapper}\` is this repository's own function, whose body is not sent: whether the failure is returned, leaves a trace or is dropped is \`${wrapper}\`'s to say` };
-  },
+  decisive: failurePassedOn((wrapper) => `its failure is passed to \`${wrapper}\` before anything else is done with it, and \`${wrapper}\` is this repository's own function, whose body is not sent: whether the failure is returned, leaves a trace or is dropped is \`${wrapper}\`'s to say`),
   mappingQuestion: (fn, call) => handlingMappingFor(fn, call, named(call)),
   observationKey: HANDLING_KEY,
   observationQuestions: (fn, call) => handlingQuestionsFor(conditionFor(fn, call)),
