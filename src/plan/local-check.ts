@@ -68,7 +68,7 @@ export function conditionFor(fn: FunctionCandidate, call: CallCandidate): Condit
   };
 }
 
-const preamble = (c: Condition) =>
+export const preamble = (c: Condition) =>
   `\`code\` is the body of \`${c.target}\`. The entries under \`evidence.related\` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. ` +
   `Assume exactly this and nothing else: ${c.setup} ${c.occurrence}, ${c.operation} returns ${c.yields}. ${c.others}${c.extra ? ` ${c.extra}` : ""}`;
 

@@ -1,0 +1,31 @@
+diff --git a/crates/agents/src/title.rs b/crates/agents/src/title.rs
+index f49c343d..d14f1ab2 100644
+--- a/crates/agents/src/title.rs
++++ b/crates/agents/src/title.rs
+@@ -109,25 +109,7 @@ pub async fn generate_title(
+             info!(title = %title, "generated session title");
+             Ok(title)
+         },
+-        Err(e) => {
+-            #[cfg(feature = "metrics")]
+-            {
+-                let duration = start.elapsed().as_secs_f64();
+-                counter!(
+-                    mem_metrics::SILENT_TURNS_TOTAL,
+-                    labels::VARIANT => "title-generation",
+-                    labels::SUCCESS => "false"
+-                )
+-                .increment(1);
+-                histogram!(
+-                    mem_metrics::SILENT_TURN_DURATION_SECONDS,
+-                    labels::VARIANT => "title-generation"
+-                )
+-                .record(duration);
+-            }
+-            warn!(error = %e, "title generation LLM call failed");
+-            Ok(String::new())
+-        },
++        Err(_e) => Ok(String::new()),
+     }
+ }
+ 
