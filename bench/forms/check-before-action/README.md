@@ -16,7 +16,7 @@ is a change to `open_session` and the run reaches it from the diff.
 
 `expected.json` was written before any request was sent and `run.ts` records its hash at the head of
 the log. `shipped`, `defect`, `rewrite`, `hidden` and `helper` are scored since version 2 of the table (ADR 0020:
-`hidden` is the defect it is once the check's value is read from its body; `helper` tells a check that
+`hidden` is the defect it is once the check's body goes with the packet and the case is assumed (the words adopted; the check's value is not read apart); `helper` tells a check that
 checks from one that does not); `caller` is recorded as the limit it is. The names were chosen so the requirement's words meet the calls, so this case does
 not count as unseen: what it can show is whether the form separates a defect from the shipped code
 and a rewrite on code written for it.

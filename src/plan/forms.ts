@@ -229,13 +229,13 @@ const checkBeforeAction: Form = {
     observed: "in the case the requirement forbids it",
     assumed: (fn, call) => `\`${fn.name}\` is called in the case the requirement describes, in which it says \`${named(call)}\` must not be made; every other operation it reaches succeeds, unless the case itself decides it otherwise.`,
     reading: {
-      reaches_it: "the call is made in a case the requirement forbids it",
-      does_not_reach: "the call is not made in a case the requirement forbids it",
+      reaches_it: "the call is made in the case the requirement forbids it",
+      does_not_reach: "the call is not made in the case the requirement forbids it",
       cannot_determine: "the code shown does not settle whether the call is made in that case",
     },
     whyListed: (target, mapping, observation, probability) =>
       `Jev answered \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}) when asked whether the requirement requires a check to pass before this call, ` +
-      `and \`${observation}\` (${probability.toFixed(2)}) when asked whether \`${target}\` still makes the call in a case the requirement forbids it. ` +
+      `and \`${observation}\` (${probability.toFixed(2)}) when asked whether \`${target}\` still makes the call in the case the requirement forbids it. ` +
       `Both are Jev's readings and neither checks the other.`,
   },
 };

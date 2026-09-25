@@ -151,8 +151,11 @@ async function measure(acceptance: string, runs: number) {
 function tableOf(dir: string, c: RealCase, log: Log): { scored: Record<string, Row>; recorded: Record<string, Row> } {
   const recorded = log.conditions.files?.[c.id]?.["expected.json"];
   const names = ["expected.json", ...readdirSync(dir).filter((n) => /^expected-v\d+\.json$/.test(n))];
-  const name = names.find((n) => sha256(readFileSync(join(dir, n), "utf8")) === recorded) ?? "expected.json";
-  return JSON.parse(readFileSync(join(dir, name), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
+  const name = names.find((n) => sha256(readFileSync(join(dir, n), "utf8")) === recorded);
+  // A log that names no table here — one written by hand, or a table replaced without its
+  // `expected-v<n>.json` kept — is scored under the current one, and says so rather than passing quietly.
+  if (name === undefined && recorded !== undefined) console.error(`${c.id}: the log's expected.json (${recorded.slice(0, 12)}…) matches no table in ${dir}; scoring under the current one`);
+  return JSON.parse(readFileSync(join(dir, name ?? "expected.json"), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
 }
 
 /** Each case's scored and recorded rows against the log, and whether every scored version passed. */

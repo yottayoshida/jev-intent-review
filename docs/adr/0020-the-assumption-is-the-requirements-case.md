@@ -99,11 +99,13 @@ by request so the host's version could not tell them apart, with the lines and t
 among the arms committed first. Arm 0 was the old words, arm 1 the case-only words, arm 2 the
 two-step. The three cases carried five versions each — shipped, defect, rewrite, hidden, and
 **helper**, made for this probe: the check moved into a helper that checks, the same call sites as
-hidden and the helper's body the only difference, so hidden and helper are told apart by the
-check's body or not at all.
+hidden and the helper the only difference — its body, and its parameter's name: hidden's helper
+takes `_history` / `_grove_version` / `_record`, an underscore that says the parameter is unused,
+a cue a reader could go by without the body (the hidden versions were measured with it before this
+probe and are not rebuilt) — so hidden and helper are told apart by the helper, not by the function.
 
 - **Version 1** (275 requests, 15 targets, three arms): arm 1 met every line — the three hidden
-  versions read as reaching the call (0.79–0.89), the three helpers as not (0.88–1.00), every
+  versions read as reaching the call (0.79–0.99), the three helpers as not (0.88–1.00), every
   shipped, rewrite and defect as before. Arm 2 read ten of eleven check values right and one
   wrong: grovedb#500's hidden `heights_need_rewrite`, whose body is `true`, as `false` three
   times of three (0.91) — a three-line body under a doc comment ("whether the heights … have to
@@ -111,11 +113,12 @@ check's body or not at all.
   hidden version as holding (0.86–0.89) and grovedb#500's as reaching in one run of three.
 - The outside line — on calls of pull requests the rules were not written on, of the runs the old
   words read as holding, none turned into a listing and at most 30 % into not settled — needed ten
-  such runs and got 6 of 33 (**version 2**, a stand-in sentence: 116 requests), 2 of 58 (**version
-  3**, the stand-in on more calls: 282 requests) and 4 of 141 (**version 4**'s predecessor — one
-  real sentence per pull request: 282 requests): under the old words, only the call the sentence's
-  own check guards holds. **Version 4** (twelve sentences, each from a real guard in a changed
-  function of four unseen pull requests; 174 requests) reached 25 such runs. Of them arm 1 held 21,
+  such runs and got 6 of 33 (**version 1**, eleven calls under a stand-in sentence, beside the
+  targets), 2 of 58 (**version 2**, the stand-in on more calls: 116 requests) and 4 of 141
+  (**version 3**, one real sentence per pull request: 282 requests): under the old words, only
+  the call the sentence's own check guards holds. **Version 4** (twelve sentences, each from a
+  real guard in a changed function of four unseen pull requests; 174 requests) reached 25 such
+  runs. Of them arm 1 held 21,
   read 2 under the bar as holding, 1 under the bar as reaching, and read **one as reaching at
   exactly 0.60**: the snapshot's `decode` under the sentence about mutations — a call the sentence
   does not govern, which the old words themselves held in only two runs of three. The line said
@@ -149,15 +152,20 @@ words held, at one reading at the bar. The dev set (#80) is where this is measur
 
 ## Consequences
 
-- One request more per check per call asked under this form. `metadata.questionsHash` moves; every
-  answer kept for a pull request (ADR 0013) under this form is asked again once.
-- `--json` carries, on an observed call and a finding under this form, `checks`: each check's
-  name, the value read and its probability. The report's *Assumed* line says the case and the
-  values.
+- No request is added: a call under this form still costs the mapping's request and the
+  observation's. `metadata.questionsHash` moves; every answer kept for a pull request (ADR 0013)
+  under this form is asked again once.
+- `--json` and the report change only in the words: the *Assumed* line says the case the
+  requirement describes and that every other operation succeeds unless the case decides it, where
+  it said the check did not pass. The bodies sent are listed as ADR 0019 has them (`sent`,
+  `notSent`); no field for a check's value exists, since none is read apart.
 - The form's earlier measurements (`check-before-action-v1.json`, `-v2.json`,
   `check-before-action-real-v1.json`, `-v2.json`, `-v3.json`) are of the old words and are not
-  appended to.
-- What the function's question still rests on: that Jev reads the requirement's case from the
-  sentence (the mapping question reads the same words), and that, given a concrete value for the
-  check, it follows the function's control flow rather than its strings. The probe measures the
-  second on three functions; the dev set (#80) measures it on more.
+  appended to; `expected-v1.json` beside each real case keeps the table they were scored under.
+- What the function's question rests on: that Jev reads the requirement's case from the sentence
+  (the mapping question reads the same words), and that, given the case and the checks' bodies,
+  it evaluates a check's body rather than going by its name or the text around the call. The probe
+  measured the second on three functions and, for the old words' holds, on twelve sentences over
+  four unseen pull requests; the dev set (#80) measures it on more. The two-step's misreading of
+  a three-line body under a doc comment says the same reader can still go by the text when the body
+  is all it is shown.

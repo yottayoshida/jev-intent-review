@@ -379,7 +379,7 @@ requirement `unreached`: the notes, of `notes`, that say something was not read.
 Each requirement's section names its form and, after the counts, how the calls read came out. Every
 call read is in exactly one of the first four sections; the label of the function's answer
 (`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and
-`when that call fails` / `in a case the requirement forbids it` in the list of calls read) is the
+`when that call fails` / `in the case the requirement forbids it` in the list of calls read) is the
 form's.
 
 | section | what it holds |
@@ -981,10 +981,13 @@ bodies under `evidence.related` are those of functions the function calls, and t
 operation succeeds unless the case itself decides it — nothing about a check. Measured before it
 was wired, on the same packets, the old words as the control, the arms interleaved so the host's
 version cannot tell them apart, the lines fixed first (`bench/decisive/words-probe*.json`,
-`bench/logs/words-probe-v[1-4].json`, 847 requests over four versions): with a fifth version of each
+`bench/logs/words-probe-v[1-4].json`, 848 requests over four versions): with a fifth version of each
 case, **helper** — the check moved into a helper that checks, the same call sites as hidden and the
-helper's body the only difference — the new words read every hidden version as reaching the call
-(0.79–0.89) and every helper as not (0.88–1.00), the shipped, rewrite and defect versions as before.
+helper the only difference (its body, and its parameter's name: hidden's helper takes `_history`,
+`_grove_version`, `_record`, an underscore that says the parameter is unused and a cue a reader
+could go by without the body; the hidden versions were built and measured with it before this,
+and are not rebuilt) — the new words read every hidden version as reaching the call
+(0.79–0.99) and every helper as not (0.88–1.00), the shipped, rewrite and defect versions as before.
 A two-step that reads each check's value from its own body first (the ADR's draft) read
 grovedb#500's `heights_need_rewrite`, whose body is `true`, as `false` three times of three under
 its doc comment and the sentence's double negative, and is not adopted. On twelve
@@ -1025,7 +1028,7 @@ FAIL: every scored version meets its row in each of 3 runs
 
 - **Every hidden version is listed, every helper holds, in three runs of three** — grovedb#500's
   `heights_need_rewrite` and moltis#1064's `has_enough_messages` with a body of `true`, the
-  constructed case's `reject_disabled` with `Ok(())`, each listed (`reaches_it` 0.81–0.88); the same
+  constructed case's `reject_disabled` with `Ok(())`, each listed (`reaches_it` 0.81–0.99); the same
   call sites with a helper that checks, each holding (`does_not_reach` 0.86–1.00). The shipped code
   and the rewrite hold as before, moltis#1064's and the constructed case's defects are listed as
   before (`bench/logs/check-before-action-v3.json`: shipped, defect, rewrite, hidden and helper three
