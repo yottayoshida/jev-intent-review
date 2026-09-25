@@ -1,0 +1,4590 @@
+{
+  "what": "The raw results of the retrospective's searches (RETRO.md, \"Candidates\"): reference, title and merge time only. No body was read. Ranges are added newest first, each recorded before any of its rows is read.",
+  "earliestFix": "2026-07-01",
+  "ranges": [
+    {
+      "from": "2026-09-01",
+      "to": "2026-09-23",
+      "takenOn": "2026-09-25",
+      "windows": [
+        {
+          "from": "2026-09-01",
+          "to": "2026-09-05",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 64,
+            "swallow error": 92
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-06",
+          "to": "2026-09-11",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 63,
+            "swallow error": 98
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-12",
+          "to": "2026-09-17",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 62,
+            "swallow error": 98
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-18",
+          "to": "2026-09-20",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 37,
+            "swallow error": 53
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-21",
+          "to": "2026-09-23",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 33,
+            "swallow error": 58
+          },
+          "cut": []
+        }
+      ],
+      "kept": 451,
+      "left": {
+        "onSplit": 34,
+        "inSearchOf80": 169,
+        "beforeEarliest": 0
+      }
+    }
+  ],
+  "rows": [
+    {
+      "order": 1,
+      "ref": "jtmthf/kestrel#268",
+      "repo": "jtmthf/kestrel",
+      "title": "Build the images once and consume them by tag (#241)",
+      "closedAt": "2026-09-23T23:11:56Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 2,
+      "ref": "garden-co/jazz#3252",
+      "repo": "garden-co/jazz",
+      "title": "Serialise automatic browser identity adoption",
+      "closedAt": "2026-09-23T22:50:31Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 3,
+      "ref": "originoneai/awr#135",
+      "repo": "originoneai/awr",
+      "title": "feat(team): protocol matrix counterexamples (AWR-TMCP-050)",
+      "closedAt": "2026-09-23T19:32:42Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 4,
+      "ref": "Nisoku/UPI#4",
+      "repo": "nisoku/upi",
+      "title": "Bump the npm_and_yarn group across 1 directory with 2 updates",
+      "closedAt": "2026-09-23T16:34:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 5,
+      "ref": "Risingtides-dev/ocean-os#448",
+      "repo": "risingtides-dev/ocean-os",
+      "title": "feat(rooms): close a room from a route, and stop the store growing forever",
+      "closedAt": "2026-09-23T14:38:13Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 6,
+      "ref": "SimoHypers/limusic#305",
+      "repo": "simohypers/limusic",
+      "title": "0.8.2: playback that survives a dead network, TVHTML5_SIMPLY, normalization switch",
+      "closedAt": "2026-09-23T14:36:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 7,
+      "ref": "artemidamoon2223-collab/Arcium-messenger-#86",
+      "repo": "artemidamoon2223-collab/arcium-messenger-",
+      "title": "ci(karpathy-review): run the review for real and gate on its completion",
+      "closedAt": "2026-09-23T14:26:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 8,
+      "ref": "tsouza/autobot#394",
+      "repo": "tsouza/autobot",
+      "title": "feat(kernel): add canonical encoding, digests, operation_key and deterministic names",
+      "closedAt": "2026-09-23T14:03:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 9,
+      "ref": "dash-chat/dash-chat#597",
+      "repo": "dash-chat/dash-chat",
+      "title": "Fix iOS tests harness",
+      "closedAt": "2026-09-23T13:40:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 10,
+      "ref": "randomcash/payserver-commons#67",
+      "repo": "randomcash/payserver-commons",
+      "title": "RCS-322: Operator subscription table cannot show real volume",
+      "closedAt": "2026-09-23T12:59:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 11,
+      "ref": "biomejs/biome#11910",
+      "repo": "biomejs/biome",
+      "title": "fix(cli): emit error if configuration has errors",
+      "closedAt": "2026-09-23T12:49:47Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 12,
+      "ref": "randomcash/payserver-client#55",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-375: Client: the account that funds a wallet-connect payment is chosen by an untested rule",
+      "closedAt": "2026-09-23T12:29:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 13,
+      "ref": "FabioSM46/voxelheim-v2#1309",
+      "repo": "fabiosm46/voxelheim-v2",
+      "title": "[Feature]: First dungeon descent — the dark cobwebbed cave, the buried-sand hall and the king's arena",
+      "closedAt": "2026-09-23T12:22:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 14,
+      "ref": "jdx/mr-boxington#517",
+      "repo": "jdx/mr-boxington",
+      "title": "fix(cc): remove rustc wrapper directories left behind by in-place mbx upgrades",
+      "closedAt": "2026-09-23T10:43:21Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 15,
+      "ref": "futuregene/future-os#798",
+      "repo": "futuregene/future-os",
+      "title": "feat(skill-reco): recommend a skill while the user types",
+      "closedAt": "2026-09-23T08:54:51Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 16,
+      "ref": "penvhq/penvhq#64",
+      "repo": "penvhq/penvhq",
+      "title": "Local first, programmable values, browser and in-process safety, deployment",
+      "closedAt": "2026-09-23T07:32:59Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 17,
+      "ref": "makewhatis/rhapsody#231",
+      "repo": "makewhatis/rhapsody",
+      "title": "fix(orchestrator): defer a review round while the author's run is live (STUDIO-1025)",
+      "closedAt": "2026-09-23T05:49:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 18,
+      "ref": "AgentWorkforce/relayhistory#245",
+      "repo": "agentworkforce/relayhistory",
+      "title": "fix: reclaim decommissioned probe installs",
+      "closedAt": "2026-09-23T03:42:20Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 19,
+      "ref": "Blackcat-Informatics/purrdf#353",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "perf(sparql-eval,shapes): drive down the change path's per-query term, and give it a prepared execution",
+      "closedAt": "2026-09-22T21:22:39Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 20,
+      "ref": "microsoft/mssql-rs#631",
+      "repo": "microsoft/mssql-rs",
+      "title": "Fix collation decoding and streamed CHAR delivery",
+      "closedAt": "2026-09-22T21:05:23Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 21,
+      "ref": "cube-js/cube#11759",
+      "repo": "cube-js/cube",
+      "title": "fix(query-orchestrator): don't report a cancelled query as a query error",
+      "closedAt": "2026-09-22T17:45:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 22,
+      "ref": "Beyon-Digital/APEX#11",
+      "repo": "beyon-digital/apex",
+      "title": "feat: wire engines end-to-end, Bloomberg-style UX pass, live-audit fixes",
+      "closedAt": "2026-09-22T15:12:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 23,
+      "ref": "dcc-mcp/dcc-mcp-core#2550",
+      "repo": "dcc-mcp/dcc-mcp-core",
+      "title": "chore(ci): refresh the two published uv.lock pins on a schedule",
+      "closedAt": "2026-09-22T15:09:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 24,
+      "ref": "Frogbyte-io/fleet-manager#113",
+      "repo": "frogbyte-io/fleet-manager",
+      "title": "FM-701: image-version promotion and the structured recipe view",
+      "closedAt": "2026-09-22T14:24:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 25,
+      "ref": "randomcash/payserver-client#47",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-358: Client: the functions that cross a network boundary are the untested ones",
+      "closedAt": "2026-09-22T12:56:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 26,
+      "ref": "randomcash/payserver-commons#66",
+      "repo": "randomcash/payserver-commons",
+      "title": "RCS-333: One amount formatter: trim trailing zeros, subscript the leading ones",
+      "closedAt": "2026-09-22T10:43:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 27,
+      "ref": "Blackcat-Informatics/purrdf#354",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "fix(348): one extension environment, and late-bound SHACL-AF function bodies",
+      "closedAt": "2026-09-22T09:54:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 28,
+      "ref": "sashiko-dev/sashiko#540",
+      "repo": "sashiko-dev/sashiko",
+      "title": "ai: redact JSON-RPC error message in AcpProcess::read_rpc_response",
+      "closedAt": "2026-09-22T08:39:43Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 29,
+      "ref": "FrozenTear/teamspeak-admin-panel#65",
+      "repo": "frozentear/teamspeak-admin-panel",
+      "title": "feat(panel): move users by picking a channel (clientmove, soft-handle 770)",
+      "closedAt": "2026-09-22T06:24:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 30,
+      "ref": "toptopworks/toptopduck#1034",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(skills): add create_skill meta-tool with gated whole-string mint (#1031)",
+      "closedAt": "2026-09-22T05:55:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 31,
+      "ref": "allodia-eu/mail-calendar#141",
+      "repo": "allodia-eu/mail-calendar",
+      "title": "Read the engine's report on the folder the user just opened",
+      "closedAt": "2026-09-21T19:18:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 32,
+      "ref": "randomcash/payserver-client#43",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-332: Implement Copy link and Download on the invoice detail page",
+      "closedAt": "2026-09-21T18:56:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 33,
+      "ref": "mjc/mega-rs#1",
+      "repo": "mjc/mega-rs",
+      "title": "feat: add parallel chunk download support",
+      "closedAt": "2026-09-21T18:30:55Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 34,
+      "ref": "Platob/yggdryl#134",
+      "repo": "platob/yggdryl",
+      "title": "Hold every binding type at its crate root and give each medium its own file",
+      "closedAt": "2026-09-21T18:20:30Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 35,
+      "ref": "kckylechen1/Tachi#1952",
+      "repo": "kckylechen1/tachi",
+      "title": "feat(vault): make vault list an account health board",
+      "closedAt": "2026-09-21T16:35:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 36,
+      "ref": "CambrianTech/continuum#4299",
+      "repo": "cambriantech/continuum",
+      "title": "fix(work): a failed board read is not an empty board — work/get names which kind of empty it saw",
+      "closedAt": "2026-09-21T14:15:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 37,
+      "ref": "randomcash/payserver-client#29",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-316: Payment methods table: header and body cells render on different grids",
+      "closedAt": "2026-09-21T13:39:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 38,
+      "ref": "randomcash/payserver-client#39",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-335: Move telemetry off errex: Sentry for errors, Grafana Cloud for metrics and logs",
+      "closedAt": "2026-09-21T13:39:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 39,
+      "ref": "Blackcat-Informatics/purrdf#351",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "The benchmark lanes: pin what a digest certifies, and share the laws that were in one lane only",
+      "closedAt": "2026-09-21T10:03:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 40,
+      "ref": "FrozenTear/scuffed-crew#101",
+      "repo": "frozentear/scuffed-crew",
+      "title": "fix(app): My Strategies no longer eternal Loading on list envelope",
+      "closedAt": "2026-09-21T09:21:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 41,
+      "ref": "milocaetano/quantick#572",
+      "repo": "milocaetano/quantick",
+      "title": "docs(velocity): rank where the loop tokens and wall clock actually go",
+      "closedAt": "2026-09-21T09:09:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 42,
+      "ref": "SauersML/gam#3695",
+      "repo": "sauersml/gam",
+      "title": "Duchon kernel chart: unconditional 1/max|K_CC| rescale, propagate errors",
+      "closedAt": "2026-09-21T04:11:01Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 43,
+      "ref": "adolfousier/ratifact#2",
+      "repo": "adolfousier/ratifact",
+      "title": "Feat/add sqlite as default db",
+      "closedAt": "2026-09-21T03:58:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 44,
+      "ref": "Verenu/Verenu#415",
+      "repo": "verenu/verenu",
+      "title": "Align Insights filters to the page's right edge",
+      "closedAt": "2026-09-21T01:43:34Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 45,
+      "ref": "ArcInstitute/scx#551",
+      "repo": "arcinstitute/scx",
+      "title": "format: refuse an unscoped whole-matrix read of a multimodal file, and name the CSR structural checker",
+      "closedAt": "2026-09-20T22:48:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 46,
+      "ref": "Blackcat-Informatics/purrdf#350",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "fix(349): make a planned depth a certificate of its own derivation",
+      "closedAt": "2026-09-20T22:39:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 47,
+      "ref": "kkrzysztofik/Anyka_ak3918_hacking_journey#118",
+      "repo": "kkrzysztofik/anyka_ak3918_hacking_journey",
+      "title": "Time settings tab: make every control real",
+      "closedAt": "2026-09-20T22:27:19Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 48,
+      "ref": "randomcash/ethpayserver#206",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-320: Plugin pages all share one generic sidebar icon; let a plugin declare its own",
+      "closedAt": "2026-09-20T20:48:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 49,
+      "ref": "randomcash/payserver-client#31",
+      "repo": "randomcash/payserver-client",
+      "title": "RCS-320: Plugin pages all share one generic sidebar icon; let a plugin declare its own",
+      "closedAt": "2026-09-20T20:47:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 50,
+      "ref": "brig-sh/hvi-vmm#146",
+      "repo": "brig-sh/hvi-vmm",
+      "title": "fix(machine): Stop and join the helper threads before boot returns",
+      "closedAt": "2026-09-20T20:16:36Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 51,
+      "ref": "SimoHypers/limusic#273",
+      "repo": "simohypers/limusic",
+      "title": "0.8.0: crossfade, playlist editing, video search",
+      "closedAt": "2026-09-20T20:02:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 52,
+      "ref": "randomcash/payserver-commons#60",
+      "repo": "randomcash/payserver-commons",
+      "title": "RCS-320: Plugin pages all share one generic sidebar icon; let a plugin declare its own",
+      "closedAt": "2026-09-20T17:34:26Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 53,
+      "ref": "deepso7/minip2p#200",
+      "repo": "deepso7/minip2p",
+      "title": "Introduce direct Connection attempts",
+      "closedAt": "2026-09-20T16:09:57Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 54,
+      "ref": "Ivy-Interactive/Ivy-Tendril-V2#190",
+      "repo": "ivy-interactive/ivy-tendril-v2",
+      "title": "Add live wireframes to plans",
+      "closedAt": "2026-09-20T16:08:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 55,
+      "ref": "kkrzysztofik/Anyka_ak3918_hacking_journey#116",
+      "repo": "kkrzysztofik/anyka_ak3918_hacking_journey",
+      "title": "feat(webui): supervised-service process control and enable/disable",
+      "closedAt": "2026-09-20T14:26:23Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 56,
+      "ref": "DIG-Network/dig-account#62",
+      "repo": "dig-network/dig-account",
+      "title": "feat(account): reward_distributor_minter() facade + public $DIG CAT coin selection (#59, #60)",
+      "closedAt": "2026-09-20T14:01:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 57,
+      "ref": "killallgit/adhd-ranch#77",
+      "repo": "killallgit/adhd-ranch",
+      "title": "[hook-server]: One hook server on every platform, and stop bundling Windows on every PR",
+      "closedAt": "2026-09-20T13:51:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 58,
+      "ref": "Shekyl-Foundation/shekyl-core#801",
+      "repo": "shekyl-foundation/shekyl-core",
+      "title": "docs: height-semantics Phase 1 (daemon_claimed_tip consumer walk)",
+      "closedAt": "2026-09-20T13:17:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 59,
+      "ref": "tinyhumansai/tinyagents#181",
+      "repo": "tinyhumansai/tinyagents",
+      "title": "fix: restore orchestration compatibility APIs",
+      "closedAt": "2026-09-20T13:11:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 60,
+      "ref": "SauersML/gam#3613",
+      "repo": "sauersml/gam",
+      "title": "Judge flatten on the geometric angle of the atom's image plane and the rows it parses (#3506)",
+      "closedAt": "2026-09-20T10:40:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 61,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#15082",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "refactor(parser): charge core token, node, and diagnostic work through the live tracker (#8786)",
+      "closedAt": "2026-09-20T10:14:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 62,
+      "ref": "Blackcat-Informatics/purrdf#342",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(340): a fused answer states, and bounds, what its producers approximated",
+      "closedAt": "2026-09-20T08:59:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 63,
+      "ref": "makewhatis/rhapsody#188",
+      "repo": "makewhatis/rhapsody",
+      "title": "fix(web): show each review's own provider on the board card (STUDIO-952)",
+      "closedAt": "2026-09-20T08:31:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 64,
+      "ref": "Blackcat-Informatics/purrdf#341",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(339): the ranked-producer contract, honest per-stratum evidence, and a bounded fused read",
+      "closedAt": "2026-09-20T06:43:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 65,
+      "ref": "lydakis/agent#1",
+      "repo": "lydakis/agent",
+      "title": "Human-facing clients over the socket protocol, bot lineage, client policy",
+      "closedAt": "2026-09-20T04:47:26Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 66,
+      "ref": "Blackcat-Informatics/purrdf#343",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "perf(shapes,sparql-eval): remove the change path's per-focus-node growth term",
+      "closedAt": "2026-09-20T04:44:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 67,
+      "ref": "toptopworks/toptopduck#1002",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(session): turn output cap via model catalog + global clamp (#1001)",
+      "closedAt": "2026-09-20T02:18:15Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 68,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#13845",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "architecture(features): classify every Cargo feature by role (#8409)",
+      "closedAt": "2026-09-20T01:50:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 69,
+      "ref": "Mesh-LLM/mesh-llm#1929",
+      "repo": "mesh-llm/mesh-llm",
+      "title": "fix(build): align macOS deployment targets with llama.cpp",
+      "closedAt": "2026-09-19T23:29:08Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 70,
+      "ref": "OctoSense-org/makepad#15",
+      "repo": "octosense-org/makepad",
+      "title": "Map fixes for Android: GL no-draw-list panic, silent HTTP cancel, compact vertex formats, host puck",
+      "closedAt": "2026-09-19T22:09:18Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 71,
+      "ref": "wheregmis/threadlane#222",
+      "repo": "wheregmis/threadlane",
+      "title": "chore(main): release 0.1.18",
+      "closedAt": "2026-09-19T18:54:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 72,
+      "ref": "preloopdev/preloop#271",
+      "repo": "preloopdev/preloop",
+      "title": "Encrypt secrets and tokens at rest, retroactive log masking ",
+      "closedAt": "2026-09-19T18:19:43Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 73,
+      "ref": "Itz-Agasta/breez#2",
+      "repo": "itz-agasta/breez",
+      "title": "Full editing pipeline + MP4 export",
+      "closedAt": "2026-09-19T18:06:36Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 74,
+      "ref": "FSM1/cipher-box#1914",
+      "repo": "fsm1/cipher-box",
+      "title": "fix(engine): cache what the write wave adopts before its floor moves",
+      "closedAt": "2026-09-19T15:52:04Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 75,
+      "ref": "Jsuppers/impresspress#106",
+      "repo": "jsuppers/impresspress",
+      "title": "fix(products): accept every v1 in a rotating Stripe signature, and stop swallowing add-on total failures",
+      "closedAt": "2026-09-19T08:37:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 76,
+      "ref": "Ivy-Interactive/Ivy-Tendril-V2#188",
+      "repo": "ivy-interactive/ivy-tendril-v2",
+      "title": "test release",
+      "closedAt": "2026-09-19T07:24:26Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 77,
+      "ref": "praveenVnktsh/minutes#32",
+      "repo": "praveenvnktsh/minutes",
+      "title": "fix: make settings edits transactional",
+      "closedAt": "2026-09-19T05:56:43Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 78,
+      "ref": "Dyse-Industries/control-rs#56",
+      "repo": "dyse-industries/control-rs",
+      "title": "ets host patches",
+      "closedAt": "2026-09-19T03:39:10Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 79,
+      "ref": "Blackcat-Informatics/purrdf#336",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(331): exact sealed per-page summaries for the paged tier",
+      "closedAt": "2026-09-19T03:14:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 80,
+      "ref": "Jsuppers/impresspress#100",
+      "repo": "jsuppers/impresspress",
+      "title": "fix(ui): the admin's htmx forms post form bodies, and every handler behind them 400'd",
+      "closedAt": "2026-09-19T02:38:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 81,
+      "ref": "pilotspace/moon#1017",
+      "repo": "pilotspace/moon",
+      "title": "fix(persistence): open every tokio --shards 1 AOF generation with MOON.COLDCUT (moon#914)",
+      "closedAt": "2026-09-19T02:19:45Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 82,
+      "ref": "9thLevelSoftware/legion-ide#218",
+      "repo": "9thlevelsoftware/legion-ide",
+      "title": "Resumed full-product completion: rounds r00-r07 (component evidence only, no acceptance change)",
+      "closedAt": "2026-09-19T00:45:50Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 83,
+      "ref": "crmne/spotifast#470",
+      "repo": "crmne/spotifast",
+      "title": "Ignore Library pages asked for before their shelf was reset",
+      "closedAt": "2026-09-18T21:14:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 84,
+      "ref": "Strike48-public/pick#458",
+      "repo": "strike48-public/pick",
+      "title": "fix(ui): persist easy-mode telemetry opt-out through the settings signal",
+      "closedAt": "2026-09-18T20:51:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 85,
+      "ref": "MostroP2P/mostrix#190",
+      "repo": "mostrop2p/mostrix",
+      "title": "Add relay remove/restore and bare-URL add in Settings",
+      "closedAt": "2026-09-18T20:13:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 86,
+      "ref": "Blackcat-Informatics/purrdf#334",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "fix(333): stop refusing a valid stream when decay ties adjacent contributions",
+      "closedAt": "2026-09-18T20:05:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 87,
+      "ref": "likesjx/philotic-stack#565",
+      "repo": "likesjx/philotic-stack",
+      "title": "feat(aiua): a moving transport carries its secret sealed to the target (R7)",
+      "closedAt": "2026-09-18T19:06:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 88,
+      "ref": "narnaud/git-loom#271",
+      "repo": "narnaud/git-loom",
+      "title": "refactor(git): make patch parking shareable, durable and visible",
+      "closedAt": "2026-09-18T18:54:29Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 89,
+      "ref": "Bahia-Software/polypus#177",
+      "repo": "bahia-software/polypus",
+      "title": "feat(packaging): auto-calibrate the gate-parallel threshold at import",
+      "closedAt": "2026-09-18T16:36:50Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 90,
+      "ref": "preloopdev/preloop#272",
+      "repo": "preloopdev/preloop",
+      "title": "Confine hashFiles, bound runner memory, cap bridge connections, mask multiline secrets ",
+      "closedAt": "2026-09-18T16:25:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 91,
+      "ref": "Vasak-OS/vasak-store#8",
+      "repo": "vasak-os/vasak-store",
+      "title": "Pruebas montadas: apretar el botón en vez de leer el .vue",
+      "closedAt": "2026-09-18T15:25:19Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 92,
+      "ref": "toptopworks/toptopduck#996",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(session): shared matcher delegation and single-line search rows (#980)",
+      "closedAt": "2026-09-18T15:18:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 93,
+      "ref": "hops-ops/distributed#266",
+      "repo": "hops-ops/distributed",
+      "title": "chore(deps): update dependency helm to v4",
+      "closedAt": "2026-09-18T15:00:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 94,
+      "ref": "ibm-granite-community/granite-cli#146",
+      "repo": "ibm-granite-community/granite-cli",
+      "title": "fix: fail setup when the config cannot be saved",
+      "closedAt": "2026-09-18T14:10:15Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 95,
+      "ref": "pando85/kaniop#1037",
+      "repo": "pando85/kaniop",
+      "title": "build(deps): Update dependency helm/helm to v4",
+      "closedAt": "2026-09-18T13:37:45Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 96,
+      "ref": "zkemail/relayer-utils#33",
+      "repo": "zkemail/relayer-utils",
+      "title": "feat/new compiler",
+      "closedAt": "2026-09-18T11:41:39Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 97,
+      "ref": "randomcash/payserver-commons#44",
+      "repo": "randomcash/payserver-commons",
+      "title": "RCS-276: Audit pass 1: auth, session and recovery",
+      "closedAt": "2026-09-18T11:25:41Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 98,
+      "ref": "randomcash/payserver-commons#46",
+      "repo": "randomcash/payserver-commons",
+      "title": "RCS-302: The page descriptor and its renderer, static pages only",
+      "closedAt": "2026-09-18T11:18:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 99,
+      "ref": "maxi-tools/coreml-rs#64",
+      "repo": "maxi-tools/coreml-rs",
+      "title": "build.rs: build the Swift library in OUT_DIR and find the archive by search",
+      "closedAt": "2026-09-18T09:16:46Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 100,
+      "ref": "toptopworks/toptopduck#991",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(skills): consume turn invocations, retire activation channels (#984)",
+      "closedAt": "2026-09-18T09:12:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 101,
+      "ref": "api7/aisix#1208",
+      "repo": "api7/aisix",
+      "title": "fix(config): an unknown resource kind is forward compat, not a failed reload",
+      "closedAt": "2026-09-18T08:19:22Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 102,
+      "ref": "heemangstudio/Rauhwpx#296",
+      "repo": "heemangstudio/rauhwpx",
+      "title": "fix(desktop): retry Windows lock when removing handoff payloads",
+      "closedAt": "2026-09-18T07:24:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 103,
+      "ref": "CrispStrobe/kerotakis#645",
+      "repo": "crispstrobe/kerotakis",
+      "title": "i18n: the particle drawing speaks the reader's language",
+      "closedAt": "2026-09-18T06:07:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 104,
+      "ref": "majiayu000/harness#2079",
+      "repo": "majiayu000/harness",
+      "title": "fix(reconcile): distinguish failed transitions from dry-run and surface tick errors",
+      "closedAt": "2026-09-18T04:49:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 105,
+      "ref": "Dyse-Industries/control-rs#52",
+      "repo": "dyse-industries/control-rs",
+      "title": "chore(workspace): dual-license split and root lint/format config",
+      "closedAt": "2026-09-18T04:31:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 106,
+      "ref": "gmhelmold/hugr-lightr#159",
+      "repo": "gmhelmold/hugr-lightr",
+      "title": "fix(ci): restore strict Windows build and enforce complete integration gates",
+      "closedAt": "2026-09-18T03:06:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 107,
+      "ref": "Blackcat-Informatics/purrdf#321",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(319): implement purrdf-retrieval composition layer",
+      "closedAt": "2026-09-18T02:24:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 108,
+      "ref": "ai-dynamo/dynamo#14815",
+      "repo": "ai-dynamo/dynamo",
+      "title": "fix(ci): Use `pytest --ignore` to Skip Tests Based on Framework",
+      "closedAt": "2026-09-18T00:38:13Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 109,
+      "ref": "ferriskey/ferriskey#1382",
+      "repo": "ferriskey/ferriskey",
+      "title": "feat(i18n): resolve and store the active locale in the console",
+      "closedAt": "2026-09-17T22:05:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 110,
+      "ref": "base/base#5060",
+      "repo": "base/base",
+      "title": "fix(rpc): use shared insertion sender for mempool submissions",
+      "closedAt": "2026-09-17T21:51:45Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 111,
+      "ref": "statecrafting/spec-spine#253",
+      "repo": "statecrafting/spec-spine",
+      "title": "fix(112): preserve truthful sweep outcomes and revision isolation",
+      "closedAt": "2026-09-17T21:07:03Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 112,
+      "ref": "drasi-project/drasi-core#825",
+      "repo": "drasi-project/drasi-core",
+      "title": "test: add reaction recovery conformance coverage",
+      "closedAt": "2026-09-17T20:06:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 113,
+      "ref": "feldera/feldera#7054",
+      "repo": "feldera/feldera",
+      "title": "[profiler] The bundle viewer should not need a running pipeline manager",
+      "closedAt": "2026-09-17T20:06:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 114,
+      "ref": "ujeenet/rustango#1559",
+      "repo": "ujeenet/rustango",
+      "title": "purge said access was revoked after failing to revoke it",
+      "closedAt": "2026-09-17T17:18:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 115,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#13162",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "test(ux): answer server-initiated LSP requests (#13170)",
+      "closedAt": "2026-09-17T15:42:05Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 116,
+      "ref": "Corgea/Sighthound#73",
+      "repo": "corgea/sighthound",
+      "title": "CWE-95 + frontend/template XSS precision",
+      "closedAt": "2026-09-17T15:07:47Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 117,
+      "ref": "estuary/flow#3490",
+      "repo": "estuary/flow",
+      "title": "connector: a V2 connector service, served in-process and over the network",
+      "closedAt": "2026-09-17T15:04:44Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 118,
+      "ref": "bindreams/claude-scriptcheck#63",
+      "repo": "bindreams/claude-scriptcheck",
+      "title": "Classify every redirect arm against the Bash manual",
+      "closedAt": "2026-09-17T14:51:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 119,
+      "ref": "cregis-dev/apex#69",
+      "repo": "cregis-dev/apex",
+      "title": "docs: align data-models.md with the schema, including the migration-added columns",
+      "closedAt": "2026-09-17T06:49:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 120,
+      "ref": "mokmok-dev/agent#4",
+      "repo": "mokmok-dev/agent",
+      "title": "refactor: apply Rust idioms and wrap secrets with secrecy/zeroize",
+      "closedAt": "2026-09-17T06:23:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 121,
+      "ref": "schjonhaug/canary#581",
+      "repo": "schjonhaug/canary",
+      "title": "Deliver NIP-17 DMs to .onion inbox relays via optional SOCKS",
+      "closedAt": "2026-09-17T06:14:39Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 122,
+      "ref": "EffortlessMetrics/copybook-rs#1029",
+      "repo": "effortlessmetrics/copybook-rs",
+      "title": "fix(release): gate dependents on exact-version index readiness (#996)",
+      "closedAt": "2026-09-17T05:58:01Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 123,
+      "ref": "epigraph-io/epigraph#464",
+      "repo": "epigraph-io/epigraph",
+      "title": "refactor(api): conversion shard 6 — stamp six route files onto AppState::read_as, with a two-sided mutation proof",
+      "closedAt": "2026-09-17T05:44:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 124,
+      "ref": "toptopworks/toptopduck#971",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(skills): retire mount popover and cold-start pending mounts (#962)",
+      "closedAt": "2026-09-17T03:31:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 125,
+      "ref": "button-inc/batten#930",
+      "repo": "button-inc/batten",
+      "title": "refactor(gate): retire the forge/record half of the bash corpus onto the engine",
+      "closedAt": "2026-09-16T23:30:29Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 126,
+      "ref": "solvela-ai/solvela#803",
+      "repo": "solvela-ai/solvela",
+      "title": "feat(fee): runtime platform-fee knob (SOLVELA_PLATFORM_FEE_PERCENT) — one helper pair owns all fee math",
+      "closedAt": "2026-09-16T22:57:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 127,
+      "ref": "apollographql/router#10118",
+      "repo": "apollographql/router",
+      "title": "chore: upgrade `shape` crate to 0.8.3",
+      "closedAt": "2026-09-16T20:51:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 128,
+      "ref": "Nisoku/Honzo#107",
+      "repo": "nisoku/honzo",
+      "title": "Bump the npm_and_yarn group across 1 directory with 2 updates",
+      "closedAt": "2026-09-16T18:54:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 129,
+      "ref": "jlevy/fdu#64",
+      "repo": "jlevy/fdu",
+      "title": "docs(release): finalize the 0.1.0 CHANGELOG and release notes",
+      "closedAt": "2026-09-16T18:16:40Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 130,
+      "ref": "ai-dynamo/dynamo#13599",
+      "repo": "ai-dynamo/dynamo",
+      "title": "fix: show correct backend versions in the install selectors",
+      "closedAt": "2026-09-16T15:58:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 131,
+      "ref": "near/nearcore#16350",
+      "repo": "near/nearcore",
+      "title": "refactor(sync): move sync peer choice into the client",
+      "closedAt": "2026-09-16T15:29:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 132,
+      "ref": "0xMiden/node#2601",
+      "repo": "0xmiden/node",
+      "title": "feat(funding-service): add the RequestFunds endpoint",
+      "closedAt": "2026-09-16T15:03:21Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 133,
+      "ref": "jainam-panchal/fusion-pipeline#46",
+      "repo": "jainam-panchal/fusion-pipeline",
+      "title": "core: Meta beside the record and never in it; decisions read Meta (#45, #43)",
+      "closedAt": "2026-09-16T13:55:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 134,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#15415",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "security(zed,agents): enforce source-authority and instruction/data boundaries (#11726) [same-root transplant of #11994]",
+      "closedAt": "2026-09-16T13:54:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 135,
+      "ref": "ar-io/ar-io-solana-contracts#136",
+      "repo": "ar-io/ar-io-solana-contracts",
+      "title": "feat(ci): guard Anchor error-code ABI at PR time (ADR-035)",
+      "closedAt": "2026-09-16T13:39:41Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 136,
+      "ref": "randomcash/ethpayserver#144",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-295: A reorg cannot retract a confirmed payment, and forgets everything on restart",
+      "closedAt": "2026-09-16T13:36:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 137,
+      "ref": "randomcash/ethpayserver#157",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-307: Sepolia RPC health has been stuck at unhealthy for hours while blocks advance normally",
+      "closedAt": "2026-09-16T12:42:26Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 138,
+      "ref": "bugsee/bugsee-cli#26",
+      "repo": "bugsee/bugsee-cli",
+      "title": "feat(xcode): add `upload-dsyms` for build-phase dSYM upload",
+      "closedAt": "2026-09-16T12:11:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 139,
+      "ref": "LOUST-PRO/paperforge#25",
+      "repo": "loust-pro/paperforge",
+      "title": "feat(tray): add Open GUI menu entry for paperforge-gui spawn",
+      "closedAt": "2026-09-16T11:30:20Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 140,
+      "ref": "leynos/femtologging#478",
+      "repo": "leynos/femtologging",
+      "title": "Adopt the estate Markdown formatting baseline",
+      "closedAt": "2026-09-16T10:38:35Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 141,
+      "ref": "jlevy/fdu#63",
+      "repo": "jlevy/fdu",
+      "title": "fix(control): .gitignore bounds degrade instead of aborting, with one liftable budget",
+      "closedAt": "2026-09-16T08:06:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 142,
+      "ref": "tinyhumansai/tinysweeper#163",
+      "repo": "tinyhumansai/tinysweeper",
+      "title": "feat(presets): polyglot preset with eight language rule documents",
+      "closedAt": "2026-09-16T07:20:12Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 143,
+      "ref": "bitty-terminal/bitty#786",
+      "repo": "bitty-terminal/bitty",
+      "title": "[CTX-0478] fix(runtime): platform gaps (Win foreground, pid TOCTOU, clipboard, diagnostics)",
+      "closedAt": "2026-09-16T02:40:50Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 144,
+      "ref": "jainam-panchal/fusion-pipeline#38",
+      "repo": "jainam-panchal/fusion-pipeline",
+      "title": "stages: edit node with set, rename, copy, hash and delete ops",
+      "closedAt": "2026-09-16T02:40:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 145,
+      "ref": "microsoft/trident#731",
+      "repo": "microsoft/trident",
+      "title": "trident-acl-agent: add storm trident-acl-agent E2E test harness, test images, and pipeline",
+      "closedAt": "2026-09-16T01:23:27Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 146,
+      "ref": "librefang/librefang#8029",
+      "repo": "librefang/librefang",
+      "title": "feat(dashboard): add pause/resume controls to the goals page",
+      "closedAt": "2026-09-16T00:46:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 147,
+      "ref": "Island-Dev-Crew/garnet#585",
+      "repo": "island-dev-crew/garnet",
+      "title": "trust(gate): batch git object reads in the rolling-review gate (U-75)",
+      "closedAt": "2026-09-15T21:28:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 148,
+      "ref": "tinyhumansai/openhuman#6290",
+      "repo": "tinyhumansai/openhuman",
+      "title": "test(skills,mcp): prove registry skills and MCP servers install and are usable by the agent",
+      "closedAt": "2026-09-15T20:39:49Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 149,
+      "ref": "leynos/weaver#228",
+      "repo": "leynos/weaver",
+      "title": "Define the Sempai query-to-selector vertical slice",
+      "closedAt": "2026-09-15T19:48:03Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 150,
+      "ref": "randomcash/ethpayserver#160",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-311: Error reporting is switched off and nothing says so",
+      "closedAt": "2026-09-15T19:45:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 151,
+      "ref": "marmot-protocol/mdk#1857",
+      "repo": "marmot-protocol/mdk",
+      "title": "Restore account-scoped user blocking in MDK",
+      "closedAt": "2026-09-15T19:06:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 152,
+      "ref": "krabka-io/krabka-broker#995",
+      "repo": "krabka-io/krabka-broker",
+      "title": "fix: answer the share-state persister error on ShareFetch and ShareAcknowledge",
+      "closedAt": "2026-09-15T18:22:44Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 153,
+      "ref": "Daniel-T-S-Adams/tig-mining-pool-public#27",
+      "repo": "daniel-t-s-adams/tig-mining-pool-public",
+      "title": "A watcher for the thing the gate cannot see",
+      "closedAt": "2026-09-15T17:44:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 154,
+      "ref": "randomcash/ethpayserver#150",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-286: Payment amounts pass through rust_decimal, which cannot represent them exactly",
+      "closedAt": "2026-09-15T14:51:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 155,
+      "ref": "platformed-com/platformed-llm#29",
+      "repo": "platformed-com/platformed-llm",
+      "title": "Report a stream that stopped without saying why, instead of guessing",
+      "closedAt": "2026-09-15T14:46:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 156,
+      "ref": "senara-solutions/mika#2325",
+      "repo": "senara-solutions/mika",
+      "title": "wip(mika#2315): trailing content after pilot end_turn (mika#1383)",
+      "closedAt": "2026-09-15T14:14:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 157,
+      "ref": "thalovant/thalovant-rust-sdk#55",
+      "repo": "thalovant/thalovant-rust-sdk",
+      "title": "Close the SDK gaps a phone found: native sign-in, and what to call a hub",
+      "closedAt": "2026-09-15T13:59:53Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 158,
+      "ref": "toptopworks/toptopduck#953",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(skills): retire tool reference keys and align the settings pane (#952)",
+      "closedAt": "2026-09-15T13:27:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 159,
+      "ref": "RedisJSON/RedisJSON#1638",
+      "repo": "redisjson/redisjson",
+      "title": "MOD-18184 Gate benchmarks on committed KPI baselines",
+      "closedAt": "2026-09-15T12:33:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 160,
+      "ref": "randomcash/ethpayserver#149",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-282: payments collapses two transfers in one transaction, and loses the second",
+      "closedAt": "2026-09-15T12:30:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 161,
+      "ref": "overfolder/overslash#619",
+      "repo": "overfolder/overslash",
+      "title": "feat(permissions): admins can backfill self-setup rules to existing agents",
+      "closedAt": "2026-09-15T11:56:50Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 162,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#15655",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "test(workspace): observe recorded limit rejections instead of propagating them (#15428)",
+      "closedAt": "2026-09-15T11:46:18Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 163,
+      "ref": "juspay/hyperswitch-prism#2299",
+      "repo": "juspay/hyperswitch-prism",
+      "title": "chore(deja): pin deja to d587865 and migrate the Superposition read boundary",
+      "closedAt": "2026-09-15T11:26:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 164,
+      "ref": "Ascending-AI/lash#1523",
+      "repo": "ascending-ai/lash",
+      "title": "Size remote actions per target from a measured table",
+      "closedAt": "2026-09-15T10:46:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 165,
+      "ref": "randomcash/ethpayserver#154",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-302: The page descriptor and its renderer, static pages only",
+      "closedAt": "2026-09-15T10:20:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 166,
+      "ref": "randomcash/ethpayserver#143",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-257: Plugin storage: own schema, own migrations, and a host API to reach it",
+      "closedAt": "2026-09-15T10:12:03Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 167,
+      "ref": "randomcash/ethpayserver#156",
+      "repo": "randomcash/ethpayserver",
+      "title": "RCS-227: feat: let a merchant change their account email and primary wallet from Settings",
+      "closedAt": "2026-09-15T09:31:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 168,
+      "ref": "xpepper/copilot-powerline#18",
+      "repo": "xpepper/copilot-powerline",
+      "title": "feat(pr): add optional pull request reference segment",
+      "closedAt": "2026-09-15T08:40:22Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 169,
+      "ref": "api7/aisix#1189",
+      "repo": "api7/aisix",
+      "title": "perf(auth): index JWT API-key bindings by resource generation",
+      "closedAt": "2026-09-15T08:18:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 170,
+      "ref": "Ascending-AI/lash#1539",
+      "repo": "ascending-ai/lash",
+      "title": "Normalize local binder names in the canonical program IR so equal module refs carry equal bytes (FIG-3120)",
+      "closedAt": "2026-09-15T08:11:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 171,
+      "ref": "gotempsh/temps#1004",
+      "repo": "gotempsh/temps",
+      "title": "fix(ci): populate shared daemon image build caches",
+      "closedAt": "2026-09-15T05:45:34Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 172,
+      "ref": "rmems/cortex-tensor#48",
+      "repo": "rmems/cortex-tensor",
+      "title": "docs: retarget safetensors to engram-parser and pin freeze to #47",
+      "closedAt": "2026-09-15T03:45:57Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 173,
+      "ref": "anvai-labs/proximaDB#1897",
+      "repo": "anvai-labs/proximadb",
+      "title": "fix(storage): harden conditional publication and queue ownership",
+      "closedAt": "2026-09-15T02:43:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 174,
+      "ref": "sria91/liter#1",
+      "repo": "sria91/liter",
+      "title": "test: add comprehensive unit tests and CI coverage workflow",
+      "closedAt": "2026-09-15T01:02:48Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 175,
+      "ref": "ArcInstitute/scx#536",
+      "repo": "arcinstitute/scx",
+      "title": "loader: bounded reader registry for large manifests (W8)",
+      "closedAt": "2026-09-15T00:39:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 176,
+      "ref": "dman-os/townframe#40",
+      "repo": "dman-os/townframe",
+      "title": "refactor: modular machines",
+      "closedAt": "2026-09-15T00:16:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 177,
+      "ref": "dman-os/townframe#38",
+      "repo": "dman-os/townframe",
+      "title": "feat(big_repo): automerge frontier worker",
+      "closedAt": "2026-09-15T00:16:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 178,
+      "ref": "dman-os/townframe#36",
+      "repo": "dman-os/townframe",
+      "title": "feat: blob pins",
+      "closedAt": "2026-09-15T00:16:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 179,
+      "ref": "fagemx/edda#1248",
+      "repo": "fagemx/edda",
+      "title": "feat(pi): registry-qualify edda-pi send/receipt with --registry (#1247)",
+      "closedAt": "2026-09-14T22:42:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 180,
+      "ref": "arnaudmaillet/core-platform#638",
+      "repo": "arnaudmaillet/core-platform",
+      "title": "fix(ci): move the BuildKit cook cache to GHCR, keyed per-arch not per-bin",
+      "closedAt": "2026-09-14T21:47:39Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 181,
+      "ref": "jdx/communique#338",
+      "repo": "jdx/communique",
+      "title": "fix(ci): prevent release PRs from merging before post-processing",
+      "closedAt": "2026-09-14T21:33:52Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 182,
+      "ref": "piekstra/google-home-cli#4",
+      "repo": "piekstra/google-home-cli",
+      "title": "feat(announce): speak over the LAN with the Cast protocol",
+      "closedAt": "2026-09-14T18:42:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 183,
+      "ref": "KevTiv/lumiere-v-1#44",
+      "repo": "kevtiv/lumiere-v-1",
+      "title": "docs(harness): coordinate remaining ERP harness implementation",
+      "closedAt": "2026-09-14T18:27:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 184,
+      "ref": "sourcemaps/upstroke#279",
+      "repo": "sourcemaps/upstroke",
+      "title": "feat(engine): run-end closure, terminal finalization and the sequential ledger (PR10)",
+      "closedAt": "2026-09-14T17:29:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 185,
+      "ref": "fagemx/edda#1234",
+      "repo": "fagemx/edda",
+      "title": "feat(pi): surface the installed extension and hand-opened load path in runtime-info (#520)",
+      "closedAt": "2026-09-14T15:17:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 186,
+      "ref": "maxkulish/lok#101",
+      "repo": "maxkulish/lok",
+      "title": "fix(CLO-655): treat {# as text in workflow templates and report template errors by kind",
+      "closedAt": "2026-09-14T14:07:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 187,
+      "ref": "fagemx/edda#1218",
+      "repo": "fagemx/edda",
+      "title": "fix(activation): refuse a stale checkout or an installed-content downgrade (#1217)",
+      "closedAt": "2026-09-14T12:04:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 188,
+      "ref": "fagemx/edda#1216",
+      "repo": "fagemx/edda",
+      "title": "fix(agent-manager): read the work card's owner return from the run's pinned mailbox root (#1211)",
+      "closedAt": "2026-09-14T11:43:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 189,
+      "ref": "tamnd/rudb-compat#46",
+      "repo": "tamnd/rudb-compat",
+      "title": "Carry out the settings a file makes about itself",
+      "closedAt": "2026-09-14T10:29:43Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 190,
+      "ref": "tamnd/rudb-compat#45",
+      "repo": "tamnd/rudb-compat",
+      "title": "Read the last of the unreadable files",
+      "closedAt": "2026-09-14T10:18:22Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 191,
+      "ref": "tinyhumansai/tinysweeper#148",
+      "repo": "tinyhumansai/tinysweeper",
+      "title": "feat(preview): UI previews — flows, callouts and clips on pull requests",
+      "closedAt": "2026-09-14T09:46:02Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 192,
+      "ref": "Ignis-lang/ignis#218",
+      "repo": "ignis-lang/ignis",
+      "title": "test(selfhost): scope fixture and fs test scratch dirs by process id (#212)",
+      "closedAt": "2026-09-14T07:39:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 193,
+      "ref": "fagemx/edda#1206",
+      "repo": "fagemx/edda",
+      "title": "fix(pi): bound the unconfirmed dependency-delivery wait so it cannot withhold later revisions (#1202)",
+      "closedAt": "2026-09-14T06:00:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 194,
+      "ref": "kent8192/reinhardt-web#6296",
+      "repo": "kent8192/reinhardt-web",
+      "title": "fix: install and invoke ExceptionHandler across the request path",
+      "closedAt": "2026-09-14T02:42:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 195,
+      "ref": "Genetic-Pottery/warlock#102",
+      "repo": "genetic-pottery/warlock",
+      "title": "WAR-91: Add an engine function that drops manifest entries under ignored directories",
+      "closedAt": "2026-09-14T02:16:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 196,
+      "ref": "prokosna/tradr#152",
+      "repo": "prokosna/tradr",
+      "title": "WI-M5-009: a refused call reaches the interface, not the console",
+      "closedAt": "2026-09-13T23:42:41Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 197,
+      "ref": "cosmicspork/tracon#206",
+      "repo": "cosmicspork/tracon",
+      "title": "feat(http): serve OpenCode's native UI from its own origin behind a single-use bootstrap",
+      "closedAt": "2026-09-13T23:02:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 198,
+      "ref": "rmems/xai-dissect#61",
+      "repo": "rmems/xai-dissect",
+      "title": "docs: add a PR template carrying the review-thread gate",
+      "closedAt": "2026-09-13T19:15:38Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 199,
+      "ref": "holon-run/holon#2962",
+      "repo": "holon-run/holon",
+      "title": "fix(memory): coordinate index writers per database",
+      "closedAt": "2026-09-13T17:52:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 200,
+      "ref": "Fisch37/CrabNBT#2",
+      "repo": "fisch37/crabnbt",
+      "title": "feat: more error parity",
+      "closedAt": "2026-09-13T17:11:53Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 201,
+      "ref": "herdrdev/herdr#3107",
+      "repo": "herdrdev/herdr",
+      "title": "feat: add Letta Code detection and restore",
+      "closedAt": "2026-09-13T15:36:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 202,
+      "ref": "jaeyoung0509/zenith#197",
+      "repo": "jaeyoung0509/zenith",
+      "title": "fix(inventory,safety): distinguish partial discovery and add symlink inspector seam (#191, #196)",
+      "closedAt": "2026-09-13T13:33:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 203,
+      "ref": "sealant-sh/sealantd#71",
+      "repo": "sealant-sh/sealantd",
+      "title": "feat: sealant-capture — whole-workspace captures to a bucket, capture-store workspace source (ADR-0015)",
+      "closedAt": "2026-09-13T10:18:45Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 204,
+      "ref": "kackyt/openwars#102",
+      "repo": "kackyt/openwars",
+      "title": "map_2の対戦成績を向上",
+      "closedAt": "2026-09-13T10:17:18Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 205,
+      "ref": "promptctl/tmux-phoenix#7",
+      "repo": "promptctl/tmux-phoenix",
+      "title": "Add conformance suite: recorded transcripts and a live round trip",
+      "closedAt": "2026-09-13T02:07:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 206,
+      "ref": "crippledgeek/rdlp#743",
+      "repo": "crippledgeek/rdlp",
+      "title": "fix(api): decide the resume point as a query, enact it as a command",
+      "closedAt": "2026-09-13T01:33:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 207,
+      "ref": "gregnazario/worktree-ui#10",
+      "repo": "gregnazario/worktree-ui",
+      "title": "feat: Phase 1 working copy — git engine, worktree detail view, stage/diff/commit (v0.2.0)",
+      "closedAt": "2026-09-12T14:31:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 208,
+      "ref": "doublegate/RustyNES#516",
+      "repo": "doublegate/rustynes",
+      "title": "chore(deps): refresh every dependency that can move, and re-measure the ones that cannot",
+      "closedAt": "2026-09-12T14:08:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 209,
+      "ref": "oxidezap/client#164",
+      "repo": "oxidezap/client",
+      "title": "feat(gui): support image clipboard paste",
+      "closedAt": "2026-09-12T13:35:15Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 210,
+      "ref": "kekkon-nexus/atypical#23",
+      "repo": "kekkon-nexus/atypical",
+      "title": "ref(build)[mnt]: replace mise & hk with tools available in npm",
+      "closedAt": "2026-09-12T12:50:36Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 211,
+      "ref": "shep-pm/shep#201",
+      "repo": "shep-pm/shep",
+      "title": "feat(lookout): a secrets pane for the store",
+      "closedAt": "2026-09-12T12:45:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 212,
+      "ref": "awdemos/Xfiles#1",
+      "repo": "awdemos/xfiles",
+      "title": "fix: deep bug-fix pass across daemon, routing, VFS, and persistence",
+      "closedAt": "2026-09-12T11:54:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 213,
+      "ref": "axpdev-lab/aeroftp#805",
+      "repo": "axpdev-lab/aeroftp",
+      "title": "fix(cli): sync-doctor no longer reports ok over a tree it could not read",
+      "closedAt": "2026-09-12T11:53:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 214,
+      "ref": "superposition/qualia#249",
+      "repo": "superposition/qualia",
+      "title": "T58: the robot's own sensors into MCAP, the dataset from real sessions, and the gate that stops them",
+      "closedAt": "2026-09-12T06:12:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 215,
+      "ref": "quality-gates/messrust#158",
+      "repo": "quality-gates/messrust",
+      "title": "Report deep generic types and long operator chains as processing errors (#155)",
+      "closedAt": "2026-09-12T05:02:25Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 216,
+      "ref": "jimsimon/trouve#140",
+      "repo": "jimsimon/trouve",
+      "title": "Route neutral models across provider backends",
+      "closedAt": "2026-09-12T03:37:34Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 217,
+      "ref": "israel12132/weissman-cybersecurity#336",
+      "repo": "israel12132/weissman-cybersecurity",
+      "title": "Close attack-path and offense-probe readiness gaps",
+      "closedAt": "2026-09-12T02:02:27Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 218,
+      "ref": "Blackcat-Informatics/purrdf#293",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(rdf-core): borrowed flat-assertion canonicalization over shared dataset views",
+      "closedAt": "2026-09-12T01:31:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 219,
+      "ref": "sourcenetwork/defradb.rs#1688",
+      "repo": "sourcenetwork/defradb.rs",
+      "title": "test(conformance): retire report-only parity probes",
+      "closedAt": "2026-09-12T01:21:50Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 220,
+      "ref": "fryorcraken/dialectica#20",
+      "repo": "fryorcraken/dialectica",
+      "title": "Give the op log a SQLite implementation, and make the trait earn itself",
+      "closedAt": "2026-09-11T23:47:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 221,
+      "ref": "EffortlessMetrics/ripr-swarm#3731",
+      "repo": "effortlessmetrics/ripr-swarm",
+      "title": "feat(ripr): owner-bound guarded Result match observations (#3709)",
+      "closedAt": "2026-09-11T20:35:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 222,
+      "ref": "peters/horizon#529",
+      "repo": "peters/horizon",
+      "title": "feat(cloud): add Azure worker readiness, stop and run-command host keys",
+      "closedAt": "2026-09-11T20:31:42Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 223,
+      "ref": "tock/tock#5099",
+      "repo": "tock/tock",
+      "title": "chips: virtio: add virtio-console for UART",
+      "closedAt": "2026-09-11T20:20:19Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 224,
+      "ref": "mech-lang/mech#809",
+      "repo": "mech-lang/mech",
+      "title": "[v0.4-R6] refactor(memory): execute and enforce planned storage",
+      "closedAt": "2026-09-11T19:05:03Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 225,
+      "ref": "macro-inc/macro#6334",
+      "repo": "macro-inc/macro",
+      "title": "Seanaye/feat/email filter projections",
+      "closedAt": "2026-09-11T18:27:55Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 226,
+      "ref": "euv-dev/euv#200",
+      "repo": "euv-dev/euv",
+      "title": "fix(engine): refresh resolveTarget per frame in cached WebGPU render-pass descriptor + bump 0.21.5",
+      "closedAt": "2026-09-11T16:55:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 227,
+      "ref": "praxis-proxy/ai#978",
+      "repo": "praxis-proxy/ai",
+      "title": "feat(tests): pinned Claude Code acceptance test harness (#871)",
+      "closedAt": "2026-09-11T16:49:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 228,
+      "ref": "mozilla/neqo#3970",
+      "repo": "mozilla/neqo",
+      "title": "refactor: remove redundant stream_id param on SendData::send",
+      "closedAt": "2026-09-11T16:02:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 229,
+      "ref": "linnix-os/linnix#116",
+      "repo": "linnix-os/linnix",
+      "title": "Cloud exporter base: config, wire types, identity, scrub, seal, spool",
+      "closedAt": "2026-09-11T15:50:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 230,
+      "ref": "ericfisherdev/ai-convobot#228",
+      "repo": "ericfisherdev/ai-convobot",
+      "title": "feat: per-companion running thoughts in multiplayer rounds (#220)",
+      "closedAt": "2026-09-11T13:52:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 231,
+      "ref": "NatLabRockies/infrastore#83",
+      "repo": "natlabrockies/infrastore",
+      "title": "Collapse the core's transaction and add paths into one each",
+      "closedAt": "2026-09-11T13:34:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 232,
+      "ref": "Blackcat-Informatics/purrdf#289",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "perf(rdf): retain shared dataset views through pipeline bundles and GTS ingestion",
+      "closedAt": "2026-09-11T12:23:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 233,
+      "ref": "tuna-os/gtk-office-suite#539",
+      "repo": "tuna-os/gtk-office-suite",
+      "title": "fix(letters): a newline in a table cell never splits the cell (#532), and save fault injection (#442)",
+      "closedAt": "2026-09-11T11:59:46Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 234,
+      "ref": "Blackcat-Informatics/purrdf#291",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(markdown): byte-identical Markdown⇄RDF codec — complete coverage and the kernel cover law",
+      "closedAt": "2026-09-11T11:46:59Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 235,
+      "ref": "ansromanov/mantis#821",
+      "repo": "ansromanov/mantis",
+      "title": "fix: close theme picker with one escape",
+      "closedAt": "2026-09-11T10:50:51Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 236,
+      "ref": "mozilla/grcov#1516",
+      "repo": "mozilla/grcov",
+      "title": "fix(parser): accept FN records with a negative line number",
+      "closedAt": "2026-09-11T08:35:01Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 237,
+      "ref": "fagemx/edda#1142",
+      "repo": "fagemx/edda",
+      "title": "feat(edda-cli): add path-aware dirty receipts",
+      "closedAt": "2026-09-11T07:41:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 238,
+      "ref": "agentmuxai/agentmux#3197",
+      "repo": "agentmuxai/agentmux",
+      "title": "fix(srv): correct three review findings in the catalog redirect merged in #3183",
+      "closedAt": "2026-09-11T07:40:20Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 239,
+      "ref": "teonimesic/plasmosome#101",
+      "repo": "teonimesic/plasmosome",
+      "title": "Specify durable controller recovery and generation settlement",
+      "closedAt": "2026-09-11T07:01:16Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 240,
+      "ref": "Entropy-Foundation/revm#51",
+      "repo": "entropy-foundation/revm",
+      "title": "[#3906] Recompile the Supra contracts when a compiled artefact cannot be read",
+      "closedAt": "2026-09-11T03:41:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 241,
+      "ref": "signalcompose/orbitscore#857",
+      "repo": "signalcompose/orbitscore",
+      "title": "fix(engine): stop a benign temp-dir race from inflating the ERROR count",
+      "closedAt": "2026-09-11T03:40:11Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 242,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#208",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 An unmeasured visit is pruned uncompensated through core, never filed as missing-activation (Issue #199)",
+      "closedAt": "2026-09-11T00:11:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 243,
+      "ref": "makewhatis/rhapsody#138",
+      "repo": "makewhatis/rhapsody",
+      "title": "feat: the console shows the diff a run produced (STUDIO-749)",
+      "closedAt": "2026-09-10T20:17:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 244,
+      "ref": "Blackcat-Informatics/purrdf#283",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "fix(rdf): admit archives holding unselected oversized payloads",
+      "closedAt": "2026-09-10T19:40:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 245,
+      "ref": "valargroup/zcash_voting#321",
+      "repo": "valargroup/zcash_voting",
+      "title": "feat: dispatch the round's immediate share before its other shares",
+      "closedAt": "2026-09-10T19:13:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 246,
+      "ref": "Paubox/paubox-rust#16",
+      "repo": "paubox/paubox-rust",
+      "title": "feat: add scheduled send support",
+      "closedAt": "2026-09-10T18:33:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 247,
+      "ref": "piekstra/google-home-cli#1",
+      "repo": "piekstra/google-home-cli",
+      "title": "feat(audit): report vendor rows without a room as unfiled",
+      "closedAt": "2026-09-10T16:10:22Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 248,
+      "ref": "actix/examples#1374",
+      "repo": "actix/examples",
+      "title": "chore(deps): bump rustls-platform-verifier from 0.5.3 to 0.7.0",
+      "closedAt": "2026-09-10T14:25:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 249,
+      "ref": "NSTKrishna/Contexto#8",
+      "repo": "nstkrishna/contexto",
+      "title": "feat(vscode): implement Phase 4 official VS Code extension",
+      "closedAt": "2026-09-10T14:24:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 250,
+      "ref": "noh-rs/nohrs#256",
+      "repo": "noh-rs/nohrs",
+      "title": "nohrs-launcher: Add a Raycast-style global launcher",
+      "closedAt": "2026-09-10T12:24:05Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 251,
+      "ref": "jaunder-org/jaunder#1425",
+      "repo": "jaunder-org/jaunder",
+      "title": "test(coverage): audit and eliminate coverage exceptions",
+      "closedAt": "2026-09-10T11:45:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 252,
+      "ref": "vibec0re/trollshell#1031",
+      "repo": "vibec0re/trollshell",
+      "title": "fix(preem): shader refusal reporting after #1020 — key the data-upload latch, give GridTooLarge its own latch, log the gl_surface sibling",
+      "closedAt": "2026-09-10T11:40:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 253,
+      "ref": "moq-dev/moq#3569",
+      "repo": "moq-dev/moq",
+      "title": "feat(moq-video): list the modes a V4L2 camera reports",
+      "closedAt": "2026-09-10T07:52:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 254,
+      "ref": "xarmian/algod-rust#1201",
+      "repo": "xarmian/algod-rust",
+      "title": "test(phase17): close closeable partial-row gaps in ledger_sim/daemon_node",
+      "closedAt": "2026-09-10T07:12:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 255,
+      "ref": "makewhatis/rhapsody#135",
+      "repo": "makewhatis/rhapsody",
+      "title": "fix(web): scroll the run-detail step spine in place, not the page (STUDIO-821)",
+      "closedAt": "2026-09-10T02:05:59Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 256,
+      "ref": "Pometry/Raphtory#2688",
+      "repo": "pometry/raphtory",
+      "title": "Cleanup graph config",
+      "closedAt": "2026-09-09T22:35:02Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 257,
+      "ref": "BOHICA-LABS/vsdd-factory#824",
+      "repo": "bohica-labs/vsdd-factory",
+      "title": "S-25.02 cluster-2: artifact-sharding roll (BC-1.18.006 v1.11)",
+      "closedAt": "2026-09-09T20:19:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 258,
+      "ref": "zleo-ai/vyane-rs#178",
+      "repo": "zleo-ai/vyane-rs",
+      "title": "feat(service): persist kernel boundary approve/deny in KernelStore (EOS-753/EOS-810)",
+      "closedAt": "2026-09-09T17:01:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 259,
+      "ref": "douglaz/fedimint-wallets#49",
+      "repo": "douglaz/fedimint-wallets",
+      "title": "Delete the daemon gateway pin; bind the standalone break-glass to one operation",
+      "closedAt": "2026-09-09T16:24:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 260,
+      "ref": "torrust/torrust-tracker#2178",
+      "repo": "torrust/torrust-tracker",
+      "title": "feat(configuration): [#2151] add tracker config path argument",
+      "closedAt": "2026-09-09T14:00:55Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 261,
+      "ref": "autumn-foundation/autumn#2568",
+      "repo": "autumn-foundation/autumn",
+      "title": "feat(openapi): export the spec without booting, and stop models exporting as blobs",
+      "closedAt": "2026-09-09T13:03:33Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 262,
+      "ref": "paiml/aprender#2793",
+      "repo": "paiml/aprender",
+      "title": "fix(ci): Silicon Nightly tested a package that has never existed (Refs paiml/infra#361)",
+      "closedAt": "2026-09-09T12:33:32Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 263,
+      "ref": "rustdesk/rustdesk#16118",
+      "repo": "rustdesk/rustdesk",
+      "title": "Wayland portal staged errors",
+      "closedAt": "2026-09-09T10:53:14Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 264,
+      "ref": "rexlunae/rython#358",
+      "repo": "rexlunae/rython",
+      "title": "Round 109: str.encode by NAME with CPython's error handlers",
+      "closedAt": "2026-09-09T08:24:55Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 265,
+      "ref": "td72/vig#179",
+      "repo": "td72/vig",
+      "title": "✨ GitHub: refresh the issue / PR lists on change with a free conditional request",
+      "closedAt": "2026-09-09T08:11:13Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 266,
+      "ref": "rustdesk/rustdesk#16082",
+      "repo": "rustdesk/rustdesk",
+      "title": "improve qos",
+      "closedAt": "2026-09-09T07:48:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 267,
+      "ref": "bemindlabs/ostraka#22",
+      "repo": "bemindlabs/ostraka",
+      "title": "A list work is taken from, and taking it down several at a time",
+      "closedAt": "2026-09-09T07:08:01Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 268,
+      "ref": "HagaleTechnologies/pancetta#361",
+      "repo": "hagaletechnologies/pancetta",
+      "title": "fix(ci): explicitly request Codex review on open, fix loose fallback",
+      "closedAt": "2026-09-09T06:16:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 269,
+      "ref": "TheDancingDeveloper-org/rustnzb#130",
+      "repo": "thedancingdeveloper-org/rustnzb",
+      "title": "fix(sabnzbd): return 200 status:false on addfile enqueue failure (#129)",
+      "closedAt": "2026-09-09T04:33:15Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 270,
+      "ref": "rust-lang/rust#160219",
+      "repo": "rust-lang/rust",
+      "title": "Implement `Thread::os_id`",
+      "closedAt": "2026-09-09T03:09:11Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 271,
+      "ref": "fagemx/edda#1086",
+      "repo": "fagemx/edda",
+      "title": "fix(edda-cli): deliver read path — argv regression guard on the gh seam, and --sha validates PR-vs-issue (GH-1079)",
+      "closedAt": "2026-09-09T02:13:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 272,
+      "ref": "nowledge-co/hawdb#354",
+      "repo": "nowledge-co/hawdb",
+      "title": "refactor(executor): propagate fallible scan errors directly",
+      "closedAt": "2026-09-09T00:44:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 273,
+      "ref": "tatari-tv/okta-auth-rs#21",
+      "repo": "tatari-tv/okta-auth-rs",
+      "title": "refactor(auth): narrow cache error match",
+      "closedAt": "2026-09-09T00:10:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 274,
+      "ref": "outlmd/outl#262",
+      "repo": "outlmd/outl",
+      "title": "ci: run the frontend tests that never ran",
+      "closedAt": "2026-09-08T22:46:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 275,
+      "ref": "Kizunad/Bong#2192",
+      "repo": "kizunad/bong",
+      "title": "外置 npc dormant 测试（plan-test-layout-refactor-v1 P2-23）",
+      "closedAt": "2026-09-08T22:06:15Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 276,
+      "ref": "rmstdope/cerebro#347",
+      "repo": "rmstdope/cerebro",
+      "title": "cb-lz5.1.1: the board records an agreed UX design and says which stage a bead is at",
+      "closedAt": "2026-09-08T21:33:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 277,
+      "ref": "zayn-tech-info/naivolt#3",
+      "repo": "zayn-tech-info/naivolt",
+      "title": "feat(numbers): make settlement, refunds, and purchase retries atomic",
+      "closedAt": "2026-09-08T20:46:21Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 278,
+      "ref": "stSoftwareAU/NEAT-AI-core#626",
+      "repo": "stsoftwareau/neat-ai-core",
+      "title": "Safe public SIMD kernels can read out of bounds — get_unchecked preconditions are caller-upheld across the crate boundary (Issue #613)",
+      "closedAt": "2026-09-08T20:16:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 279,
+      "ref": "randlee/atm-core#1325",
+      "repo": "randlee/atm-core",
+      "title": "fix(daemon): singleton guards, no test runtime-home override (#1322)",
+      "closedAt": "2026-09-08T16:05:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 280,
+      "ref": "NodeSpaceAI/nodespace-core#2493",
+      "repo": "nodespaceai/nodespace-core",
+      "title": "Bound GetChildrenTree's subtree payload with an actionable error",
+      "closedAt": "2026-09-08T15:24:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 281,
+      "ref": "sourcenetwork/defradb.rs#1694",
+      "repo": "sourcenetwork/defradb.rs",
+      "title": "fix(db): traverse commits from live collection heads",
+      "closedAt": "2026-09-08T15:03:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 282,
+      "ref": "Qiskit/qiskit-fermions#333",
+      "repo": "qiskit/qiskit-fermions",
+      "title": "Wrap up fermionic trotterization",
+      "closedAt": "2026-09-08T14:56:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 283,
+      "ref": "JustasMonkev/pkg-rust-port#15",
+      "repo": "justasmonkev/pkg-rust-port",
+      "title": "Fix packaging safety and portability issues; remove unused dependencies",
+      "closedAt": "2026-09-08T14:12:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 284,
+      "ref": "wisnuwiry/padu#157",
+      "repo": "wisnuwiry/padu",
+      "title": "feat: integrate Antigravity provider with model reasoning effort support",
+      "closedAt": "2026-09-08T12:49:26Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 285,
+      "ref": "microsoft/ox-tools#123",
+      "repo": "microsoft/ox-tools",
+      "title": "perf(cargo-anvil): parallelize Miri test artifacts",
+      "closedAt": "2026-09-08T12:11:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 286,
+      "ref": "yukimemi/yui#285",
+      "repo": "yukimemi/yui",
+      "title": "Merge magi run 20260908-202645-4446 (candidate A)",
+      "closedAt": "2026-09-08T11:54:56Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 287,
+      "ref": "api7/aisix#1148",
+      "repo": "api7/aisix",
+      "title": "feat(apikey): grant models by resource id, so a rename keeps the grant",
+      "closedAt": "2026-09-08T11:38:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 288,
+      "ref": "leynos/femtologging#455",
+      "repo": "leynos/femtologging",
+      "title": "Adopt the Netsuke environment-access lint policy (#423)",
+      "closedAt": "2026-09-08T10:40:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 289,
+      "ref": "stSoftwareAU/NEAT-AI-core#617",
+      "repo": "stsoftwareau/neat-ai-core",
+      "title": "Expose the pruning rewrite APIs through WASM with native/WASM parity (Issue #592)",
+      "closedAt": "2026-09-08T10:38:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 290,
+      "ref": "waddle-social/waddle#1738",
+      "repo": "waddle-social/waddle",
+      "title": "feat(server): ingress authority cutover with canonical identity (#1657)",
+      "closedAt": "2026-09-08T10:26:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 291,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#15137",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "fix(vscode): classify unsupported candidate smoke honestly (#15136)",
+      "closedAt": "2026-09-08T09:49:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 292,
+      "ref": "leynos/repovec-appliance#105",
+      "repo": "leynos/repovec-appliance",
+      "title": "Adopt the environment-access lint policy (#99)",
+      "closedAt": "2026-09-08T09:09:23Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 293,
+      "ref": "tinyhumansai/opencompany#2087",
+      "repo": "tinyhumansai/opencompany",
+      "title": "feat(console): offer self sign-out from the account menu",
+      "closedAt": "2026-09-08T08:50:46Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 294,
+      "ref": "windmill-labs/windmill#11014",
+      "repo": "windmill-labs/windmill",
+      "title": "feat: draw a dbt column trace, across projects and the pipeline boundary",
+      "closedAt": "2026-09-08T08:29:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 295,
+      "ref": "agentdoc-dev/adoc#204",
+      "repo": "agentdoc-dev/adoc",
+      "title": "feat(core): return typed retrieval policy failures (E6.1.T2)",
+      "closedAt": "2026-09-08T08:15:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 296,
+      "ref": "imbue-ai/datalib#314",
+      "repo": "imbue-ai/datalib",
+      "title": "Pin every render read, and retire the ratchet",
+      "closedAt": "2026-09-08T06:44:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 297,
+      "ref": "ahrav/eidnara#250",
+      "repo": "ahrav/eidnara",
+      "title": "Port the smart-note compiler without dreamer cron or token capture (U3.11)",
+      "closedAt": "2026-09-08T06:31:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 298,
+      "ref": "tinyhumansai/opencompany#2049",
+      "repo": "tinyhumansai/opencompany",
+      "title": "fix(console): stop offering a member Settings controls their role cannot use",
+      "closedAt": "2026-09-08T06:16:03Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 299,
+      "ref": "statecrafting/butler-ai#31",
+      "repo": "statecrafting/butler-ai",
+      "title": "feat(017): the release pipeline, and the four secrets it stops at",
+      "closedAt": "2026-09-08T05:00:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 300,
+      "ref": "constellation-works/orbit#1664",
+      "repo": "constellation-works/orbit",
+      "title": "[code-review] Load task sidecars and the `--input-file` once per `task show` / `tool run`",
+      "closedAt": "2026-09-08T03:14:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 301,
+      "ref": "ahrav/eidnara#226",
+      "repo": "ahrav/eidnara",
+      "title": "Add the native launcher and version compatibility parsing eidnara-host/X.Y.Z (U2.25)",
+      "closedAt": "2026-09-08T00:56:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 302,
+      "ref": "openooxml/betteroffice#362",
+      "repo": "openooxml/betteroffice",
+      "title": "fix(docx): improve imports, font loading and pagination",
+      "closedAt": "2026-09-07T22:35:05Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 303,
+      "ref": "leynos/femtologging#456",
+      "repo": "leynos/femtologging",
+      "title": "Strengthen residual handler test contracts",
+      "closedAt": "2026-09-07T21:37:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 304,
+      "ref": "Falconiere/toolu-orm#24",
+      "repo": "falconiere/toolu-orm",
+      "title": "feat(connection): adopt a pre-configured rusqlite connection",
+      "closedAt": "2026-09-07T21:04:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 305,
+      "ref": "Choochmeque/autocxx#92",
+      "repo": "choochmeque/autocxx",
+      "title": "POC: lower std::shared_ptr<const T> to an opaque C++ holder",
+      "closedAt": "2026-09-07T19:46:07Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 306,
+      "ref": "alondero/buildmesh#1643",
+      "repo": "alondero/buildmesh",
+      "title": "test(agent): fix pre-existing test panics in #1531 verification suite",
+      "closedAt": "2026-09-07T18:46:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 307,
+      "ref": "causes-tracker/causes-tracker#559",
+      "repo": "causes-tracker/causes-tracker",
+      "title": "chore(deps): update dependency jj-vcs/jj to v0.44.0",
+      "closedAt": "2026-09-07T18:45:48Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 308,
+      "ref": "fagemx/edda#1070",
+      "repo": "fagemx/edda",
+      "title": "feat(edda-cli): edda review due — the trigger policy in the product (GH-763)",
+      "closedAt": "2026-09-07T17:04:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 309,
+      "ref": "George-RD/mag#437",
+      "repo": "george-rd/mag",
+      "title": "build(deps): bump the pre-stable group with 2 updates",
+      "closedAt": "2026-09-07T17:03:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 310,
+      "ref": "epigraph-io/epigraph#435",
+      "repo": "epigraph-io/epigraph",
+      "title": "security(api,db): serve semantic search, void detection and method lookup on one viewer-stamped connection",
+      "closedAt": "2026-09-07T16:40:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 311,
+      "ref": "Pinvou/pinvou-agent#421",
+      "repo": "pinvou/pinvou-agent",
+      "title": "fix(local-model): keep user-selected model end to end",
+      "closedAt": "2026-09-07T15:32:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 312,
+      "ref": "limnifs/limnifs#241",
+      "repo": "limnifs/limnifs",
+      "title": "Tree-name trust boundary + slice-map contract + mmap'd VFS slabs",
+      "closedAt": "2026-09-07T12:11:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 313,
+      "ref": "arto-app/Arto#249",
+      "repo": "arto-app/arto",
+      "title": "Render Markdown with ox-content instead of pulldown-cmark",
+      "closedAt": "2026-09-07T11:27:35Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 314,
+      "ref": "WuKong512/win-resources-timeline#22",
+      "repo": "wukong512/win-resources-timeline",
+      "title": "Add AMD privilege qualification tooling and deployment documentation",
+      "closedAt": "2026-09-07T11:25:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 315,
+      "ref": "gmsol-labs/gmx-solana#433",
+      "repo": "gmsol-labs/gmx-solana",
+      "title": "fix(store): drop the builder fee recorded by a discarded execution",
+      "closedAt": "2026-09-07T11:02:57Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 316,
+      "ref": "prokosna/tradr#120",
+      "repo": "prokosna/tradr",
+      "title": "WI-M7-008: refuse an empty catch in Kotlin, and repair the two that predate it",
+      "closedAt": "2026-09-07T07:40:59Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 317,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#146",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 Give synapse visits screen-record and learnings-cache parity (Issue #136)",
+      "closedAt": "2026-09-07T04:54:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 318,
+      "ref": "This-Is-NPC/omakure#47",
+      "repo": "this-is-npc/omakure",
+      "title": "fix(health): surface registry failures in the ingest path",
+      "closedAt": "2026-09-07T03:22:26Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 319,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#143",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 Resolve synapse-source fold values for constant and input neurons (Issue #134)",
+      "closedAt": "2026-09-07T03:02:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 320,
+      "ref": "agent-ix/quire-contract-codegen#25",
+      "repo": "agent-ix/quire-contract-codegen",
+      "title": "Generate bounded Kani contracts and proof dependencies",
+      "closedAt": "2026-09-07T02:12:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 321,
+      "ref": "macanderson/stella#6323",
+      "repo": "macanderson/stella",
+      "title": "fix(stella-core): fifteen defects from the 2026-09-06 core audit",
+      "closedAt": "2026-09-06T23:41:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 322,
+      "ref": "jirathip-dev/corral#437",
+      "repo": "jirathip-dev/corral",
+      "title": "iOS (#426): refresh grants per host so Bazzite Read Tail works while Mac is active",
+      "closedAt": "2026-09-06T21:02:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 323,
+      "ref": "Rohith-E-S/adbshare#6",
+      "repo": "rohith-e-s/adbshare",
+      "title": "fix(adbfs): panic-free paths, correct errnos, cache/rename integrity",
+      "closedAt": "2026-09-06T20:59:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 324,
+      "ref": "antimatter-studios/rust-fs-erofs#47",
+      "repo": "antimatter-studios/rust-fs-erofs",
+      "title": "perf: a metadata cache, and the measurement that sized it",
+      "closedAt": "2026-09-06T20:19:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 325,
+      "ref": "noahsabaj/mermaid-cli#402",
+      "repo": "noahsabaj/mermaid-cli",
+      "title": "refactor(model): one stream accumulator, five adapters",
+      "closedAt": "2026-09-06T19:52:50Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 326,
+      "ref": "jahala/weeder#1",
+      "repo": "jahala/weeder",
+      "title": "weed: the judge of the diff",
+      "closedAt": "2026-09-06T13:53:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 327,
+      "ref": "alexmohr/assimilate#477",
+      "repo": "alexmohr/assimilate",
+      "title": "fix(agent): say why a backup ended with borg's warning status",
+      "closedAt": "2026-09-06T13:04:07Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 328,
+      "ref": "ModernRelay/omnigraph#669",
+      "repo": "modernrelay/omnigraph",
+      "title": "fix(loader): refuse wrong-typed JSON dates instead of coercing them to NULL",
+      "closedAt": "2026-09-06T12:40:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 329,
+      "ref": "Ignis-lang/ignis#168",
+      "repo": "ignis-lang/ignis",
+      "title": "fix(ownership): drop the bindings a let condition hands to its branch",
+      "closedAt": "2026-09-06T11:12:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 330,
+      "ref": "SimoHypers/limusic#174",
+      "repo": "simohypers/limusic",
+      "title": "0.6.10: blocked artists, custom app icon, radio duplicates, lyrics auto-scroll",
+      "closedAt": "2026-09-06T11:01:17Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 331,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#14950",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "test(ux): prove HX-* header completion through the real LSP path (#14948)",
+      "closedAt": "2026-09-06T09:15:53Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 332,
+      "ref": "RouHim/this-week-in-past#207",
+      "repo": "rouhim/this-week-in-past",
+      "title": "feat: rusqlite_migration without breaking database changes",
+      "closedAt": "2026-09-06T09:03:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 333,
+      "ref": "Jsuppers/impresspress#23",
+      "repo": "jsuppers/impresspress",
+      "title": "refactor(legalpages): a repo layer; publish is the only status transition (B10)",
+      "closedAt": "2026-09-06T08:49:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 334,
+      "ref": "fagemx/edda#976",
+      "repo": "fagemx/edda",
+      "title": "fix(fleet): pre-push guard reads the remote ref, refuses tag moves, and ships in the git-native installer",
+      "closedAt": "2026-09-06T07:00:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 335,
+      "ref": "firelock-ai/kin#1562",
+      "repo": "firelock-ai/kin",
+      "title": "Answer a JSON log from the running daemon, and name the plan's own cost",
+      "closedAt": "2026-09-06T01:18:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 336,
+      "ref": "abhisheksharma001/graphify#38",
+      "repo": "abhisheksharma001/graphify",
+      "title": "s37: the engine does not park on a price it cannot read",
+      "closedAt": "2026-09-05T23:13:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 337,
+      "ref": "indigoai-us/hq-desktop-app#721",
+      "repo": "indigoai-us/hq-desktop-app",
+      "title": "Fix @hq/platform work-mesh allow-list test, and stop CI from silently skipping every packages/* suite",
+      "closedAt": "2026-09-05T22:57:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 338,
+      "ref": "crippledgeek/rdlp#694",
+      "repo": "crippledgeek/rdlp",
+      "title": "fix(desktop): Reveal in Folder hung forever — run the blocking reveal off the async runtime",
+      "closedAt": "2026-09-05T21:42:45Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 339,
+      "ref": "honerlaw/darric#19",
+      "repo": "honerlaw/darric",
+      "title": "Single-flight the whisper model load so a mid-download session still transcribes",
+      "closedAt": "2026-09-05T19:19:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 340,
+      "ref": "saibaneer/bld-townhall#31",
+      "repo": "saibaneer/bld-townhall",
+      "title": "M10: human payment handoff (Stripe sandbox) — verified evidence advances a booking, never a claim",
+      "closedAt": "2026-09-05T19:16:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 341,
+      "ref": "SimoHypers/limusic#159",
+      "repo": "simohypers/limusic",
+      "title": "Multiple Google accounts with switching",
+      "closedAt": "2026-09-05T17:11:31Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 342,
+      "ref": "stratalab/strata-core#3106",
+      "repo": "stratalab/strata-core",
+      "title": "Fix #3071: don't log a recovered lock contention as an engine error",
+      "closedAt": "2026-09-05T14:35:28Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 343,
+      "ref": "polymorph-components/polyvisor#140",
+      "repo": "polymorph-components/polyvisor",
+      "title": "Port us-devices-list: the account's devices, on enrollment",
+      "closedAt": "2026-09-05T12:46:41Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 344,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#123",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "Experiment with correlated-neuron merging to remove redundant hidden units (Issue #109)",
+      "closedAt": "2026-09-05T12:31:43Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 345,
+      "ref": "stSoftwareAU/NEAT-AI-Backpropagation#110",
+      "repo": "stsoftwareau/neat-ai-backpropagation",
+      "title": "🎯 Make NEAT-AI-scorer the acceptance oracle for production backprop candidates (Issue #104)",
+      "closedAt": "2026-09-05T11:29:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 346,
+      "ref": "ZeroSum-Solutions/buzz#13",
+      "repo": "zerosum-solutions/buzz",
+      "title": "feat(desktop): export a markdown document as PDF (T9)",
+      "closedAt": "2026-09-05T11:11:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 347,
+      "ref": "ModernRelay/omnigraph#627",
+      "repo": "modernrelay/omnigraph",
+      "title": "feat: unify graph JSON output on one Arrow writer and offer Arrow IPC as a query result format",
+      "closedAt": "2026-09-05T10:49:43Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 348,
+      "ref": "api7/aisix#1136",
+      "repo": "api7/aisix",
+      "title": "fix(etcd): re-authenticate when etcd rejects the connection's auth token",
+      "closedAt": "2026-09-05T09:57:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 349,
+      "ref": "factorial-io/scotty#898",
+      "repo": "factorial-io/scotty",
+      "title": "refactor(tasks): own task state in a per-task actor",
+      "closedAt": "2026-09-05T08:13:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 350,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#120",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "Experiment with structural neighbourhood pruning for low-importance chains and branches (Issue #108)",
+      "closedAt": "2026-09-05T08:05:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 351,
+      "ref": "Zackriya-Solutions/meetily#744",
+      "repo": "zackriya-solutions/meetily",
+      "title": "fix(ui/summary): follow up #665 reasoning isolation and sidebar logo",
+      "closedAt": "2026-09-05T07:55:18Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 352,
+      "ref": "rustdesk/rustdesk#16062",
+      "repo": "rustdesk/rustdesk",
+      "title": "port forward shared conn",
+      "closedAt": "2026-09-05T06:59:51Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 353,
+      "ref": "ahrav/eidnara#39",
+      "repo": "ahrav/eidnara",
+      "title": "U3 (i/12): shm-native N-API addon package",
+      "closedAt": "2026-09-05T06:58:18Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 354,
+      "ref": "sourcenetwork/defradb.rs#1692",
+      "repo": "sourcenetwork/defradb.rs",
+      "title": "perf: benchmark suite, run-document history and a published dashboard",
+      "closedAt": "2026-09-05T05:35:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 355,
+      "ref": "fagemx/edda#873",
+      "repo": "fagemx/edda",
+      "title": "docs(bridges): publish implementable adapter contract",
+      "closedAt": "2026-09-05T04:01:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 356,
+      "ref": "tequdev/rshooks#109",
+      "repo": "tequdev/rshooks",
+      "title": "fix(build): make Windows current a real directory entry, not a text file",
+      "closedAt": "2026-09-05T01:28:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 357,
+      "ref": "FieldmouseWorks/Conary#870",
+      "repo": "fieldmouseworks/conary",
+      "title": "fix(core): make persisted vocabularies typed at their owner",
+      "closedAt": "2026-09-05T00:28:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 358,
+      "ref": "maus-inc/mausVoice#164",
+      "repo": "maus-inc/mausvoice",
+      "title": "Auto-title chats and add animated timestamps to the sidebar",
+      "closedAt": "2026-09-04T23:30:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 359,
+      "ref": "milyin/prebindgen#706",
+      "repo": "milyin/prebindgen",
+      "title": "The return side reads its leaves off its rows (#701 step 3)",
+      "closedAt": "2026-09-04T22:02:01Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 360,
+      "ref": "ModernRelay/omnigraph#622",
+      "repo": "modernrelay/omnigraph",
+      "title": "rfc: add RFC 0051, JSON output via Arrow",
+      "closedAt": "2026-09-04T20:06:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 361,
+      "ref": "sourcemaps/upstroke#136",
+      "repo": "sourcemaps/upstroke",
+      "title": "test(workspace_manager): sweep tests.rs for correctness, shape, standards and mutation strength",
+      "closedAt": "2026-09-04T19:32:20Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 362,
+      "ref": "contentauth/c2pa-rs#2540",
+      "repo": "contentauth/c2pa-rs",
+      "title": "fix: x.509 cert with missing org should not be a reporting failure",
+      "closedAt": "2026-09-04T18:16:18Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 363,
+      "ref": "doublegate/RustyNES#494",
+      "repo": "doublegate/rustynes",
+      "title": "v2.6.15 \"Warrant\" — the claims v2.7.0 will make become checkable, and the instrument pays the oracle back",
+      "closedAt": "2026-09-04T18:07:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 364,
+      "ref": "jorgealonsodev/vallumix#30",
+      "repo": "jorgealonsodev/vallumix",
+      "title": "fix(cli): make the installed binary actually usable",
+      "closedAt": "2026-09-04T18:01:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 365,
+      "ref": "metabrainz/mb-mail-service#433",
+      "repo": "metabrainz/mb-mail-service",
+      "title": "chore(deps): update zgosalvez/github-actions-report-lcov action to v7",
+      "closedAt": "2026-09-04T16:21:11Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 366,
+      "ref": "toptopworks/toptopduck#822",
+      "repo": "toptopworks/toptopduck",
+      "title": "fix(session): widen trace dedup to unified quota and mcp_invoke pool (#820)",
+      "closedAt": "2026-09-04T16:03:13Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 367,
+      "ref": "shep-pm/shep-deploy#13",
+      "repo": "shep-pm/shep-deploy",
+      "title": "fix: refuse daemon-acted Flockfile fields, validate the record, dwell after turnover, restore the whole app",
+      "closedAt": "2026-09-04T15:55:57Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 368,
+      "ref": "vetcoders/prview-rs#27",
+      "repo": "vetcoders/prview-rs",
+      "title": "feat(runtime): bounded execution — resource governor, task ledger, honest cancellation",
+      "closedAt": "2026-09-04T14:58:52Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 369,
+      "ref": "gosuda/bitcoin-rs#261",
+      "repo": "gosuda/bitcoin-rs",
+      "title": "feat: add compact live UTXO view to ScriptIndex",
+      "closedAt": "2026-09-04T12:54:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 370,
+      "ref": "AXELL2022/Anivox-Wraper#1",
+      "repo": "axell2022/anivox-wraper",
+      "title": "feat(linux): port to linux with wayland/mpv fixes and arch packaging",
+      "closedAt": "2026-09-04T12:10:25Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 371,
+      "ref": "OpenCoven/coven#911",
+      "repo": "opencoven/coven",
+      "title": "fix: make Ward direct applies auditable and atomic",
+      "closedAt": "2026-09-04T11:29:25Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 372,
+      "ref": "fagemx/edda#862",
+      "repo": "fagemx/edda",
+      "title": "fix(postmortem): command_failure keying, segment command word matching, and separate show counter (GH-813)",
+      "closedAt": "2026-09-04T11:13:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 373,
+      "ref": "api7/aisix#1131",
+      "repo": "api7/aisix",
+      "title": "feat(server): bind the proxy listener only after the first configuration is applied",
+      "closedAt": "2026-09-04T10:11:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 374,
+      "ref": "fagemx/edda#856",
+      "repo": "fagemx/edda",
+      "title": "feat(conductor): add infrastructure contract plans",
+      "closedAt": "2026-09-04T09:58:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 375,
+      "ref": "plethwaith/gwead#5",
+      "repo": "plethwaith/gwead",
+      "title": "Type cancellation end to end so the wallclock deadline is reported as the deadline",
+      "closedAt": "2026-09-04T02:28:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 376,
+      "ref": "fagemx/edda#818",
+      "repo": "fagemx/edda",
+      "title": "fix(bridge): surface swallowed hook-path write errors in agent_phase (GH-745)",
+      "closedAt": "2026-09-04T01:14:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 377,
+      "ref": "igevin/mHost#187",
+      "repo": "igevin/mhost",
+      "title": "perf: add snapshot metadata index (#179)",
+      "closedAt": "2026-09-04T00:59:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 378,
+      "ref": "dreadnode/ares#440",
+      "repo": "dreadnode/ares",
+      "title": "ci: harden template build pipeline and expand rust test coverage",
+      "closedAt": "2026-09-04T00:54:05Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 379,
+      "ref": "nanobpm/nano-bpm#1109",
+      "repo": "nanobpm/nano-bpm",
+      "title": "fix(console): atomic pack install so a failed extract can't strand an empty pack dir",
+      "closedAt": "2026-09-04T00:42:30Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 380,
+      "ref": "fagemx/edda#815",
+      "repo": "fagemx/edda",
+      "title": "refactor(edda-cli): split cmd_bridge.rs into cmd_bridge/ directory module (GH-777)",
+      "closedAt": "2026-09-04T00:27:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 381,
+      "ref": "jm2/balun#41",
+      "repo": "jm2/balun",
+      "title": "fix(test): restore blocking mode and read timeouts for ScriptedHttpServer on Windows",
+      "closedAt": "2026-09-03T23:46:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 382,
+      "ref": "Rusty-Mill/rusty_mill#154",
+      "repo": "rusty-mill/rusty_mill",
+      "title": "fix(rusty_tokio): don't orphan a Windows socket when its AFD-poll re-arm fails",
+      "closedAt": "2026-09-03T23:38:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 383,
+      "ref": "jorge-menjivar/super-stt#407",
+      "repo": "jorge-menjivar/super-stt",
+      "title": "Fill every pipeline stage through one implementation",
+      "closedAt": "2026-09-03T21:46:22Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 384,
+      "ref": "apollographql/router#9949",
+      "repo": "apollographql/router",
+      "title": "fix(federation): fix composition of @requires when sibling field returns Query root type",
+      "closedAt": "2026-09-03T18:56:15Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 385,
+      "ref": "sjawhar/knives#64",
+      "repo": "sjawhar/knives",
+      "title": "fix: no recorded consumers is an answer; a tip the trunk has is a base, not a member",
+      "closedAt": "2026-09-03T16:25:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 386,
+      "ref": "dsh-tauri/deepseek-harness-desktop#328",
+      "repo": "dsh-tauri/deepseek-harness-desktop",
+      "title": "refactor: introduce shared silence() utility for intentional error swallowing",
+      "closedAt": "2026-09-03T16:07:30Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 387,
+      "ref": "kmolan/multicalc-rust#330",
+      "repo": "kmolan/multicalc-rust",
+      "title": "Add host-only Python bindings crate multicalc-py",
+      "closedAt": "2026-09-03T15:59:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 388,
+      "ref": "shenghaoc/oxpinyin#300",
+      "repo": "shenghaoc/oxpinyin",
+      "title": "perf(datagen): emit 1-gram-only interpolation2.text",
+      "closedAt": "2026-09-03T15:05:52Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 389,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#14358",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "fix(lsp): preserve definition and references errors instead of returning empty success (#5108)",
+      "closedAt": "2026-09-03T13:55:48Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 390,
+      "ref": "MostroP2P/mostro-watchdog#28",
+      "repo": "mostrop2p/mostro-watchdog",
+      "title": "feat: discover Mostro relays dynamically via NIP-65 (kind 10002) events",
+      "closedAt": "2026-09-03T13:54:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 391,
+      "ref": "contentauth/c2pa-rs#2176",
+      "repo": "contentauth/c2pa-rs",
+      "title": "fix: propagate hard errors when parsing ingredient streams",
+      "closedAt": "2026-09-03T13:07:34Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 392,
+      "ref": "KooshaPari/HeliosLite#236",
+      "repo": "kooshapari/helioslite",
+      "title": "feat(p0.3/p0.4): add input pipeline + output/audit spine crates",
+      "closedAt": "2026-09-03T12:45:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 393,
+      "ref": "toptopworks/toptopduck#805",
+      "repo": "toptopworks/toptopduck",
+      "title": "fix(gateway): treat bridge resets as disconnects in serve (#801)",
+      "closedAt": "2026-09-03T12:42:45Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 394,
+      "ref": "cooklang/cookcli#483",
+      "repo": "cooklang/cookcli",
+      "title": "feat(cli): add `cook completions <shell>` for shell completion scripts",
+      "closedAt": "2026-09-03T12:37:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 395,
+      "ref": "ilmai/plugin-things#22",
+      "repo": "ilmai/plugin-things",
+      "title": "Add NoteExpression and MIDI event support",
+      "closedAt": "2026-09-03T12:12:15Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 396,
+      "ref": "tinyhumansai/openhuman#5962",
+      "repo": "tinyhumansai/openhuman",
+      "title": "fix(billing): wire billing interval through to purchasePlan on upgrade",
+      "closedAt": "2026-09-03T11:17:03Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 397,
+      "ref": "rmstdope/cerebro#300",
+      "repo": "rmstdope/cerebro",
+      "title": "refactor(cb-3da): a port-bind test retries instead of racing the runner",
+      "closedAt": "2026-09-03T09:49:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 398,
+      "ref": "hua0512/rust-srec#824",
+      "repo": "hua0512/rust-srec",
+      "title": "fix(deploy): make the bundled systemd unit able to start the server",
+      "closedAt": "2026-09-03T09:43:52Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 399,
+      "ref": "UnrealPhantasy/Blunderbuss#87",
+      "repo": "unrealphantasy/blunderbuss",
+      "title": "chore: three gates for language and identity, and the identity one holds no name",
+      "closedAt": "2026-09-03T09:20:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 400,
+      "ref": "api7/aisix#1121",
+      "repo": "api7/aisix",
+      "title": "fix(guardrails): remove the whole-blob scan from the files surface",
+      "closedAt": "2026-09-03T08:38:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 401,
+      "ref": "petar-basic/chat-systems#73",
+      "repo": "petar-basic/chat-systems",
+      "title": "Architecture review follow-ups: durable worker, typed API contract, object_store, email outbox",
+      "closedAt": "2026-09-03T08:29:24Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 402,
+      "ref": "rustdesk/rustdesk#15814",
+      "repo": "rustdesk/rustdesk",
+      "title": "fix(windows): filter detached DXGI outputs for Win+P single-display modes",
+      "closedAt": "2026-09-03T08:04:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 403,
+      "ref": "EffortlessMetrics/perl-lsp-swarm#14613",
+      "repo": "effortlessmetrics/perl-lsp-swarm",
+      "title": "fix(references): resolve the qualified-name cursor component before tier dispatch (#1849)",
+      "closedAt": "2026-09-03T07:58:06Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 404,
+      "ref": "pmcfadin/cqlite#3987",
+      "repo": "pmcfadin/cqlite",
+      "title": "fix(#3890): bound the single-partition seek's PARSE input to the partition's authoritative extent",
+      "closedAt": "2026-09-03T07:52:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 405,
+      "ref": "ai-dynamo/dynamo#13248",
+      "repo": "ai-dynamo/dynamo",
+      "title": "test(deploy): avoid port-forward restart race",
+      "closedAt": "2026-09-03T07:43:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 406,
+      "ref": "librefang/librefang#8121",
+      "repo": "librefang/librefang",
+      "title": "fix(plugins): serve stale verified registry index when remote fetch fails",
+      "closedAt": "2026-09-03T07:37:38Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 407,
+      "ref": "zama-ai/fhevm#3672",
+      "repo": "zama-ai/fhevm",
+      "title": "chore(kms-connector): decryption source in db",
+      "closedAt": "2026-09-03T07:10:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 408,
+      "ref": "toptopworks/toptopduck#797",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(session): converge stale/active info in the working set (#793)",
+      "closedAt": "2026-09-03T06:53:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 409,
+      "ref": "OptimisticPessimist/sentrith#1",
+      "repo": "optimisticpessimist/sentrith",
+      "title": "feat: automatic usage measurement v2, engineering profiles, safe update path",
+      "closedAt": "2026-09-03T06:38:39Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 410,
+      "ref": "fagemx/edda#768",
+      "repo": "fagemx/edda",
+      "title": "fix(conductor): reconcile in-memory state with disk before phase selection (GH-750)",
+      "closedAt": "2026-09-03T05:40:03Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 411,
+      "ref": "agent-ix/tl-mltl#19",
+      "repo": "agent-ix/tl-mltl",
+      "title": "Close the removal census Makefile blind spot",
+      "closedAt": "2026-09-03T02:43:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 412,
+      "ref": "ai-agent-assembly/agent-assembly#2353",
+      "repo": "ai-agent-assembly/agent-assembly",
+      "title": "[AAASM-5756] 🐛 (docs/scripts): Fix SLA label drift, add --root, document marker exception, add negative control",
+      "closedAt": "2026-09-03T02:16:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 413,
+      "ref": "fagemx/edda#726",
+      "repo": "fagemx/edda",
+      "title": "feat(bridge): ingest pi session transcripts post-dispatch (GH-577)",
+      "closedAt": "2026-09-03T00:11:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 414,
+      "ref": "artifact-keeper/artifact-keeper#3668",
+      "repo": "artifact-keeper/artifact-keeper",
+      "title": "fix(security): return one generic message for every local login failure",
+      "closedAt": "2026-09-02T23:30:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 415,
+      "ref": "DIG-Network/dig-mirror-coin#11",
+      "repo": "dig-network/dig-mirror-coin",
+      "title": "feat(census): seeded census-height search bounded by a caller-supplied lower bound",
+      "closedAt": "2026-09-02T21:18:33Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 416,
+      "ref": "zingolabs/zaino#1483",
+      "repo": "zingolabs/zaino",
+      "title": "Feat: Isolate finalised state behind ports",
+      "closedAt": "2026-09-02T21:12:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 417,
+      "ref": "Dyse-Industries/control-rs#48",
+      "repo": "dyse-industries/control-rs",
+      "title": "Mdsdev/de sloppification",
+      "closedAt": "2026-09-02T20:42:38Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 418,
+      "ref": "windmill-labs/windmill#10933",
+      "repo": "windmill-labs/windmill",
+      "title": "fix: apply object-storage test SSRF validation to all non-super-admins",
+      "closedAt": "2026-09-02T20:29:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 419,
+      "ref": "gfx-rs/wgpu#10242",
+      "repo": "gfx-rs/wgpu",
+      "title": "`Buffer::unmap` should not raise any validation errors",
+      "closedAt": "2026-09-02T18:19:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 420,
+      "ref": "fagemx/edda#713",
+      "repo": "fagemx/edda",
+      "title": "fix(edda-conductor): manual skip on a pending phase survives concurrent runner saves (GH-556)",
+      "closedAt": "2026-09-02T17:59:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 421,
+      "ref": "supabase/etl#1010",
+      "repo": "supabase/etl",
+      "title": "fix(tests): bound replication slot inactivity wait",
+      "closedAt": "2026-09-02T15:11:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 422,
+      "ref": "rustdesk/rustdesk#15774",
+      "repo": "rustdesk/rustdesk",
+      "title": "Custom client no rebuild",
+      "closedAt": "2026-09-02T14:14:04Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 423,
+      "ref": "NEAR-DevHub/trezu#1502",
+      "repo": "near-devhub/trezu",
+      "title": "refactor: Gracefully retry fetching the data on the frontend errors",
+      "closedAt": "2026-09-02T14:06:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 424,
+      "ref": "amackillop/kitaebot#153",
+      "repo": "amackillop/kitaebot",
+      "title": "Append parsed test evidence to failing exec runs",
+      "closedAt": "2026-09-02T12:11:38Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 425,
+      "ref": "vow-lang/vow#1219",
+      "repo": "vow-lang/vow",
+      "title": "fix(compiler): create output parent directories in self-hosted builds",
+      "closedAt": "2026-09-02T09:31:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 426,
+      "ref": "saibaneer/bld-townhall#21",
+      "repo": "saibaneer/bld-townhall",
+      "title": "M6B — the dispatcher, the simulator, and M6's gate",
+      "closedAt": "2026-09-02T08:56:14Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 427,
+      "ref": "junhoyeo/tokscale#1247",
+      "repo": "junhoyeo/tokscale",
+      "title": "fix(cursor): key sessions by conversationId from usage-events JSON",
+      "closedAt": "2026-09-02T08:39:04Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 428,
+      "ref": "api7/aisix#1097",
+      "repo": "api7/aisix",
+      "title": "fix(guardrails): close audit and config status gaps",
+      "closedAt": "2026-09-02T06:30:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 429,
+      "ref": "toptopworks/toptopduck#778",
+      "repo": "toptopworks/toptopduck",
+      "title": "feat(session): add full-result CSV export and TSV copy (#769)",
+      "closedAt": "2026-09-02T04:28:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 430,
+      "ref": "KooshaPari/AgilePlus#1060",
+      "repo": "kooshapari/agileplus",
+      "title": "chore: wtree-sprawl cleanup — core-mcp-runtime linear2 (MCP runtime+CI fixes, 72 commits unique to local)",
+      "closedAt": "2026-09-01T22:33:38Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 431,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#83",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 Guarantee per-run screening progress: restart the exhausted sweep and report zero-progress runs (Issue #77)",
+      "closedAt": "2026-09-01T21:02:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 432,
+      "ref": "Blackcat-Informatics/purrdf#221",
+      "repo": "blackcat-informatics/purrdf",
+      "title": "feat(sparql): SEP-0008 SHA-3 builtins and CONSTRUCT GRAPH with first-party corpora (#192, #190)",
+      "closedAt": "2026-09-01T21:02:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 433,
+      "ref": "outlmd/outl#252",
+      "repo": "outlmd/outl",
+      "title": "fix: lock the workspace before the backlinks index",
+      "closedAt": "2026-09-01T21:00:16Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 434,
+      "ref": "utensils/mold#1524",
+      "repo": "utensils/mold",
+      "title": "fix(gallery): open retained source media on a keyless host",
+      "closedAt": "2026-09-01T20:13:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 435,
+      "ref": "charioxai/chariox#26",
+      "repo": "charioxai/chariox",
+      "title": "Workflow deployment runtime platform",
+      "closedAt": "2026-09-01T18:16:42Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 436,
+      "ref": "the-hcma/rusty-jack#220",
+      "repo": "the-hcma/rusty-jack",
+      "title": "feat: surface daemon health errors and log privacy on wake",
+      "closedAt": "2026-09-01T16:22:46Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 437,
+      "ref": "microsoft/mssql-rs#427",
+      "repo": "microsoft/mssql-rs",
+      "title": "mssql-odbc: deliver bound PLP (max/LOB) columns instead of failing the row",
+      "closedAt": "2026-09-01T16:19:59Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 438,
+      "ref": "api7/aisix#1090",
+      "repo": "api7/aisix",
+      "title": "feat(auth): deliver the caller's verified JWT to internal upstreams",
+      "closedAt": "2026-09-01T16:11:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 439,
+      "ref": "githubnext/ado-aw#1974",
+      "repo": "githubnext/ado-aw",
+      "title": "test(safe-outputs): verify work item rendering fidelity end to end",
+      "closedAt": "2026-09-01T14:38:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 440,
+      "ref": "rayfalling/XEngine#1",
+      "repo": "rayfalling/xengine",
+      "title": "feat: core-ecs-foundation — ECS 核心 + 帧更新调度（首个里程碑）",
+      "closedAt": "2026-09-01T14:26:18Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 441,
+      "ref": "cama-apps/cama-mm#649",
+      "repo": "cama-apps/cama-mm",
+      "title": "Correctness audit: fix confirmed bugs and consolidate shared abstractions",
+      "closedAt": "2026-09-01T13:25:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 442,
+      "ref": "meow-rs/meow-rs#473",
+      "repo": "meow-rs/meow-rs",
+      "title": "feat: pluggable TcpDialer for dialer-proxy chaining (Phase 1)",
+      "closedAt": "2026-09-01T11:38:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 443,
+      "ref": "Pinvou/pinvou-agent#218",
+      "repo": "pinvou/pinvou-agent",
+      "title": "feat(chat): default local reasoning off, auto-probed tiers",
+      "closedAt": "2026-09-01T10:38:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 444,
+      "ref": "api7/aisix#1086",
+      "repo": "api7/aisix",
+      "title": "fix(proxy): echo the caller's model name on the native passthrough paths",
+      "closedAt": "2026-09-01T10:32:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 445,
+      "ref": "githubnext/ado-aw#1999",
+      "repo": "githubnext/ado-aw",
+      "title": "refactor(cli): split main() dispatch into per-group helper functions",
+      "closedAt": "2026-09-01T10:29:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 446,
+      "ref": "marmot-protocol/mdk#1615",
+      "repo": "marmot-protocol/mdk",
+      "title": "Batch app-component reads onto one MLS group load",
+      "closedAt": "2026-09-01T10:10:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 447,
+      "ref": "cgamja/DeskPeng#39",
+      "repo": "cgamja/deskpeng",
+      "title": "feat: 핀볼 판 — 켠 동안 화면 전체가 판이 된다",
+      "closedAt": "2026-09-01T08:40:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 448,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#81",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 Declare pruned provenance: publish the tagged neurons a run deliberately removed (Issue #75)",
+      "closedAt": "2026-09-01T08:26:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 449,
+      "ref": "stSoftwareAU/NEAT-AI-Ockham#80",
+      "repo": "stsoftwareau/neat-ai-ockham",
+      "title": "🪒 Coverage: count every hidden neuron in the denominator, including tagged ones (Issue #74)",
+      "closedAt": "2026-09-01T06:45:50Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 450,
+      "ref": "OxideAV/oxideav-bluray#3",
+      "repo": "oxideav/oxideav-bluray",
+      "title": "chore: release v0.0.4",
+      "closedAt": "2026-09-01T01:12:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 451,
+      "ref": "tamada/oinkie#53",
+      "repo": "tamada/oinkie",
+      "title": "refactor: write the headless lifter shape once, not once per tool",
+      "closedAt": "2026-09-01T00:39:48Z",
+      "queries": [
+        "ignored error"
+      ]
+    }
+  ]
+}

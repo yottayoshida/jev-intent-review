@@ -1,5 +1,5 @@
 {
-  "protocolVersion": 2,
+  "protocolVersion": 3,
   "what": "Every candidate the records of bench/ name, with where it came from and what was decided about it. Built by build-pool.ts; do not edit by hand.",
   "rows": [
     {
