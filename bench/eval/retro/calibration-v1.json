@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "promptsVersion": 2,
+  "cases": [
+    {
+      "fix": "armaxri/termiHub#2751",
+      "origin": {
+        "number": 1708,
+        "by": "blame",
+        "share": 0.21212121212121213
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When a graphical session is lost, the shared SessionStateMachine must move through disconnected to reconnecting and attempt automatic reconnection no more than 3 times.",
+            "quote": "`SessionStateMachine` — the shared `connecting → authenticating → active → resizing → disconnected → reconnecting` lifecycle with the max-3 auto-retry cap, unit-tested in isolation."
+          },
+          {
+            "text": "When a remote-desktop session fails, the RemoteDesktopTab must show the RemoteDesktopOverlay in its failure state, as it does for the connecting and reconnecting states.",
+            "quote": "One `remote-desktop` tab type → `RemoteDesktopTab` composing the shared `RemoteDesktopCanvas`, floating hover `RemoteDesktopToolbar` (Ctrl+Alt+Del, clipboard, scaling, fullscreen, disconnect), `RemoteDesktopOverlay` (connecting/reconnecting/failure), and a slide-out bidirectional clipboard panel."
+          },
+          {
+            "text": "GraphicalSessionManager must reject an attempt to connect a remote-desktop session using a non-graphical connection type rather than starting a session.",
+            "quote": "Rust: state-machine transitions + reconnect cap; mock backend (frames flow, resize, clipboard, view-only); `GraphicalSessionManager` integration against the mock (connect→active, events emitted, resize/input/clipboard round-trip, non-graphical type rejected)."
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "armaxri/termiHub#2732",
+      "origin": {
+        "number": 679,
+        "by": "blame",
+        "share": 0.23529411764705882
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The material describes a normal cleanup step: close_session() now calls disconnect() before dropping the entry. It also describes the new panel's Kill and Kill All behavior on success. It never says what must happen when an operation fails. Examples it leaves unaddressed include disconnect() returning an error, a Kill or Kill All call failing, and list_local_sessions or close_agent_session failing."
+      }
+    },
+    {
+      "fix": "ratazzi/quebec#136",
+      "origin": {
+        "number": 9,
+        "by": "blame",
+        "share": 0.1
+      },
+      "label80": "falls_back_or_degrades",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When dispatching a claimed execution fails, or when running the job raises an error, the worker must still remove or release that claimed execution rather than leave it behind.",
+            "quote": "Fix multiple paths where claimed executions could leak — dispatch errors, execution errors, DB backpressure, crashed worker recovery, and transient transaction failures (with retry loop + emergency cleanup)"
+          },
+          {
+            "text": "When the after_executed database transaction fails, the worker must retry it, and if the retries do not succeed it must run an emergency cleanup so the claimed execution is not leaked.",
+            "quote": "fix(worker): add transaction retry with emergency cleanup for after_executed"
+          },
+          {
+            "text": "When the claimed executions of a crashed worker are recovered, the recovery code must release their semaphores and unblock the jobs waiting on them.",
+            "quote": "fix: release semaphore and unblock jobs when recovering crashed worker's claimed executions"
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "origin": {
+        "number": 375,
+        "by": "blame",
+        "share": 0.5
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The material describes a move-only refactor and says only generally that there are 'no behavior changes'. The reviewer notes that no error messages changed, but that is an observation, not a requirement. Nothing in the title, description, review comment or issue #271 states how the moved code must behave when an operation it performs fails."
+      }
+    }
+  ],
+  "checked": [],
+  "verdict": "stopped",
+  "why": "stopped by an error: Command failed: gh pr diff 187 -R beboite/boite-legacy\nthe diff contains terminal escape sequences; pass --allow-escape-sequences to output it anyway\n",
+  "counts": {
+    "plantedLeftOut": 0,
+    "cleanLeftOut": 0,
+    "agreement": null,
+    "leakWritten": 0,
+    "leakCaught": 0,
+    "runs": 5,
+    "byRepo": {}
+  },
+  "recordsCut": 0,
+  "n1": {
+    "before": {
+      "originMain": "e5e0d4e8dc0e607813955fc26ba68397e25e847f Auto-backup: 86 file(s) updated at 2026-09-24 21:37",
+      "statusLines": 25,
+      "auditBytes": 2850853240
+    },
+    "after": {
+      "originMain": "e5e0d4e8dc0e607813955fc26ba68397e25e847f Auto-backup: 86 file(s) updated at 2026-09-24 21:37",
+      "statusLines": 25,
+      "auditBytes": 2850941882
+    },
+    "emptyDir": "/var/folders/lm/837r2dnd3tsbn9ng4rvxgrbm0000gp/T/jir-annotator-eSkPV1",
+    "probe": {
+      "counted": true,
+      "model": [
+        "claude-opus-5-5"
+      ],
+      "why": null
+    },
+    "problem": null
+  },
+  "extraRows": 137
+}

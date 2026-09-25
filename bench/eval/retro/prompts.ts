@@ -9,9 +9,42 @@
 
 import { spawnSync } from "node:child_process";
 import { assertEmptyDir, claudeArgs, MODEL } from "../baseline.ts";
+import { LABELS, type Label } from "../split.ts";
 import { BUNDLE_FIELDS, type Bundle } from "./material.ts";
 
-export const PROMPTS_VERSION = 1;
+/**
+ * The first screen of a sealed candidate (RETRO.md v2): what the code before the later fix did with
+ * the failure the fix is about. The meaning of each label is PROTOCOL.md's "Labels", word for word.
+ */
+export const LABEL_SYSTEM = [
+  "You read a pull request that was merged, as it stood when it merged: its title, description, comments and the issues it addressed.",
+  "Label how the code before the fix handled the failure the pull request is about: the behaviour the fix changed, not the one it asks for.",
+  `One of ${LABELS.map((l) => `\`${l}\``).join(", ")}. \`cannot_label\` means the pull request is about failure handling and its text does not say how; \`not_failure_handling\` means it is about something else.`,
+  "Quote the sentence your label rests on.",
+  'Answer with JSON only: {"label":"...","quote":"..."}.',
+].join("\n");
+
+/** Labels that keep a later fix: the code before it did not bring the failure to the caller. */
+export const KEEP_LABELS: readonly Label[] = ["swallows_as_success", "falls_back_or_degrades", "logs_or_warns", "records_or_handles_locally"];
+
+/** The later fix as the labellers see it: its own bundle, cut at its merge the way O's is. */
+export const labelRequest = (fixBundle: Bundle) => `The pull request, as it stood when it merged:\n\n${bundleText(fixBundle)}`;
+
+/** One labeller's answer, or `null` when it is not one of the labels. */
+export function readLabel(json: unknown): Label | null {
+  const l = (json as { label?: unknown } | null)?.label;
+  return typeof l === "string" && (LABELS as readonly string[]).includes(l) ? (l as Label) : null;
+}
+
+/** Three labels, two of three deciding; three different labels make `cannot_label`, as PROTOCOL.md does. */
+export function majority(labels: readonly Label[]): Label {
+  const counts = new Map<Label, number>();
+  for (const l of labels) counts.set(l, (counts.get(l) ?? 0) + 1);
+  const top = [...counts].sort((a, b) => b[1] - a[1])[0];
+  return top !== undefined && top[1] >= 2 ? top[0] : "cannot_label";
+}
+
+export const PROMPTS_VERSION = 2;
 
 /** The most items a written requirement may have: more items, more chances for one to be listed. */
 export const MAX_ITEMS = 3;

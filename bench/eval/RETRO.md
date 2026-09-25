@@ -1,4 +1,4 @@
-# The retrospective measurement, version 1 (issue #89)
+# The retrospective measurement, version 2 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -7,8 +7,22 @@ tool is run. The denominator, the rule for a detection, the tool's version, the 
 smallest effect of interest, the guards, the candidate cap and the stop rule are written here before
 the first case is scored, and the gate is judged on this measurement's sealed cases alone.**
 
-Changing any of it makes version 2, and a result is compared only with results of its own version.
-Nothing has been measured under this version: no candidate has been examined, no requirement written.
+Changing any of it makes a new version, and a result is compared only with results of its own version.
+
+**Version 2** (before any candidate was examined) added the screen of F — whether it fixed a
+failure-handling defect at all; version 1 let through a pull request that only matched a search
+phrase — put the steps in the order below, cheapest first, and wrote how the hindsight check is
+calibrated and what that calibration cannot see. Nothing was examined under version 1. The
+calibration writes one record per attempt, `retro/calibration-v<n>.json`, whatever its verdict; an
+attempt that stopped is not taken again under its name, the next is the next number, and the runs
+allowed are counted over every attempt. Three attempts on 2026-09-25: the first stopped after 5 runs
+(`gh pr diff` refused a diff holding terminal escape sequences), the second after 5 more (`gh api`
+refused it too — the change was not tried alone before the run), and the third **passed: 10 of 10
+planted names left out, 0 of 10 clean**, after 151 runs, 161 in all of the 250 allowed. (Its record
+says 15 were spent before it: the counting added the second record's total, which already held the
+first's. 10 were; `nextAttempt` now reads the latest record.) Before the third, the steps that run no
+annotator were run over the first 80 candidates alone, to find tool errors without spending a run.
+No sealed candidate has been examined.
 
 ## The question
 
@@ -51,6 +65,20 @@ of the measurement and is reported with it.
 - The rows are examined in their recorded order. **One case per repository**: the first of a
   repository's rows to pass every step below is its case; later rows of the same repository are not
   examined.
+- **The steps, in order** — those that run no annotator first:
+  1. O is found (below, "The original pull request"); a row with none is left out.
+  2. The bundle is built (below, "What the writer sees"); a gap makes the case one without a
+     requirement.
+  3. **F is screened**: F's title, description and the issues it closed, cut at F's merge the way O's
+     bundle is, are read by three annotators with `LABEL_SYSTEM` (`retro/prompts.ts`), whose labels are
+     `PROTOCOL.md`'s "Labels", word for word. Two of three decide; three different labels make
+     `cannot_label`. F is kept when the label is `swallows_as_success`, `falls_back_or_degrades`,
+     `logs_or_warns` or `records_or_handles_locally` — the code before F did not bring the failure to
+     the caller — and left out, with the label, otherwise.
+  4. Caught before the merge (below).
+  5. The writer, then 6. the checker (below, "Writing and checking the requirement").
+- An annotator's answer that cannot be counted — another model, not JSON, the run failing — is asked
+  again up to three times; after that the run over the rows stops, and that row is decided neither way.
 - A passed candidate's repository is placed by `split.ts`'s `sideOf`, the salt being the first main
   merge commit holding the batch's verdicts' hashes (below, "Where records live"). A repository that
   another measurement placed first keeps that side and is left out of this one.
@@ -137,12 +165,34 @@ the ones of `BASELINE.md`, and are not these.)
 2. **The checker** is another annotator, given the bundle, F and the requirement, and `CHECK_SYSTEM`:
    which words say what only F could tell. **Any such word leaves the case out** as one whose
    requirement could not be written; the requirement is not rewritten.
-3. **The check is calibrated before any sealed candidate reaches it.** On dev — F/O pairs gathered from
-   repositories already on the split, by the same steps, with F on or after 2026-07-01 — ten
-   requirements written by an annotator who is given F (`LEAK_SYSTEM`) and ten written by the writer are
-   mixed and checked. The check passes when it leaves out at least 9 of the 10 planted ones and at most 1
-   of the 10 written ones. Ten is a check that the step works, not an estimate of its rate (9 of 10 has
-   a lower bound of 0.555). Until the check passes, no sealed candidate is checked.
+3. **The check is calibrated before any sealed candidate reaches it** (`retro/calibrate.ts`). The
+   material is dev's: the later fixes of `pool.json` that #80 labelled with one of the four kept labels,
+   pull requests merged on or after 2026-07-01, one per repository, in the pool's order, through steps
+   1, 2 and 5 above (step 4 is not needed to calibrate a check that reads only the requirement and F).
+   The first ten cases with a requirement written and a function name to plant are used. **The planted
+   requirements are made, not written**: each of the ten written requirements, its first item ending
+   "(the call in `name`)", `name` a function F changed (a hunk header of its diff, or a `fn` line it
+   removed or added) that is not in the bundle. The twenty are shuffled and checked one by one. The check
+   passes when it leaves out at least 9 of the 10 planted and at most 1 of the 10 written. Ten is a check
+   that the step works, not an estimate of its rate (9 of 10 has a lower bound of 0.555). Until the check
+   passes, no sealed candidate is checked. **What this cannot see**: a name makes hindsight visible, so
+   the calibration shows the check catches a name F told; a requirement in the bundle's own words that
+   picks the call F picked is not measured by it. Recorded beside it and never in the verdict: the
+   twenty checked a second time (how often two runs agree), ten requirements written by an annotator
+   shown F (`LEAK_SYSTEM`) and how many the check leaves out, and the screen of step 3 run on each used
+   case's F against #80's label for it (the same model family labelled both, so it is no independent
+   measure). A recorded answer that cannot be counted, or that the budget cuts, is given up on and
+   counted as cut; it never stops the verdict. **Dev's extra material** is searched beforehand the same
+   way, kept to the dev side of the split (`retro/search.ts --dev`, recorded in
+   `retro/search-dev-v1.json`, never in the sealed search), and its rows are tried after the pool's in
+   the same run; they have no label from #80, so for them the screen of step 3 decides, as it will for a
+   sealed row. Fewer than ten cases after both, and the calibration stops as insufficient. A
+   repository's case is the first of its rows to pass every step; a row that fails leaves its
+   repository's next row to be tried. A calibration that cannot go on — an answer the verdict needs
+   never counted, the budget reached, the network — stops, and still writes its record with the runs it
+   spent. The rule of step 2 stays as
+   it is — one checking, any word leaves the case out: checking twice and leaving out only on two would
+   leave out fewer cases, and so move the primary metric in the tool's favour.
 4. The requirement that passes is frozen before the tool runs on O.
 
 ## Scoring
@@ -209,6 +259,14 @@ is opened, and none exists.
 ## Annotator runs
 
 The owner allowed running the annotators of this file with `claude -p` in the form above, which does not
-load user-level hooks (2026-09-25). The count grows with the candidates: for each case one writer, one
-checker and three for "caught before the merge", and the calibration's twenty. The yield check under
-"Candidates" stops the runs before they go to scale when 17 repositories are out of reach.
+load user-level hooks (2026-09-25). The count grows with the candidates: for each row that reaches it,
+three for the screen of F, three for "caught before the merge", one writer and one checker. The yield
+check under "Candidates" stops the runs before they go to scale when 17 repositories are out of reach.
+**The calibration was allowed 250 runs** (owner, 2026-09-25; expected 136 to 216, answers asked again
+included); `calibrate.ts` stops at 250, the N=1 run below counted in them. Before the first run of the
+calibration, one writer's run is made, and the workspace's `origin/main`, the length of its `git
+status` and the size of omamori's audit log are recorded before and after it. Other sessions work in
+the same workspace, so a moved `origin/main` or a longer status is recorded, not taken for this run's;
+the calibration does not start when the run left a mark only it could — an auto-backup commit (the
+hook `claude -p` would fire if it loaded user settings), or the audit log naming the run's directory —
+or gave no answer to count. The runs for sealed rows are asked for, as a number, before they start.
