@@ -20,6 +20,7 @@ its own version, and the count of openings (below) runs across versions.
 | `sealed-access.jsonl` | every opening of the sealed set and every result. Lines are only ever added |
 | `metrics.ts` | the metrics, the interval, the gates |
 | `run.ts` | the one entry: `--set dev` and `--set sealed` |
+| `drift.ts`, `drift/` | Jev's drift on the dev set: its questions frozen, sent again, and compared with a baseline taken on two days (`#87`, rule in `drift/README.md`). Dev only; a sealed replay is a sealed opening |
 
 ## Dev and sealed
 
