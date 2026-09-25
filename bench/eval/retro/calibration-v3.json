@@ -1,0 +1,1411 @@
+{
+  "version": 1,
+  "promptsVersion": 2,
+  "cases": [
+    {
+      "fix": "armaxri/termiHub#2751",
+      "origin": {
+        "number": 1708,
+        "by": "blame",
+        "share": 0.21212121212121213
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When a graphical session disconnects, the shared session state machine moves it to reconnecting and auto-retries at most 3 times.",
+            "quote": "`SessionStateMachine` — the shared `connecting → authenticating → active → resizing → disconnected → reconnecting` lifecycle with the max-3 auto-retry cap, unit-tested in isolation."
+          },
+          {
+            "text": "GraphicalSessionManager must reject a connect request whose connection type is not graphical, rather than opening a session for it.",
+            "quote": "Rust: state-machine transitions + reconnect cap; mock backend (frames flow, resize, clipboard, view-only); `GraphicalSessionManager` integration against the mock (connect→active, events emitted, resize/input/clipboard round-trip, non-graphical type rejected)."
+          },
+          {
+            "text": "RemoteDesktopTab must show the RemoteDesktopOverlay in a failure state when the session fails, in addition to its connecting and reconnecting states.",
+            "quote": "One `remote-desktop` tab type → `RemoteDesktopTab` composing the shared `RemoteDesktopCanvas`, floating hover `RemoteDesktopToolbar` (Ctrl+Alt+Del, clipboard, scaling, fullscreen, disconnect), `RemoteDesktopOverlay` (connecting/reconnecting/failure), and a slide-out bidirectional clipboard panel."
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "armaxri/termiHub#2732",
+      "origin": {
+        "number": 679,
+        "by": "blame",
+        "share": 0.23529411764705882
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The material never says what the changed code must do when an operation fails. The serial fix is about releasing the port during a normal close_session() call, not about handling an error. The test plan covers only success paths and the empty state (\"No open connections.\"). No sentence addresses errors or failures in disconnect(), close_agent_session, list_local_sessions, or the Kill / Kill All actions."
+      }
+    },
+    {
+      "fix": "ratazzi/quebec#136",
+      "origin": {
+        "number": 9,
+        "by": "blame",
+        "share": 0.1
+      },
+      "label80": "falls_back_or_degrades",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When dispatching a claimed execution fails, or when executing it fails, the worker must not leave that claimed execution behind (leaked).",
+            "quote": "fix(worker): prevent claimed execution leaks on dispatch and execution errors"
+          },
+          {
+            "text": "When the after_executed database transaction fails, it must be retried, and if the retries do not succeed an emergency cleanup must run so the claimed execution is not leaked.",
+            "quote": "fix(worker): add transaction retry with emergency cleanup for after_executed"
+          },
+          {
+            "text": "When a crashed worker's claimed executions are recovered, the recovery must release the semaphore and unblock the jobs that were blocked.",
+            "quote": "fix: release semaphore and unblock jobs when recovering crashed worker's claimed executions"
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "origin": {
+        "number": 375,
+        "by": "blame",
+        "share": 0.5
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The material describes a move-only refactor: code is relocated from src/commands/mod.rs into python.rs, project.rs and tooling.rs with no renames, signature changes or behavior changes. It never states what the code must do when an operation fails. The reviewer's note 'No behavior/signature/error-message/JSON-key changes found' reports what the reviewer observed about the move. It does not state a requirement for failure handling. The test failures mentioned are local environment problems unrelated to the change."
+      }
+    },
+    {
+      "fix": "beboite/boite-legacy#187",
+      "origin": {
+        "number": 36,
+        "by": "blame",
+        "share": 0.009933774834437087
+      },
+      "label80": "swallows_as_success",
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When `session.migrate` returns `false` while moving a thread, the thread must drop its session id and start a fresh session instead of launching with `--resume` on the old id.",
+            "quote": "`session.migrate` carries the transcript and answers reachability rather than \"did I copy something\": on `false` the thread drops its session id and starts fresh, because replaying an id claude cannot find fails the launch outright instead of degrading to a new session."
+          },
+          {
+            "text": "When an opening prompt cannot be passed to the target CLI (any CLI other than claude and codex), Boite must show the user the intended prompt rather than silently discarding it.",
+            "quote": "For the rest Boite shows the user what was meant to be said rather than dropping it silently."
+          },
+          {
+            "text": "The acting MCP tools (`thread_move`, `project_create`, `thread_spawn`) must write their reply, including any refusal, before the work that kills the calling process runs, so the calling agent can still read a refusal.",
+            "quote": "The three that act answer before they finish: two of them kill the process that called them, so the reply is written while the agent is still there to read a refusal, and the work happens after it has gone."
+          }
+        ]
+      },
+      "name": "ensure_boite_excluded"
+    },
+    {
+      "fix": "Diogo-Esteves/polyVocal#60",
+      "origin": {
+        "number": null,
+        "why": "no merged pull request into the default branch holds the lines the fix removed"
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "why": "no merged pull request into the default branch holds the lines the fix removed"
+    },
+    {
+      "fix": "cavi-ai/bobby-browser#163",
+      "origin": {
+        "number": null,
+        "why": "no merged pull request into the default branch holds the lines the fix removed"
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "why": "no merged pull request into the default branch holds the lines the fix removed"
+    },
+    {
+      "fix": "dolang-org/dolang#337",
+      "origin": {
+        "number": 332,
+        "by": "blame",
+        "share": 0.16666666666666666
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The only material is the title 'Pull container images quietly'. The body is empty, and there are no comments, reviews or linked issues. Nothing in the material says what must happen when pulling an image or any other operation fails, so no requirement can be written."
+      }
+    },
+    {
+      "fix": "TumbleOwlee/ferrowl#127",
+      "origin": {
+        "number": 44,
+        "by": "blame",
+        "share": 0.3448275862068966
+      },
+      "label80": "swallows_as_success",
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When operations in the codec, store and util libraries fail, they must return thiserror-based error enums instead of anyhow errors, and the error message text must be identical to the text before the change.",
+            "quote": "libs: replace anyhow with thiserror enums in codec/store/util; error message text unchanged"
+          },
+          {
+            "text": "The ocpp shared-state locks must use parking_lot through closure-scoped accessors (lock.rs, HasState trait) rather than std RwLock, so no lock acquisition unwraps a poisoned-lock error.",
+            "quote": "ocpp: replace std RwLock + poison unwraps with parking_lot behind closure-scoped accessors (lock.rs, HasState trait); guard cannot outlive its closure, making the fixed reentrancy-deadlock class unrepresentable"
+          }
+        ]
+      },
+      "name": "spawn_detach_with_context"
+    },
+    {
+      "fix": "MarshalX/python-libipld#117",
+      "origin": {
+        "number": 114,
+        "by": "blame",
+        "share": 0.8857142857142857
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "none": "The material contains only a PR title about restructuring lib.rs into modules, an empty description, and an automated benchmark report; nothing states how the code must behave when an operation fails."
+      }
+    },
+    {
+      "fix": "getappz/agentflare#229",
+      "origin": {
+        "number": 175,
+        "by": "blame",
+        "share": 0.7741935483870968
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "The credential-file writes in `activate_with` and `activate_into`, and the shell-rc write in `write_managed_block`, must go through a same-directory temp file plus `rename`, so that a process killed mid-write leaves the original file in place rather than a truncated or zero-byte file.",
+            "quote": "Neither is crash-atomic: a process killed mid-write (OOM kill, SIGKILL, power loss) leaves a truncated or zero-byte file in place of the original."
+          },
+          {
+            "text": "When the temp-file-plus-rename write fails because the parent directory is read-only but the target file itself is writable, the writer must fall back to overwriting the existing file in place.",
+            "quote": "Adds `src/atomic_fs.rs` (ported from lean-ctx's `core/atomic_fs.rs`): a same-directory temp file + `rename` for crash-atomicity, with an in-place-overwrite fallback for the read-only-directory/writable-inode case."
+          },
+          {
+            "text": "In the temp-file write block, a failure of `sync_all()` must be returned as an error before `rename` is attempted, not discarded, and the temp file must be handled the same way as after a `write_all` failure.",
+            "quote": "Preserve the current flush handling and ensure a sync_all error returns before rename, leaving the temporary file behavior consistent with write_all failures."
+          }
+        ]
+      },
+      "name": "run",
+      "why": "`run` is in the bundle already"
+    },
+    {
+      "fix": "dsx-ai-factory/infra-controller#3469",
+      "origin": {
+        "number": 711,
+        "by": "blame",
+        "share": 0.14285714285714285
+      },
+      "label80": "swallows_as_success",
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "If writing a log batch to disk fails in the periodic logs collector (crates/health/src/collectors/logs/periodic.rs), the code must not advance `last_seen_ids` or `total_log_count`, or it must make the failure handling explicit, for example by retrying on the next run when the writer errors.",
+            "quote": "Consider only advancing `last_seen_ids` (and `total_log_count`) after a successful write, or otherwise making the failure semantics explicit (e.g., retry on next run when the writer errors)."
+          },
+          {
+            "text": "The OTLP drain task (crates/health/src/otlp/drain.rs) must retry with backoff instead of giving up when an attempt to connect to or flush to the OTLP collector fails.",
+            "quote": "New OTLP drain task: connect, batch, flush, retry w/ backoff."
+          }
+        ]
+      },
+      "name": "get_switch_nvos_credentials"
+    },
+    {
+      "fix": "Davidslv/cce-rust#168",
+      "origin": {
+        "number": 81,
+        "by": "blame",
+        "share": 0.75
+      },
+      "label80": "falls_back_or_degrades",
+      "labels": [
+        "falls_back_or_degrades",
+        "falls_back_or_degrades",
+        "falls_back_or_degrades"
+      ],
+      "screen": "falls_back_or_degrades",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When writing fingerprint.json fails during `cce index`, `cce init` or `cce sync pull`, the code emits a warning and the index or pull operation still succeeds.",
+            "quote": "Best-effort: a failed fingerprint write warns and never fails the index/pull."
+          },
+          {
+            "text": "When one of `cce doctor`'s checks fails, the full report is still rendered, while the no-store usage error takes the ordinary error path.",
+            "quote": "Usage errors (no store anywhere) take the ordinary error path; a failing check still renders the full report."
+          },
+          {
+            "text": "`cce doctor` exits non-zero only for definite corruption or mismatch findings; advisory findings and a missing fingerprint leave the exit code at 0.",
+            "quote": "Exit code: non-zero **only** on definite corruption/mismatch."
+          }
+        ]
+      },
+      "name": "cmd_doctor"
+    },
+    {
+      "fix": "liveask/liveask#127",
+      "origin": {
+        "number": null,
+        "why": "no merged pull request into the default branch holds the lines the fix removed"
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "why": "no merged pull request into the default branch holds the lines the fix removed"
+    },
+    {
+      "fix": "AndreaBozzo/dataprof#370",
+      "origin": {
+        "number": 293,
+        "by": "blame",
+        "share": 0.42857142857142855
+      },
+      "label80": "falls_back_or_degrades",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "invalid": "item 1 quotes words that are not in the material"
+      }
+    },
+    {
+      "fix": "risingwavelabs/risingwave#26399",
+      "origin": {
+        "number": 19221,
+        "by": "named"
+      },
+      "label80": "swallows_as_success",
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When converting a microsecond-based RisingWave timestamp/timestamptz to nanoseconds, the code multiplies with `checked_mul(1_000)` and calls `unwrap()` on the result instead of `unwrap_or_default()`, because the multiplication is treated as unable to overflow.",
+            "quote": "yes, `microsecond checked_mul(1_000)` is safe, then `unwrap()` safely."
+          }
+        ]
+      },
+      "name": "invalid_arrow_temporal_value"
+    },
+    {
+      "fix": "mandubian/autonoetic#901",
+      "origin": {
+        "number": 896,
+        "by": "blame",
+        "share": 0.6666666666666666
+      },
+      "label80": "swallows_as_success",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When agent_message is addressed by a target_session_id that has no binding in session_agent_bindings, it must refuse with status `target_session_not_found` and must not deliver the message.",
+            "quote": "Naming a permitted role alongside an arbitrary session no longer launders the grant, and an unbound session id is refused (`target_session_not_found`) rather than delivered to unchecked."
+          },
+          {
+            "text": "When the target agent is installed but its manifest cannot be loaded, agent_message must return status `target_agent_unavailable` with `exists: true`, distinct from `target_agent_not_found`.",
+            "quote": "Returned when an agent is installed but its manifest cannot be loaded — a broken bundle, not a missing one, distinguished from `target_agent_not_found` by `exists: true`."
+          },
+          {
+            "text": "The `no_live_recipients` failure message must state the actual rule (no unfinished sessions of the role other than the sender's own), not that the agent 'has no active sessions'.",
+            "quote": "The message now states the actual rule, so an agent can't misdiagnose the failure."
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "vybestack/llxprt-jefe#416",
+      "origin": {
+        "number": 291,
+        "by": "blame",
+        "share": 0.859375
+      },
+      "label80": "records_or_handles_locally",
+      "labels": [],
+      "screen": "cannot_label",
+      "kept": null,
+      "written": {
+        "requirements": [
+          {
+            "text": "When a liveness probe fails transiently during startup reconciliation, the persisted agent is classified as recoverable rather than stopped or stale.",
+            "quote": "refuse wrong-session, changed-launch-signature, and reused-PID restoration while preserving recoverable agents during transient probe failures"
+          },
+          {
+            "text": "When local session probing returns empty or malformed pane flags, liveness is reported as Unavailable, and Missing is returned only for valid all-dead pane output.",
+            "quote": "`src/runtime/liveness.rs#L105-L116`: return `Unavailable` for empty or malformed pane flags; reserve `Missing` for valid all-dead output."
+          },
+          {
+            "text": "When the SSH or query step of a remote session liveness check fails, the result is Unavailable and is not treated as a confirmed Missing session.",
+            "quote": "Empty/malformed pane output is Unavailable; valid all-dead output is Missing; SSH failures no longer collapse to Missing."
+          }
+        ]
+      },
+      "name": "classify_startup",
+      "why": "`classify_startup` is in the bundle already"
+    },
+    {
+      "fix": "git-ai-project/git-ai#1717",
+      "origin": {
+        "number": 1625,
+        "by": "blame",
+        "share": 0.23076923076923078
+      },
+      "label80": "falls_back_or_degrades",
+      "labels": [
+        "falls_back_or_degrades",
+        "falls_back_or_degrades",
+        "falls_back_or_degrades"
+      ],
+      "screen": "falls_back_or_degrades",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When `BashHistoryDatabase::new()` fails in `global()`, the fallback database at the temp path must be opened through the schema-initializing `open_at_path`, not a bare `Connection` without schema.",
+            "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+          },
+          {
+            "text": "If opening the temp-path fallback also fails, `global()` must fall back to an in-memory database whose schema has been initialized, so the `bash_checkpoint_calls` table exists for `candidates_near_timestamps` queries.",
+            "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+          },
+          {
+            "text": "A failure to initialize the bash history database must not cause `recover_bash_mtime` / `recover_attribution` to make `post_commit` fail; the post-commit must degrade gracefully instead of breaking the user's git workflow.",
+            "quote": "This breaks the user's git workflow for an issue that should degrade gracefully."
+          }
+        ]
+      },
+      "name": "merge_filters"
+    },
+    {
+      "fix": "yottayoshida/omamori#553",
+      "origin": {
+        "number": 329,
+        "by": "blame",
+        "share": 0.6458333333333334
+      },
+      "label80": "swallows_as_success",
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When `remove_file` fails for a staging file during age-based pruning, the retain closure must return `true` so the file stays counted and the Phase 2 count cap is applied against the files actually on disk.",
+            "quote": "- **retain failed-delete undercount** (CONFIRMED, 3 angles): closure now returns `true` on `remove_file` failure so Phase 2 count-cap sees actual on-disk files"
+          },
+          {
+            "text": "When loading the config fails, `staging_json_summary` must return `status: \"error\"` and must not fall back to default retention settings.",
+            "quote": "- **JSON/text config error divergence** (CONFIRMED, 1 angle): `staging_json_summary` returns `status: \"error\"` on config load failure instead of falling back to defaults"
+          }
+        ]
+      },
+      "name": "fsync_parent"
+    },
+    {
+      "fix": "pnpm/pnpm#15357",
+      "origin": {
+        "number": 14103,
+        "by": "blame",
+        "share": 0.8333333333333334
+      },
+      "label80": null,
+      "labels": [
+        "propagates",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "pnpm/pnpm#15304",
+      "origin": {
+        "number": 2746,
+        "by": "blame",
+        "share": 0.8
+      },
+      "label80": null,
+      "labels": [
+        "propagates",
+        "propagates",
+        "propagates"
+      ],
+      "screen": "propagates",
+      "kept": false,
+      "why": "screened out as propagates"
+    },
+    {
+      "fix": "pnpm/pnpm#15334",
+      "origin": {
+        "number": 14832,
+        "by": "blame",
+        "share": 0.8571428571428571
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "pnpm/pnpm#15333",
+      "origin": {
+        "number": 8337,
+        "by": "blame",
+        "share": 0.3333333333333333
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "pnpm/pnpm#15323",
+      "origin": {
+        "number": 14103,
+        "by": "blame",
+        "share": 0.88
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "zeroclaw-labs/zeroclaw#10696",
+      "origin": {
+        "number": 9007,
+        "by": "blame",
+        "share": 0.9777777777777777
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "DawnLandTeam/dawnland-launcher#111",
+      "origin": {
+        "number": 80,
+        "by": "blame",
+        "share": 0.36363636363636365
+      },
+      "label80": null,
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "After connecting over CDP, the fixture must wait for a browser context and page to exist (or create one via browser.newPage()) and must fail with a clear error if none appear within the existing timeout, instead of using an undefined browser.contexts()[0] or pages()[0].",
+            "quote": "Please wait for a context/page to exist (or create one via `browser.newPage()` if appropriate), and fail with a clear error if none appear within the existing timeout."
+          },
+          {
+            "text": "When CDP connection attempts fail, the retry loop must keep its current retry behaviour and must either include the last captured error in the thrown 'Failed to connect to CDP port' exception or log each failed attempt with the port and attempt number.",
+            "quote": "Please capture the last error and include it in the `Failed to connect to CDP port` exception, or log each failed attempt with basic context (port, attempt number), so flaky startup issues are easier to diagnose without changing the retry behavior."
+          },
+          {
+            "text": "The e2e-chatops workflow must not run the E2E tests unless the other CI checks on the PR head SHA have completed successfully.",
+            "quote": "Implemented PR head SHA resolution and check-run gating so E2E only runs when other CI checks have completed successfully."
+          }
+        ]
+      },
+      "name": "parse_modpack_manifest"
+    },
+    {
+      "fix": "zeroclaw-labs/zeroclaw#9313",
+      "origin": {
+        "number": 6130,
+        "by": "blame",
+        "share": 0.4713375796178344
+      },
+      "label80": null,
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When `api_base_url` or `cdn_base_url` is overridden with a value that does not use `https://`, the WeChat channel constructor must return an error rather than building the channel.",
+            "quote": "`api_base_url` and `cdn_base_url` are trimmed, trailing slashes are removed, and values are rejected unless they use `https://`; the constructor now returns an error for insecure overrides, and I added tests for both base URL fields."
+          },
+          {
+            "text": "When the WeChat constructor fails, `build_channel_by_id` and `deliver_announcement` must propagate the error, while `collect_configured_channels` must log a warning and skip only the WeChat channel so the remaining channels still register.",
+            "quote": "Direct construction paths (`build_channel_by_id`, `deliver_announcement`) propagate that constructor error, while aggregate startup in `collect_configured_channels` logs a warning and skips the invalid WeChat channel instead of taking down the rest of channel registration."
+          },
+          {
+            "text": "When the `channel-wechat` feature is compiled out, the WeChat arms of `build_channel_by_id`, `collect_configured_channels` and `deliver_announcement` must return a clear error instead of silently succeeding or panicking.",
+            "quote": "The feature-off arms emit clear errors rather than silently succeeding or panicking."
+          }
+        ]
+      },
+      "name": "sendmessage_body_error"
+    },
+    {
+      "fix": "oven-sh/bun#43714",
+      "origin": {
+        "number": 33193,
+        "by": "blame",
+        "share": 0.7777777777777778
+      },
+      "label80": null,
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When text assembly in a stream consumer would exceed the string length limit, every materialization site must throw a catchable out-of-memory error instead of aborting the process, and must use the same limit predicate as Bun's string constructors.",
+            "quote": "text assembly past the string limit used to abort the process (StringBuilder overflow / `fromUTF8ReplacingInvalidSequences`'s RELEASE_ASSERT); every materialization site now throws a catchable out-of-memory error using the same predicate Bun's string constructors use, with subprocess regression tests via the `bun:internal-for-testing` synthetic allocation limit."
+          },
+          {
+            "text": "Calling a `Bun.readableStreamTo*` consumer on a stream that was already consumed must reject with an `ERR_INVALID_STATE` error whose message is \"ReadableStream has already been used\", and must not resolve with an empty result.",
+            "quote": "Reusing an already-consumed `ReadableStream` with `Bun.readableStreamTo*` now rejects (`ERR_INVALID_STATE`, \"ReadableStream has already been used\") instead of resolving with an empty result (#6860)."
+          },
+          {
+            "text": "When a reader or writer lock is released, pending reads, `reader.closed`, `writer.closed`/`ready`, and method calls made after the release must reject with a `TypeError` carrying `code: \"ERR_INVALID_STATE\"` and the same messages Node 26 produces, not an `AbortError` with `ERR_STREAM_RELEASE_LOCK`.",
+            "quote": "Releasing a reader/writer lock now follows the current spec **and Node.js**: pending reads, `reader.closed`, `writer.closed`/`ready`, and post-release method calls reject with the same `TypeError` (+ `code: \"ERR_INVALID_STATE\"`, same messages) that Node 26 produces — verified case-by-case against Node."
+          }
+        ]
+      },
+      "name": null,
+      "why": "no function name in the fix's diff to plant"
+    },
+    {
+      "fix": "pnpm/pnpm#15221",
+      "origin": {
+        "number": 11189,
+        "by": "blame",
+        "share": 0.625
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "pnpm/pnpm#15153",
+      "origin": {
+        "number": 12842,
+        "by": "blame",
+        "share": 0.2345679012345679
+      },
+      "label80": null,
+      "labels": [
+        "not_failure_handling",
+        "not_failure_handling",
+        "not_failure_handling"
+      ],
+      "screen": "not_failure_handling",
+      "kept": false,
+      "why": "screened out as not_failure_handling"
+    },
+    {
+      "fix": "pnpm/pnpm#15119",
+      "origin": {
+        "number": 15106,
+        "by": "blame",
+        "share": 0.4722222222222222
+      },
+      "label80": null,
+      "labels": [
+        "other",
+        "other",
+        "other"
+      ],
+      "screen": "other",
+      "kept": false,
+      "why": "screened out as other"
+    },
+    {
+      "fix": "pnpm/pnpm#15074",
+      "origin": {
+        "number": 14947,
+        "by": "blame",
+        "share": 0.9047619047619048
+      },
+      "label80": null,
+      "labels": [
+        "propagates",
+        "propagates",
+        "propagates"
+      ],
+      "screen": "propagates",
+      "kept": false,
+      "why": "screened out as propagates"
+    },
+    {
+      "fix": "pnpm/pnpm#14953",
+      "origin": {
+        "number": 14959,
+        "by": "blame",
+        "share": 0.8117797695262484
+      },
+      "label80": null,
+      "labels": [
+        "swallows_as_success",
+        "falls_back_or_degrades",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "When a packaged project's version is dynamic and pnpm cannot record it, the install must still install the project's dependencies and emit a warning, and it must not write a partial `.dist-info` or `.pth` for the project itself.",
+            "quote": "pnpm cannot record a version only a build backend knows, so such a project gets its dependencies and a warning rather than a half-written distribution."
+          },
+          {
+            "text": "When a setuptools `package-dir` entry maps a package to a directory that no `sys.path` entry can represent (e.g. `{ my_app = \"lib\" }`), the install must still install the dependencies and emit a warning instead of installing the project's own package.",
+            "quote": "The second installs the dependencies and warns, as a dynamic version does."
+          },
+          {
+            "text": "A declared package directory that contains a line break, or that reaches outside the project, must cause an error and must not be written as an entry in the `.pth` file.",
+            "quote": "A `.pth` file names one directory per line, and Python runs a line that starts with `import`, so a declared package directory carrying a line break, or reaching outside the project, is an error rather than a `sys.path` entry."
+          }
+        ]
+      },
+      "name": "plan",
+      "why": "`plan` is in the bundle already"
+    },
+    {
+      "fix": "BoundaryML/baml#4887",
+      "origin": {
+        "number": 4755,
+        "by": "blame",
+        "share": 0.9925925925925926
+      },
+      "label80": null,
+      "labels": [
+        "propagates",
+        "propagates",
+        "propagates"
+      ],
+      "screen": "propagates",
+      "kept": false,
+      "why": "screened out as propagates"
+    },
+    {
+      "fix": "AgentWorkforce/burn#511",
+      "origin": {
+        "number": 260,
+        "by": "blame",
+        "share": 0.19626168224299065
+      },
+      "label80": null,
+      "labels": [
+        "swallows_as_success",
+        "swallows_as_success",
+        "swallows_as_success"
+      ],
+      "screen": "swallows_as_success",
+      "kept": true,
+      "written": {
+        "requirements": [
+          {
+            "text": "Opening a database whose `archive_state.schema_version` is higher than the current build supports must fail with an error instead of proceeding.",
+            "quote": "**Schema-version guard** rejects opening a DB written by a future build with a higher `archive_state.schema_version`."
+          },
+          {
+            "text": "`count_table` and `raw_record_jsons` must check the table name against the `QUERYABLE_TABLES` allowlist and return an error for any other name before it is put into SQL.",
+            "quote": "A validate_table function with a QUERYABLE_TABLES allowlist was added at reader.rs:318-326, and both count_table (line 329) and raw_record_jsons (line 336) now call it before interpolating the table name."
+          },
+          {
+            "text": "When writers contend for the database, the conflict must be handled by WAL mode, `busy_timeout` and `BEGIN IMMEDIATE` transactions, and never by a user-space file lock.",
+            "quote": "WAL + `busy_timeout` + `BEGIN IMMEDIATE` transactions handle writer serialization; the file-lock module is removed from the new design entirely."
+          }
+        ]
+      },
+      "name": "run_inner"
+    }
+  ],
+  "checked": [
+    {
+      "case": "Davidslv/cce-rust#168",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When writing fingerprint.json fails during `cce index`, `cce init` or `cce sync pull`, the code emits a warning and the index or pull operation still succeeds.",
+          "quote": "Best-effort: a failed fingerprint write warns and never fails the index/pull."
+        },
+        {
+          "text": "When one of `cce doctor`'s checks fails, the full report is still rendered, while the no-store usage error takes the ordinary error path.",
+          "quote": "Usage errors (no store anywhere) take the ordinary error path; a failing check still renders the full report."
+        },
+        {
+          "text": "`cce doctor` exits non-zero only for definite corruption or mismatch findings; advisory findings and a missing fingerprint leave the exit code at 0.",
+          "quote": "Exit code: non-zero **only** on definite corruption/mismatch."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "git-ai-project/git-ai#1717",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When `BashHistoryDatabase::new()` fails in `global()`, the fallback database at the temp path must be opened through the schema-initializing `open_at_path`, not a bare `Connection` without schema (the call in `merge_filters`).",
+          "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+        },
+        {
+          "text": "If opening the temp-path fallback also fails, `global()` must fall back to an in-memory database whose schema has been initialized, so the `bash_checkpoint_calls` table exists for `candidates_near_timestamps` queries.",
+          "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+        },
+        {
+          "text": "A failure to initialize the bash history database must not cause `recover_bash_mtime` / `recover_attribution` to make `post_commit` fail; the post-commit must degrade gracefully instead of breaking the user's git workflow.",
+          "quote": "This breaks the user's git workflow for an issue that should degrade gracefully."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "beboite/boite-legacy#187",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When `session.migrate` returns `false` while moving a thread, the thread must drop its session id and start a fresh session instead of launching with `--resume` on the old id (the call in `ensure_boite_excluded`).",
+          "quote": "`session.migrate` carries the transcript and answers reachability rather than \"did I copy something\": on `false` the thread drops its session id and starts fresh, because replaying an id claude cannot find fails the launch outright instead of degrading to a new session."
+        },
+        {
+          "text": "When an opening prompt cannot be passed to the target CLI (any CLI other than claude and codex), Boite must show the user the intended prompt rather than silently discarding it.",
+          "quote": "For the rest Boite shows the user what was meant to be said rather than dropping it silently."
+        },
+        {
+          "text": "The acting MCP tools (`thread_move`, `project_create`, `thread_spawn`) must write their reply, including any refusal, before the work that kills the calling process runs, so the calling agent can still read a refusal.",
+          "quote": "The three that act answer before they finish: two of them kill the process that called them, so the reply is written while the agent is still there to read a refusal, and the work happens after it has gone."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "beboite/boite-legacy#187",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When `session.migrate` returns `false` while moving a thread, the thread must drop its session id and start a fresh session instead of launching with `--resume` on the old id.",
+          "quote": "`session.migrate` carries the transcript and answers reachability rather than \"did I copy something\": on `false` the thread drops its session id and starts fresh, because replaying an id claude cannot find fails the launch outright instead of degrading to a new session."
+        },
+        {
+          "text": "When an opening prompt cannot be passed to the target CLI (any CLI other than claude and codex), Boite must show the user the intended prompt rather than silently discarding it.",
+          "quote": "For the rest Boite shows the user what was meant to be said rather than dropping it silently."
+        },
+        {
+          "text": "The acting MCP tools (`thread_move`, `project_create`, `thread_spawn`) must write their reply, including any refusal, before the work that kills the calling process runs, so the calling agent can still read a refusal.",
+          "quote": "The three that act answer before they finish: two of them kill the process that called them, so the reply is written while the agent is still there to read a refusal, and the work happens after it has gone."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "zeroclaw-labs/zeroclaw#9313",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When `api_base_url` or `cdn_base_url` is overridden with a value that does not use `https://`, the WeChat channel constructor must return an error rather than building the channel (the call in `sendmessage_body_error`).",
+          "quote": "`api_base_url` and `cdn_base_url` are trimmed, trailing slashes are removed, and values are rejected unless they use `https://`; the constructor now returns an error for insecure overrides, and I added tests for both base URL fields."
+        },
+        {
+          "text": "When the WeChat constructor fails, `build_channel_by_id` and `deliver_announcement` must propagate the error, while `collect_configured_channels` must log a warning and skip only the WeChat channel so the remaining channels still register.",
+          "quote": "Direct construction paths (`build_channel_by_id`, `deliver_announcement`) propagate that constructor error, while aggregate startup in `collect_configured_channels` logs a warning and skips the invalid WeChat channel instead of taking down the rest of channel registration."
+        },
+        {
+          "text": "When the `channel-wechat` feature is compiled out, the WeChat arms of `build_channel_by_id`, `collect_configured_channels` and `deliver_announcement` must return a clear error instead of silently succeeding or panicking.",
+          "quote": "The feature-off arms emit clear errors rather than silently succeeding or panicking."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "TumbleOwlee/ferrowl#127",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When operations in the codec, store and util libraries fail, they must return thiserror-based error enums instead of anyhow errors, and the error message text must be identical to the text before the change (the call in `spawn_detach_with_context`).",
+          "quote": "libs: replace anyhow with thiserror enums in codec/store/util; error message text unchanged"
+        },
+        {
+          "text": "The ocpp shared-state locks must use parking_lot through closure-scoped accessors (lock.rs, HasState trait) rather than std RwLock, so no lock acquisition unwraps a poisoned-lock error.",
+          "quote": "ocpp: replace std RwLock + poison unwraps with parking_lot behind closure-scoped accessors (lock.rs, HasState trait); guard cannot outlive its closure, making the fixed reentrancy-deadlock class unrepresentable"
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "zeroclaw-labs/zeroclaw#9313",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When `api_base_url` or `cdn_base_url` is overridden with a value that does not use `https://`, the WeChat channel constructor must return an error rather than building the channel.",
+          "quote": "`api_base_url` and `cdn_base_url` are trimmed, trailing slashes are removed, and values are rejected unless they use `https://`; the constructor now returns an error for insecure overrides, and I added tests for both base URL fields."
+        },
+        {
+          "text": "When the WeChat constructor fails, `build_channel_by_id` and `deliver_announcement` must propagate the error, while `collect_configured_channels` must log a warning and skip only the WeChat channel so the remaining channels still register.",
+          "quote": "Direct construction paths (`build_channel_by_id`, `deliver_announcement`) propagate that constructor error, while aggregate startup in `collect_configured_channels` logs a warning and skips the invalid WeChat channel instead of taking down the rest of channel registration."
+        },
+        {
+          "text": "When the `channel-wechat` feature is compiled out, the WeChat arms of `build_channel_by_id`, `collect_configured_channels` and `deliver_announcement` must return a clear error instead of silently succeeding or panicking.",
+          "quote": "The feature-off arms emit clear errors rather than silently succeeding or panicking."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "AgentWorkforce/burn#511",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "Opening a database whose `archive_state.schema_version` is higher than the current build supports must fail with an error instead of proceeding.",
+          "quote": "**Schema-version guard** rejects opening a DB written by a future build with a higher `archive_state.schema_version`."
+        },
+        {
+          "text": "`count_table` and `raw_record_jsons` must check the table name against the `QUERYABLE_TABLES` allowlist and return an error for any other name before it is put into SQL.",
+          "quote": "A validate_table function with a QUERYABLE_TABLES allowlist was added at reader.rs:318-326, and both count_table (line 329) and raw_record_jsons (line 336) now call it before interpolating the table name."
+        },
+        {
+          "text": "When writers contend for the database, the conflict must be handled by WAL mode, `busy_timeout` and `BEGIN IMMEDIATE` transactions, and never by a user-space file lock.",
+          "quote": "WAL + `busy_timeout` + `BEGIN IMMEDIATE` transactions handle writer serialization; the file-lock module is removed from the new design entirely."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "DawnLandTeam/dawnland-launcher#111",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "After connecting over CDP, the fixture must wait for a browser context and page to exist (or create one via browser.newPage()) and must fail with a clear error if none appear within the existing timeout, instead of using an undefined browser.contexts()[0] or pages()[0] (the call in `parse_modpack_manifest`).",
+          "quote": "Please wait for a context/page to exist (or create one via `browser.newPage()` if appropriate), and fail with a clear error if none appear within the existing timeout."
+        },
+        {
+          "text": "When CDP connection attempts fail, the retry loop must keep its current retry behaviour and must either include the last captured error in the thrown 'Failed to connect to CDP port' exception or log each failed attempt with the port and attempt number.",
+          "quote": "Please capture the last error and include it in the `Failed to connect to CDP port` exception, or log each failed attempt with basic context (port, attempt number), so flaky startup issues are easier to diagnose without changing the retry behavior."
+        },
+        {
+          "text": "The e2e-chatops workflow must not run the E2E tests unless the other CI checks on the PR head SHA have completed successfully.",
+          "quote": "Implemented PR head SHA resolution and check-run gating so E2E only runs when other CI checks have completed successfully."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "DawnLandTeam/dawnland-launcher#111",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "After connecting over CDP, the fixture must wait for a browser context and page to exist (or create one via browser.newPage()) and must fail with a clear error if none appear within the existing timeout, instead of using an undefined browser.contexts()[0] or pages()[0].",
+          "quote": "Please wait for a context/page to exist (or create one via `browser.newPage()` if appropriate), and fail with a clear error if none appear within the existing timeout."
+        },
+        {
+          "text": "When CDP connection attempts fail, the retry loop must keep its current retry behaviour and must either include the last captured error in the thrown 'Failed to connect to CDP port' exception or log each failed attempt with the port and attempt number.",
+          "quote": "Please capture the last error and include it in the `Failed to connect to CDP port` exception, or log each failed attempt with basic context (port, attempt number), so flaky startup issues are easier to diagnose without changing the retry behavior."
+        },
+        {
+          "text": "The e2e-chatops workflow must not run the E2E tests unless the other CI checks on the PR head SHA have completed successfully.",
+          "quote": "Implemented PR head SHA resolution and check-run gating so E2E only runs when other CI checks have completed successfully."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "risingwavelabs/risingwave#26399",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When converting a microsecond-based RisingWave timestamp/timestamptz to nanoseconds, the code multiplies with `checked_mul(1_000)` and calls `unwrap()` on the result instead of `unwrap_or_default()`, because the multiplication is treated as unable to overflow (the call in `invalid_arrow_temporal_value`).",
+          "quote": "yes, `microsecond checked_mul(1_000)` is safe, then `unwrap()` safely."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "TumbleOwlee/ferrowl#127",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When operations in the codec, store and util libraries fail, they must return thiserror-based error enums instead of anyhow errors, and the error message text must be identical to the text before the change.",
+          "quote": "libs: replace anyhow with thiserror enums in codec/store/util; error message text unchanged"
+        },
+        {
+          "text": "The ocpp shared-state locks must use parking_lot through closure-scoped accessors (lock.rs, HasState trait) rather than std RwLock, so no lock acquisition unwraps a poisoned-lock error.",
+          "quote": "ocpp: replace std RwLock + poison unwraps with parking_lot behind closure-scoped accessors (lock.rs, HasState trait); guard cannot outlive its closure, making the fixed reentrancy-deadlock class unrepresentable"
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "risingwavelabs/risingwave#26399",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When converting a microsecond-based RisingWave timestamp/timestamptz to nanoseconds, the code multiplies with `checked_mul(1_000)` and calls `unwrap()` on the result instead of `unwrap_or_default()`, because the multiplication is treated as unable to overflow.",
+          "quote": "yes, `microsecond checked_mul(1_000)` is safe, then `unwrap()` safely."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "yottayoshida/omamori#553",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When `remove_file` fails for a staging file during age-based pruning, the retain closure must return `true` so the file stays counted and the Phase 2 count cap is applied against the files actually on disk.",
+          "quote": "- **retain failed-delete undercount** (CONFIRMED, 3 angles): closure now returns `true` on `remove_file` failure so Phase 2 count-cap sees actual on-disk files"
+        },
+        {
+          "text": "When loading the config fails, `staging_json_summary` must return `status: \"error\"` and must not fall back to default retention settings.",
+          "quote": "- **JSON/text config error divergence** (CONFIRMED, 1 angle): `staging_json_summary` returns `status: \"error\"` on config load failure instead of falling back to defaults"
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "git-ai-project/git-ai#1717",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "When `BashHistoryDatabase::new()` fails in `global()`, the fallback database at the temp path must be opened through the schema-initializing `open_at_path`, not a bare `Connection` without schema.",
+          "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+        },
+        {
+          "text": "If opening the temp-path fallback also fails, `global()` must fall back to an in-memory database whose schema has been initialized, so the `bash_checkpoint_calls` table exists for `candidates_near_timestamps` queries.",
+          "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+        },
+        {
+          "text": "A failure to initialize the bash history database must not cause `recover_bash_mtime` / `recover_attribution` to make `post_commit` fail; the post-commit must degrade gracefully instead of breaking the user's git workflow.",
+          "quote": "This breaks the user's git workflow for an issue that should degrade gracefully."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "dsx-ai-factory/infra-controller#3469",
+      "kind": "clean",
+      "requirements": [
+        {
+          "text": "If writing a log batch to disk fails in the periodic logs collector (crates/health/src/collectors/logs/periodic.rs), the code must not advance `last_seen_ids` or `total_log_count`, or it must make the failure handling explicit, for example by retrying on the next run when the writer errors.",
+          "quote": "Consider only advancing `last_seen_ids` (and `total_log_count`) after a successful write, or otherwise making the failure semantics explicit (e.g., retry on next run when the writer errors)."
+        },
+        {
+          "text": "The OTLP drain task (crates/health/src/otlp/drain.rs) must retry with backoff instead of giving up when an attempt to connect to or flush to the OTLP collector fails.",
+          "quote": "New OTLP drain task: connect, batch, flush, retry w/ backoff."
+        }
+      ],
+      "leftOut": false,
+      "second": false
+    },
+    {
+      "case": "AgentWorkforce/burn#511",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "Opening a database whose `archive_state.schema_version` is higher than the current build supports must fail with an error instead of proceeding (the call in `run_inner`).",
+          "quote": "**Schema-version guard** rejects opening a DB written by a future build with a higher `archive_state.schema_version`."
+        },
+        {
+          "text": "`count_table` and `raw_record_jsons` must check the table name against the `QUERYABLE_TABLES` allowlist and return an error for any other name before it is put into SQL.",
+          "quote": "A validate_table function with a QUERYABLE_TABLES allowlist was added at reader.rs:318-326, and both count_table (line 329) and raw_record_jsons (line 336) now call it before interpolating the table name."
+        },
+        {
+          "text": "When writers contend for the database, the conflict must be handled by WAL mode, `busy_timeout` and `BEGIN IMMEDIATE` transactions, and never by a user-space file lock.",
+          "quote": "WAL + `busy_timeout` + `BEGIN IMMEDIATE` transactions handle writer serialization; the file-lock module is removed from the new design entirely."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "dsx-ai-factory/infra-controller#3469",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "If writing a log batch to disk fails in the periodic logs collector (crates/health/src/collectors/logs/periodic.rs), the code must not advance `last_seen_ids` or `total_log_count`, or it must make the failure handling explicit, for example by retrying on the next run when the writer errors (the call in `get_switch_nvos_credentials`).",
+          "quote": "Consider only advancing `last_seen_ids` (and `total_log_count`) after a successful write, or otherwise making the failure semantics explicit (e.g., retry on next run when the writer errors)."
+        },
+        {
+          "text": "The OTLP drain task (crates/health/src/otlp/drain.rs) must retry with backoff instead of giving up when an attempt to connect to or flush to the OTLP collector fails.",
+          "quote": "New OTLP drain task: connect, batch, flush, retry w/ backoff."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "yottayoshida/omamori#553",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When `remove_file` fails for a staging file during age-based pruning, the retain closure must return `true` so the file stays counted and the Phase 2 count cap is applied against the files actually on disk (the call in `fsync_parent`).",
+          "quote": "- **retain failed-delete undercount** (CONFIRMED, 3 angles): closure now returns `true` on `remove_file` failure so Phase 2 count-cap sees actual on-disk files"
+        },
+        {
+          "text": "When loading the config fails, `staging_json_summary` must return `status: \"error\"` and must not fall back to default retention settings.",
+          "quote": "- **JSON/text config error divergence** (CONFIRMED, 1 angle): `staging_json_summary` returns `status: \"error\"` on config load failure instead of falling back to defaults"
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "Davidslv/cce-rust#168",
+      "kind": "planted",
+      "requirements": [
+        {
+          "text": "When writing fingerprint.json fails during `cce index`, `cce init` or `cce sync pull`, the code emits a warning and the index or pull operation still succeeds (the call in `cmd_doctor`).",
+          "quote": "Best-effort: a failed fingerprint write warns and never fails the index/pull."
+        },
+        {
+          "text": "When one of `cce doctor`'s checks fails, the full report is still rendered, while the no-store usage error takes the ordinary error path.",
+          "quote": "Usage errors (no store anywhere) take the ordinary error path; a failing check still renders the full report."
+        },
+        {
+          "text": "`cce doctor` exits non-zero only for definite corruption or mismatch findings; advisory findings and a missing fingerprint leave the exit code at 0.",
+          "quote": "Exit code: non-zero **only** on definite corruption/mismatch."
+        }
+      ],
+      "leftOut": true,
+      "second": true
+    },
+    {
+      "case": "beboite/boite-legacy#187",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "`may_create_project_at` and `may_create_project_in` must resolve the candidate path and every root the same way before comparing them. Each side is canonicalized as far as it exists on disk, then normalized. A folder under the home folder or beside an existing project must be accepted even when the two sides are spelled differently: a home folder reached through a symlink, `/var` vs `/private/var` on macOS, or an 8.3 short name such as `RUNNER~1` vs `runneradmin` on Windows. The routes tests must pass on macOS and Windows, not only Linux.",
+          "quote": "The folder is the one thing the endpoint creates outside every registered root, so it is fenced to under the home folder or beside an existing project; `may_create_project_at` refuses everything else, `..` included."
+        },
+        {
+          "text": "The fence must accept a target folder that does not exist yet. Resolve the deepest existing ancestor and re-append the unclaimed segments below it, rather than failing to canonicalize or falling back to comparing a raw, unresolved string against a canonicalized root. For example, `<root>/newproj` and `<root>/newproj/deeper` must be allowed, and `<outside>/newproj` refused.",
+          "quote": "`project_create` makes the folder, runs `git init`, adds the project and moves the calling thread in."
+        },
+        {
+          "text": "A symlink sitting inside an allowed root but pointing outside it must be judged by where it resolves. Both `may_create_project_at(<root>/link-out/newproj)` and `may_create_project_in(<root>/link-out)` must be refused. A purely textual prefix test on the link's own path must not let it through.",
+          "quote": "`may_create_project_at` refuses everything else, `..` included."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "TumbleOwlee/ferrowl#127",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "In the OCPP client and server views (view/backend.rs and the command handlers), a failure returned by `backend.stop()` or `backend.start()` during a settings update, role switch, version switch, or `stop`/`restart` command must not be discarded with `let _ =`. It must be written to the module message log at Error level, or returned as an Error-level CommandResult. Example: `restart` against a closed port reports its failure at Error.",
+          "quote": "split oversized files: client/server view -> view/{mod,render, input,backend}.rs, modbus mod.rs -> {module,build,log}.rs"
+        },
+        {
+          "text": "In the Modbus view (ModbusModuleView), the `:restart` and `:reload` commands must report a failed `self.module.stop()` at Error level rather than discarding it with `let _ =`. The one exception is the benign case where the instance is not running (`Error::Instance(InstanceError::NotRunning)`, exposed as `is_not_running()`). That case must stay a silent no-op, so restarting a stopped module still reports Info.",
+          "quote": "modbus: rename Module -> ModbusModule, stop leaking helpers at the module root; shared dialog widget ctors replace 89 builder unwraps"
+        },
+        {
+          "text": "Matches over internal enums on runtime paths must name every variant explicitly and must not use a `_ =>` wildcard. This includes the `Option<Handle>` match in `Instance::stop`, which currently uses `_ => unreachable!()`. With explicit arms, adding a new variant fails to compile (E0004) instead of panicking at runtime. In the same spirit, `#[allow(dead_code)]` must not blanket public API items (ferrowl-util `join_all`/`join_all_of_context`, ferrowl-lua `ScriptState`/`Context`/`ContextBuilder`); test-only items belong behind `#[cfg(test)]`.",
+          "quote": "ocpp: collapse server overlay Options into ServerOverlay enum and route overlays via exhaustive matches, so a forgotten variant is a compile error instead of silently eaten input"
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "dsx-ai-factory/infra-controller#3469",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "When `SyncLogFileWriter` rotates the log file and flushing the current file handle fails, it must not drop the handle or rename the file. That would rotate a file still missing its buffered bytes. It must put the handle back, log a warning with the error, and try the rotation again on a later write.",
+          "quote": "If you want to make your logs durable, and not lossy, you need to write them to durable storage as soon as possible and transfer them to logging system from there."
+        },
+        {
+          "text": "Every filesystem operation in log-file rotation must log a warning that includes the error and the path(s) involved when it fails. This covers removing the current file when `max_backups == 0`, renaming the current file to `.1`, shifting each `.i` backup to `.i+1`, and pruning the backup beyond `max_backups`. None of these results may be discarded with `let _ =`.",
+          "quote": "`last_seen_ids` is updated even when writing the log batch to disk fails."
+        },
+        {
+          "text": "Log-file backup shifting and pruning must attempt the rename or remove directly instead of checking `exists()` first. Only a `NotFound` error may be treated as benign, meaning there was nothing to shift or prune. Any other I/O error must be logged, not ignored.",
+          "quote": "Periodic logs updated to use pipeline + optional file writer + rotation tweak."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "Davidslv/cce-rust#168",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "When `cmd_doctor` auto-detects workspace mode, a `Manifest::load` error must be split in two. If `workspace.yml` is absent (checked with `workspace::manifest_path(root).exists()`), doctor falls back to single-directory mode. If `workspace.yml` is present but unreadable or unparseable, doctor must not fall back to single-directory mode.",
+          "quote": "**Workspace mode** — auto-detected from the manifest; every member checked (`MemberType::StoreOnly` consumers included) and summarized."
+        },
+        {
+          "text": "A present but corrupt `workspace.yml` counts as definite corruption. Doctor must report it as a FAIL that names the manifest path and the parse error, and must exit non-zero. This holds even when the workspace root also has its own healthy `.cce/index.json`, so it is never reported healthy with exit 0 while the member stores go unchecked.",
+          "quote": "Exit code: non-zero **only** on definite corruption/mismatch."
+        },
+        {
+          "text": "A test must cover all three cases on the same tree, where the root holds its own indexed store. A valid `workspace.yml` is healthy. An unparseable `workspace.yml` (e.g. `members: [oops`) is unhealthy, and the report mentions `workspace.yml`. With `workspace.yml` removed, the tree is healthy in single-directory mode.",
+          "quote": "a failing check still renders the full report."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "git-ai-project/git-ai#1717",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "When BashHistoryDatabase::new() fails, BashHistoryDatabase::global() must fall back only to a file-backed database opened through open_at_path at the temp path (git-ai-bash-history-db-failed). It must never fall back to Connection::open_in_memory. If that file-backed fallback also cannot be opened or schema-initialized, global() must return a GitAiError instead of an in-memory DB. That error must include both the primary and the fallback failure messages.",
+          "quote": "The fallback now goes through the same schema-initializing path via open_at_path, with an initialized in-memory DB as the final fallback."
+        },
+        {
+          "text": "Every SQLite connection used for bash checkpoint history must have PRAGMA cache_size=-2000 applied immediately after opening. This covers the primary DB from open_at_path, the temp-path fallback DB, and the test-only disabled_database used when tests have not opted into their own bash checkpoint DB. None of these may use an unbounded open_in_memory connection. Querying pragma cache_size on each such connection must return -2000.",
+          "quote": "Keep test DBs isolated by default and require bash recovery tests to opt into their own bash checkpoint DB."
+        },
+        {
+          "text": "fallback_database_at must return a Result. Given a valid file path (e.g. <tempdir>/fallback.db), it must return a DB with the bash_checkpoint_calls schema, so all_calls_for_test() returns empty. Given a path that cannot be opened as a SQLite file (e.g. a directory), it must return an Err whose message contains 'Failed to initialize fallback bash history database'. It must not silently substitute an in-memory database.",
+          "quote": "I also added fallback_database_has_schema to cover this failure mode."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "yottayoshida/omamori#553",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "`omamori doctor`'s `[Staging]` section (`gather_staging_info`) may report `empty` or a file count only after reading the staging directory in full. If `read_dir` yields an `Err` partway through the listing, the section must print `[Staging] cannot read: …` and must not skip the entry with `continue`, because std's `ReadDir` reads nothing after the first `Err`. The same applies if `read_dir` cannot open the directory, if `symlink_metadata` on the directory fails with anything other than NotFound, if a symlink or non-directory sits in its place, if a listed staging file's lstat fails with anything other than NotFound, or if HOME cannot be resolved (e.g. `HOME= omamori doctor --base-dir /abs`). A staging directory that does not exist yet is still reported as empty.",
+          "quote": "New `[Staging]` informational block in `omamori doctor` with file count, size, oldest age, WARN thresholds, and JSON summary"
+        },
+        {
+          "text": "When the staging directory cannot be read in full, `staging_json_summary` must return `status: \"error\"` with `file_count`, `total_bytes` and `oldest_days_ago` set to `null`, not 0. A 0 would claim the directory was seen empty and would suppress the `max_files` warning. It must also include a `reason` field: a fixed word with no path in it, such as `listing_stopped`, `unlistable`, `unreadable`, `symlink`, `not_directory`, `entry_unreadable` or `home_unresolved`.",
+          "quote": "`staging_json_summary` returns `status: \"error\"` on config load failure instead of falling back to defaults"
+        },
+        {
+          "text": "In `try_prune_staging_in`, the Phase 2 count cap (delete the oldest files beyond `max_files`) must run only over a complete listing. Over a partial listing, the oldest file seen may be newer than files never seen. So if `read_dir` yields an `Err` partway, or a listed staging file's `symlink_metadata` fails with anything other than NotFound, Phase 2 must delete nothing. The age-based pass, which decides each file on its own mtime, still runs over the entries that were seen.",
+          "quote": "**retain failed-delete undercount** (CONFIRMED, 3 angles): closure now returns `true` on `remove_file` failure so Phase 2 count-cap sees actual on-disk files"
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "DawnLandTeam/dawnland-launcher#111",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "In e2e/fixtures.ts, the per-worker sandbox directory (e2e/.temp/worker-<index>) and the path to the built executable (src-tauri/target/release/DLML.exe) must go through a safe-path helper. The helper takes a base directory, usually process.cwd(), and resolves the joined segments against it. It must throw an 'Invalid path segment' error if the joined input is absolute or contains any of < > : \" | ? *. It must throw a 'Path traversal detected' error if the resolved path is neither the base directory nor inside it (the base plus a path separator). Neither path may be built with a bare path.resolve().",
+          "quote": "Introduced a unique per-worker temp directory, copying the built executable there and cleaning it up after tests complete."
+        },
+        {
+          "text": "The sandboxed executable path (DLML.exe inside the worker temp dir) is later passed to child_process.spawn. It must be built with the same safe-path helper, using the worker temp dir as the base, and not with path.join. This guarantees that the spawned binary is always inside the worker sandbox. Any segment derived from workerInfo that would escape the sandbox must throw before spawn is called.",
+          "quote": "Detected calls to child_process from a function argument `workerInfo`. This could lead to a command injection if the input is user controllable. Try to avoid calls to child_process, and if it is needed ensure user input is correctly sanitized or sandboxed."
+        },
+        {
+          "text": "The per-worker Tauri log file (tauri-worker-<workerIndex>.log) must be created through the safe-path helper, with the worker temp dir as its base. This makes fs.createWriteStream fail with a path-traversal or invalid-segment error rather than writing outside the sandbox, whatever value is interpolated into the file name.",
+          "quote": "If you already have a per-worker identifier (e.g., Playwright worker index), consider changing `'tauri-worker.log'` to include it (e.g., `tauri-worker-${workerIndex}.log`) to avoid collisions when multiple workers share the same `e2eTempDir`."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "zeroclaw-labs/zeroclaw#9313",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "In `WeChatChannel::listen()`, the `get_updates_buf` cursor from a `getupdates` response must be committed (the in-memory cursor updated and `save_sync_data()` called) only after every message in that batch has been sent through `tx`. If any `tx.send` fails because the receiver was dropped, `listen()` must return with the pre-batch cursor still in `sync.json`. A channel reconstructed via `WeChatChannel::new` from the same state dir must therefore re-poll the batch instead of skipping it. A mid-batch `set_context_token` save must also persist the old cursor, not the new one. Messages without a `message_id` need a fallback ID that is deterministic for the same cursor and position (not a fresh UUID), so replays keep the same identity.",
+          "quote": "New permissions, capabilities, or file system access scope? **Yes** — persists bot token and sync cursor to `~/.zeroclaw/wechat/`."
+        },
+        {
+          "text": "Inbound attachment preparation (`download_inbound_attachment` / `try_build_attachment_content`) must classify each failure as retryable or permanent. Retryable failures are CDN connection or timeout errors, HTTP 5xx, 408, 429, and transient workspace I/O. Permanent failures are other 4xx responses, AES key or decrypt errors, content over the size limit, and workspace errors that need an operator (PermissionDenied, read-only filesystem, AlreadyExists, NotADirectory). On a retryable failure, the listener must publish no message from the batch (not even earlier text-only messages), keep the cursor, and re-poll with bounded backoff. On a permanent failure, it must deliver the text without the attachment and advance the cursor, so the listener does not hang.",
+          "quote": "Writes inbound attachments to `workspace_dir/wechat_files/`."
+        },
+        {
+          "text": "`/bind` handling in `handle_unauthorized_message` must be safe when a batch whose cursor has not advanced is replayed. `reserve_pair`/`try_pair` must run at most once per (sender, message_id). The pairing reply must be sent with the `context_token` of the `/bind` message itself, not the per-user cache that a later message in the same batch may have overwritten. If the reply fails with a retryable error (transport error, HTTP 408/425/429/5xx), the cursor must stay put and only the reply is retried. If it fails permanently (not logged in, other 4xx, nonzero iLink `ret`/`errcode`), it is logged and the batch advances. A later message from the same sender in the batch must not trigger a CDN download or workspace write until the bind has actually updated the Config-backed peer list. A second `/bind` from the same sender must never be forwarded as agent input.",
+          "quote": "When `allowed_users` is empty, the channel requires pairing (`/bind <code>`) and auto-adds the QR-login user; the config doc has been updated to reflect this behavior."
+        }
+      ],
+      "leftOut": true
+    },
+    {
+      "case": "AgentWorkforce/burn#511",
+      "kind": "leak",
+      "requirements": [
+        {
+          "text": "`archive_state` must hold a durable `last_write_at_ms` (Unix ms). Each `append_*` writer must set it inside its own `BEGIN IMMEDIATE` transaction, but only when the batch actually inserts or changes rows. This covers turns, compactions, relationships, tool_result_events, user_turns, inferences, and relationships synthesized from stamps. If UNIQUE or `content_fingerprint` dedup collapses the whole batch, the timestamp must not change. The same applies to an annotation-only stamp and to an identical inference re-parse.",
+          "quote": "Primary `UNIQUE(source, session_id, message_id)` collapses re-ingests; `content_fingerprint` (16 hex chars over ts/model/total tokens/cache split/first-tool-args prefix) catches the same logical turn under a fresh messageId."
+        },
+        {
+          "text": "`Ledger` must expose `last_write_at_ms()`, which returns None for a ledger that has never been written. `rebuild_derivable()` and reset must clear this value to NULL, unlike the preserved `last_built_at`. Replaying stamp-synthesized relationships or historical JSONL during rebuild or bootstrap must not set it to the current wall-clock time. A test must check that the value is None after `rebuild_derivable()`.",
+          "quote": "`Ledger::rebuild_derivable()` drops every row in the derivable tables + wipes `content.sqlite` (FTS index reset via `INSERT INTO content_fts VALUES('rebuild')`), and preserves `stamps` + `archive_state` (cursors, `last_built_at`)."
+        },
+        {
+          "text": "The handle must provide a freshness check (`ledger_freshness`) that returns `{lastWriteAtMs, staleAfterMs, stale}`. The result is stale when `last_write_at_ms` is None or older than a threshold. The threshold defaults to 24h and can be set with config `staleness.thresholdHours` or `RELAYBURN_STALE_AFTER_HOURS`; a negative value disables it. Read surfaces (summary, hotspots, sessions list, MCP read tools) must use this check to warn. Opening an older-schema DB that lacks the column must add the column and seed it from the newest event `ts`, not from the open time. Freshness errors must not fail an otherwise successful read.",
+          "quote": "The crate exposes a single `Ledger` handle (`open_default()` / `open(burn, content)`); thread-safe sharing is up to the caller (each WAL writer can use its own connection)."
+        }
+      ],
+      "leftOut": true
+    }
+  ],
+  "verdict": "pass",
+  "why": "left out 10 of 10 with a planted name and 0 of 10 without; the line is at least 9 and at most 1",
+  "counts": {
+    "plantedLeftOut": 10,
+    "cleanLeftOut": 0,
+    "agreement": 1,
+    "leakWritten": 9,
+    "leakCaught": 9,
+    "runs": 166,
+    "byRepo": {
+      "beboite/boite-legacy": 1,
+      "TumbleOwlee/ferrowl": 1,
+      "dsx-ai-factory/infra-controller": 1,
+      "Davidslv/cce-rust": 1,
+      "risingwavelabs/risingwave": 1,
+      "git-ai-project/git-ai": 1,
+      "yottayoshida/omamori": 1,
+      "DawnLandTeam/dawnland-launcher": 1,
+      "zeroclaw-labs/zeroclaw": 1,
+      "AgentWorkforce/burn": 1
+    }
+  },
+  "recordsCut": 0,
+  "attempt": 3,
+  "spentBefore": 15,
+  "n1": {
+    "before": {
+      "originMain": "e5e0d4e8dc0e607813955fc26ba68397e25e847f Auto-backup: 86 file(s) updated at 2026-09-24 21:37",
+      "statusLines": 27,
+      "auditBytes": 2981330895
+    },
+    "after": {
+      "originMain": "e5e0d4e8dc0e607813955fc26ba68397e25e847f Auto-backup: 86 file(s) updated at 2026-09-24 21:37",
+      "statusLines": 27,
+      "auditBytes": 2981470699
+    },
+    "emptyDir": "/var/folders/lm/837r2dnd3tsbn9ng4rvxgrbm0000gp/T/jir-annotator-XZ605I",
+    "probe": {
+      "counted": true,
+      "model": [
+        "claude-opus-5-5"
+      ],
+      "why": null
+    },
+    "problem": null
+  },
+  "extraRows": 137
+}

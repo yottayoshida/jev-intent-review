@@ -140,21 +140,50 @@ export function rangeProblem(from: string, to: string, today: string, searched: 
   return null;
 }
 
-function main(from: string, to: string) {
+/** Dev's extra material for the calibration (RETRO.md v2): the same search, kept to the split's dev repositories. */
+export const DEV_SEARCH = join(HERE, "search-dev-v1.json");
+
+/**
+ * The dev rows of a range: repositories on the dev side of the split only, fixes from `EARLIEST_FIX`.
+ * Written to `DEV_SEARCH`, never to the sealed search: the sealed record's order and counts are its own.
+ */
+export function devRowsOf(hits: ReadonlyMap<string, Hit[]>, dev: ReadonlySet<string>, start: number): { rows: Row[]; left: { notDev: number; beforeEarliest: number } } {
+  const everyone = new Set<string>();
+  for (const list of hits.values()) for (const h of list) everyone.add(h.repository.nameWithOwner.toLowerCase());
+  const notDev = new Set([...everyone].filter((r) => !dev.has(r)));
+  const { rows, left } = rowsOf(hits, notDev, new Set(), start);
+  return { rows, left: { notDev: left.onSplit, beforeEarliest: left.beforeEarliest } };
+}
+
+function main(first: string, second: string, third: string) {
+  const isDev = first === "--dev";
+  const [from, to] = isDev ? [second, third] : [first, second];
+  const file = isDev ? DEV_SEARCH : SEARCH;
   const today = new Date().toISOString().slice(0, 10);
-  const split = new Set((JSON.parse(readFileSync(join(HERE, "..", "split.json"), "utf8")) as Split).repos.map((r) => r.repo.toLowerCase()));
+  const splitRepos = (JSON.parse(readFileSync(join(HERE, "..", "split.json"), "utf8")) as Split).repos;
+  const split = new Set(splitRepos.map((r) => r.repo.toLowerCase()));
+  const dev = new Set(splitRepos.filter((r) => r.side === "dev").map((r) => r.repo.toLowerCase()));
   const of80 = searchOf80(join(HERE, ".."));
-  const book: Search = existsSync(SEARCH) ? JSON.parse(readFileSync(SEARCH, "utf8")) : { what: "The raw results of the retrospective's searches (RETRO.md, \"Candidates\"): reference, title and merge time only. No body was read. Ranges are added newest first, each recorded before any of its rows is read.", earliestFix: EARLIEST_FIX, ranges: [], rows: [] };
+  const what = isDev
+    ? "Dev's extra material for the hindsight check's calibration (RETRO.md v2): the same searches, kept to repositories on the dev side of split.json. Not the sealed search."
+    : "The raw results of the retrospective's searches (RETRO.md, \"Candidates\"): reference, title and merge time only. No body was read. Ranges are added newest first, each recorded before any of its rows is read.";
+  const book: Search = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : { what, earliestFix: EARLIEST_FIX, ranges: [], rows: [] };
   const problem = rangeProblem(from, to, today, book.ranges);
   if (problem !== null) throw new Error(problem);
-  const run = (p: string, f: string, t: string) => JSON.parse(execFileSync("gh", queryOf(p, f, t), { encoding: "utf8" })) as Hit[];
+  // GitHub's search allows 30 requests a minute, apart from the API's hourly budget: one every 2.1 s.
+  const pause = new Int32Array(new SharedArrayBuffer(4));
+  const run = (p: string, f: string, t: string) => {
+    Atomics.wait(pause, 0, 0, 2100);
+    return JSON.parse(execFileSync("gh", queryOf(p, f, t), { encoding: "utf8" })) as Hit[];
+  };
   const { windows, hits } = searchRange(from, to, run);
-  const { rows, left } = rowsOf(hits, split, of80, book.rows.length);
+  const kept = isDev ? devRowsOf(hits, dev, book.rows.length) : rowsOf(hits, split, of80, book.rows.length);
+  const { rows, left } = kept as { rows: Row[]; left: Search["ranges"][number]["left"] };
   book.ranges.push({ from, to, takenOn: today, windows, kept: rows.length, left });
   book.rows.push(...rows);
-  writeFileSync(SEARCH, `${JSON.stringify(book, null, 2)}\n`);
+  writeFileSync(file, `${JSON.stringify(book, null, 2)}\n`);
   const cut = windows.filter((w) => w.cut.length > 0);
   console.log(`${from}..${to}: ${windows.length} windows, ${rows.length} rows kept; left out ${JSON.stringify(left)}${cut.length > 0 ? `; CUT on ${cut.map((w) => `${w.from} (${w.cut.join(", ")})`).join("; ")}` : ""}`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main(process.argv[2] ?? "", process.argv[3] ?? "");
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main(process.argv[2] ?? "", process.argv[3] ?? "", process.argv[4] ?? "");
