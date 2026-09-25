@@ -11,6 +11,20 @@
       ]
     },
     {
+      "repo": "1jehuang/jcode",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      },
+      "readAs": "maxivillus/jcode"
+    },
+    {
       "repo": "agentworkforce/burn",
       "side": "dev",
       "fixed": true,
@@ -115,6 +129,19 @@
       ]
     },
     {
+      "repo": "caniko/chaosbox",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "cavi-ai/bobby-browser",
       "side": "dev",
       "fixed": true,
@@ -129,6 +156,19 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "chris-moreton/rusty-rival",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "clap-rs/clap",
@@ -205,12 +245,38 @@
       ]
     },
     {
+      "repo": "esoltys/luminous",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "extra-chill/homeboy",
       "side": "dev",
       "fixed": true,
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "folo-rs/folo",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "getappz/agentflare",
@@ -293,12 +359,38 @@
       ]
     },
     {
+      "repo": "keinsleif/sbsp",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "kennguy3n/knowledge",
       "side": "dev",
       "fixed": true,
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "kexa-io/kxn",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "kontorprotocol/kontor",
@@ -318,6 +410,19 @@
       ]
     },
     {
+      "repo": "libra-tools/libra",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "limn-works/scp",
       "side": "dev",
       "fixed": true,
@@ -334,6 +439,19 @@
       ]
     },
     {
+      "repo": "lpm-dev/rust-client",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "mandubian/autonoetic",
       "side": "dev",
       "fixed": true,
@@ -348,6 +466,19 @@
       "why": [
         "acceptance-v1: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "mnzsss/ivar",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "moltis-org/moltis",
@@ -374,6 +505,19 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "neboto/neboto-tui",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "ng/yggdrasil",
@@ -466,12 +610,51 @@
       ]
     },
     {
+      "repo": "rowsncolumns/formualizer",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "rust-lang/cargo",
       "side": "dev",
       "fixed": true,
       "why": [
         "sentence-choice: used to build or tune"
       ]
+    },
+    {
+      "repo": "ruvnet/ruvector",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
+      "repo": "sendra-lab/sendra",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "sg-devel/tailtriage",
@@ -522,12 +705,38 @@
       ]
     },
     {
+      "repo": "thegreencedar/codestory",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "tokio-rs/tokio",
       "side": "dev",
       "fixed": true,
       "why": [
         "sentence-choice: used to build or tune"
       ]
+    },
+    {
+      "repo": "tokuhirom/mutsu",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "tumbleowlee/ferrowl",
@@ -569,6 +778,19 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "watany-dev/chokkin",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b1: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
+      "batch": {
+        "measurement": "#80",
+        "id": "b1"
+      }
     },
     {
       "repo": "yottayoshida/omamori",

@@ -66,7 +66,9 @@ dev set may be run and read as often as work needs.
    licence** (any licence will do, GPL and MPL included: the cases are kept private and never distributed;
    owner, 2026-09-25); when it is a **fork or a copy of a repository already met** — GitHub's `parent` or
    `source` is in the pool, the split, an earlier batch or an earlier row — which counts as the same
-   repository; or when an **earlier row of the same repository was kept** (one case per repository).
+   repository; or when an **earlier row of the same repository was kept** (one case per repository). A
+   fork not screened out (its source not met yet) is examined as its source: the split holds the source,
+   with the fork in `readAs`, and the side is drawn for the source's name.
 3. A candidate is examined once its pull request or issue text is read. It is kept when (a) its
    requirement can be written as "a failure must reach the caller as an error, not as a success, an
    empty value or an absence", and (c) the behaviour difference of a defect can be observed in a
