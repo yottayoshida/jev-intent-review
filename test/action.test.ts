@@ -9,11 +9,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { parse } from "yaml";
-import { annotationsOf, CHECK_NAME, conclude, finish, gitSameAt, redact, secretsOf, sourceHash, truncate, withoutAnswer, type Deps } from "../action/finish.ts";
+import { annotationsOf, CHECK_NAME, CHECK_SUMMARY_LIMIT, conclude, finish, gitSameAt, redact, secretsOf, sourceHash, truncate, withoutAnswer, type Deps } from "../action/finish.ts";
 import { JUDGMENT_ENV } from "../src/judgments/client.ts";
 import { renderJson, renderMarkdown } from "../src/report/markdown.ts";
 import type { ReviewReport } from "../src/types.ts";
-import { localCheckResult, report } from "./helpers/reports.ts";
+import { largeRun, localCheckResult, report } from "./helpers/reports.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const scratch = () => mkdtempSync(join(tmpdir(), "jev-action-"));
@@ -211,7 +211,7 @@ test("finish puts the report in a check run and the summary, and writes the log 
   const sent: Sent[] = [];
   await finish(env, deps(201, sent));
   onlyOwnLines(logLines(work));
-  assert.deepEqual(logLines(work), ["jev-intent-review: 1 call worth checking of 2 read, 1 not checked.", `jev-intent-review: The check run "${CHECK_NAME}" holds the same report.`]);
+  assert.deepEqual(logLines(work), ["jev-intent-review: 1 call worth checking of 2 read, 1 not checked.", `jev-intent-review: The check run "${CHECK_NAME}" holds what decides; the artifact holds the whole report.`]);
   // The check run: completed once, on the pull request's head, with the report and one annotation.
   assert.equal(sent.length, 1);
   const body = sent[0]!.body as { name: string; head_sha: string; status: string; conclusion: string; output: { title: string; summary: string; annotations: unknown[] } };
@@ -223,7 +223,14 @@ test("finish puts the report in a check run and the summary, and writes the log 
   for (const written of [md, readFileSync(join(work, "artifact", "report.json"), "utf8"), readFileSync(join(work, "artifact", "stderr.txt"), "utf8"), readFileSync(summary, "utf8"), JSON.stringify(sent)]) {
     assert.ok(!written.includes("cf-secret-value") && !written.includes("check-token-value"), "no key in what is written");
   }
-  assert.ok(readFileSync(summary, "utf8").startsWith(md), "the summary starts with the report");
+  // The artifact holds the whole report; the summary and the check run hold what decides (ADR 0021).
+  const parsed = JSON.parse(readFileSync(join(work, "artifact", "report.json"), "utf8")) as ReviewReport;
+  assert.equal(md, renderMarkdown(parsed), "report.md is the whole report");
+  const decision = renderMarkdown(parsed, { audit: false });
+  assert.notEqual(decision, md, "this report has an audit to leave out");
+  assert.ok(readFileSync(summary, "utf8").startsWith(decision), "the summary starts with what decides");
+  assert.ok(body.output.summary.startsWith(decision), "and so does the check run");
+  for (const view of [readFileSync(summary, "utf8"), body.output.summary]) assert.match(view, /The full report — every call read and every call not checked, each with its reason — is `report\.md` in the artifact `jev-intent-review`\./);
   assert.deepEqual(JSON.parse(readFileSync(join(work, "artifact", "action.json"), "utf8")).ref, "0123abc");
   assert.equal(readFileSync(join(work, "checked"), "utf8"), "true\n");
   assert.deepEqual(readdirSync(join(work, "artifact")).sort(), ["action.json", "report.json", "report.md", "stderr.txt"]);
@@ -276,9 +283,9 @@ test("what became of the check run is said as it happened: created, created with
   });
   assert.deepEqual(sent.map((s) => s.method), ["POST", "PATCH"]);
   const said = logLines(partial.work).join("\n");
-  assert.match(said, /holds the same report; GitHub refused some of its marks/);
+  assert.match(said, /holds what decides; the artifact holds the whole report. GitHub refused some of the check run.s marks/);
   assert.ok(!said.includes("No check run"), said);
-  assert.match(readFileSync(partial.summary, "utf8"), /refused some of its marks/);
+  assert.match(readFileSync(partial.summary, "utf8"), /refused some of the check run.s marks/);
 
   // No head commit in the event: nothing was sent, which is not the same as being refused.
   const headless = workDir(renderJson(report()), 0);
@@ -556,3 +563,50 @@ test("run.sh hands the command the kept answers, private again, and says when th
   assert.match(runSh("finish", { ACTION_PATH: fake, JEV_WORK: work, JEV_ANSWERS: dirLink }).outputs, /answers-kept=false\n$/);
 });
 
+
+test("a large run's check run and job summary hold what decides, uncut, and the artifact the whole report", async () => {
+  const big = largeRun();
+  const { work, summary, env } = workDir(renderJson(big), 0);
+  const sent: Sent[] = [];
+  await finish(env, deps(201, sent));
+  const full = renderMarkdown(big);
+  const decision = renderMarkdown(big, { audit: false });
+  assert.equal(readFileSync(join(work, "artifact", "report.md"), "utf8"), full, "the artifact holds every call");
+  const checkRun = (sent[0]!.body as { output: { summary: string } }).output.summary;
+  for (const view of [checkRun, readFileSync(summary, "utf8")]) {
+    assert.ok(view.startsWith(decision), "what decides, whole");
+    assert.ok(!view.includes("The report is cut here"), "not cut");
+    assert.ok(!view.includes("is_empty_0("), "no line of the audit");
+  }
+  // The control: the whole report, under the same limit, is cut.
+  assert.ok(truncate(full, CHECK_SUMMARY_LIMIT, "cut").endsWith("\n\ncut\n"), "the whole report would not have fitted");
+});
+
+test("a view that has to be cut says so once, and does not also point at the full report", async () => {
+  // Enough findings that what decides is itself over the check run's limit.
+  const base = localCheckResult();
+  const many = { ...base, findings: Array.from({ length: 200 }, (_, i) => ({ ...base.findings[0]!, call: `c${i}(x)`, why: "x".repeat(400) })) };
+  const { summary, env } = workDir(renderJson(report({ requirements: [many] })), 0);
+  const sent: Sent[] = [];
+  await finish(env, deps(201, sent));
+  const checkRun = (sent[0]!.body as { output: { summary: string } }).output.summary;
+  assert.match(checkRun, /The report is cut here; the whole of it is `report\.md` in the artifact `jev-intent-review`\./);
+  assert.ok(!checkRun.includes("The full report — every call read"), "one pointer, not two");
+  // The job summary's limit is larger: it holds the view whole, with the pointer.
+  assert.ok(!readFileSync(summary, "utf8").includes("The report is cut here"));
+  assert.match(readFileSync(summary, "utf8"), /The full report — every call read/);
+});
+
+test("the quickstart's workflow is the one the Action's page documents, and it names the Action's own inputs", () => {
+  const yamlOf = (page: string) => {
+    const blocks = [...readFileSync(join(ROOT, "docs", page), "utf8").matchAll(/^```yaml\n([\s\S]*?)^```$/gm)].map((m) => m[1]!);
+    assert.equal(blocks.length, 1, `${page} holds one workflow`);
+    return blocks[0]!;
+  };
+  const quick = yamlOf("quickstart.md");
+  assert.equal(quick, yamlOf("github-action.md"), "the two pages cannot drift apart");
+  const workflow = parse(quick) as { jobs: { review: { steps: { uses?: string; with?: Record<string, string> }[] } } };
+  const step = workflow.jobs.review.steps.find((s) => s.uses?.startsWith("yottayoshida/jev-intent-review@"))!;
+  const inputs = Object.keys((parse(readFileSync(join(ROOT, "action.yml"), "utf8")) as { inputs: Record<string, unknown> }).inputs);
+  for (const name of Object.keys(step.with ?? {})) assert.ok(inputs.includes(name), `${name} is an input of action.yml`);
+});

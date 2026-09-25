@@ -30,7 +30,7 @@ const fn = listing.functions[0]!;
 async function sites(): Promise<Site[]> {
   const out: Site[] = [];
   for (const call of listing.calls.filter((c) => c.functionId === fn.id)) {
-    const applicability = await FORMS.check_before_action.askable({ requirement, fn, call, resultOf: async () => ({ ok: true }), readHere: async () => null });
+    const applicability = await FORMS.check_before_action.askable({ requirement, fn, call, resultOf: async () => ({ ok: true }), readHere: async () => null, calleeResultOf: async () => ({ ok: true }) });
     if (applicability.ok) out.push({ call, fn, origin: "changed", fnOrigin: "changed", applicability });
   }
   return out;
@@ -83,7 +83,7 @@ pub fn make_title(store: &Store) -> Result<String, E> {
   const answers = await Promise.all(
     real.calls
       .filter((c) => c.functionId === opened.id)
-      .map((call) => FORMS.failure_propagation.askable({ requirement: { ...requirement, form: "failure_propagation" }, fn: opened, call, resultOf: (f, c) => applicabilityOf(discoverer, f, c), readHere: async () => null })),
+      .map((call) => FORMS.failure_propagation.askable({ requirement: { ...requirement, form: "failure_propagation" }, fn: opened, call, resultOf: (f, c) => applicabilityOf(discoverer, f, c), readHere: async () => null, calleeResultOf: async () => ({ ok: true }) })),
   );
   assert.ok(answers.some((a) => a.ok), "at least one call is askable, so the check is not vacuous");
   for (const a of answers) assert.equal((a as { names?: boolean }).names, undefined);

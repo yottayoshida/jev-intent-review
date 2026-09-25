@@ -5,6 +5,8 @@
 `jev-intent-review` checks whether a pull request actually satisfies the intent behind it — including code the diff did not touch.
 It starts from the requirement, not from the changed lines: **the diff is a search hint, not the review boundary.**
 
+It reads **Rust** only, and requirements written in **two shapes** — a requirements section or a `Property:` paragraph — asking one of **two things** of each call: how a failure must reach the caller, or that a check passes before an action — and, when a spec names it, a third: that a failure is returned, logged or recorded rather than silently dropped.
+
 ## Demo
 
 A real run on omamori's [PR #476](https://github.com/yottayoshida/omamori/pull/476) (`52a58fa` → `e58c04f`) with the requirements in [`bench/fixtures/omamori-468/stated-failure-handling.spec.json`](bench/fixtures/omamori-468/stated-failure-handling.spec.json).
@@ -35,36 +37,11 @@ export TYPESAFE_API_KEY=...
 jev-intent-review --base <base> --head <head> --intent-spec spec.json
 ```
 
-On pull requests, use the Action. Pin it to a commit: there is no tag yet.
-
-```yaml
-name: intent-review
-on: pull_request
-permissions:
-  contents: read
-  pull-requests: read
-  issues: read
-  checks: write
-concurrency:
-  group: intent-review-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-jobs:
-  review:
-    name: intent review (same-repository pull requests only)
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: yottayoshida/jev-intent-review@<the full 40-character commit>
-        with:
-          jev-provider: cloudflare
-          cloudflare-account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-```
-
-Pull requests from forks are not reviewed. Why, and what a run leaves: [docs/github-action.md](docs/github-action.md).
+On pull requests, use the Action: one workflow file, two secrets and one requirement, in
+[docs/quickstart.md](docs/quickstart.md). Pin it to a commit: there is no tag yet.
+The check run puts the calls worth checking and the ones not settled first; every call, with its
+reason, is in the artifact. Pull requests from forks are not reviewed. Why, and what a run leaves:
+[docs/github-action.md](docs/github-action.md).
 
 ## What it does
 
@@ -80,6 +57,7 @@ Surfacing a defect in an unchanged caller is the goal; how far it gets today is 
 
 ## Docs
 
+* [Quick start on a Rust repository](docs/quickstart.md) — the workflow, the secrets, one requirement, reading the check run
 * [Why, and what it is aiming at](docs/overview.md) — the problem, an example, the pipeline, the current scope
 * [Using the command](docs/usage.md) — flags, `--json`, the JevFuzz trace, how intent is read, Jev hosts, development
 * [GitHub Action](docs/github-action.md) — inputs, what a run leaves, reused answers, limits, which pull requests are reviewed

@@ -69,9 +69,10 @@ export function requirementSentencesIn(root: string): { file: string; text: stri
       const path = join(dir, entry.name);
       const rel = relative(root, path);
       if (entry.isDirectory()) {
-        // bench/decisive/outside: sentences written for the probe of the check form's words (#82),
+        // bench/decisive/outside and bench/handling/specs: sentences written for the probes of a form
+        // (#82, #85),
         // each naming its form, so the form question is never put to them.
-        if (entry.name === "node_modules" || rel === "bench/logs" || rel === "bench/decisive/outside") continue;
+        if (entry.name === "node_modules" || rel === "bench/logs" || rel === "bench/decisive/outside" || rel === "bench/handling/specs") continue;
         walk(path);
         continue;
       }

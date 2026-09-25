@@ -1,0 +1,14 @@
+{
+  "what": "One line per batch of sealed candidates, #80's and #89's (PROTOCOL.md rule 5): the range of rows read, how many rows were read, how many were kept, and the sha256 of the verdicts file in the sandbox. Lines are only ever added; a repository placed by a batch is salted with the first main merge commit holding its sha256.",
+  "batches": [
+    {
+      "measurement": "#80",
+      "id": "b1",
+      "from": 1,
+      "to": 100,
+      "rows": 100,
+      "kept": 17,
+      "sha256": "fed1296769f8be426d81699314973c9f0605d45fe956a604371b2b5780cb2d1a"
+    }
+  ]
+}

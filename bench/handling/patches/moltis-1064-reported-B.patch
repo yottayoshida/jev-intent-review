@@ -1,0 +1,16 @@
+diff --git a/crates/gateway/src/channel_events/commands/dispatch.rs b/crates/gateway/src/channel_events/commands/dispatch.rs
+index 59a55d70..c3e99448 100644
+--- a/crates/gateway/src/channel_events/commands/dispatch.rs
++++ b/crates/gateway/src/channel_events/commands/dispatch.rs
+@@ -75,7 +75,10 @@ pub(in crate::channel_events) async fn dispatch_command(
+         "compact" => session_handlers::handle_compact(state, &session_key).await,
+         "title" => session_handlers::handle_title(state, &session_key)
+             .await
+-            .or_else(|_| Ok(String::new())),
++            .or_else(|e| {
++                tracing::warn!(error = %e, "title command failed");
++                Ok(String::new())
++            }),
+         "context" => session_handlers::handle_context(state, &session_key).await,
+         "sessions" => {
+             session_handlers::handle_sessions(

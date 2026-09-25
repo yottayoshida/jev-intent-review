@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "moltis-org/moltis#1064 — the requirement written in the form failure_handling (#85)",
+  "summary": "",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "If generating a session's automatic title fails, the failure must be returned, logged or recorded. It must not be turned silently into a successful result with no label.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": [],
+      "form": "failure_handling"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

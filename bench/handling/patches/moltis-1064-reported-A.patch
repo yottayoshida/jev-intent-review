@@ -1,0 +1,19 @@
+diff --git a/crates/gateway/src/session/title.rs b/crates/gateway/src/session/title.rs
+index 3bcae569..b79be7e1 100644
+--- a/crates/gateway/src/session/title.rs
++++ b/crates/gateway/src/session/title.rs
+@@ -119,8 +119,12 @@ pub(crate) async fn generate_title_for_session(
+     };
+ 
+     let chat_msgs = moltis_agents::model::values_to_chat_messages(&history);
+-    let Ok(title) = moltis_agents::title::generate_title(provider, &chat_msgs).await else {
+-        return Ok(None);
++    let title = match moltis_agents::title::generate_title(provider, &chat_msgs).await {
++        Ok(title) => title,
++        Err(e) => {
++            warn!(error = %e, session = %session_key, "auto-title: title generation failed");
++            return Ok(None);
++        },
+     };
+     // Persist the title as the session label and read back the
+     // entry atomically so the broadcast version is consistent.

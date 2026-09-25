@@ -7,7 +7,7 @@ import { codeBlock, codeSpan, renderJson, renderMarkdown, resultKind } from "../
 import { EXIT, ToolError } from "../src/types.ts";
 import { VERSION } from "../src/version.ts";
 import { FIXTURES } from "./helpers/repo.ts";
-import { localCheckResult, report } from "./helpers/reports.ts";
+import { largeRun, localCheckResult, report } from "./helpers/reports.ts";
 
 test("codeSpan cannot be broken out of, whatever the text holds", () => {
   assert.equal(codeSpan("plain"), "`plain`");
@@ -167,4 +167,53 @@ test("the report names a requirement's source as the pull request author's from 
 test("VERSION matches package.json", () => {
   const pkg = JSON.parse(readFileSync(join(import.meta.dirname, "..", "package.json"), "utf8"));
   assert.equal(VERSION, pkg.version);
+});
+
+// ---- the two views (#86, ADR 0021) ---------------------------------------------------------------
+
+test("the report puts what decides first, and the audit last", () => {
+  const full = renderMarkdown(largeRun());
+  const at = (s: string) => {
+    const i = full.indexOf(s);
+    assert.ok(i >= 0, `${s} is in the report`);
+    return i;
+  };
+  const order = ["## R1", "### Worth checking", "### Not settled", "### Notes", "### Read as holding", "### Read, but not required of by the requirement", "### Every call read", "### Not checked", "## R2"];
+  const places = order.map(at);
+  assert.deepEqual([...places].sort((a, b) => a - b), places, "in this order");
+  // A call not settled says what it rests on, now that the list of calls read is not beside it.
+  assert.match(full, /- src\/auth\.rs · open_session — `step_unknown_0\(grove_version\)`: .*\n {2}- Jev, on whether the requirement requires it here: applies \(0\.90\)\n {2}- when that call fails: cannot_determine \(0\.55\) — read as `cannot_determine`\n/);
+  // A change no requirement asked for is above the requirements.
+  const withChange = renderMarkdown({ ...largeRun(), unexpectedChanges: [{ id: "C1", location: { path: "src/x.rs", startLine: 1, endLine: 2 }, excerpt: "x", judgment: "unrequested", mappedRequirements: [], confidence: 0.9, notes: [] }] });
+  assert.ok(withChange.indexOf("## Changes no requirement asked for") < withChange.indexOf("## R1"));
+});
+
+test("without the audit, the report keeps every finding and call not settled and counts the rest", () => {
+  const run = largeRun();
+  const full = renderMarkdown(run);
+  const decision = renderMarkdown(run, { audit: false });
+  for (const i of [0, 1, 2]) assert.ok(decision.includes(`— \`step_violates_${i}(grove_version)\``), `finding ${i}`);
+  for (const i of [0, 1]) assert.ok(decision.includes(`\`step_unknown_${i}(grove_version)\`:`), `not settled ${i}`);
+  assert.ok(decision.includes("### Notes"), "what was not read");
+  for (const gone of ["### Read as holding", "### Read, but not required of by the requirement", "### Every call read", "is_empty_0("]) assert.ok(!decision.includes(gone), gone);
+  assert.match(decision, /\n_4 read as holding, 11 not required of, 300 not checked: each call, with its reason, is in the full report\._\n/);
+  // What the counted calls rest on is not on this page, and the page says so; the warning holding
+  // calls carry goes with their count.
+  assert.ok(decision.includes("rests on is printed here for the calls listed, and in the full report for the rest."));
+  assert.ok(!full.includes("in the full report for the rest"), "the whole report prints all of it");
+  assert.match(decision, /\n_Those read as holding: two readings that agree\. Where what decides it is in code that was not sent, they can agree and be wrong\._\n/);
+  // R2 read no call: its reasons are all it has to say, and stay.
+  for (let i = 0; i < 5; i++) assert.ok(decision.includes(`\`held_in_r2_${i}(chunk, &mut self.tree)\``), `R2's call ${i}`);
+  // The first line says where the reasons are.
+  assert.match(decision.split("\n")[2] ?? "", /305 not checked, for the reasons in the full report\./);
+  assert.match(full.split("\n")[2] ?? "", /305 not checked, for the reasons under each requirement\./);
+  // The whole report holds every call; the view is small beside it.
+  for (let i = 0; i < 300; i++) assert.ok(full.includes(`\`is_empty_${i}(chunk, &mut self.tree)\``), `call ${i}`);
+  assert.ok(Buffer.byteLength(full) > 65535, `the whole report is over the check run's limit (${Buffer.byteLength(full)} bytes)`);
+  assert.ok(Buffer.byteLength(decision) < 16384, `the view is not (${Buffer.byteLength(decision)} bytes)`);
+});
+
+test("a report with nothing to leave out is the same in both views", () => {
+  const nothing = { ...localCheckResult(), observed: [], mappings: [], findings: [], unchecked: [] };
+  for (const r of [report({ skipReason: "No credentials.", requirements: [] }), report({ requirements: [] }), report({ requirements: [nothing] })]) assert.equal(renderMarkdown(r, { audit: false }), renderMarkdown(r));
 });

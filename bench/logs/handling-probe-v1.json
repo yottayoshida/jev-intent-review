@@ -1,0 +1,879 @@
+{
+  "conditions": {
+    "tool": "0f7b72a3baf850d09fbf04f37b1e33d34ab9bd68",
+    "plan": "7456ec9205e2448f879bab7383ae5da368b7b2de8297f4d228e16f25055b7cd2",
+    "model": "typesafe/jev",
+    "bar": 0.6,
+    "runs": 3,
+    "question": "a3f3b487481b84be4e708154e3881d91d698d42c67c0033fe4bb7ab8a49fc2ef"
+  },
+  "records": [
+    {
+      "id": "moltis-B-defect",
+      "run": 1,
+      "commit": "4697c3977399b015efd2ac38fd9aec6797783117",
+      "packet": "f32902ee33cbbf50838aacf945918f74f71cc2eabc1a254273664616e824e273",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "reports_locally": 0,
+          "continues_silently": 1,
+          "cannot_determine": 0,
+          "propagates": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-reported",
+      "run": 1,
+      "commit": "40a352f7709db6ec3bd68370c7c106fc07d33c16",
+      "packet": "268dcb8e4c6ce2a04849ec5b6196042569b5d5510c26ba083b3dd63c8ae0b857",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.97,
+        "probabilities": {
+          "reports_locally": 0.97,
+          "continues_silently": 0.02,
+          "cannot_determine": 0,
+          "propagates": 0.01
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "grovedb-A-rewrite",
+      "run": 1,
+      "commit": "87e06509bc8da68b9c815ad5799f507d81183c69",
+      "packet": "09ccec0135d123bea89e20d42cbe5a986ebe7ca197b4e9faece3c81d26588875",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "propagates": 1,
+          "continues_silently": 0,
+          "reports_locally": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-A-shipped",
+      "run": 1,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "20f253a9d92bd095af2f1ba6b690f6569737c7de0f7767df973875c6d88752ea",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "continues_silently": 0,
+          "reports_locally": 0,
+          "propagates": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-A-decoy",
+      "run": 1,
+      "commit": "768c134ea6af4333c60a6fcf3594684520401090",
+      "packet": "d4719fe6c3babf0757a05a357554e437b0e3af8118ccfd9b2c1d62160239df9c",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.95,
+        "probabilities": {
+          "propagates": 0,
+          "cannot_determine": 0,
+          "continues_silently": 0.95,
+          "reports_locally": 0.05
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "moltis-A-defect",
+      "run": 1,
+      "commit": "fa45a528825734c277a84107af93b4ea9ff105d0",
+      "packet": "e21bc1272fa2410252780b3f5f734c0781128f7bbd459d35fc1acda51132e0be",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.9,
+        "probabilities": {
+          "reports_locally": 0.1,
+          "propagates": 0,
+          "continues_silently": 0.9,
+          "cannot_determine": 0
+        },
+        "confidence": 0.86
+      }
+    },
+    {
+      "id": "grovedb-A-decoy",
+      "run": 1,
+      "commit": "3b5b7d6b6a426337bbeadbdd2bc730ab7d783930",
+      "packet": "1da1f372d155358a696764f397fb3986ca23efd06b53f8e09dabeaab74bef3cf",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.88,
+        "probabilities": {
+          "propagates": 0.08,
+          "continues_silently": 0.88,
+          "cannot_determine": 0.03,
+          "reports_locally": 0.01
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "moltis-C-silent",
+      "run": 1,
+      "commit": "2eca635510273b13574f02475c23ab75a95a7b1e",
+      "packet": "8acc39a7614216935b0eebf50a2e6c2a443b475f73dcc229b7e10be93519a173",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.99,
+        "probabilities": {
+          "propagates": 0,
+          "continues_silently": 0.99,
+          "reports_locally": 0.01,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-B-reported",
+      "run": 1,
+      "commit": "48b2bf3e2b0e9375fe876eab5d0d69abbfee9967",
+      "packet": "f33029f3349f7fccf9d38a606066410701d0c208766333586badfdf0f859c15f",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.98,
+        "probabilities": {
+          "propagates": 0,
+          "reports_locally": 0.98,
+          "continues_silently": 0.02,
+          "cannot_determine": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-B-decoy",
+      "run": 1,
+      "commit": "3504ec17b72562f61db7792b957fda418657cf82",
+      "packet": "d4f0e00f292880d4dfe0cd8fc0150e76a3a06a45679263ec1c49bd6d127fe9b8",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 1,
+          "cannot_determine": 0,
+          "reports_locally": 0,
+          "propagates": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-defect",
+      "run": 1,
+      "commit": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+      "packet": "3182877bbd5d8be2a13f7df0b664f6874ba1c2cf84b1c24e869ea84a5bc4beee",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.89,
+        "probabilities": {
+          "propagates": 0.09,
+          "reports_locally": 0,
+          "continues_silently": 0.89,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.86
+      }
+    },
+    {
+      "id": "moltis-A-reported",
+      "run": 1,
+      "commit": "8b8b878043f074b36dcbf2f3b7dbc8fcefe81b53",
+      "packet": "995c0eb2bc0900888eacb517be9c65f86dfc5aef0bab1c2f046ca963971b097c",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reports_locally": 1,
+          "continues_silently": 0,
+          "propagates": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-C-shipped",
+      "run": 1,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "3be7dd02f6aa10e60021f82153b8282d36ec4f24f26799cde01d203d1b739766",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.98,
+        "probabilities": {
+          "continues_silently": 0,
+          "reports_locally": 0.02,
+          "propagates": 0.98,
+          "cannot_determine": 0
+        },
+        "confidence": 0.97
+      }
+    },
+    {
+      "id": "moltis-A-rewrite",
+      "run": 1,
+      "commit": "e14b5b7d1268fc583d428735086583335943e684",
+      "packet": "870c0995c808e887b1cc8179afb3ef8b71d4f0dcd5bd4cc9c0f926ed44145327",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "propagates": 1,
+          "cannot_determine": 0,
+          "reports_locally": 0,
+          "continues_silently": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-B-shipped",
+      "run": 1,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "6b14aec5c2265e9eacff8ab171b217186e19e84705465721675ad286331ee31c",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "propagates": 0.99,
+          "reports_locally": 0,
+          "continues_silently": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-shipped",
+      "run": 1,
+      "commit": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+      "packet": "b3269c3b8dc2b3920357e736d8c0ea48b8a5360a948efb62cccdc0ae00149156",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "reports_locally": 0,
+          "cannot_determine": 0.01,
+          "propagates": 0.99,
+          "continues_silently": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-C-logged",
+      "run": 1,
+      "commit": "3e35d5175e2f0fe27db7259f2741a97f0d424527",
+      "packet": "4429f39ef725071afcc6fb5408a37d60b8a4debced86ed747a7538083fb3bacf",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.98,
+        "probabilities": {
+          "cannot_determine": 0,
+          "propagates": 0,
+          "reports_locally": 0.98,
+          "continues_silently": 0.02
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-B-reported",
+      "run": 2,
+      "commit": "48b2bf3e2b0e9375fe876eab5d0d69abbfee9967",
+      "packet": "f33029f3349f7fccf9d38a606066410701d0c208766333586badfdf0f859c15f",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.99,
+        "probabilities": {
+          "propagates": 0,
+          "reports_locally": 0.99,
+          "continues_silently": 0.01,
+          "cannot_determine": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-B-decoy",
+      "run": 2,
+      "commit": "3504ec17b72562f61db7792b957fda418657cf82",
+      "packet": "d4f0e00f292880d4dfe0cd8fc0150e76a3a06a45679263ec1c49bd6d127fe9b8",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "propagates": 0,
+          "cannot_determine": 0,
+          "reports_locally": 0,
+          "continues_silently": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-reported",
+      "run": 2,
+      "commit": "40a352f7709db6ec3bd68370c7c106fc07d33c16",
+      "packet": "268dcb8e4c6ce2a04849ec5b6196042569b5d5510c26ba083b3dd63c8ae0b857",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.97,
+        "probabilities": {
+          "cannot_determine": 0,
+          "continues_silently": 0.02,
+          "reports_locally": 0.97,
+          "propagates": 0.01
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "moltis-A-shipped",
+      "run": 2,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "20f253a9d92bd095af2f1ba6b690f6569737c7de0f7767df973875c6d88752ea",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "propagates": 0.99,
+          "cannot_determine": 0.01,
+          "continues_silently": 0,
+          "reports_locally": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-A-decoy",
+      "run": 2,
+      "commit": "768c134ea6af4333c60a6fcf3594684520401090",
+      "packet": "d4719fe6c3babf0757a05a357554e437b0e3af8118ccfd9b2c1d62160239df9c",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.93,
+        "probabilities": {
+          "propagates": 0,
+          "cannot_determine": 0,
+          "continues_silently": 0.93,
+          "reports_locally": 0.07
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "moltis-A-defect",
+      "run": 2,
+      "commit": "fa45a528825734c277a84107af93b4ea9ff105d0",
+      "packet": "e21bc1272fa2410252780b3f5f734c0781128f7bbd459d35fc1acda51132e0be",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.95,
+        "probabilities": {
+          "reports_locally": 0.05,
+          "continues_silently": 0.95,
+          "cannot_determine": 0,
+          "propagates": 0
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "moltis-B-shipped",
+      "run": 2,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "6b14aec5c2265e9eacff8ab171b217186e19e84705465721675ad286331ee31c",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reports_locally": 0,
+          "propagates": 0.99,
+          "continues_silently": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-B-defect",
+      "run": 2,
+      "commit": "4697c3977399b015efd2ac38fd9aec6797783117",
+      "packet": "f32902ee33cbbf50838aacf945918f74f71cc2eabc1a254273664616e824e273",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 1,
+          "cannot_determine": 0,
+          "reports_locally": 0,
+          "propagates": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-defect",
+      "run": 2,
+      "commit": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+      "packet": "3182877bbd5d8be2a13f7df0b664f6874ba1c2cf84b1c24e869ea84a5bc4beee",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.87,
+        "probabilities": {
+          "reports_locally": 0,
+          "cannot_determine": 0.02,
+          "propagates": 0.11,
+          "continues_silently": 0.87
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "moltis-A-reported",
+      "run": 2,
+      "commit": "8b8b878043f074b36dcbf2f3b7dbc8fcefe81b53",
+      "packet": "995c0eb2bc0900888eacb517be9c65f86dfc5aef0bab1c2f046ca963971b097c",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 1,
+        "probabilities": {
+          "propagates": 0,
+          "continues_silently": 0,
+          "reports_locally": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-rewrite",
+      "run": 2,
+      "commit": "87e06509bc8da68b9c815ad5799f507d81183c69",
+      "packet": "09ccec0135d123bea89e20d42cbe5a986ebe7ca197b4e9faece3c81d26588875",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "reports_locally": 0,
+          "propagates": 1,
+          "cannot_determine": 0,
+          "continues_silently": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-C-logged",
+      "run": 2,
+      "commit": "3e35d5175e2f0fe27db7259f2741a97f0d424527",
+      "packet": "4429f39ef725071afcc6fb5408a37d60b8a4debced86ed747a7538083fb3bacf",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.98,
+        "probabilities": {
+          "continues_silently": 0.02,
+          "cannot_determine": 0,
+          "reports_locally": 0.98,
+          "propagates": 0
+        },
+        "confidence": 0.97
+      }
+    },
+    {
+      "id": "grovedb-A-decoy",
+      "run": 2,
+      "commit": "3b5b7d6b6a426337bbeadbdd2bc730ab7d783930",
+      "packet": "1da1f372d155358a696764f397fb3986ca23efd06b53f8e09dabeaab74bef3cf",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.89,
+        "probabilities": {
+          "continues_silently": 0.89,
+          "cannot_determine": 0.03,
+          "reports_locally": 0.01,
+          "propagates": 0.07
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "moltis-C-shipped",
+      "run": 2,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "3be7dd02f6aa10e60021f82153b8282d36ec4f24f26799cde01d203d1b739766",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "reports_locally": 0.01,
+          "cannot_determine": 0,
+          "propagates": 0.99,
+          "continues_silently": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-A-rewrite",
+      "run": 2,
+      "commit": "e14b5b7d1268fc583d428735086583335943e684",
+      "packet": "870c0995c808e887b1cc8179afb3ef8b71d4f0dcd5bd4cc9c0f926ed44145327",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "continues_silently": 0,
+          "reports_locally": 0,
+          "propagates": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "grovedb-A-shipped",
+      "run": 2,
+      "commit": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+      "packet": "b3269c3b8dc2b3920357e736d8c0ea48b8a5360a948efb62cccdc0ae00149156",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "continues_silently": 0,
+          "reports_locally": 0,
+          "cannot_determine": 0.01,
+          "propagates": 0.99
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-C-silent",
+      "run": 2,
+      "commit": "2eca635510273b13574f02475c23ab75a95a7b1e",
+      "packet": "8acc39a7614216935b0eebf50a2e6c2a443b475f73dcc229b7e10be93519a173",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.99,
+        "probabilities": {
+          "continues_silently": 0.99,
+          "reports_locally": 0.01,
+          "propagates": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "moltis-C-silent",
+      "run": 3,
+      "commit": "2eca635510273b13574f02475c23ab75a95a7b1e",
+      "packet": "8acc39a7614216935b0eebf50a2e6c2a443b475f73dcc229b7e10be93519a173",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.99,
+        "probabilities": {
+          "continues_silently": 0.99,
+          "cannot_determine": 0,
+          "reports_locally": 0.01,
+          "propagates": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-B-decoy",
+      "run": 3,
+      "commit": "3504ec17b72562f61db7792b957fda418657cf82",
+      "packet": "d4f0e00f292880d4dfe0cd8fc0150e76a3a06a45679263ec1c49bd6d127fe9b8",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 1,
+          "propagates": 0,
+          "reports_locally": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-rewrite",
+      "run": 3,
+      "commit": "87e06509bc8da68b9c815ad5799f507d81183c69",
+      "packet": "09ccec0135d123bea89e20d42cbe5a986ebe7ca197b4e9faece3c81d26588875",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "reports_locally": 0,
+          "propagates": 1,
+          "continues_silently": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-A-shipped",
+      "run": 3,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "20f253a9d92bd095af2f1ba6b690f6569737c7de0f7767df973875c6d88752ea",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "propagates": 0.99,
+          "cannot_determine": 0.01,
+          "continues_silently": 0,
+          "reports_locally": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-B-shipped",
+      "run": 3,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "6b14aec5c2265e9eacff8ab171b217186e19e84705465721675ad286331ee31c",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "reports_locally": 0,
+          "propagates": 0.99,
+          "continues_silently": 0,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-A-defect",
+      "run": 3,
+      "commit": "fa45a528825734c277a84107af93b4ea9ff105d0",
+      "packet": "e21bc1272fa2410252780b3f5f734c0781128f7bbd459d35fc1acda51132e0be",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.9,
+        "probabilities": {
+          "continues_silently": 0.9,
+          "reports_locally": 0.1,
+          "cannot_determine": 0,
+          "propagates": 0
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "moltis-A-rewrite",
+      "run": 3,
+      "commit": "e14b5b7d1268fc583d428735086583335943e684",
+      "packet": "870c0995c808e887b1cc8179afb3ef8b71d4f0dcd5bd4cc9c0f926ed44145327",
+      "answer": {
+        "choice": "propagates",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 0,
+          "reports_locally": 0,
+          "cannot_determine": 0,
+          "propagates": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-C-logged",
+      "run": 3,
+      "commit": "3e35d5175e2f0fe27db7259f2741a97f0d424527",
+      "packet": "4429f39ef725071afcc6fb5408a37d60b8a4debced86ed747a7538083fb3bacf",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.98,
+        "probabilities": {
+          "propagates": 0,
+          "reports_locally": 0.98,
+          "continues_silently": 0.02,
+          "cannot_determine": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "moltis-A-decoy",
+      "run": 3,
+      "commit": "768c134ea6af4333c60a6fcf3594684520401090",
+      "packet": "d4719fe6c3babf0757a05a357554e437b0e3af8118ccfd9b2c1d62160239df9c",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.94,
+        "probabilities": {
+          "propagates": 0.01,
+          "cannot_determine": 0,
+          "continues_silently": 0.94,
+          "reports_locally": 0.05
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "moltis-B-defect",
+      "run": 3,
+      "commit": "4697c3977399b015efd2ac38fd9aec6797783117",
+      "packet": "f32902ee33cbbf50838aacf945918f74f71cc2eabc1a254273664616e824e273",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 1,
+          "propagates": 0,
+          "reports_locally": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "grovedb-A-decoy",
+      "run": 3,
+      "commit": "3b5b7d6b6a426337bbeadbdd2bc730ab7d783930",
+      "packet": "1da1f372d155358a696764f397fb3986ca23efd06b53f8e09dabeaab74bef3cf",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.92,
+        "probabilities": {
+          "reports_locally": 0,
+          "cannot_determine": 0.02,
+          "propagates": 0.06,
+          "continues_silently": 0.92
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "moltis-A-reported",
+      "run": 3,
+      "commit": "8b8b878043f074b36dcbf2f3b7dbc8fcefe81b53",
+      "packet": "995c0eb2bc0900888eacb517be9c65f86dfc5aef0bab1c2f046ca963971b097c",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 1,
+        "probabilities": {
+          "continues_silently": 0,
+          "propagates": 0,
+          "reports_locally": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "moltis-C-shipped",
+      "run": 3,
+      "commit": "4106d46dad04481a932597141739e42a5452cc86",
+      "packet": "3be7dd02f6aa10e60021f82153b8282d36ec4f24f26799cde01d203d1b739766",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.98,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reports_locally": 0.02,
+          "continues_silently": 0,
+          "propagates": 0.98
+        },
+        "confidence": 0.97
+      }
+    },
+    {
+      "id": "moltis-B-reported",
+      "run": 3,
+      "commit": "48b2bf3e2b0e9375fe876eab5d0d69abbfee9967",
+      "packet": "f33029f3349f7fccf9d38a606066410701d0c208766333586badfdf0f859c15f",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.99,
+        "probabilities": {
+          "reports_locally": 0.99,
+          "continues_silently": 0.01,
+          "cannot_determine": 0,
+          "propagates": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "grovedb-A-reported",
+      "run": 3,
+      "commit": "40a352f7709db6ec3bd68370c7c106fc07d33c16",
+      "packet": "268dcb8e4c6ce2a04849ec5b6196042569b5d5510c26ba083b3dd63c8ae0b857",
+      "answer": {
+        "choice": "reports_locally",
+        "probability": 0.97,
+        "probabilities": {
+          "propagates": 0.01,
+          "continues_silently": 0.02,
+          "reports_locally": 0.97,
+          "cannot_determine": 0
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "grovedb-A-shipped",
+      "run": 3,
+      "commit": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+      "packet": "b3269c3b8dc2b3920357e736d8c0ea48b8a5360a948efb62cccdc0ae00149156",
+      "answer": {
+        "choice": "propagates",
+        "probability": 0.99,
+        "probabilities": {
+          "reports_locally": 0,
+          "continues_silently": 0,
+          "cannot_determine": 0.01,
+          "propagates": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "grovedb-A-defect",
+      "run": 3,
+      "commit": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+      "packet": "3182877bbd5d8be2a13f7df0b664f6874ba1c2cf84b1c24e869ea84a5bc4beee",
+      "answer": {
+        "choice": "continues_silently",
+        "probability": 0.88,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "continues_silently": 0.88,
+          "reports_locally": 0,
+          "propagates": 0.09
+        },
+        "confidence": 0.83
+      }
+    }
+  ]
+}

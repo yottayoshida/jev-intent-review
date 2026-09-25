@@ -1,0 +1,1841 @@
+{
+  "what": "Dev's extra material for the hindsight check's calibration (RETRO.md v2): the same searches, kept to repositories on the dev side of split.json. Not the sealed search.",
+  "earliestFix": "2026-07-01",
+  "ranges": [
+    {
+      "from": "2026-09-01",
+      "to": "2026-09-23",
+      "takenOn": "2026-09-25",
+      "windows": [
+        {
+          "from": "2026-09-01",
+          "to": "2026-09-05",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 64,
+            "swallow error": 92
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-06",
+          "to": "2026-09-11",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 63,
+            "swallow error": 98
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-12",
+          "to": "2026-09-17",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 62,
+            "swallow error": 98
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-18",
+          "to": "2026-09-20",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 37,
+            "swallow error": 53
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-09-21",
+          "to": "2026-09-23",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 33,
+            "swallow error": 58
+          },
+          "cut": []
+        }
+      ],
+      "kept": 34,
+      "left": {
+        "notDev": 620,
+        "beforeEarliest": 0
+      }
+    },
+    {
+      "from": "2026-08-01",
+      "to": "2026-08-31",
+      "takenOn": "2026-09-25",
+      "windows": [
+        {
+          "from": "2026-08-01",
+          "to": "2026-08-03",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 26,
+            "swallow error": 51
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-04",
+          "to": "2026-08-07",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 38,
+            "swallow error": 87
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-08",
+          "to": "2026-08-11",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 47,
+            "swallow error": 60
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-12",
+          "to": "2026-08-15",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 41,
+            "swallow error": 74
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-16",
+          "to": "2026-08-19",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 34,
+            "swallow error": 64
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-20",
+          "to": "2026-08-23",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 31,
+            "swallow error": 72
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-24",
+          "to": "2026-08-27",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 31,
+            "swallow error": 74
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-08-28",
+          "to": "2026-08-31",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 33,
+            "swallow error": 55
+          },
+          "cut": []
+        }
+      ],
+      "kept": 42,
+      "left": {
+        "notDev": 764,
+        "beforeEarliest": 0
+      }
+    },
+    {
+      "from": "2026-07-01",
+      "to": "2026-07-31",
+      "takenOn": "2026-09-25",
+      "windows": [
+        {
+          "from": "2026-07-01",
+          "to": "2026-07-03",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 30,
+            "swallow error": 78
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-04",
+          "to": "2026-07-07",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 1,
+            "ignored error": 28,
+            "swallow error": 91
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-08",
+          "to": "2026-07-11",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 0,
+            "ignored error": 29,
+            "swallow error": 80
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-12",
+          "to": "2026-07-15",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 45,
+            "swallow error": 85
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-16",
+          "to": "2026-07-19",
+          "found": {
+            "propagate error instead of silently": 0,
+            "error treated as success": 1,
+            "ignored error": 44,
+            "swallow error": 89
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-20",
+          "to": "2026-07-23",
+          "found": {
+            "propagate error instead of silently": 3,
+            "error treated as success": 0,
+            "ignored error": 35,
+            "swallow error": 75
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-24",
+          "to": "2026-07-27",
+          "found": {
+            "propagate error instead of silently": 3,
+            "error treated as success": 0,
+            "ignored error": 38,
+            "swallow error": 79
+          },
+          "cut": []
+        },
+        {
+          "from": "2026-07-28",
+          "to": "2026-07-31",
+          "found": {
+            "propagate error instead of silently": 1,
+            "error treated as success": 0,
+            "ignored error": 38,
+            "swallow error": 71
+          },
+          "cut": []
+        }
+      ],
+      "kept": 80,
+      "left": {
+        "notDev": 850,
+        "beforeEarliest": 0
+      }
+    }
+  ],
+  "rows": [
+    {
+      "order": 1,
+      "ref": "pnpm/pnpm#15357",
+      "repo": "pnpm/pnpm",
+      "title": "fix: do not report packages with build scripts as modified in store status (pnpm/pnpm#7215)",
+      "closedAt": "2026-09-23T20:20:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 2,
+      "ref": "pnpm/pnpm#15304",
+      "repo": "pnpm/pnpm",
+      "title": "fix(make-dedicated-lockfile): keep package.json and the staged node_modules intact",
+      "closedAt": "2026-09-23T12:48:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 3,
+      "ref": "pnpm/pnpm#15334",
+      "repo": "pnpm/pnpm",
+      "title": "fix(pack): preserve executable file permissions in tarball (pnpm/pnpm#6285)",
+      "closedAt": "2026-09-23T09:32:52Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 4,
+      "ref": "pnpm/pnpm#15333",
+      "repo": "pnpm/pnpm",
+      "title": "fix(patch): resolve default patch path with pnpm patch-commit <pkg>",
+      "closedAt": "2026-09-23T06:05:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 5,
+      "ref": "pnpm/pnpm#15323",
+      "repo": "pnpm/pnpm",
+      "title": "fix(env): clean up dangling shims and symlinks on env remove (pnpm/pnpm#6122)",
+      "closedAt": "2026-09-23T06:02:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 6,
+      "ref": "zeroclaw-labs/zeroclaw#10696",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "title": "fix(runtime): trim history to a low-water target instead of the cap",
+      "closedAt": "2026-09-22T10:22:58Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 7,
+      "ref": "DawnLandTeam/dawnland-launcher#111",
+      "repo": "dawnlandteam/dawnland-launcher",
+      "title": "fix: resolve path traversal vulnerability in e2e fixtures",
+      "closedAt": "2026-09-22T10:18:55Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 8,
+      "ref": "zeroclaw-labs/zeroclaw#9313",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "title": "fix(wechat): persist sync cursor only after inbound batch is enqueued",
+      "closedAt": "2026-09-22T07:38:55Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 9,
+      "ref": "oven-sh/bun#43714",
+      "repo": "oven-sh/bun",
+      "title": "streams: add the ERR_INVALID_STATE code to the locked-stream errors of cancel, pipeTo and pipeThrough",
+      "closedAt": "2026-09-21T22:33:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 10,
+      "ref": "pnpm/pnpm#15221",
+      "repo": "pnpm/pnpm",
+      "title": "fix(store): export CreateNewStoreControllerOptions and include cafile",
+      "closedAt": "2026-09-21T18:53:36Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 11,
+      "ref": "pnpm/pnpm#15153",
+      "repo": "pnpm/pnpm",
+      "title": "feat(manifest): support writing package.yaml",
+      "closedAt": "2026-09-20T11:39:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 12,
+      "ref": "zeroclaw-labs/zeroclaw#9535",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "title": "feat(runtime): anchor context compaction to model window ratio",
+      "closedAt": "2026-09-20T03:41:04Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 13,
+      "ref": "pnpm/pnpm#15119",
+      "repo": "pnpm/pnpm",
+      "title": "fix: signal the script's process group when pnpm has no terminal",
+      "closedAt": "2026-09-19T15:25:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 14,
+      "ref": "pnpm/pnpm#15074",
+      "repo": "pnpm/pnpm",
+      "title": "fix(cargo): read a Cargo config above the workspace through its path",
+      "closedAt": "2026-09-18T19:44:37Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 15,
+      "ref": "DawnLandTeam/dawnland-launcher#107",
+      "repo": "dawnlandteam/dawnland-launcher",
+      "title": "fix: resolve mod dependency false positives and optimize prelaunch checks",
+      "closedAt": "2026-09-17T06:56:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 16,
+      "ref": "pnpm/pnpm#14953",
+      "repo": "pnpm/pnpm",
+      "title": "feat(python): install a workspace project from its own source",
+      "closedAt": "2026-09-16T18:14:26Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 17,
+      "ref": "BoundaryML/baml#4887",
+      "repo": "boundaryml/baml",
+      "title": "chore: more resilient nightly candidate selection",
+      "closedAt": "2026-09-16T01:44:53Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 18,
+      "ref": "AgentWorkforce/burn#511",
+      "repo": "agentworkforce/burn",
+      "title": "Fix #507: warn on stale ledger reads",
+      "closedAt": "2026-09-13T21:03:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 19,
+      "ref": "dobesv/harnx#1875",
+      "repo": "dobesv/harnx",
+      "title": "fix(runtime): recover durable tool invocations after restart",
+      "closedAt": "2026-09-13T19:33:43Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 20,
+      "ref": "armaxri/termiHub#2886",
+      "repo": "armaxri/termihub",
+      "title": "fix(backend): add best-effort drop guards to serial/wsl/telnet/ssh backends (CORE-020)",
+      "closedAt": "2026-09-12T23:42:16Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 21,
+      "ref": "armaxri/termiHub#2816",
+      "repo": "armaxri/termihub",
+      "title": "fix(sftp): make transfer-queue controls honest — no false success",
+      "closedAt": "2026-09-12T01:20:15Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 22,
+      "ref": "armaxri/termiHub#2751",
+      "repo": "armaxri/termihub",
+      "title": "fix: surface/audit remaining swallowed errors + add fireAndForget helper (Closes #2733)",
+      "closedAt": "2026-09-11T03:12:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 23,
+      "ref": "armaxri/termiHub#2732",
+      "repo": "armaxri/termihub",
+      "title": "fix: surface swallowed errors on connection/credential action paths",
+      "closedAt": "2026-09-10T23:02:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 24,
+      "ref": "pnpm/pnpm#14768",
+      "repo": "pnpm/pnpm",
+      "title": "fix(deps-restorer): copy a nested node_modules the filesystem won't rename",
+      "closedAt": "2026-09-10T09:18:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 25,
+      "ref": "pnpm/pnpm#13985",
+      "repo": "pnpm/pnpm",
+      "title": "fix(global): fail closed on incomplete bin ownership",
+      "closedAt": "2026-09-09T15:44:20Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 26,
+      "ref": "pnpm/pnpm#14645",
+      "repo": "pnpm/pnpm",
+      "title": "fix(cli): resolve the working directory to the local prefix",
+      "closedAt": "2026-09-07T07:32:10Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 27,
+      "ref": "pnpm/pnpm#14233",
+      "repo": "pnpm/pnpm",
+      "title": "feat: add pipelines, run records, and Cargo build caching",
+      "closedAt": "2026-09-06T23:02:39Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 28,
+      "ref": "ratazzi/quebec#136",
+      "repo": "ratazzi/quebec",
+      "title": "fix(scheduler): propagate recurring concurrency errors",
+      "closedAt": "2026-09-05T16:24:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 29,
+      "ref": "openfootmanager/openfootmanager#503",
+      "repo": "openfootmanager/openfootmanager",
+      "title": "fix(match): stop the press conference trusting what it is told",
+      "closedAt": "2026-09-04T10:15:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 30,
+      "ref": "pnpm/pnpm#14526",
+      "repo": "pnpm/pnpm",
+      "title": "fix(store): keep CAS blobs on verification failure instead of unlinking them",
+      "closedAt": "2026-09-04T06:53:49Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 31,
+      "ref": "pnpm/pnpm#14499",
+      "repo": "pnpm/pnpm",
+      "title": "fix(package-manager): record a validation baseline that covers the validated manifests",
+      "closedAt": "2026-09-03T13:35:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 32,
+      "ref": "goldsky-io/streamling#106",
+      "repo": "goldsky-io/streamling",
+      "title": "perf(dynamic-table): Arrow-backed collision-free key set for the postgres cache",
+      "closedAt": "2026-09-03T06:20:29Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 33,
+      "ref": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "repo": "void-technology-inc/pybun",
+      "title": "fix: propagate/surface silently swallowed errors (Issue #386)",
+      "closedAt": "2026-09-02T22:35:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 34,
+      "ref": "pnpm/pnpm#14454",
+      "repo": "pnpm/pnpm",
+      "title": "fix(cli): keep detached children alive when pnpm is launched by Node",
+      "closedAt": "2026-09-02T11:49:29Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 35,
+      "ref": "oven-sh/bun#34552",
+      "repo": "oven-sh/bun",
+      "title": "test/bundler: stop silently dropping every itBundled test on Windows",
+      "closedAt": "2026-08-29T05:04:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 36,
+      "ref": "mandubian/autonoetic#1217",
+      "repo": "mandubian/autonoetic",
+      "title": "feat(web): visibility parity batch — promotion verdicts, LLM activity, credential prompt, labels panel",
+      "closedAt": "2026-08-28T20:26:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 37,
+      "ref": "pnpm/pnpm#14259",
+      "repo": "pnpm/pnpm",
+      "title": "feat: persist verified remote build artifacts",
+      "closedAt": "2026-08-27T23:22:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 38,
+      "ref": "pnpm/pnpm#14242",
+      "repo": "pnpm/pnpm",
+      "title": "fix(fs.hard-link-dir): fill the destination in place",
+      "closedAt": "2026-08-27T19:37:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 39,
+      "ref": "pnpm/pnpm#14189",
+      "repo": "pnpm/pnpm",
+      "title": "perf: reuse store content when restoring a remote build",
+      "closedAt": "2026-08-27T16:11:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 40,
+      "ref": "pnpm/pnpm#14215",
+      "repo": "pnpm/pnpm",
+      "title": "refactor: extract workspace task scheduler",
+      "closedAt": "2026-08-27T09:58:02Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 41,
+      "ref": "pnpm/pnpm#14209",
+      "repo": "pnpm/pnpm",
+      "title": "feat: workspace task orchestration (RFC 23)",
+      "closedAt": "2026-08-27T00:41:03Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 42,
+      "ref": "pnpm/pnpm#14167",
+      "repo": "pnpm/pnpm",
+      "title": "feat(init): pin the latest pnpm version, not the running one",
+      "closedAt": "2026-08-25T16:25:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 43,
+      "ref": "pnpm/pnpm#14140",
+      "repo": "pnpm/pnpm",
+      "title": "feat(stage): approve staged packages interactively with one OTP",
+      "closedAt": "2026-08-24T22:10:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 44,
+      "ref": "oneiron-dev/oneiron#738",
+      "repo": "oneiron-dev/oneiron",
+      "title": "W5.5: store → directory module (move-only)",
+      "closedAt": "2026-08-24T12:43:50Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 45,
+      "ref": "oneiron-dev/oneiron#730",
+      "repo": "oneiron-dev/oneiron",
+      "title": "W5.5: task_verb → directory module (move-only)",
+      "closedAt": "2026-08-24T12:43:43Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 46,
+      "ref": "oven-sh/bun#40251",
+      "repo": "oven-sh/bun",
+      "title": "Remove redundant exception checks that follow already-checked calls",
+      "closedAt": "2026-08-24T01:49:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 47,
+      "ref": "pnpm/pnpm#14109",
+      "repo": "pnpm/pnpm",
+      "title": "feat(config): honor the settings the Rust CLI only recognized",
+      "closedAt": "2026-08-23T14:39:50Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 48,
+      "ref": "pnpm/pnpm#14076",
+      "repo": "pnpm/pnpm",
+      "title": "fix(cli): suggest and preserve project-aware shims",
+      "closedAt": "2026-08-23T12:36:30Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 49,
+      "ref": "qdrant/qdrant#10296",
+      "repo": "qdrant/qdrant",
+      "title": "feat: add a dedicated min operator to score formulas",
+      "closedAt": "2026-08-21T17:21:45Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 50,
+      "ref": "zeroclaw-labs/zeroclaw#9194",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "title": "feat(secrets): extract KeySource trait + FileKeySource backend",
+      "closedAt": "2026-08-20T02:32:10Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 51,
+      "ref": "beboite/boite-legacy#187",
+      "repo": "beboite/boite-legacy",
+      "title": "Fix what the audit found: cross-platform project roots, swallowed errors, advisory gate",
+      "closedAt": "2026-08-20T01:07:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 52,
+      "ref": "pnpm/pnpm#14012",
+      "repo": "pnpm/pnpm",
+      "title": "perf(link): prefer hardlink over clone in Auto on Linux",
+      "closedAt": "2026-08-19T13:09:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 53,
+      "ref": "oven-sh/bun#35863",
+      "repo": "oven-sh/bun",
+      "title": "bun test: stop panicking on a path argument or tree entry longer than the path buffer",
+      "closedAt": "2026-08-18T21:16:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 54,
+      "ref": "oven-sh/bun#29642",
+      "repo": "oven-sh/bun",
+      "title": "Fix crash and dropped properties in Bun.inspect when a property lookup or getPrototypeOf throws during the property walk",
+      "closedAt": "2026-08-18T04:31:41Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 55,
+      "ref": "oven-sh/bun#37673",
+      "repo": "oven-sh/bun",
+      "title": "tls: deliver application data written before the handshake over a Duplex or named pipe",
+      "closedAt": "2026-08-18T00:19:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 56,
+      "ref": "anchapin/fluxion#3078",
+      "repo": "anchapin/fluxion",
+      "title": "fix(hygiene): untrack 104 stale .agents/ files + extend check_root_hygiene.py (closes #3076)",
+      "closedAt": "2026-08-17T04:36:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 57,
+      "ref": "pnpm/pnpm#13931",
+      "repo": "pnpm/pnpm",
+      "title": "feat(gvs): restore NODE_PATH resolution for scripts, ESM included",
+      "closedAt": "2026-08-16T09:20:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 58,
+      "ref": "anchapin/fluxion#3008",
+      "repo": "anchapin/fluxion",
+      "title": "fix(security): resolve #2911 — validate NaN/Inf + physical-range bounds in fluxion-wasm f64 setters",
+      "closedAt": "2026-08-15T05:52:27Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 59,
+      "ref": "oven-sh/bun#37352",
+      "repo": "oven-sh/bun",
+      "title": "Bump WebKit to 3997b59485da",
+      "closedAt": "2026-08-11T23:46:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 60,
+      "ref": "Diogo-Esteves/polyVocal#60",
+      "repo": "diogo-esteves/polyvocal",
+      "title": "fix: audio pipeline drops speech, buffers unboundedly, swallows errors",
+      "closedAt": "2026-08-11T23:06:35Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 61,
+      "ref": "pnpm/pnpm#13633",
+      "repo": "pnpm/pnpm",
+      "title": "fix(global): switch global installs over atomically",
+      "closedAt": "2026-08-11T09:21:01Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 62,
+      "ref": "pnpm/pnpm#13634",
+      "repo": "pnpm/pnpm",
+      "title": "fix(pacquet): keep filtered workspace links shallow",
+      "closedAt": "2026-08-10T22:00:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 63,
+      "ref": "vybestack/llxprt-jefe#688",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Make multiplexer identity config-authoritative",
+      "closedAt": "2026-08-07T15:21:06Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 64,
+      "ref": "oven-sh/bun#31831",
+      "repo": "oven-sh/bun",
+      "title": "process: port Node.js v26.3.0 process compatibility tests and fix the gaps they surface (env exotic-object/TZ semantics, warnings pipeline + CLI flags, uncaught origin/exit codes, execve throw, threadCpuUsage/finalization/loadEnvFile, native-module identity; +26 tests)",
+      "closedAt": "2026-08-07T03:56:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 65,
+      "ref": "zeroclaw-labs/zeroclaw#9741",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "title": "ci(container): validate canonical all-features image",
+      "closedAt": "2026-08-07T02:46:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 66,
+      "ref": "oneiron-dev/oneiron#604",
+      "repo": "oneiron-dev/oneiron",
+      "title": "ONE-1447 [SKILL-CONV-2] stale-fold deletion hook",
+      "closedAt": "2026-08-06T07:23:33Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 67,
+      "ref": "vybestack/llxprt-jefe#686",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Key the multiplexer on the installation, not the machine (#547)",
+      "closedAt": "2026-08-06T05:56:26Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 68,
+      "ref": "dsx-ai-factory/infra-controller#4608",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "docs: pull our failure-boundary guidance into STYLE_GUIDE.md",
+      "closedAt": "2026-08-05T23:41:01Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 69,
+      "ref": "oven-sh/bun#36972",
+      "repo": "oven-sh/bun",
+      "title": "install: add install.hoist to disable the isolated linker's hoisted fallback directory",
+      "closedAt": "2026-08-05T19:51:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 70,
+      "ref": "pnpm/pnpm#13658",
+      "repo": "pnpm/pnpm",
+      "title": "fix: materialize and hash `link:` dependencies in virtual-store slots",
+      "closedAt": "2026-08-05T11:54:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 71,
+      "ref": "Extra-Chill/homeboy#11562",
+      "repo": "extra-chill/homeboy",
+      "title": "fix(runner): report unverifiable daemons as unverified, not healthy",
+      "closedAt": "2026-08-05T02:04:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 72,
+      "ref": "pnpm/pnpm#13648",
+      "repo": "pnpm/pnpm",
+      "title": "fix(pacquet): make the global virtual store safe to share, and reachable from the Node API",
+      "closedAt": "2026-08-05T00:01:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 73,
+      "ref": "cavi-ai/bobby-browser#163",
+      "repo": "cavi-ai/bobby-browser",
+      "title": "fix: six more gap-audit findings (validation stub, leak paths, swallowed errors)",
+      "closedAt": "2026-08-04T21:19:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 74,
+      "ref": "oven-sh/bun#32832",
+      "repo": "oven-sh/bun",
+      "title": "node:http2: don't kill the process on a malformed HEADERS block sent to a server",
+      "closedAt": "2026-08-04T07:38:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 75,
+      "ref": "oven-sh/bun#36840",
+      "repo": "oven-sh/bun",
+      "title": "sql(postgres): honour PGSSLMODE from the environment",
+      "closedAt": "2026-08-04T04:42:30Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 76,
+      "ref": "pnpm/pnpm#13528",
+      "repo": "pnpm/pnpm",
+      "title": "feat(lockfile): key named-registry packages by their registry",
+      "closedAt": "2026-08-02T14:52:29Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 77,
+      "ref": "iii-hq/workers#653",
+      "repo": "iii-hq/workers",
+      "title": "(MOT-4231) feat(state): add atomic harness control-plane primitives",
+      "closedAt": "2026-07-31T18:11:08Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 78,
+      "ref": "dsx-ai-factory/infra-controller#2134",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "feat(rest-api): Tenant TargetedInstanceCreation capability implementation",
+      "closedAt": "2026-07-30T17:11:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 79,
+      "ref": "dobesv/harnx#1277",
+      "repo": "dobesv/harnx",
+      "title": "feat(grep): add native harnx-vercel-grep-server MCP server",
+      "closedAt": "2026-07-30T02:19:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 80,
+      "ref": "oven-sh/bun#35246",
+      "repo": "oven-sh/bun",
+      "title": "bun:ffi: use the engine-native FFI when available",
+      "closedAt": "2026-07-29T11:37:34Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 81,
+      "ref": "dolang-org/dolang#337",
+      "repo": "dolang-org/dolang",
+      "title": "Avoid swallowing error output from unknown docker errors",
+      "closedAt": "2026-07-29T01:56:54Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 82,
+      "ref": "risingwavelabs/risingwave#26399",
+      "repo": "risingwavelabs/risingwave",
+      "title": "fix(common): make Timestamptz representability a construction-time invariant",
+      "closedAt": "2026-07-28T22:27:04Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 83,
+      "ref": "pnpm/pnpm#13464",
+      "repo": "pnpm/pnpm",
+      "title": "perf: reuse lockfile entries for safe override updates",
+      "closedAt": "2026-07-28T21:51:23Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 84,
+      "ref": "dsx-ai-factory/infra-controller#4206",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "feat: Bring TUI to generated command parity",
+      "closedAt": "2026-07-28T21:27:37Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 85,
+      "ref": "getappz/agentflare#357",
+      "repo": "getappz/agentflare",
+      "title": "fix(asset): close staging symlink/TOCTOU bypass, log swallowed blob-reclaim errors",
+      "closedAt": "2026-07-28T08:35:17Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 86,
+      "ref": "vybestack/llxprt-jefe#488",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Bound and trust local Unix process probe subprocesses (Fixes #400)",
+      "closedAt": "2026-07-28T05:37:27Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 87,
+      "ref": "vybestack/llxprt-jefe#469",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Replace portable shell and Make automation with cross-platform Rust xtask (Fixes #459)",
+      "closedAt": "2026-07-27T16:24:03Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 88,
+      "ref": "vybestack/llxprt-jefe#466",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Port llxprt-code pr-review GitHub Action to jefe (Fixes #451)",
+      "closedAt": "2026-07-27T12:18:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 89,
+      "ref": "vybestack/llxprt-jefe#453",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Re-sync jefe CI OCR review with newer llxprt-code OCR rigor (Fixes #449)",
+      "closedAt": "2026-07-27T12:15:58Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 90,
+      "ref": "mandubian/autonoetic#901",
+      "repo": "mandubian/autonoetic",
+      "title": "fix(agent-messaging): gate liveness on the session path; resolve existence via alias registry",
+      "closedAt": "2026-07-27T09:36:57Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 91,
+      "ref": "qdrant/qdrant#9673",
+      "repo": "qdrant/qdrant",
+      "title": "Add Logstore and Blobstore wrapper",
+      "closedAt": "2026-07-26T18:23:29Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 92,
+      "ref": "vybestack/llxprt-jefe#416",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Reap orphaned Windows worker trees on dead psmux panes (Fixes #332)",
+      "closedAt": "2026-07-26T03:49:45Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 93,
+      "ref": "pnpm/pnpm#13375",
+      "repo": "pnpm/pnpm",
+      "title": "fix(cli): close the six pnpm-12-on-n8n defects",
+      "closedAt": "2026-07-25T18:34:26Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 94,
+      "ref": "Smicry/rosregview#5",
+      "repo": "smicry/rosregview",
+      "title": "[ROSREGVIEW] Optimization pass: compactness, consistency, robustness",
+      "closedAt": "2026-07-25T18:21:35Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 95,
+      "ref": "dsx-ai-factory/infra-controller#4163",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "feat: instrument scout firmware and mlx observations",
+      "closedAt": "2026-07-25T15:37:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 96,
+      "ref": "oven-sh/bun#31827",
+      "repo": "oven-sh/bun",
+      "title": "node:repl: replace the stub with Node v26.3.0's REPL — v26 readline stack, acorn recoverable-parse + top-level await, completion, history, --interactive (82 vendored upstream tests)",
+      "closedAt": "2026-07-25T03:02:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 97,
+      "ref": "oven-sh/bun#34444",
+      "repo": "oven-sh/bun",
+      "title": "node:test: run(), expectFailure, and Node v26.3.0 skip/todo semantics",
+      "closedAt": "2026-07-24T04:28:41Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 98,
+      "ref": "vybestack/llxprt-jefe#402",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Add deterministic schema-1 real-PTY harness (Fixes #380)",
+      "closedAt": "2026-07-24T04:16:41Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 99,
+      "ref": "pnpm/pnpm#12841",
+      "repo": "pnpm/pnpm",
+      "title": "fix(setup): persist GitHub Actions env files",
+      "closedAt": "2026-07-24T00:42:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 100,
+      "ref": "0xckruger/arbiter_v2#3",
+      "repo": "0xckruger/arbiter_v2",
+      "title": "Test decoder price math; remove fake V3 simulate_swap",
+      "closedAt": "2026-07-23T23:55:11Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 101,
+      "ref": "goldsky-io/streamling#68",
+      "repo": "goldsky-io/streamling",
+      "title": "feat: add opt-in Postgres dynamic table cache",
+      "closedAt": "2026-07-23T21:33:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 102,
+      "ref": "pnpm/pnpm#13234",
+      "repo": "pnpm/pnpm",
+      "title": "fix(pacquet): don't resolve workspace/link/file deps against the registry under update --latest",
+      "closedAt": "2026-07-23T15:01:51Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 103,
+      "ref": "oven-sh/bun#35088",
+      "repo": "oven-sh/bun",
+      "title": "Bun.serve: drain a tryEnd response tail before closing on peer FIN",
+      "closedAt": "2026-07-23T04:52:25Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 104,
+      "ref": "vybestack/llxprt-jefe#401",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Keep multiplexer work outside shared runtime lock (Fixes #374)",
+      "closedAt": "2026-07-23T04:30:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 105,
+      "ref": "pnpm/pnpm#13198",
+      "repo": "pnpm/pnpm",
+      "title": "feat(update): update GitHub Actions dependencies",
+      "closedAt": "2026-07-21T22:41:31Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 106,
+      "ref": "pnpm/pnpm#13202",
+      "repo": "pnpm/pnpm",
+      "title": "feat(pacquet): support recursive outdated queries",
+      "closedAt": "2026-07-21T22:13:58Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 107,
+      "ref": "pnpm/pnpm#13195",
+      "repo": "pnpm/pnpm",
+      "title": "feat(update): generate changesets for dependency updates",
+      "closedAt": "2026-07-21T21:48:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 108,
+      "ref": "SG-devel/tailtriage#1097",
+      "repo": "sg-devel/tailtriage",
+      "title": "Simplify tracing live session API",
+      "closedAt": "2026-07-21T21:13:25Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 109,
+      "ref": "pnpm/pnpm#13197",
+      "repo": "pnpm/pnpm",
+      "title": "feat(config): add update and audit settings sections superseding updateConfig, auditConfig, and auditLevel",
+      "closedAt": "2026-07-21T20:28:44Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 110,
+      "ref": "Extra-Chill/homeboy#9526",
+      "repo": "extra-chill/homeboy",
+      "title": "fix(audit): command_wrapper_bypass exempts sibling thin wrappers with different return contracts",
+      "closedAt": "2026-07-21T16:30:37Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 111,
+      "ref": "oven-sh/bun#34782",
+      "repo": "oven-sh/bun",
+      "title": "ci: single arm64 debian-13 build host; ThinLTO everywhere; baseline-only x64; rust+link merge; sysroots; WebKit a36c188; rust 2026-07-20",
+      "closedAt": "2026-07-21T09:35:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 112,
+      "ref": "Extra-Chill/homeboy#9321",
+      "repo": "extra-chill/homeboy",
+      "title": "refactor(agents): delegate finalization git_output to canonical run_git",
+      "closedAt": "2026-07-21T00:01:00Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 113,
+      "ref": "armaxri/termiHub#1816",
+      "repo": "armaxri/termihub",
+      "title": "feat(rdp): bind remote-clipboard files to the host OS clipboard + paste UI (Closes #1804)",
+      "closedAt": "2026-07-20T23:39:13Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 114,
+      "ref": "pnpm/pnpm#13173",
+      "repo": "pnpm/pnpm",
+      "title": "feat(package-manager): complete install-state repair paths",
+      "closedAt": "2026-07-20T13:02:01Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 115,
+      "ref": "pnpm/pnpm#13170",
+      "repo": "pnpm/pnpm",
+      "title": "fix: finish global virtual store behavior",
+      "closedAt": "2026-07-20T12:14:07Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 116,
+      "ref": "oven-sh/bun#32746",
+      "repo": "oven-sh/bun",
+      "title": "Bun.serve(http3): fix heap use-after-free when client resets a streaming response",
+      "closedAt": "2026-07-20T00:54:30Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 117,
+      "ref": "pnpm/pnpm#13161",
+      "repo": "pnpm/pnpm",
+      "title": "test(pacquet): complete Stage 10 long-tail ports",
+      "closedAt": "2026-07-19T22:17:38Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 118,
+      "ref": "pnpm/pnpm#13156",
+      "repo": "pnpm/pnpm",
+      "title": "test(pacquet): port the global virtual store suites (stage 5)",
+      "closedAt": "2026-07-19T20:48:18Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 119,
+      "ref": "pnpm/pnpm#13144",
+      "repo": "pnpm/pnpm",
+      "title": "test(pacquet): port the remaining optionalDependencies and installSome suites",
+      "closedAt": "2026-07-19T13:55:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 120,
+      "ref": "pnpm/pnpm#13133",
+      "repo": "pnpm/pnpm",
+      "title": "fix(resolver): condense retained registry metadata to keep large installs in memory",
+      "closedAt": "2026-07-19T07:40:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 121,
+      "ref": "beagleboard/bb-imager-rs#653",
+      "repo": "beagleboard/bb-imager-rs",
+      "title": "bb-flasher-pb2-mspm0: Add inline tests for the sysfs upload state mac…",
+      "closedAt": "2026-07-18T18:59:45Z",
+      "queries": [
+        "error treated as success"
+      ]
+    },
+    {
+      "order": 122,
+      "ref": "TumbleOwlee/ferrowl#127",
+      "repo": "tumbleowlee/ferrowl",
+      "title": "Harden swallowed error paths and tighten dead-code hygiene",
+      "closedAt": "2026-07-18T10:26:08Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 123,
+      "ref": "getappz/agentflare#237",
+      "repo": "getappz/agentflare",
+      "title": "feat(ci): wire LOC-gate into pre-commit hook (staged files only)",
+      "closedAt": "2026-07-18T04:33:22Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 124,
+      "ref": "MarshalX/python-libipld#117",
+      "repo": "marshalx/python-libipld",
+      "title": "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`",
+      "closedAt": "2026-07-18T00:01:47Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 125,
+      "ref": "pnpm/pnpm#13014",
+      "repo": "pnpm/pnpm",
+      "title": "fix(resolver): recover after metadata cache loss",
+      "closedAt": "2026-07-17T20:05:04Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 126,
+      "ref": "getappz/agentflare#229",
+      "repo": "getappz/agentflare",
+      "title": "Propagate silently-swallowed errors in credential/profile writes",
+      "closedAt": "2026-07-17T19:54:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 127,
+      "ref": "pnpm/pnpm#13072",
+      "repo": "pnpm/pnpm",
+      "title": "ci(release): gate releases on a publishable manifest, a real upgrade, and pnpm doctor",
+      "closedAt": "2026-07-17T07:54:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 128,
+      "ref": "dsx-ai-factory/infra-controller#3469",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "feat: surface the swallowed errors across the fleet",
+      "closedAt": "2026-07-16T20:45:08Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 129,
+      "ref": "pnpm/pnpm#13076",
+      "repo": "pnpm/pnpm",
+      "title": "fix(self-update): discard an installed pnpm that cannot run",
+      "closedAt": "2026-07-16T12:38:22Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 130,
+      "ref": "oven-sh/bun#34294",
+      "repo": "oven-sh/bun",
+      "title": "test: use tempDir in log-test.test.ts instead of hardcoded /tmp path",
+      "closedAt": "2026-07-16T03:38:21Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 131,
+      "ref": "vybestack/llxprt-jefe#304",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Complete input responsiveness work left by PR #290 (Fixes #301)",
+      "closedAt": "2026-07-15T05:44:20Z",
+      "queries": [
+        "ignored error",
+        "swallow error"
+      ]
+    },
+    {
+      "order": 132,
+      "ref": "edge-toolkit/core#84",
+      "repo": "edge-toolkit/core",
+      "title": "Fix DeepSource bug-risk alerts",
+      "closedAt": "2026-07-14T07:42:22Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 133,
+      "ref": "vybestack/llxprt-jefe#288",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Fix #261: port local repository workflows to native Windows",
+      "closedAt": "2026-07-14T03:37:50Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 134,
+      "ref": "vybestack/llxprt-jefe#282",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Support upstream issue and PR repositories for forks (Fixes #266)",
+      "closedAt": "2026-07-14T02:17:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 135,
+      "ref": "vybestack/llxprt-jefe#276",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Add issue/PR property editing (labels, assignees, milestone, type, title, state) (Fixes #175)",
+      "closedAt": "2026-07-13T23:54:42Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 136,
+      "ref": "pnpm/pnpm#12925",
+      "repo": "pnpm/pnpm",
+      "title": "fix: kill spawned process trees with taskkill on Windows error exits",
+      "closedAt": "2026-07-13T14:30:02Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 137,
+      "ref": "pnpm/pnpm#12833",
+      "repo": "pnpm/pnpm",
+      "title": "fix(config): allow tokenHelper to be set in the global auth.ini",
+      "closedAt": "2026-07-13T14:05:49Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 138,
+      "ref": "pnpm/pnpm#12876",
+      "repo": "pnpm/pnpm",
+      "title": "feat(overrides): add convergence overrides (\"pkg@\": exact version)",
+      "closedAt": "2026-07-13T14:02:14Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 139,
+      "ref": "Davidslv/cce-rust#168",
+      "repo": "davidslv/cce-rust",
+      "title": "fix: surface swallowed errors — doctor corrupt workspace.yml + code-sync overwrite-guard twin (#126 #163)",
+      "closedAt": "2026-07-11T22:03:06Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 140,
+      "ref": "Davidslv/cce-rust#96",
+      "repo": "davidslv/cce-rust",
+      "title": "fix: sync push race — re-apply on conflicted retry, never report success without publishing (#92)",
+      "closedAt": "2026-07-11T15:00:11Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 141,
+      "ref": "iii-hq/workers#469",
+      "repo": "iii-hq/workers",
+      "title": "(MOT-3955) fix: make subagent approvals and failures visible",
+      "closedAt": "2026-07-11T00:40:53Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 142,
+      "ref": "goldsky-io/streamling#55",
+      "repo": "goldsky-io/streamling",
+      "title": "fix: make the live table schema authoritative for ClickHouse sink writes",
+      "closedAt": "2026-07-10T21:22:32Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 143,
+      "ref": "vybestack/llxprt-jefe#181",
+      "repo": "vybestack/llxprt-jefe",
+      "title": "Make select-to-copy work on forms, choosers, and confirm overlays (Fixes #178)",
+      "closedAt": "2026-07-10T20:44:00Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 144,
+      "ref": "AndreaBozzo/dataprof#370",
+      "repo": "andreabozzo/dataprof",
+      "title": "fix(decode): audit swallowed errors on decode paths",
+      "closedAt": "2026-07-10T18:19:16Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 145,
+      "ref": "pnpm/pnpm#12846",
+      "repo": "pnpm/pnpm",
+      "title": "feat(pacquet): support custom fetchers from pnpmfile",
+      "closedAt": "2026-07-10T14:06:10Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 146,
+      "ref": "liveask/liveask#127",
+      "repo": "liveask/liveask",
+      "title": "fix swallowing error on fetch",
+      "closedAt": "2026-07-10T06:48:05Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 147,
+      "ref": "getappz/agentflare#94",
+      "repo": "getappz/agentflare",
+      "title": "fix: post-1.0.0 code review — ponytail custom skills, auth health scoring, CI defects",
+      "closedAt": "2026-07-08T07:16:19Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 148,
+      "ref": "dsx-ai-factory/infra-controller#3115",
+      "repo": "dsx-ai-factory/infra-controller",
+      "title": "feat: For BF4 get the pf0 mac address from NDF0 path",
+      "closedAt": "2026-07-07T20:01:40Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 149,
+      "ref": "oneiron-dev/oneiron#390",
+      "repo": "oneiron-dev/oneiron",
+      "title": "ONE-1564: verify LinkedIn sends after observation",
+      "closedAt": "2026-07-07T13:30:58Z",
+      "queries": [
+        "ignored error"
+      ]
+    },
+    {
+      "order": 150,
+      "ref": "armaxri/termiHub#1180",
+      "repo": "armaxri/termihub",
+      "title": "fix(tunnel): confirm + feedback on tunnel delete (#1141)",
+      "closedAt": "2026-07-07T08:26:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 151,
+      "ref": "oven-sh/bun#33230",
+      "repo": "oven-sh/bun",
+      "title": "Fix a spurious unhandledRejection when an async iterable Response body throws",
+      "closedAt": "2026-07-06T22:48:56Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 152,
+      "ref": "iii-hq/workers#390",
+      "repo": "iii-hq/workers",
+      "title": "feat(worktree): git worktree lifecycle worker with per-repo land queue and console surface",
+      "closedAt": "2026-07-06T11:43:12Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 153,
+      "ref": "thedoublejay/gather-step#67",
+      "repo": "thedoublejay/gather-step",
+      "title": "feat: v5.11.0 confidence bands, query index-staleness, and telemetry diagnostics",
+      "closedAt": "2026-07-05T02:01:20Z",
+      "queries": [
+        "error treated as success"
+      ]
+    },
+    {
+      "order": 154,
+      "ref": "openfootmanager/openfootmanager#308",
+      "repo": "openfootmanager/openfootmanager",
+      "title": "fix(ui): promoted youth players lingered in the prospects list",
+      "closedAt": "2026-07-04T01:07:09Z",
+      "queries": [
+        "swallow error"
+      ]
+    },
+    {
+      "order": 155,
+      "ref": "git-ai-project/git-ai#1717",
+      "repo": "git-ai-project/git-ai",
+      "title": "[codex] Enforce sqlite memory limits",
+      "closedAt": "2026-07-01T23:38:00Z",
+      "queries": [
+        "propagate error instead of silently"
+      ]
+    },
+    {
+      "order": 156,
+      "ref": "mandubian/autonoetic#706",
+      "repo": "mandubian/autonoetic",
+      "title": "fix(gateway): supersede still-pending plan revision on amend + Session Room gate hygiene",
+      "closedAt": "2026-07-01T09:55:30Z",
+      "queries": [
+        "ignored error"
+      ]
+    }
+  ]
+}

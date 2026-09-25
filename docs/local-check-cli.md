@@ -18,6 +18,7 @@ the sentence has to say depends on its **form** — what the check asks of each 
 |---|---|---|
 | `failure_propagation` (the default) | what must happen when something fails | "If reading an existing integrity baseline fails, the baseline-loading operation must return an error to its caller. It must not return a successful result saying that no baseline exists." |
 | `check_before_action` (experimental) | which action must not happen unless a check passes, naming the action by a word its call carries | "A disabled API key must never create a session." — `create_session(…)` is asked about; `audit(…)` is not |
+| `failure_handling` (experimental, named in the spec only) | what must happen when something fails — the failure may be returned, logged or recorded, and must not be turned silently into a success. A call is worth checking when, under its failure, the function goes on as if it had succeeded and leaves no trace of the failure — an empty or absent value a caller cannot tell from a success, with nothing logged or recorded, counts as no trace | "A failure to write an entry to the audit log must be returned or logged; it must not be dropped." — asked in any function whose callee returns a `Result`, one that returns `()` included ([ADR 0023](adr/0023-a-failure-may-be-handled-not-silenced.md)) |
 
 ```json
 {
@@ -34,12 +35,12 @@ the sentence has to say depends on its **form** — what the check asks of each 
 }
 ```
 
-A spec names the form; a value outside the two stops the run. A requirement read from an issue, a
+A spec names the form; a value outside the three stops the run. A requirement read from an issue, a
 pull request, `--intent` or `--intent-file` names none, so before its calls the run asks Jev once,
 over the sentence alone, which form it says ([ADR 0008](adr/0008-who-chooses-a-requirements-form.md);
 measured first on every requirement sentence this repository holds in a spec, fixture or golden
 file — [below](#how-jev-reads-the-form-of-a-sentence)): the form Jev says at the bar of 0.6,
-`failure_propagation` or `check_before_action`; when Jev reads `neither`, is under the bar, or
+`failure_propagation` or `check_before_action` — `failure_handling` is not offered, and an answer naming it reads as the default; when Jev reads `neither`, is under the bar, or
 gives no answer, the default, `failure_propagation`, as before. The report's form line says which form and who chose it
 (`named in the spec`, `the default`, `Jev read the sentence as this, 0.91`, or the default with
 what Jev read instead), and `--json` carries `formBy`, `formReading` and `formNotAsked` per
@@ -90,15 +91,15 @@ every sentence as `R1`; the run sends the requirement's own id), and its calls a
 the form Jev chose at the bar, or under `failure_propagation` when Jev read neither form or was not
 sure. A spec's requirement is not asked; nor is one on a run that read no function.
 
-| | `failure_propagation` | `check_before_action` |
-|---|---|---|
-| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
-| the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
-| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) |
-| what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
-| against the requirement | `returns_success` | `reaches_it` |
+| | `failure_propagation` | `check_before_action` | `failure_handling` (a spec names it) |
+|---|---|---|---|
+| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own | its callee settles as for `failure_propagation`, whatever the function returns — one that returns `()` included (a sibling of the change still returns a `Result`) |
+| the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made | a failure of this call not be turned silently into a success |
+| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) | as for `failure_propagation`, word for word |
+| what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` | `propagates` / `reports_locally` / `continues_silently` / `cannot_determine` |
+| against the requirement | `returns_success` | `reaches_it` | `continues_silently` |
 
-**Every call asked about is read by one rule, the same for both forms**, into one of four:
+**Every call asked about is read by one rule, the same for every form**, into one of four:
 
 - the requirement `applies` at 0.6 or more, and the function's answer at 0.6 or more is the one
   against the requirement → **worth checking**; the one keeping it → **holding**; anything else
@@ -130,9 +131,10 @@ asks about their calls under a budget of its own, 10 per requirement:
   function or, under a changed function's name, settles nowhere. A function whose calls were cut by
   the per-function cap is not one. At most 20. Its calls are dealt one function at a time in seed
   order, the calls that tied it first.
-- **Seeds and siblings are chosen by returning a `Result`,** under either form. A requirement that a
+- **Seeds and siblings are chosen by returning a `Result`,** under every form. A requirement that a
   check pass before an action is asked about the same siblings, and a helper that returns `()` is no
-  seed for it (#39).
+  seed for it (#39); under `failure_handling`, which asks in a function that returns `()` elsewhere,
+  a sibling still returns a `Result`.
 - **Not reached:** a sibling that shares only a function outside the repository (`fs::…`), or only a
   function written several times as one thing — a trait's method, a function per platform; two hops
   out; a function whose call to a changed trait `impl` settles at the trait's versions, which can be
@@ -385,8 +387,12 @@ without an answer and how many notes say what was not read, in the same numbers 
 title, and the check run is not green. `--json` carries the counts these are drawn from, and per
 requirement `unreached`: the notes, of `notes`, that say something was not read.
 
-Each requirement's section names its form and, after the counts, how the calls read came out. Every
-call read is in exactly one of the first four sections; the label of the function's answer
+Each requirement's section names its form and, after the counts, how the calls read came out, in the
+order a reader decides from ([ADR 0021](adr/0021-the-check-run-holds-what-decides.md)): *Worth
+checking*, *Not settled*, the requirement's *Notes*, and then the audit — *Read as holding*, *Read,
+but not required of by the requirement*, *Every call read* and *Not checked*. Every call read is in
+exactly one of *Worth checking*, *Not settled*, *Read as holding* and *Read, but not required of*; the
+label of the function's answer
 (`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and
 `when that call fails` / `in the case the requirement forbids it` in the list of calls read) is the
 form's.
@@ -394,11 +400,18 @@ form's.
 | section | what it holds |
 |---|---|
 | **Worth checking** | the requirement read as applying, and the function's answer against it, both over the bar |
-| **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
-| **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
-| **Read, but not required of by the requirement** | `does_not_apply` over the bar |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
+| **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which, with both answers and the bodies sent with it |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
+| **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
+| **Read, but not required of by the requirement** | `does_not_apply` over the bar |
+| **Every call read** | each call read, with the function's answer and the bodies sent with it |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
+
+The command prints all of it. The GitHub Action's check run and job summary print everything up to
+the audit, and in its place one line of counts — so many read as holding, so many not required of,
+so many not checked — and the report's first line says the reasons are in the full report, which is
+`report.md` in the Action's artifact. A requirement that read no call keeps its *Not checked* lines
+in both.
 
 None of the four is a requirement verdict: each is what two answers about one call came to. A
 listed call rests on two Jev readings that do not check each other. Everything either of them used
@@ -1520,6 +1533,48 @@ What this does not measure:
   argument from the code above.
 - Any pull request of this tool's author's repositories: the 17 entries of `yottayoshida/omamori`
   are issues.
+
+### `failure_handling`, measured before it was wired (#85)
+
+**The form's observation question tells a function that drops a failure from one that logs it and
+goes on, and from one that returns it — on these four places, three runs of three each.** The question
+is `src/plan/handling.ts`'s, sent on the packets the run builds, before the form was wired; the versions,
+the expected answers and the lines were committed first (packets built as the run builds them, with one fixed requirement sentence; `bench/handling/probe.json`, log
+`bench/logs/handling-probe-v1.json`, `typesafe/jev` on Cloudflare, 2026-09-25). *reported* is a
+defect version with the failure logged where it is dropped; *decoy* is a defect version with a line
+that logs something else in the same function, the failure still dropped; moltis#1064's
+`generate_title`, as its defect version has it, already logs the failure and records a metric before
+returning an empty title (*logged*), and *silent* takes those two away.
+
+| place | shipped | rewrite | defect | reported | decoy |
+|---|---|---|---|---|---|
+| grovedb#500 `finalize` → `rewrite_heights` | propagates 3/3 (0.99) | propagates 3/3 (1.00) | continues_silently 3/3 (0.87–0.89) | reports_locally 3/3 (0.97) | continues_silently 3/3 (0.88–0.92) |
+| moltis#1064 `generate_title_for_session` → `generate_title` | propagates 3/3 (0.99–1.00) | propagates 3/3 (1.00) | continues_silently 3/3 (0.90–0.95) | reports_locally 3/3 (1.00) | continues_silently 3/3 (0.93–0.95) |
+| moltis#1064 `dispatch_command` → `handle_title` | propagates 3/3 (0.99) | — | continues_silently 3/3 (1.00) | reports_locally 3/3 (0.98–0.99) | continues_silently 3/3 (1.00) |
+| moltis#1064 `generate_title` → `complete` | propagates 3/3 (0.98–0.99) | — | *logged*: reports_locally 3/3 (0.98) | — | *silent*: continues_silently 3/3 (0.99) |
+
+Both lines hold: every version that is not shipped or rewritten got its expected answer at the bar in
+three runs of three, and no shipped or rewritten version was answered `continues_silently`. What this
+does not show: how it answers in a function that returns `()` — all four functions here return a
+`Result`, and the form asks in one that does not, which the probe did not reach — nor how the form does on pull requests it was not built on, its mapping question (not sent
+by the probe), or how often it lists a call that is not a defect there. Two repositories and four
+places are the whole of it; the form is used only where a spec names it.
+
+<!-- forms-85:begin -->
+Which requirements the new sentence can write is recorded apart, and is no gate (`bench/eval/forms-85/`,
+fixed before any judgment; `bench/eval/forms-85.json`): for each of the evaluation pool's 91 labelled
+rows, three fresh annotators per form, in separate sessions, read the pull request's and its issues' text
+and said whether its requirement could be written as `failure_propagation` (a) and, apart, as
+`failure_handling` (a′). On the rows of Rust repositories whose code before the fix swallowed the
+failure (`swallows_as_success`, 37 rows, 23 repositories), (a) could write 21 (56.8 %, mean over
+repositories 52.7 %) and (a) or (a′) 28 (75.7 %, mean 64.9 %); on every row not labelled
+`not_failure_handling` (67 rows, 35 repositories, `other` and `cannot_label` among them), 32 and 43. Agreement: (a) unanimous on 72 rows, (a′) on 81; the annotators'
+(a) says what the case choice's own verdict said on 57 of the 70 rows that have one. This counts
+sentences, not what the run reaches: whether the tool reaches the call in those pull requests is not
+measured. The six annotators worked in one directory, and one kept its notes there; no other
+annotator's quotes match those notes on more than 31 rows of 91, which the same sentence of a pull
+request, quoted twice, would also give — that nothing was read across is not shown.
+<!-- forms-85:end -->
 
 ### How Jev reads the form of a sentence
 

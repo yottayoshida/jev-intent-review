@@ -1,0 +1,15 @@
+diff --git a/merk/src/merk/restore.rs b/merk/src/merk/restore.rs
+index 7f0dd6c3..8f2aa56d 100644
+--- a/merk/src/merk/restore.rs
++++ b/merk/src/merk/restore.rs
+@@ -521,7 +521,9 @@ impl<'db, S: StorageContext<'db>> Restorer<S> {
+ 
+         // if height values are wrong, rewrite height
+         if self.verify_height(grove_version).is_err() {
+-            let _ = self.rewrite_heights(grove_version);
++            if let Err(e) = self.rewrite_heights(grove_version) {
++                eprintln!("finalize: rewriting tree heights failed: {e}");
++            }
+             // update the root node after height rewrite
+             self.merk
+                 .load_base_root(

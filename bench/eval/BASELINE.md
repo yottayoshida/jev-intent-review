@@ -20,7 +20,7 @@ to the diff; it gets the files around the change, gathered by the rule below.
 The two ideas the tool spends its complexity on answer on different defects, so the result is read
 apart as well as together: **A**, a defect in a function the pull request changed (inside the diff), is
 where small typed questions differ from one free-form review; **B**, a defect in an unchanged caller of
-a changed function, is where reaching beyond the diff differs. `PROTOCOL.md` rule 5 builds both.
+a changed function, is where reaching beyond the diff differs. `PROTOCOL.md` rule 6 builds both.
 
 **The sealed set is chosen for the supported surface.** It is not a sample of code review in general,
 and no claim here is about code review in general.
