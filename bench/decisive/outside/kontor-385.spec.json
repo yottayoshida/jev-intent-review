@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "kontorprotocol/kontor#385 — a check-before-action requirement written for the outside line of #82's probe of the words (version 3)",
+  "summary": "Written on 2026-09-25 after reading make_value in core/indexer/src/reactor/batches.rs at the pull request's head, before any request of version 3: the batch is validated only when some transaction is pending (txs.is_empty() returns Ok(None) first).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A batch must not be validated when no transaction is pending.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["validate_batch"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

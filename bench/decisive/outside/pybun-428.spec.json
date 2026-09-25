@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "pybun#428 — a check-before-action requirement written for the outside line of #82's probe of the words (version 3)",
+  "summary": "Written on 2026-09-25 after reading collect_inputs_recursive in src/build.rs at the pull request's head, before any request of version 3: a directory in the ignore set is skipped (ignore.contains) before its inputs are collected.",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The inputs of a directory in the ignore set must not be collected.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["collect_inputs_recursive"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}
