@@ -24,6 +24,8 @@ and the gates count both. Version 1 had one defect of any place. Nothing was mea
 | `sealed-access.jsonl` | every opening of the sealed set and every result. Lines are only ever added |
 | `metrics.ts` | the metrics, the interval, the gates |
 | `run.ts` | the one entry: `--set dev` and `--set sealed` |
+| `drift.ts`, `drift/` | Jev's drift on the dev set: its questions frozen, sent again, and compared with a baseline taken on two days (`#87`, rule in `drift/README.md`). Dev only; a sealed replay is a sealed opening |
+| `BASELINE.md`, `baseline.ts`, `compare.ts` | the comparison with a frontier model (`#88`): a baseline given the same bytes in one request, scored the same way, and the gate on the difference |
 
 ## Dev and sealed
 
