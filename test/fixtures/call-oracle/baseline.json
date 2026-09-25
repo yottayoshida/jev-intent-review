@@ -1,0 +1,985 @@
+[
+ {
+  "path": "comments.rs",
+  "calls": [
+   {
+    "callee": "real",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "real",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "other",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "other",
+    "line": 7,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 3,
+    "column": 15,
+    "callee": "old_call",
+    "class": "false_positive",
+    "reason": "comment"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 4,
+    "column": 4,
+    "callee": "real",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 5,
+    "column": 13,
+    "callee": "not_a_call",
+    "class": "false_positive",
+    "reason": "string"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 7,
+    "column": 4,
+    "callee": "other",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 7,
+    "column": 17,
+    "callee": "trailing_note",
+    "class": "false_positive",
+    "reason": "comment"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "constructors.rs",
+  "calls": [
+   {
+    "callee": "zero",
+    "capitalized": false,
+    "column": 16,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "zero",
+    "line": 6,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "E::A",
+    "capitalized": true,
+    "column": 15,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "A",
+    "line": 8,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "drop",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "drop",
+    "line": 9,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "Ok",
+    "capitalized": true,
+    "column": 4,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "Ok",
+    "line": 10,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "declared_exclusion"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 5,
+    "column": 11,
+    "callee": "E::A",
+    "class": "false_positive",
+    "reason": "pattern"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 6,
+    "column": 16,
+    "callee": "zero",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 8,
+    "column": 15,
+    "callee": "E::A",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 9,
+    "column": 4,
+    "callee": "drop",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "macro_names.rs",
+  "calls": [
+   {
+    "callee": "unwrap",
+    "capitalized": false,
+    "column": 20,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "unwrap",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "write",
+    "capitalized": false,
+    "column": 8,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "write",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss",
+    "macroNameCollision": true
+   },
+   {
+    "callee": "format",
+    "capitalized": false,
+    "column": 12,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "format",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss",
+    "macroNameCollision": true
+   },
+   {
+    "callee": "to_string",
+    "capitalized": false,
+    "column": 31,
+    "fn": {
+     "line": 9,
+     "name": "format"
+    },
+    "kind": "method",
+    "last": "to_string",
+    "line": 9,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 4,
+    "column": 20,
+    "callee": "unwrap",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 7,
+    "column": 17,
+    "callee": "compute",
+    "class": "in_macro"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "multiline.rs",
+  "calls": [
+   {
+    "callee": "compute",
+    "capitalized": false,
+    "column": 12,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "compute",
+    "line": 3,
+    "multiline": true,
+    "turbofish": "none",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "build",
+    "capitalized": false,
+    "column": 9,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "build",
+    "line": 7,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "with",
+    "capitalized": false,
+    "column": 9,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "with",
+    "line": 6,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "builder",
+    "capitalized": false,
+    "column": 12,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "builder",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "g",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "g",
+    "line": 8,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 5,
+    "column": 12,
+    "callee": "builder",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 6,
+    "column": 9,
+    "callee": "with",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 7,
+    "column": 9,
+    "callee": "build",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 8,
+    "column": 4,
+    "callee": "g",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "nested.rs",
+  "calls": [
+   {
+    "callee": "deep",
+    "capitalized": false,
+    "column": 8,
+    "fn": {
+     "line": 3,
+     "name": "inner"
+    },
+    "kind": "path",
+    "last": "deep",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "inner",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "outer"
+    },
+    "kind": "path",
+    "last": "inner",
+    "line": 6,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "helper",
+    "capitalized": false,
+    "column": 20,
+    "fn": {
+     "line": 2,
+     "name": "outer"
+    },
+    "kind": "path",
+    "last": "helper",
+    "line": 7,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "outer",
+     "line": 2
+    },
+    "line": 3,
+    "column": 7,
+    "callee": "inner",
+    "class": "false_positive",
+    "reason": "definition"
+   },
+   {
+    "fn": {
+     "name": "outer",
+     "line": 2
+    },
+    "line": 4,
+    "column": 8,
+    "callee": "deep",
+    "class": "false_positive",
+    "reason": "duplicate"
+   },
+   {
+    "fn": {
+     "name": "outer",
+     "line": 2
+    },
+    "line": 6,
+    "column": 4,
+    "callee": "inner",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "outer",
+     "line": 2
+    },
+    "line": 7,
+    "column": 20,
+    "callee": "helper",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "inner",
+     "line": 3
+    },
+    "line": 4,
+    "column": 8,
+    "callee": "deep",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "one_line.rs",
+  "calls": [
+   {
+    "callee": "foo",
+    "capitalized": false,
+    "column": 9,
+    "fn": {
+     "line": 2,
+     "name": "a"
+    },
+    "kind": "path",
+    "last": "foo",
+    "line": 2,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "bar",
+    "capitalized": false,
+    "column": 15,
+    "fn": {
+     "line": 3,
+     "name": "b"
+    },
+    "kind": "path",
+    "last": "bar",
+    "line": 3,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   }
+  ],
+  "candidates": [],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "other_callee.rs",
+  "calls": [
+   {
+    "callee": "",
+    "capitalized": false,
+    "column": 16,
+    "fn": {
+     "line": 4,
+     "name": "go"
+    },
+    "kind": "other",
+    "last": "",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "",
+    "capitalized": false,
+    "column": 28,
+    "fn": {
+     "line": 4,
+     "name": "go"
+    },
+    "kind": "other",
+    "last": "",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "make",
+    "capitalized": false,
+    "column": 22,
+    "fn": {
+     "line": 4,
+     "name": "go"
+    },
+    "kind": "path",
+    "last": "make",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "go",
+     "line": 4
+    },
+    "line": 5,
+    "column": 22,
+    "callee": "make",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "raw.rs",
+  "calls": [
+   {
+    "callee": "type",
+    "capitalized": false,
+    "column": 14,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "type",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "match",
+    "capitalized": false,
+    "column": 8,
+    "fn": {
+     "line": 3,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "match",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "silent_miss"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 4,
+    "column": 14,
+    "callee": "type",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "tests_and_cfg.rs",
+  "calls": [
+   {
+    "callee": "work",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "live"
+    },
+    "kind": "path",
+    "last": "work",
+    "line": 3,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "live",
+     "line": 2
+    },
+    "line": 3,
+    "column": 4,
+    "callee": "work",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "top_level_test",
+     "line": 12
+    },
+    "line": 13,
+    "column": 4,
+    "callee": "check",
+    "class": "false_positive",
+    "reason": "test_only"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "traits.rs",
+  "calls": [
+   {
+    "callee": "pow",
+    "capitalized": false,
+    "column": 19,
+    "fn": {
+     "line": 4,
+     "name": "def"
+    },
+    "kind": "method",
+    "last": "pow",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "req",
+    "capitalized": false,
+    "column": 13,
+    "fn": {
+     "line": 4,
+     "name": "def"
+    },
+    "kind": "method",
+    "last": "req",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "def",
+     "line": 4
+    },
+    "line": 5,
+    "column": 13,
+    "callee": "req",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "def",
+     "line": 4
+    },
+    "line": 5,
+    "column": 19,
+    "callee": "pow",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "turbofish.rs",
+  "calls": [
+   {
+    "callee": "foo",
+    "capitalized": false,
+    "column": 12,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "foo",
+    "line": 3,
+    "multiline": false,
+    "turbofish": "last",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "Vec::new",
+    "capitalized": false,
+    "column": 23,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "new",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "inner",
+    "class": "detected"
+   },
+   {
+    "callee": "collect",
+    "capitalized": false,
+    "column": 26,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "method",
+    "last": "collect",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "last",
+    "class": "silent_miss"
+   },
+   {
+    "callee": "it",
+    "capitalized": false,
+    "column": 21,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "it",
+    "line": 5,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "bar",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "f"
+    },
+    "kind": "path",
+    "last": "bar",
+    "line": 6,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 4,
+    "column": 23,
+    "callee": "new",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 5,
+    "column": 21,
+    "callee": "it",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 6,
+    "column": 4,
+    "callee": "bar",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "types.rs",
+  "calls": [
+   {
+    "callee": "g",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "run"
+    },
+    "kind": "path",
+    "last": "g",
+    "line": 4,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "run",
+     "line": 2
+    },
+    "line": 3,
+    "column": 16,
+    "callee": "Fn",
+    "class": "false_positive",
+    "reason": "type"
+   },
+   {
+    "fn": {
+     "name": "run",
+     "line": 2
+    },
+    "line": 4,
+    "column": 4,
+    "callee": "g",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ },
+ {
+  "path": "where_clause.rs",
+  "calls": [
+   {
+    "callee": "into",
+    "capitalized": false,
+    "column": 14,
+    "fn": {
+     "line": 2,
+     "name": "generic"
+    },
+    "kind": "method",
+    "last": "into",
+    "line": 6,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   },
+   {
+    "callee": "add",
+    "capitalized": false,
+    "column": 4,
+    "fn": {
+     "line": 2,
+     "name": "generic"
+    },
+    "kind": "path",
+    "last": "add",
+    "line": 7,
+    "multiline": false,
+    "turbofish": "none",
+    "class": "detected"
+   }
+  ],
+  "candidates": [
+   {
+    "fn": {
+     "name": "generic",
+     "line": 2
+    },
+    "line": 6,
+    "column": 14,
+    "callee": "into",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "generic",
+     "line": 2
+    },
+    "line": 7,
+    "column": 4,
+    "callee": "add",
+    "class": "matched"
+   }
+  ],
+  "columnDisagreements": 0
+ }
+]
