@@ -11,6 +11,7 @@ const call = (expression: string, line = 1): CallCandidate => ({
   id: `c${n++}`,
   functionId: "f",
   line,
+  column: 1,
   text: expression,
   callee: expression.slice(0, expression.indexOf("(")),
   expression,

@@ -545,7 +545,7 @@ test("failure_propagation: the same rule holds a call in a caller one hop out", 
 });
 
 test("a call the rules cannot tell from another of the same text is held, not asked, under either form", async () => {
-  const target: CallCandidate = { id: "t", functionId: "f", line: 2, text: "", callee: "load", expression: "load(x)", expressionComplete: true };
+  const target: CallCandidate = { id: "t", functionId: "f", line: 2, column: 1, text: "", callee: "load", expression: "load(x)", expressionComplete: true };
   const fn = { id: "f", path: "src/a.rs", name: "f", startLine: 1, endLine: 3, signature: "fn f() -> Result<(), E>" } as never;
   for (const form of Object.values(FORMS)) {
     const twice = await form.decisive({ requirement: GUARD, fn, call: target, body: "load(x)?; settle(load(x))?;", calls: [target], defined: async () => true });
