@@ -964,6 +964,79 @@ FAIL: every scored version meets its row in each of 3 runs
   and a rewrite in 17 of 18 scored runs; a check hidden in a helper it is not shown is, as for the
   failure form, not something it can see.
 
+### The checks' bodies sent, and the words that assume the case (#82)
+
+The hidden versions above were read as holding, or not settled, because the check's body was not
+sent. Sent (ADR 0019: the checks above the call in a condition whose name meets the requirement,
+one definition each, and what they call one level down), under the words above — "assume … the
+check it asks for does not pass" — the constructed case's hidden version turned from holding to the
+defect it is (`reaches_it` 0.80–0.83, three of three; `bench/logs/check-before-action-v2.json`),
+moltis#1064's moved and stayed holding (`does_not_reach` 1.00 → 0.83–0.88;
+`bench/logs/check-before-action-real-v3.json`), and grovedb#500's did not move
+(`cannot_determine` 0.50–0.57). A body is read when the function is eight lines; a seventy-line
+function with `debug!("auto-title: too few messages, skipping")` in its other arm is read by that.
+
+So the words changed (ADR 0020): the question assumes the case the requirement describes, says the
+bodies under `evidence.related` are those of functions the function calls, and that every other
+operation succeeds unless the case itself decides it — nothing about a check. Measured before it
+was wired, on the same packets, the old words as the control, the arms interleaved so the host's
+version cannot tell them apart, the lines fixed first (`bench/decisive/words-probe*.json`,
+`bench/logs/words-probe-v[1-4].json`, 847 requests over four versions): with a fifth version of each
+case, **helper** — the check moved into a helper that checks, the same call sites as hidden and the
+helper's body the only difference — the new words read every hidden version as reaching the call
+(0.79–0.89) and every helper as not (0.88–1.00), the shipped, rewrite and defect versions as before.
+A two-step that reads each check's value from its own body first (the ADR's draft) read
+grovedb#500's `heights_need_rewrite`, whose body is `true`, as `false` three times of three under
+its doc comment and the sentence's double negative, and is not adopted. On twelve
+check-before-action sentences written from real guards in four pull requests the rules were not
+written on (`bench/decisive/outside/`), of 25 runs the old words read as holding the new words held
+21, read 3 under the bar, and read one as reaching at exactly 0.60 — the snapshot's `decode` under
+the sentence about mutations, a call the sentence does not govern and the old words themselves
+held in two runs of three. The line said none; the owner ruled it the line's coarseness (it counted
+observations without the mapping, which sets that call aside) and adopted the words with this
+written down. What the probe does not show is that Jev evaluates rather than skims in general.
+
+Measured again under the adopted words, the same cases, patches and tables — with hidden scored as
+the defect it is and helper as holding (version 2 of each `expected.json`; the tables the earlier
+logs were scored under are kept as `expected-v1.json`) — three runs of every version
+(`bench/logs/check-before-action-real-v4.json`, `bench/logs/check-before-action-v3.json`):
+
+<!-- check-before-action-real-v4:begin -->
+```
+grovedb-500 scored:
+  shipped  3/3
+  defect   1/3
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+  rewrite  3/3
+  hidden   3/3
+  helper   3/3
+grovedb-500 recorded, not scored:
+moltis-1064 scored:
+  shipped  3/3
+  defect   3/3
+  rewrite  3/3
+  hidden   3/3
+  helper   3/3
+moltis-1064 recorded, not scored:
+FAIL: every scored version meets its row in each of 3 runs
+```
+<!-- check-before-action-real-v4:end -->
+
+- **Every hidden version is listed, every helper holds, in three runs of three** — grovedb#500's
+  `heights_need_rewrite` and moltis#1064's `has_enough_messages` with a body of `true`, the
+  constructed case's `reject_disabled` with `Ok(())`, each listed (`reaches_it` 0.81–0.88); the same
+  call sites with a helper that checks, each holding (`does_not_reach` 0.86–1.00). The shipped code
+  and the rewrite hold as before, moltis#1064's and the constructed case's defects are listed as
+  before (`bench/logs/check-before-action-v3.json`: shipped, defect, rewrite, hidden and helper three
+  of three, the caller version recorded as the table reads).
+- **grovedb#500's defect is listed in one run of three**: the observation read `reaches_it`
+  0.88–0.92 in every run — the line version 2 of `bench/decisive/expected.json` holds it to — and
+  the mapping, which #82 did not change, came back `applies` 0.63, 0.58, 0.59: under the bar twice,
+  as it had on 2026-09-25 under the old words (0.53–0.54) and had not the day before (0.61–0.62 in
+  two of three). The scorer above reads outcomes, so it says 1/3 and FAIL; the row's own line is
+  met. 832 requests over 30 runs, and 108 over 18 for the constructed case.
+
 ### The order inside a function
 
 The calls into a function the change touched go first in their function (see *What it asks*). What

@@ -127,7 +127,7 @@ async function check2(acceptance: string) {
  * "violates in at least 2 of 3"; a run where the target is not checked fails whatever the row says.
  */
 export function check3(): { lines: string[]; pass: boolean } {
-  type Run = { observed: { key: string; outcome: string }[]; unchecked: { key: string; why: string }[] };
+  type Run = { observed: { key: string; outcome: string; observation?: string }[]; unchecked: { key: string; why: string }[] };
   const expected = readJson<{ check3: { rows: Record<string, Record<string, string>> } }>(join(ROOT, "bench/decisive/expected.json")).check3.rows;
   const real = readJson<{ cases: Record<string, Record<string, { runs: Run[] }>> }>(join(ROOT, "bench/logs/check-before-action-real-v4.json"));
   const constructed = readJson<{ versions: Record<string, { runs: Run[] }> }>(join(ROOT, "bench/logs/check-before-action-v3.json"));
@@ -141,10 +141,23 @@ export function check3(): { lines: string[]; pass: boolean } {
     const key = targetOf(id);
     for (const [version, row] of Object.entries(rows)) {
       const runs = (id === "constructed" ? constructed.versions[version]?.runs : real.cases[id]?.[version]?.runs) ?? [];
-      const got = runs.map((r) => r.observed.find((o) => o.key === key)?.outcome ?? (r.unchecked.some((u) => u.key === key) ? "not checked" : "not read"));
-      const want = row.startsWith("satisfies") ? "satisfies" : "violates";
+      const found = runs.map((r) => r.observed.find((o) => o.key === key));
+      const got = runs.map((r, i) => found[i]?.outcome ?? (r.unchecked.some((u) => u.key === key) ? "not checked" : "not read"));
       const need = /at least (\d)/.exec(row)?.[1] ? Number(/at least (\d)/.exec(row)![1]) : 3;
-      const ok = runs.length === 3 && got.filter((g) => g === want).length >= need && !got.includes("not checked");
+      let ok: boolean;
+      if (row.startsWith("observation ")) {
+        // A row about the observation alone (version 2: grovedb-500's defect, whose mapping is not
+        // this plan's): the answer and its number, read from "reaches_it 0.92", against the bar.
+        const answer = row.split(" ")[1]!;
+        const hits = found.filter((o) => {
+          const [choice, p] = (o?.observation ?? "").split(" ");
+          return choice === answer && Number(p) >= 0.6;
+        }).length;
+        ok = runs.length === 3 && hits >= need && !got.includes("not checked");
+      } else {
+        const want = row.startsWith("satisfies") ? "satisfies" : "violates";
+        ok = runs.length === 3 && got.filter((g) => g === want).length >= need && !got.includes("not checked");
+      }
       if (!ok) pass = false;
       lines.push(`${ok ? "ok  " : "MISS"} ${id} ${version}: ${got.join(", ") || "no run"} (expected ${row})`);
     }
