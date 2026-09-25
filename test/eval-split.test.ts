@@ -15,8 +15,9 @@ test("the committed split holds, and pool.json and split.json are what build-poo
   execFileSync(process.execPath, [fileURLToPath(new URL("../bench/eval/build-pool.ts", import.meta.url)), "--check"], { stdio: "pipe" });
 });
 
-test("every repository in the pool before any sealed case is dev, and none is sealed", () => {
-  assert.equal(split.repos.filter((r) => r.side === "sealed").length, 0);
+test("every repository in the pool before any sealed case is dev, and only repositories placed by the hash are sealed", () => {
+  assert.deepEqual(split.repos.filter((r) => r.side === "sealed" && (r.fixed || r.salt === undefined)).map((r) => r.repo), []);
+  assert.deepEqual([...poolRepos].filter((p) => split.repos.find((e) => e.repo === p.toLowerCase())?.side !== "dev"), []);
   for (const r of ["yottayoshida/omamori", "yottayoshida/sideeye", "moltis-org/moltis", "dashpay/grovedb", "kontorprotocol/kontor", "oxidezap/whatsapp-rust", "naoray/instruckt-tauri", "void-technology-inc/pybun", "ratazzi/quebec", "burntsushi/ripgrep"]) {
     assert.equal(split.repos.find((e) => e.repo === r)?.side, "dev", r);
   }
@@ -114,7 +115,9 @@ test("a salt is the first main merge commit holding its batch's sha256, found by
   // example/new and example/second have a row in 1..100; example/later only at row 150.
   const rowsOf = (_m: string, repo: string) => ({ "example/new": [7], "example/second": [30], "example/later": [150] } as Record<string, number[]>)[repo] ?? [];
   const entry = (salt: string, over: Partial<Split["repos"][number]> = {}) => ({ repo: "example/new", side: sideOf("example/new", salt), fixed: false, why: ["test"], salt, batch: { measurement: "#80" as const, id: "b1" }, ...over });
-  const at = (e: Split["repos"][number], b = [batch]) => batchSaltProblems({ ...split, repos: [...split.repos, e] }, b, firstMergeWith, rowsOf);
+  // The committed split's fixed entries only: its hashed ones name the real batches, not this fake.
+  const fixedOnly: Split = { ...split, repos: split.repos.filter((e) => e.fixed) };
+  const at = (e: Split["repos"][number], b = [batch]) => batchSaltProblems({ ...fixedOnly, repos: [...fixedOnly.repos, e] }, b, firstMergeWith, rowsOf);
   assert.deepEqual(at(entry(first)), []);
   // A later merge commit that also holds the hash is not the salt.
   assert.match(at(entry(later)).join(), /is not f+, the first main merge commit/);
@@ -123,17 +126,20 @@ test("a salt is the first main merge commit holding its batch's sha256, found by
   assert.match(at(entry(first, { batch: undefined })).join(), /names no batch/);
   assert.match(at(entry(first, { batch: { measurement: "#89", id: "b1" } })).join(), /not in sealed-batches.json/);
   // A batch that reached main by a squash or a direct push has no salt, and says so.
-  assert.match(batchSaltProblems({ ...split, repos: [...split.repos, entry(first)] }, [batch], () => ({ commit: first, merge: false }), rowsOf).join(), /not a merge commit/);
+  assert.match(batchSaltProblems({ ...fixedOnly, repos: [...fixedOnly.repos, entry(first)] }, [batch], () => ({ commit: first, merge: false }), rowsOf).join(), /not a merge commit/);
   // A repository whose only row is in a later batch cannot be hung on this one, whatever `kept` allows.
   assert.match(at(entry(first, { repo: "example/later", side: sideOf("example/later", first) })).join(), /no batch of #80 read a row of it/);
+  // A repository read on a fork is found by the fork's rows.
+  assert.deepEqual(at(entry(first, { repo: "example/source", side: sideOf("example/source", first), readAs: "Example/New" })), []);
+  assert.match(at(entry(first, { repo: "example/source", side: sideOf("example/source", first) })).join(), /no batch of #80 read a row of it/);
   // With both batches merged, a repository first read in b1 cannot take b2's salt.
   const b2: SealedBatch = { ...batch, id: "b2", from: 101, to: 200, sha256: "c".repeat(64) };
   const both = (sha: string) => (sha === batch.sha256 ? { commit: first, merge: true } : sha === b2.sha256 ? { commit: later, merge: true } : null);
   const moved = entry(later, { batch: { measurement: "#80", id: "b2" } });
-  assert.match(batchSaltProblems({ ...split, repos: [...split.repos, moved] }, [batch, b2], both, rowsOf).join(), /names batch #80 b2, but b1 read its first row/);
+  assert.match(batchSaltProblems({ ...fixedOnly, repos: [...fixedOnly.repos, moved] }, [batch, b2], both, rowsOf).join(), /names batch #80 b2, but b1 read its first row/);
   // More repositories naming a batch than it kept.
   const two = [entry(first), entry(first, { repo: "example/second", side: sideOf("example/second", first) })];
-  assert.match(batchSaltProblems({ ...split, repos: [...split.repos, ...two] }, [{ ...batch, kept: 1 }], firstMergeWith, rowsOf).join(), /kept 1 and 2 repositories name it/);
+  assert.match(batchSaltProblems({ ...fixedOnly, repos: [...fixedOnly.repos, ...two] }, [{ ...batch, kept: 1 }], firstMergeWith, rowsOf).join(), /kept 1 and 2 repositories name it/);
 });
 
 test("batches are only added: an earlier line changed or removed is caught", () => {
