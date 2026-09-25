@@ -51,6 +51,8 @@ export interface SplitEntry {
   salt?: string;
   /** For an entry placed by the hash: the batch of `sealed-batches.json` whose verdicts it was judged in. */
   batch?: { measurement: SealedBatch["measurement"]; id: string };
+  /** For a repository whose pull request was read on a fork: the fork, whose rows count as this repository's. */
+  readAs?: string;
   /** For a sealed repository moved to dev: when, and what it was read for. */
   contaminated?: { on: string; why: string };
 }
@@ -158,7 +160,7 @@ export function batchSaltProblems(
     }
     // The batch must be the first of its measurement that read a row of this repository: a repository cannot
     // be hung on an earlier batch with room to spare in `kept`, or a later one, once both salts are known.
-    const rows = rowsOf(b.measurement, e.repo);
+    const rows = [e.repo, ...(e.readAs === undefined ? [] : [e.readAs.toLowerCase()])].flatMap((r) => rowsOf(b.measurement, r));
     const firstReading = batches.find((x) => x.measurement === b.measurement && rows.some((r) => x.from <= r && r <= x.to));
     if (firstReading === undefined) problems.push(`${e.repo}: no batch of ${b.measurement} read a row of it`);
     else if (firstReading.id !== b.id) problems.push(`${e.repo}: names batch ${b.measurement} ${b.id}, but ${firstReading.id} read its first row`);
