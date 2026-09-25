@@ -1,0 +1,4884 @@
+{
+  "conditions": {
+    "tool": "8a0a82d6f407b2debe16f81678a020e58f3b5821",
+    "plan": "dc32a650d401be4eca5ddc5f3637859ba99bfbbb55fcb284e73aabb131a1b587",
+    "model": "typesafe/jev",
+    "bar": 0.6,
+    "runs": 3,
+    "limits": {
+      "each": 4000,
+      "total": 8000
+    }
+  },
+  "records": [
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 1,
+      "arm": 0,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.86,
+          "reaches_it": 0.13,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 1,
+      "arm": 1,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.94,
+        "probabilities": {
+          "does_not_reach": 0.94,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.03
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 1,
+      "arm": 2,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.87,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_false_or_err": 0.06,
+            "returns_true_or_ok": 0.87
+          },
+          "confidence": 0.81
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 2,
+      "arm": 0,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.91,
+        "probabilities": {
+          "reaches_it": 0.08,
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.91
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 2,
+      "arm": 1,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.02,
+          "does_not_reach": 0.92
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 2,
+      "arm": 2,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.84,
+          "probabilities": {
+            "returns_true_or_ok": 0.84,
+            "returns_false_or_err": 0.07,
+            "cannot_determine": 0.09
+          },
+          "confidence": 0.76
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 3,
+      "arm": 0,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.87,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.12
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 3,
+      "arm": 1,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.93,
+        "probabilities": {
+          "reaches_it": 0.04,
+          "cannot_determine": 0.03,
+          "does_not_reach": 0.93
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 3,
+      "arm": 2,
+      "packet": "490d56600e0b3ab3d44a452f39d84c94525b8c72667d0b621065c96bf3e4a74c",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.81,
+          "probabilities": {
+            "returns_true_or_ok": 0.81,
+            "cannot_determine": 0.11,
+            "returns_false_or_err": 0.08
+          },
+          "confidence": 0.71
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 1,
+      "arm": 0,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.96
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 1,
+      "arm": 1,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "does_not_reach": 0.04,
+          "reaches_it": 0.92,
+          "cannot_determine": 0.04
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 1,
+      "arm": 2,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 2,
+      "arm": 0,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "does_not_reach": 0.04,
+          "reaches_it": 0.94,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 2,
+      "arm": 1,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.91,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.91,
+          "cannot_determine": 0.04
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 2,
+      "arm": 2,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.89,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 3,
+      "arm": 0,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.94,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 3,
+      "arm": 1,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "reaches_it": 0.9,
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.05
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 3,
+      "arm": 2,
+      "packet": "771f637f0ce3a09fa931111288499502e8ac7c977c471e8f9c8e844add5de6d6",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "reaches_it": 0.89,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 1,
+      "arm": 0,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.83,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.16
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 1,
+      "arm": 1,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.05,
+          "does_not_reach": 0.92
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 1,
+      "arm": 2,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.82,
+          "probabilities": {
+            "returns_true_or_ok": 0.82,
+            "returns_false_or_err": 0.09,
+            "cannot_determine": 0.09
+          },
+          "confidence": 0.72
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 2,
+      "arm": 0,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.15,
+          "does_not_reach": 0.84
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 2,
+      "arm": 1,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.94,
+        "probabilities": {
+          "reaches_it": 0.04,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.94
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 2,
+      "arm": 2,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.81,
+          "probabilities": {
+            "returns_true_or_ok": 0.81,
+            "returns_false_or_err": 0.08,
+            "cannot_determine": 0.11
+          },
+          "confidence": 0.71
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 3,
+      "arm": 0,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.81,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.18
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 3,
+      "arm": 1,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.05,
+          "does_not_reach": 0.92
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 3,
+      "arm": 2,
+      "packet": "19be3b8012a4d3f36f16cf10fcf6f4a7b632dcce921862887ee14edfdc379740",
+      "sent": [
+        "verify_height@1",
+        "verify_tree_height@2"
+      ],
+      "checks": {
+        "verify_height": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.81,
+          "probabilities": {
+            "returns_true_or_ok": 0.81,
+            "cannot_determine": 0.12,
+            "returns_false_or_err": 0.07
+          },
+          "confidence": 0.71
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 1,
+      "arm": 0,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.59,
+        "probabilities": {
+          "reaches_it": 0.59,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.39
+        },
+        "confidence": 0.38
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 1,
+      "arm": 1,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "does_not_reach": 0.14,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.84
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 1,
+      "arm": 2,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.92,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_false_or_err": 0.92,
+            "returns_true_or_ok": 0.07
+          },
+          "confidence": 0.87
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.97,
+        "probabilities": {
+          "reaches_it": 0.03,
+          "cannot_determine": 0,
+          "does_not_reach": 0.97
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 2,
+      "arm": 0,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "reaches_it": 0.7,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.28
+        },
+        "confidence": 0.54
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 2,
+      "arm": 1,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "does_not_reach": 0.1,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 2,
+      "arm": 2,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_false_or_err": 0.91,
+            "returns_true_or_ok": 0.07
+          },
+          "confidence": 0.87
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.97,
+        "probabilities": {
+          "reaches_it": 0.03,
+          "does_not_reach": 0.97,
+          "cannot_determine": 0
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 3,
+      "arm": 0,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.52,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.52,
+          "does_not_reach": 0.46
+        },
+        "confidence": 0.28
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 3,
+      "arm": 1,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.89
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 3,
+      "arm": 2,
+      "packet": "dfe4180a484d47976fd772e8bf99a5532de98bfa581da76dced10065c522a129",
+      "sent": [
+        "heights_need_rewrite@1"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_false_or_err": 0.91,
+            "returns_true_or_ok": 0.07
+          },
+          "confidence": 0.87
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.97,
+        "probabilities": {
+          "reaches_it": 0.03,
+          "cannot_determine": 0,
+          "does_not_reach": 0.97
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 1,
+      "arm": 0,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.83,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.16,
+          "does_not_reach": 0.83
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 1,
+      "arm": 1,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.91,
+        "probabilities": {
+          "reaches_it": 0.07,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.91
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 1,
+      "arm": 2,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.88,
+          "probabilities": {
+            "returns_false_or_err": 0.88,
+            "cannot_determine": 0.02,
+            "returns_true_or_ok": 0.1
+          },
+          "confidence": 0.82
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "reaches_it": 0.01,
+          "cannot_determine": 0,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 2,
+      "arm": 0,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.9,
+        "probabilities": {
+          "does_not_reach": 0.9,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.09
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 2,
+      "arm": 1,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.09,
+          "does_not_reach": 0.88,
+          "cannot_determine": 0.03
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 2,
+      "arm": 2,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.9,
+          "probabilities": {
+            "returns_true_or_ok": 0.08,
+            "cannot_determine": 0.02,
+            "returns_false_or_err": 0.9
+          },
+          "confidence": 0.86
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 0.99,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.97
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 3,
+      "arm": 0,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.87,
+        "probabilities": {
+          "reaches_it": 0.12,
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.87
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 3,
+      "arm": 1,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.91,
+        "probabilities": {
+          "reaches_it": 0.06,
+          "cannot_determine": 0.03,
+          "does_not_reach": 0.91
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "cba grovedb-500 helper",
+      "run": 3,
+      "arm": 2,
+      "packet": "7878509b27bd9c0b0377230a62c6ede72db49a057f6a7fdd00b2ed84441ac28e",
+      "sent": [
+        "heights_need_rewrite@1",
+        "verify_height@2"
+      ],
+      "checks": {
+        "heights_need_rewrite": {
+          "choice": "returns_false_or_err",
+          "probability": 0.86,
+          "probabilities": {
+            "returns_false_or_err": 0.86,
+            "cannot_determine": 0.02,
+            "returns_true_or_ok": 0.12
+          },
+          "confidence": 0.79
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0.01,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 1,
+      "arm": 0,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 1,
+      "arm": 1,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 1,
+      "arm": 2,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 2,
+      "arm": 0,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.99,
+          "reaches_it": 0.01,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 2,
+      "arm": 1,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "reaches_it": 0.01,
+          "does_not_reach": 0.99,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 2,
+      "arm": 2,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 3,
+      "arm": 0,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.99,
+          "reaches_it": 0.01,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 3,
+      "arm": 1,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 3,
+      "arm": 2,
+      "packet": "9bb957094875aff0089732f61d42d1ca4902c1f116fbfd1319c4cfe3d2f7450e",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 1,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 1,
+      "arm": 0,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "reaches_it": 0.96,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 1,
+      "arm": 1,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.95,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.95
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 1,
+      "arm": 2,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.95,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "reaches_it": 0.95,
+          "cannot_determine": 0.03
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 2,
+      "arm": 0,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "reaches_it": 0.96,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 2,
+      "arm": 1,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.95,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.95
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 2,
+      "arm": 2,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.97,
+        "probabilities": {
+          "reaches_it": 0.97,
+          "does_not_reach": 0.01,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 3,
+      "arm": 0,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.97,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "reaches_it": 0.97,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 3,
+      "arm": 1,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.96
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 3,
+      "arm": 2,
+      "packet": "cc82550221835170dc0992a3965a11a2010c0d6b67f1897ca72e03322565d12b",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.96
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 1,
+      "arm": 0,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.98,
+        "probabilities": {
+          "reaches_it": 0.02,
+          "does_not_reach": 0.98,
+          "cannot_determine": 0
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 1,
+      "arm": 1,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.99,
+          "reaches_it": 0.01,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 1,
+      "arm": 2,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 2,
+      "arm": 0,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 0.99,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 2,
+      "arm": 1,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 2,
+      "arm": 2,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 3,
+      "arm": 0,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "reaches_it": 0.01,
+          "cannot_determine": 0,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 3,
+      "arm": 1,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 3,
+      "arm": 2,
+      "packet": "c38ff26089c39017ae88e9fceb73f746e34bd146fa44b457b07818125cb7dc66",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 1,
+      "arm": 0,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.11,
+          "does_not_reach": 0.88,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 1,
+      "arm": 1,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "reaches_it": 0.86,
+          "does_not_reach": 0.13,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 1,
+      "arm": 2,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.91,
+          "probabilities": {
+            "returns_true_or_ok": 0.91,
+            "cannot_determine": 0.01,
+            "returns_false_or_err": 0.08
+          },
+          "confidence": 0.86
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "reaches_it": 0.92,
+          "cannot_determine": 0,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 2,
+      "arm": 0,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.89,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.89,
+          "reaches_it": 0.1
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 2,
+      "arm": 1,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "does_not_reach": 0.13,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 2,
+      "arm": 2,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.88,
+          "probabilities": {
+            "returns_false_or_err": 0.11,
+            "returns_true_or_ok": 0.88,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.81
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "does_not_reach": 0.1,
+          "cannot_determine": 0,
+          "reaches_it": 0.9
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 3,
+      "arm": 0,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.86,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.13,
+          "does_not_reach": 0.86
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 3,
+      "arm": 1,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.19
+        },
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 3,
+      "arm": 2,
+      "packet": "cf522cd4955da54063749d5a95ccda29c038ac1f2c22f1e013a238c175b3d285",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.88,
+          "probabilities": {
+            "returns_false_or_err": 0.11,
+            "cannot_determine": 0.01,
+            "returns_true_or_ok": 0.88
+          },
+          "confidence": 0.82
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "reaches_it": 0.92,
+          "cannot_determine": 0,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 1,
+      "arm": 0,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 1,
+      "arm": 1,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 1,
+      "arm": 2,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_false_or_err",
+          "probability": 0.98,
+          "probabilities": {
+            "returns_false_or_err": 0.98,
+            "returns_true_or_ok": 0,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.98
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 1,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 2,
+      "arm": 0,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 2,
+      "arm": 1,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "does_not_reach": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 2,
+      "arm": 2,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_false_or_err",
+          "probability": 0.98,
+          "probabilities": {
+            "returns_false_or_err": 0.98,
+            "cannot_determine": 0.02,
+            "returns_true_or_ok": 0
+          },
+          "confidence": 0.97
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 3,
+      "arm": 0,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 3,
+      "arm": 1,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "cba moltis-1064 helper",
+      "run": 3,
+      "arm": 2,
+      "packet": "85c1dd2594a4534dec5ba1d2afa9924ba4cac3bedce718644499613e07ff37cc",
+      "sent": [
+        "has_enough_messages@1"
+      ],
+      "checks": {
+        "has_enough_messages": {
+          "choice": "returns_false_or_err",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_false_or_err": 0.99,
+            "cannot_determine": 0.01,
+            "returns_true_or_ok": 0
+          },
+          "confidence": 0.98
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 1,
+      "arm": 0,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.99,
+          "cannot_determine": 0,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 1,
+      "arm": 1,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 1,
+      "arm": 2,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.94,
+          "probabilities": {
+            "returns_false_or_err": 0,
+            "cannot_determine": 0.06,
+            "returns_true_or_ok": 0.94
+          },
+          "confidence": 0.91
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 2,
+      "arm": 0,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 2,
+      "arm": 1,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 2,
+      "arm": 2,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "returns_false_or_err": 0,
+            "returns_true_or_ok": 0.94
+          },
+          "confidence": 0.91
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 3,
+      "arm": 0,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 3,
+      "arm": 1,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 3,
+      "arm": 2,
+      "packet": "b70acda0c315ad320bc63b665af5da26be14acd3ad63833fea995bbfe0d9996e",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.92,
+          "probabilities": {
+            "returns_false_or_err": 0,
+            "cannot_determine": 0.08,
+            "returns_true_or_ok": 0.92
+          },
+          "confidence": 0.88
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 1,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 1,
+      "arm": 0,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 1,
+          "cannot_determine": 0,
+          "does_not_reach": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 1,
+      "arm": 1,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 0,
+          "reaches_it": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 1,
+      "arm": 2,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.93,
+          "probabilities": {
+            "returns_true_or_ok": 0.93,
+            "returns_false_or_err": 0,
+            "cannot_determine": 0.07
+          },
+          "confidence": 0.9
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 1,
+          "does_not_reach": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 2,
+      "arm": 0,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 0,
+          "reaches_it": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 2,
+      "arm": 1,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 0,
+          "reaches_it": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 2,
+      "arm": 2,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.93,
+          "probabilities": {
+            "returns_false_or_err": 0,
+            "returns_true_or_ok": 0.93,
+            "cannot_determine": 0.07
+          },
+          "confidence": 0.89
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 0,
+          "reaches_it": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 3,
+      "arm": 0,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 0,
+          "reaches_it": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 3,
+      "arm": 1,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 1,
+          "cannot_determine": 0,
+          "does_not_reach": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 3,
+      "arm": 2,
+      "packet": "e7b540c2fc52885d1143d3d7714038f809ec79a598bd92858943eb575a1c4761",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "returns_true_or_ok": 0.94,
+            "returns_false_or_err": 0
+          },
+          "confidence": 0.9
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 0,
+          "cannot_determine": 0,
+          "reaches_it": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 1,
+      "arm": 0,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.91,
+        "probabilities": {
+          "reaches_it": 0.09,
+          "does_not_reach": 0.91,
+          "cannot_determine": 0
+        },
+        "confidence": 0.86
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 1,
+      "arm": 1,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0.01,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 1,
+      "arm": 2,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_true_or_ok": 0.93,
+            "returns_false_or_err": 0
+          },
+          "confidence": 0.9
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.99,
+          "cannot_determine": 0,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 2,
+      "arm": 0,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.9,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0.1,
+          "does_not_reach": 0.9
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 2,
+      "arm": 1,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 2,
+      "arm": 2,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_true_or_ok": 0.93,
+            "returns_false_or_err": 0
+          },
+          "confidence": 0.89
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 3,
+      "arm": 0,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.87,
+        "probabilities": {
+          "reaches_it": 0.13,
+          "does_not_reach": 0.87,
+          "cannot_determine": 0
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 3,
+      "arm": 1,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0.01,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 3,
+      "arm": 2,
+      "packet": "805ab266b14b3c3485f695c069c970dd7976bc24f1d866be604eeefee0c14f31",
+      "sent": [
+        "is_disabled@1"
+      ],
+      "checks": {
+        "is_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_false_or_err": 0,
+            "returns_true_or_ok": 0.93
+          },
+          "confidence": 0.89
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 1,
+      "arm": 0,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.15,
+          "reaches_it": 0.83,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 1,
+      "arm": 1,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.01,
+          "reaches_it": 0.99,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 1,
+      "arm": 2,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.88,
+          "probabilities": {
+            "returns_false_or_err": 0.09,
+            "returns_true_or_ok": 0.88,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.82
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "reaches_it": 0.92,
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 2,
+      "arm": 0,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.16,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.81
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 2,
+      "arm": 1,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.99,
+        "probabilities": {
+          "does_not_reach": 0.01,
+          "reaches_it": 0.99,
+          "cannot_determine": 0
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 2,
+      "arm": 2,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.91,
+          "probabilities": {
+            "returns_false_or_err": 0.07,
+            "returns_true_or_ok": 0.91,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.86
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.93,
+        "probabilities": {
+          "reaches_it": 0.93,
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 3,
+      "arm": 0,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.19
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 3,
+      "arm": 1,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0,
+          "does_not_reach": 0.01,
+          "reaches_it": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 3,
+      "arm": 2,
+      "packet": "bc734a2a4789b04b2ea70509530d68686d71f61901ff5cc44afdb97ef12acaf9",
+      "sent": [
+        "reject_disabled@1"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_true_or_ok",
+          "probability": 0.89,
+          "probabilities": {
+            "returns_false_or_err": 0.08,
+            "returns_true_or_ok": 0.89,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.83
+        }
+      },
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.92,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 1,
+      "arm": 0,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 1,
+      "arm": 1,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "cannot_determine": 0,
+          "reaches_it": 0
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 1,
+      "arm": 2,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_false_or_err",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_false_or_err": 1,
+            "returns_true_or_ok": 0
+          },
+          "confidence": 0.99
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.94,
+        "probabilities": {
+          "reaches_it": 0.04,
+          "does_not_reach": 0.94,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 2,
+      "arm": 0,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 2,
+      "arm": 1,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 2,
+      "arm": 2,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_false_or_err",
+          "probability": 1,
+          "probabilities": {
+            "returns_true_or_ok": 0,
+            "returns_false_or_err": 1,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.96,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.02,
+          "does_not_reach": 0.96
+        },
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 3,
+      "arm": 0,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 3,
+      "arm": 1,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "cannot_determine": 0,
+          "reaches_it": 0,
+          "does_not_reach": 1
+        },
+        "confidence": 1
+      }
+    },
+    {
+      "id": "constructed helper",
+      "run": 3,
+      "arm": 2,
+      "packet": "c6a58774b81263a55e8ad2c05633460a737b5e9049d9cf0a606fe202c960345e",
+      "sent": [
+        "reject_disabled@1",
+        "is_disabled@2"
+      ],
+      "checks": {
+        "reject_disabled": {
+          "choice": "returns_false_or_err",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_false_or_err": 0.99,
+            "returns_true_or_ok": 0
+          },
+          "confidence": 0.99
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.95,
+        "probabilities": {
+          "reaches_it": 0.03,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.95
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 1,
+      "arm": 0,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.51,
+        "probabilities": {
+          "cannot_determine": 0.11,
+          "reaches_it": 0.38,
+          "does_not_reach": 0.51
+        },
+        "confidence": 0.26
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 1,
+      "arm": 1,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.53,
+        "probabilities": {
+          "reaches_it": 0.53,
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.34
+        },
+        "confidence": 0.3
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 1,
+      "arm": 2,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.52,
+        "probabilities": {
+          "reaches_it": 0.52,
+          "does_not_reach": 0.33,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.28
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 2,
+      "arm": 0,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.45,
+        "probabilities": {
+          "reaches_it": 0.45,
+          "does_not_reach": 0.44,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.18
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 2,
+      "arm": 1,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.53,
+        "probabilities": {
+          "cannot_determine": 0.14,
+          "reaches_it": 0.53,
+          "does_not_reach": 0.33
+        },
+        "confidence": 0.31
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 2,
+      "arm": 2,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.59,
+        "probabilities": {
+          "cannot_determine": 0.13,
+          "reaches_it": 0.59,
+          "does_not_reach": 0.28
+        },
+        "confidence": 0.38
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 3,
+      "arm": 0,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.47,
+        "probabilities": {
+          "cannot_determine": 0.1,
+          "reaches_it": 0.47,
+          "does_not_reach": 0.43
+        },
+        "confidence": 0.2
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 3,
+      "arm": 1,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.52,
+        "probabilities": {
+          "does_not_reach": 0.37,
+          "cannot_determine": 0.11,
+          "reaches_it": 0.52
+        },
+        "confidence": 0.29
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 3,
+      "arm": 2,
+      "packet": "b502ea700475fae6b5b8cda7b68bd0bbc3c165aecd0fc36407d929c96cc3a8e5",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.54,
+        "probabilities": {
+          "cannot_determine": 0.1,
+          "reaches_it": 0.54,
+          "does_not_reach": 0.36
+        },
+        "confidence": 0.3
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 1,
+      "arm": 0,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.91,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "reaches_it": 0.91,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 1,
+      "arm": 1,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.72,
+        "probabilities": {
+          "reaches_it": 0.72,
+          "cannot_determine": 0.17,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.58
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 1,
+      "arm": 2,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "does_not_reach": 0.11,
+          "reaches_it": 0.7,
+          "cannot_determine": 0.19
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 2,
+      "arm": 0,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.93,
+        "probabilities": {
+          "reaches_it": 0.93,
+          "cannot_determine": 0.05,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 2,
+      "arm": 1,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "reaches_it": 0.73,
+          "cannot_determine": 0.18,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 2,
+      "arm": 2,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "cannot_determine": 0.2,
+          "reaches_it": 0.68,
+          "does_not_reach": 0.12
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 3,
+      "arm": 0,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.93,
+        "probabilities": {
+          "cannot_determine": 0.05,
+          "reaches_it": 0.93,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 3,
+      "arm": 1,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "cannot_determine": 0.18,
+          "does_not_reach": 0.13,
+          "reaches_it": 0.69
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "run": 3,
+      "arm": 2,
+      "packet": "f2ca4ce8f8e44c4f1010a79d45bff764a18beeccff0eb744f9ba6dbab337285a",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6900000000000001,
+        "probabilities": {
+          "cannot_determine": 0.19,
+          "does_not_reach": 0.12,
+          "reaches_it": 0.6900000000000001
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 1,
+      "arm": 0,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.17,
+          "reaches_it": 0.76,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 1,
+      "arm": 1,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.57,
+        "probabilities": {
+          "reaches_it": 0.57,
+          "does_not_reach": 0.24,
+          "cannot_determine": 0.19
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 1,
+      "arm": 2,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.59,
+        "probabilities": {
+          "does_not_reach": 0.24,
+          "reaches_it": 0.59,
+          "cannot_determine": 0.17
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 2,
+      "arm": 0,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "reaches_it": 0.78,
+          "does_not_reach": 0.14
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 2,
+      "arm": 1,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.53,
+        "probabilities": {
+          "reaches_it": 0.53,
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.31
+        },
+        "confidence": 0.3
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 2,
+      "arm": 2,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "does_not_reach": 0.18,
+          "cannot_determine": 0.18,
+          "reaches_it": 0.64
+        },
+        "confidence": 0.47
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 3,
+      "arm": 0,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.15
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 3,
+      "arm": 1,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "cannot_determine": 0.16,
+          "reaches_it": 0.61,
+          "does_not_reach": 0.23
+        },
+        "confidence": 0.41
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "run": 3,
+      "arm": 2,
+      "packet": "d4f9babf990badd424d82e7e8b99f877f71b49e273b40d2168771084f0b4ea26",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.62,
+        "probabilities": {
+          "does_not_reach": 0.2,
+          "cannot_determine": 0.18,
+          "reaches_it": 0.62
+        },
+        "confidence": 0.43
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 1,
+      "arm": 0,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "reaches_it": 0.82,
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.1
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 1,
+      "arm": 1,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "reaches_it": 0.55,
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.29
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 1,
+      "arm": 2,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.52,
+        "probabilities": {
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.35,
+          "reaches_it": 0.52
+        },
+        "confidence": 0.28
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 2,
+      "arm": 0,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "reaches_it": 0.8,
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 2,
+      "arm": 1,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.57,
+        "probabilities": {
+          "does_not_reach": 0.3,
+          "reaches_it": 0.57,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.36
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 2,
+      "arm": 2,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.54,
+        "probabilities": {
+          "does_not_reach": 0.31,
+          "cannot_determine": 0.15,
+          "reaches_it": 0.54
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 3,
+      "arm": 0,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8099999999999999,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "reaches_it": 0.8099999999999999,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 3,
+      "arm": 1,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.52,
+        "probabilities": {
+          "reaches_it": 0.52,
+          "does_not_reach": 0.35,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.28
+      }
+    },
+    {
+      "id": "pybun-428 python_which · Cache::new()",
+      "run": 3,
+      "arm": 2,
+      "packet": "000ce201016abfb6554cf1f9d8f6817fbcd246d54bf58b8361b654a9f32587ae",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.46,
+        "probabilities": {
+          "reaches_it": 0.46,
+          "cannot_determine": 0.14,
+          "does_not_reach": 0.4
+        },
+        "confidence": 0.18
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 1,
+      "arm": 0,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.02,
+          "reaches_it": 0.92
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 1,
+      "arm": 1,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.13,
+          "reaches_it": 0.81,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 1,
+      "arm": 2,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "reaches_it": 0.83,
+          "does_not_reach": 0.11,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 2,
+      "arm": 0,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.08,
+          "reaches_it": 0.9
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 2,
+      "arm": 1,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "reaches_it": 0.81,
+          "does_not_reach": 0.13,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 2,
+      "arm": 2,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.13,
+          "cannot_determine": 0.06,
+          "reaches_it": 0.81
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 3,
+      "arm": 0,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.93,
+        "probabilities": {
+          "reaches_it": 0.93,
+          "cannot_determine": 0.05,
+          "does_not_reach": 0.01
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 3,
+      "arm": 1,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "reaches_it": 0.78,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 3,
+      "arm": 2,
+      "packet": "52b1c7d8bd06a3b9e1ff26b8da85a8049370886fe84bbb08bea27085c062e244",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "reaches_it": 0.83,
+          "does_not_reach": 0.1,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 1,
+      "arm": 0,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.98,
+        "probabilities": {
+          "does_not_reach": 0.98,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 1,
+      "arm": 1,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.83,
+        "probabilities": {
+          "reaches_it": 0.04,
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.83
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 1,
+      "arm": 2,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.9,
+          "probabilities": {
+            "cannot_determine": 0.09,
+            "returns_false_or_err": 0.9,
+            "returns_true_or_ok": 0.01
+          },
+          "confidence": 0.85
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "reaches_it": 0,
+          "does_not_reach": 1,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 2,
+      "arm": 0,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.98,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.01,
+          "does_not_reach": 0.98
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 2,
+      "arm": 1,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.86,
+          "reaches_it": 0.05,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 2,
+      "arm": 2,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.89,
+          "probabilities": {
+            "returns_false_or_err": 0.89,
+            "cannot_determine": 0.1,
+            "returns_true_or_ok": 0.01
+          },
+          "confidence": 0.84
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 3,
+      "arm": 0,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.98,
+        "probabilities": {
+          "reaches_it": 0.01,
+          "does_not_reach": 0.98,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 3,
+      "arm": 1,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.05,
+          "cannot_determine": 0.1,
+          "does_not_reach": 0.85
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "run": 3,
+      "arm": 2,
+      "packet": "3002e7ca98643b3d0439e62698f1123c81c59a2277d057259881668caed4c9c3",
+      "sent": [
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.92,
+          "probabilities": {
+            "returns_true_or_ok": 0.01,
+            "returns_false_or_err": 0.92,
+            "cannot_determine": 0.07
+          },
+          "confidence": 0.88
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 1,
+        "probabilities": {
+          "does_not_reach": 1,
+          "reaches_it": 0,
+          "cannot_determine": 0
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 1,
+      "arm": 0,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.96,
+        "probabilities": {
+          "reaches_it": 0.02,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.96
+        },
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 1,
+      "arm": 1,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.75,
+        "probabilities": {
+          "does_not_reach": 0.75,
+          "reaches_it": 0.1,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 1,
+      "arm": 2,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.88,
+          "probabilities": {
+            "cannot_determine": 0.1,
+            "returns_false_or_err": 0.88,
+            "returns_true_or_ok": 0.02
+          },
+          "confidence": 0.82
+        },
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.9,
+          "probabilities": {
+            "returns_false_or_err": 0.9,
+            "returns_true_or_ok": 0.01,
+            "cannot_determine": 0.09
+          },
+          "confidence": 0.85
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 2,
+      "arm": 0,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.98,
+        "probabilities": {
+          "does_not_reach": 0.98,
+          "reaches_it": 0.01,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.96
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 2,
+      "arm": 1,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.71,
+        "probabilities": {
+          "does_not_reach": 0.71,
+          "reaches_it": 0.1,
+          "cannot_determine": 0.19
+        },
+        "confidence": 0.57
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 2,
+      "arm": 2,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.89,
+          "probabilities": {
+            "returns_false_or_err": 0.89,
+            "returns_true_or_ok": 0.01,
+            "cannot_determine": 0.1
+          },
+          "confidence": 0.84
+        },
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.88,
+          "probabilities": {
+            "cannot_determine": 0.11,
+            "returns_true_or_ok": 0.01,
+            "returns_false_or_err": 0.88
+          },
+          "confidence": 0.82
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 3,
+      "arm": 0,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.97,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.97,
+          "reaches_it": 0.01
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 3,
+      "arm": 1,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.71,
+        "probabilities": {
+          "cannot_determine": 0.19,
+          "does_not_reach": 0.71,
+          "reaches_it": 0.1
+        },
+        "confidence": 0.57
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "run": 3,
+      "arm": 2,
+      "packet": "6cb02cc9291c05489713d43e0dcb51b5fe41e555afd0f9863d9b4bae53fd1593",
+      "sent": [
+        "should_notify@1",
+        "should_send_notify@1",
+        "should_emit_notify@2"
+      ],
+      "checks": {
+        "should_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.88,
+          "probabilities": {
+            "returns_false_or_err": 0.88,
+            "cannot_determine": 0.1,
+            "returns_true_or_ok": 0.02
+          },
+          "confidence": 0.82
+        },
+        "should_send_notify": {
+          "choice": "returns_false_or_err",
+          "probability": 0.85,
+          "probabilities": {
+            "cannot_determine": 0.14,
+            "returns_true_or_ok": 0.01,
+            "returns_false_or_err": 0.85
+          },
+          "confidence": 0.78
+        }
+      },
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.99,
+        "probabilities": {
+          "reaches_it": 0,
+          "cannot_determine": 0.01,
+          "does_not_reach": 0.99
+        },
+        "confidence": 0.99
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 1,
+      "arm": 0,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "reaches_it": 0.96,
+          "cannot_determine": 0.04,
+          "does_not_reach": 0
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 1,
+      "arm": 1,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.03,
+          "reaches_it": 0.88
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 1,
+      "arm": 2,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "reaches_it": 0.86,
+          "cannot_determine": 0.11,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 2,
+      "arm": 0,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "does_not_reach": 0.01,
+          "reaches_it": 0.94,
+          "cannot_determine": 0.05
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 2,
+      "arm": 1,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.07,
+          "reaches_it": 0.92,
+          "does_not_reach": 0.01
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 2,
+      "arm": 2,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "reaches_it": 0.88,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 3,
+      "arm": 0,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9299999999999999,
+        "probabilities": {
+          "reaches_it": 0.9299999999999999,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.01
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 3,
+      "arm": 1,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "reaches_it": 0.89,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "run": 3,
+      "arm": 2,
+      "packet": "51cc2019078db78d9d4d883f9625659aace74e61ac74361f56265b503e56e35d",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 1,
+      "arm": 0,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "reaches_it": 0.84,
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 1,
+      "arm": 1,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.62,
+        "probabilities": {
+          "reaches_it": 0.62,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.23
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 1,
+      "arm": 2,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.54,
+        "probabilities": {
+          "cannot_determine": 0.17,
+          "reaches_it": 0.54,
+          "does_not_reach": 0.29
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 2,
+      "arm": 0,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "reaches_it": 0.84,
+          "cannot_determine": 0.12,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 2,
+      "arm": 1,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "does_not_reach": 0.24,
+          "cannot_determine": 0.15,
+          "reaches_it": 0.61
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 2,
+      "arm": 2,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.57,
+        "probabilities": {
+          "cannot_determine": 0.18,
+          "reaches_it": 0.57,
+          "does_not_reach": 0.25
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 3,
+      "arm": 0,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "cannot_determine": 0.11,
+          "reaches_it": 0.86,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 3,
+      "arm": 1,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "reaches_it": 0.61,
+          "cannot_determine": 0.17,
+          "does_not_reach": 0.22
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "run": 3,
+      "arm": 2,
+      "packet": "a9c4b4c29e2bccc70927936d50b563783373a984ad3d2dade6e95dd0ac08f834",
+      "sent": [],
+      "checks": {},
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.63,
+        "probabilities": {
+          "does_not_reach": 0.23,
+          "reaches_it": 0.63,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.45
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 1,
+      "arm": 0,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "reaches_it": 0.92,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 1,
+      "arm": 1,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "reaches_it": 0.82,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 1,
+      "arm": 2,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "checks": {
+        "handle_started_round": {
+          "choice": "cannot_determine",
+          "probability": 0.5,
+          "probabilities": {
+            "returns_false_or_err": 0.05,
+            "returns_true_or_ok": 0.45,
+            "cannot_determine": 0.5
+          },
+          "confidence": 0.25
+        }
+      },
+      "held": "the value of the check `handle_started_round` could not be read (cannot_determine 0.50)"
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 2,
+      "arm": 0,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "cannot_determine": 0.04,
+          "does_not_reach": 0.02,
+          "reaches_it": 0.94
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 2,
+      "arm": 1,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "reaches_it": 0.83,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 2,
+      "arm": 2,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "checks": {
+        "handle_started_round": {
+          "choice": "cannot_determine",
+          "probability": 0.5,
+          "probabilities": {
+            "returns_false_or_err": 0.03,
+            "cannot_determine": 0.5,
+            "returns_true_or_ok": 0.47
+          },
+          "confidence": 0.24
+        }
+      },
+      "held": "the value of the check `handle_started_round` could not be read (cannot_determine 0.50)"
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 3,
+      "arm": 0,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.92,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 3,
+      "arm": 1,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "does_not_reach": 0.04,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "kontor-385 handle_consensus_msg · handle_get_value(height, round, timeout, reply)",
+      "run": 3,
+      "arm": 2,
+      "packet": "56ea9788898ff8fea3e80741f486697e5251dd0430debf5fe22489605ed71804",
+      "sent": [
+        "handle_started_round@1"
+      ],
+      "checks": {
+        "handle_started_round": {
+          "choice": "cannot_determine",
+          "probability": 0.53,
+          "probabilities": {
+            "returns_true_or_ok": 0.43,
+            "cannot_determine": 0.53,
+            "returns_false_or_err": 0.04
+          },
+          "confidence": 0.3
+        }
+      },
+      "held": "the value of the check `handle_started_round` could not be read (cannot_determine 0.53)"
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 1,
+      "arm": 0,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.77,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 1,
+      "arm": 1,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.56,
+        "probabilities": {
+          "does_not_reach": 0.25,
+          "cannot_determine": 0.19,
+          "reaches_it": 0.56
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 1,
+      "arm": 2,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "checks": {
+        "select_block_latest": {
+          "choice": "cannot_determine",
+          "probability": 0.84,
+          "probabilities": {
+            "returns_false_or_err": 0.02,
+            "cannot_determine": 0.84,
+            "returns_true_or_ok": 0.14
+          },
+          "confidence": 0.76
+        }
+      },
+      "held": "the value of the check `select_block_latest` could not be read (cannot_determine 0.84)"
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 2,
+      "arm": 0,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.13,
+          "reaches_it": 0.74,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.6
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 2,
+      "arm": 1,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.44,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.41,
+          "reaches_it": 0.44
+        },
+        "confidence": 0.16
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 2,
+      "arm": 2,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "checks": {
+        "select_block_latest": {
+          "choice": "cannot_determine",
+          "probability": 0.83,
+          "probabilities": {
+            "cannot_determine": 0.83,
+            "returns_true_or_ok": 0.15,
+            "returns_false_or_err": 0.02
+          },
+          "confidence": 0.74
+        }
+      },
+      "held": "the value of the check `select_block_latest` could not be read (cannot_determine 0.83)"
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 3,
+      "arm": 0,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.79,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 3,
+      "arm": 1,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "reaches_it": 0.55,
+          "does_not_reach": 0.28,
+          "cannot_determine": 0.17
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "kontor-385 create_runtime_executor · select_block_at_height(&conn, 0)",
+      "run": 3,
+      "arm": 2,
+      "packet": "c1c351e9a9528bb1903d3a0971b5808b435d14ee008782dbd8c1a4f3e2cfc2c8",
+      "sent": [
+        "select_block_latest@1",
+        "from_row@2"
+      ],
+      "checks": {
+        "select_block_latest": {
+          "choice": "cannot_determine",
+          "probability": 0.86,
+          "probabilities": {
+            "returns_false_or_err": 0.02,
+            "cannot_determine": 0.86,
+            "returns_true_or_ok": 0.12
+          },
+          "confidence": 0.79
+        }
+      },
+      "held": "the value of the check `select_block_latest` could not be read (cannot_determine 0.86)"
+    }
+  ]
+}

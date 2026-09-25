@@ -33,8 +33,11 @@ import type { ChoiceAnswer, Requirement } from "../../src/types.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = join(HERE, "..", "..");
-const PLAN = join(HERE, "words-probe.json");
-const LOG = join(ROOT, "bench", "logs", "words-probe-v1.json");
+// The plan and its log: version 1 by default; a later version names both (`send … <plan> <log>`).
+const argvPlan = process.argv[6] ?? process.argv[5];
+const PLAN = process.argv[2] === "send" ? (process.argv[6] ? join(ROOT, process.argv[6]) : join(HERE, "words-probe.json")) : process.argv[5] ? join(ROOT, process.argv[5]) : join(HERE, "words-probe.json");
+const LOG = process.argv[2] === "send" ? (process.argv[7] ? join(ROOT, process.argv[7]) : join(ROOT, "bench", "logs", "words-probe-v1.json")) : process.argv[6] ? join(ROOT, process.argv[6]) : join(ROOT, "bench", "logs", "words-probe-v1.json");
+void argvPlan;
 
 interface Target {
   set: "S" | "D" | "H";
@@ -66,6 +69,8 @@ interface Plan {
   wording: { function: string; value_clause: string; value_words: Record<string, string>; check: string; check_criteria: Record<string, string> };
   bar: number;
   runs: number;
+  /** The arms sent. Version 1 sent all three; a later version may send fewer. */
+  send?: (0 | 1 | 2)[];
   targets: Target[];
   outside: Outside[];
 }
@@ -130,11 +135,26 @@ const fill = (template: string, values: Record<string, string>) => template.repl
 
 /** The function's question: arm 0 from src; arms 1 and 2 from the template, arm 2 with the values read. */
 function functionQuestion(plan: Plan, arm: 0 | 1 | 2, fn: FunctionCandidate, call: CallCandidate, values: { expression: string; value: string }[]): Questions {
-  const old = FORMS.check_before_action.observationQuestions(fn, call) as Record<string, { type: "choice"; instructions: string; criteria: Record<string, string> }>;
-  if (arm === 0) return old;
+  if (arm === 0) return { in_forbidden_case: { type: "choice", instructions: fill(OLD_WORDING, { F: fn.name, X: named(call) }), criteria: REACH_CRITERIA } };
   const clause = arm === 2 ? values.map((v) => fill(plan.wording.value_clause, { C: v.expression, V: plan.wording.value_words[v.value]! })).join("") : "";
-  return { in_forbidden_case: { type: "choice", instructions: fill(plan.wording.function, { F: fn.name, X: named(call), VALUES: clause }), criteria: old.in_forbidden_case!.criteria } };
+  return { in_forbidden_case: { type: "choice", instructions: fill(plan.wording.function, { F: fn.name, X: named(call), VALUES: clause }), criteria: REACH_CRITERIA } };
 }
+
+/**
+ * Arm 0's words: src/plan/forms.ts at 8a0a82d, the commit version 1 was sent from, word for word.
+ * Carried here so that the control stays the old question after src moves to the words adopted.
+ */
+const OLD_WORDING =
+  "`code` is the body of `{F}`. The entries under `evidence.related` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. " +
+  "Assume exactly this and nothing else: `{F}` is called in a case where `requirement.text` says the call `{X}` must not be made, because the check it asks for does not pass. " +
+  "Under that condition: does `{F}` go on to make the call `{X}`?";
+
+/** The three answers, the same words in every arm (src/plan/forms.ts REACH_CRITERIA at 8a0a82d and since). */
+const REACH_CRITERIA = {
+  reaches_it: "Yes. In that case the function still makes that call.",
+  does_not_reach: "No. In that case the function returns, fails or takes another path before making that call.",
+  cannot_determine: "The code shown does not settle whether that call is made in that case.",
+} as const;
 
 /** The check-value question, on the check's own body. */
 function checkQuestion(plan: Plan, fn: FunctionCandidate, call: CallCandidate, check: { name: string; expression: string }): Questions {
@@ -153,7 +173,7 @@ async function send(acceptance: string, constructed: string, limit: number) {
   const endpoint = endpointFromEnv(process.env);
   if (endpoint?.host !== "cloudflare") throw new Error("the log records Cloudflare's model: set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, JEV_PROVIDER unset or cloudflare, no JEV_API_URL");
   const git = await Git.open(ROOT);
-  const dirty = (await git.text(["status", "--porcelain", "--", ".", ":(exclude)bench/logs/words-probe-v1.json"])).trim();
+  const dirty = (await git.text(["status", "--porcelain", "--", ".", `:(exclude)${LOG.slice(ROOT.length + 1)}`])).trim();
   if (dirty !== "") throw new Error(`commit first; the working tree has changes besides the log:\n${dirty}`);
   const plan = readJson<Plan>(PLAN);
   const conditions = { tool: (await git.text(["rev-parse", "HEAD"])).trim(), plan: sha256(readFileSync(PLAN, "utf8")), model: jevModel("cloudflare"), bar: plan.bar, runs: plan.runs, limits: DECISIVE_LIMITS };
@@ -175,7 +195,7 @@ async function send(acceptance: string, constructed: string, limit: number) {
     const checks = sent.filter((s) => s.depth === 1).map((s) => ({ name: s.name, expression: expressionOf(calls, s.name), related: packet.evidence.related.find((r) => r.path === s.path && r.lines === s.lines)! }));
     const second = sent.filter((s) => s.depth === 2).map((s) => packet.evidence.related.find((r) => r.path === s.path && r.lines === s.lines)!);
     for (let run = 1; run <= plan.runs; run++) {
-      for (const arm of [0, 1, 2] as const) {
+      for (const arm of plan.send ?? ([0, 1, 2] as const)) {
         if (done(item.id, run, arm)) continue;
         const record: Record_ = { id: item.id, run, arm, packet: packetSha, sent: sent.map((s) => `${s.name}@${s.depth}`) };
         try {
@@ -216,7 +236,7 @@ export function score(plan: Plan, records: Record_[], bodies: Record<string, { p
   const of = (id: string, arm: number) => records.filter((r) => r.id === id && r.arm === arm && r.error === undefined);
   const results: Record<1 | 2, { values: boolean; hidden: boolean; defect: boolean; settled: boolean; outside: boolean }> = { 1: { values: true, hidden: true, defect: true, settled: true, outside: true }, 2: { values: true, hidden: true, defect: true, settled: true, outside: true } };
 
-  for (const arm of [0, 1, 2] as const) {
+  for (const arm of plan.send ?? ([0, 1, 2] as const)) {
     out.push(`arm ${arm}:`);
     // The check values (arm 2 only).
     if (arm === 2) {
@@ -272,14 +292,22 @@ export function score(plan: Plan, records: Record_[], bodies: Record<string, { p
       out.push(`  net ${id}: ${reads ? "reads a parameter" : "reads none of its parameters"}`);
     }
   }
+  const arms = plan.send ?? [0, 1, 2];
   const r2 = results[2];
   const r1 = results[1];
+  if (plan.targets.length === 0) {
+    // A later version that re-measures the outside line alone: the target lines are version 1's.
+    const passing = ([2, 1] as const).filter((a) => arms.includes(a) && results[a].outside);
+    out.push(`outside line: ${passing.length > 0 ? `PASS for arm ${passing.join(" and ")}` : "FAIL for every arm sent"}; the target lines are the earlier version's`);
+    return { lines: out, adopt: passing[0] ?? null };
+  }
   const adopt: 0 | 1 | 2 | null = r2.values && r2.hidden && r2.defect && r2.settled && r2.outside ? 2 : r1.hidden && r1.defect && r1.settled && r1.outside ? 1 : null;
   out.push(adopt === 2 ? "ADOPT arm 2 (two-step)" : adopt === 1 ? "ADOPT arm 1 (case only): arm 2 failed a line" : "ADOPT nothing: both arms failed a line; back to the owner");
   return { lines: out, adopt };
 }
 
 const [mode, acceptance, constructed, limit] = process.argv.slice(2);
+// score: `score [<acceptance dir> <constructed repo>] [<plan> <log>]` — the plan and log are argv[5] and argv[6] above.
 if (mode === "send" && acceptance && constructed && limit) await send(acceptance, constructed, Number(limit));
 else if (mode === "score") {
   const plan = readJson<Plan>(PLAN);
@@ -298,6 +326,6 @@ else if (mode === "score") {
   }
   for (const line of score(plan, log.records, bodies).lines) console.log(line);
 } else if (mode !== undefined) {
-  console.error("usage: probe-words.ts send <acceptance dir> <constructed repo> <limit> | score [<acceptance dir> <constructed repo>]");
+  console.error("usage: probe-words.ts send <acceptance dir> <constructed repo> <limit> [<plan> <log>] | score [<acceptance dir> <constructed repo>] [<plan> <log>]");
   process.exitCode = 2;
 }
