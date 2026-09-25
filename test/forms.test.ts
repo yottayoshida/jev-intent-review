@@ -290,13 +290,13 @@ test("check_before_action end to end: the unguarded action is worth checking, th
   const f = unguarded!.findings[0]!;
   assert.equal(f.property, "check_passes_before_call");
   assert.equal(f.observation, "reaches_it");
-  assert.match(f.condition, /must not be made, because the check it asks for does not pass/);
+  assert.match(f.condition, /is called in the case the requirement describes, in which it says `create_session\(store, &record\)` must not be made; every other operation it reaches succeeds, unless the case itself decides it otherwise/);
   assert.match(f.why, /still makes the call in a case the requirement forbids it/);
   const text = renderLocalCheck([unguarded!]);
   assert.match(text, /Form: `check_before_action`/);
   assert.match(text, /### Worth checking/);
   assert.match(text, /\*\*Jev, on whether the function still makes the call\*\*: reaches_it/);
-  assert.match(text, /in a case the requirement forbids it: \*\*reaches_it\*\*/);
+  assert.match(text, /in the case the requirement forbids it: \*\*reaches_it\*\*/);
   assert.ok(!/when that call fails/.test(text), "no failure-form words in a check-form section");
   assert.ok(!/violat/i.test(text));
 });

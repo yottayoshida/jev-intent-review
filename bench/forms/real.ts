@@ -143,12 +143,24 @@ async function measure(acceptance: string, runs: number) {
   console.log(score(log, runs).join("\n"));
 }
 
+/**
+ * The table a log was taken under: the log records `expected.json`'s sha256, and a table replaced
+ * since is kept byte for byte as `expected-v<n>.json` (version 1: hidden recorded, not scored). A log
+ * whose sha matches none — one written by hand — scores under the current table.
+ */
+function tableOf(dir: string, c: RealCase, log: Log): { scored: Record<string, Row>; recorded: Record<string, Row> } {
+  const recorded = log.conditions.files?.[c.id]?.["expected.json"];
+  const names = ["expected.json", ...readdirSync(dir).filter((n) => /^expected-v\d+\.json$/.test(n))];
+  const name = names.find((n) => sha256(readFileSync(join(dir, n), "utf8")) === recorded) ?? "expected.json";
+  return JSON.parse(readFileSync(join(dir, name), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
+}
+
 /** Each case's scored and recorded rows against the log, and whether every scored version passed. */
 export function score(log: Log, runs: number, cases = loadRealCases()): string[] {
   const lines: string[] = [];
   let all = true;
   for (const { dir, c } of cases) {
-    const expected = JSON.parse(readFileSync(join(dir, "expected.json"), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
+    const expected = tableOf(dir, c, log);
     for (const [part, rows] of [["scored", expected.scored], ["recorded, not scored", expected.recorded]] as const) {
       lines.push(`${c.id} ${part}:`);
       for (const [v, row] of Object.entries(rows)) {

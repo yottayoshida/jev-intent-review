@@ -85,7 +85,7 @@ sure. A spec's requirement is not asked; nor is one on a run that read no functi
 |---|---|---|
 | a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
-| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
+| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
 | against the requirement | `returns_success` | `reaches_it` |
 

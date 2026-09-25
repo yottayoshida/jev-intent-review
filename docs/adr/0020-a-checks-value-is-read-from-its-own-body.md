@@ -1,6 +1,7 @@
-# 0020. Under `check_before_action`, a check's value is read from its own body, and assumed by name in the function's question
+# 0020. Under `check_before_action`, the assumption is the requirement's case, with the checks' bodies sent, and not that "the check does not pass"
 
-Status: Accepted
+Status: Accepted (the decision below is the one measured and adopted on 2026-09-25; the two-step
+this ADR was drafted for was measured in the same probe and not adopted — see *What was measured*)
 
 ## Context
 
@@ -38,8 +39,25 @@ not to go by names leaves the comments and strings where they are.
 
 ## Decision
 
-The check's value is read where there is nothing to skim, and the function is asked under that
-value — the failure form's shape.
+The function's question assumes the case the requirement describes — the one in which it says the
+call must not be made — and nothing about any check: *assume exactly this and nothing else: `F` is
+called in the case `requirement.text` describes, the one in which it says the call `X` must not be
+made; every other operation the function reaches succeeds, unless the case itself decides it
+otherwise. Under that condition: does `F` go on to make the call `X`?* — with the bodies of the
+checks the form named above the call under `evidence.related` (ADR 0019), which the question now
+says are "the bodies of functions `F` calls, given so that what those calls do can be read". The
+three answers stay; the mapping question is unchanged; the rule (`review/outcome.ts`) reads the
+same two answers. "Unless the case itself decides it otherwise" is for a check the rule did not
+name — one that binds its result first, one whose name does not meet the words: it is Jev's to read
+from the case, as before this decision, and not forced to succeed.
+
+That is the case-only wording, the plan's first draft, which this ADR was drafted to reject for a
+two-step (below) that reads each check's value from the check's own body first. Both were measured
+on the same packets before either was wired, and the two-step failed a line the case-only wording
+met, so the words above are the decision and the two-step is the record. What follows is the
+two-step as it was drafted, kept because the probe measured it.
+
+### The two-step, drafted and measured, not adopted
 
 1. After the mapping has read the requirement as applying to the call, for each check the form
    named and sent (ADR 0019), one question of its own, with a packet of the check's body (and what
@@ -74,13 +92,41 @@ helper that checks — the same call sites as the hidden version, the helper's b
 difference, and `false` or `Err` the value in the case. Hidden and helper are told apart by the
 check's body or not at all, so an answer that is always `true` fails one of them.
 
-The words are measured before they are wired: the three cases' twelve targets, the old words, the
-case-only words (the plan's first draft) and this two-step, on the same packets, the arms
-interleaved request by request so the host's version cannot tell them apart, with the lines and
-the rule choosing among the arms committed first (`bench/decisive/words-probe.json`). This
-two-step is the decision if it meets its lines; the case-only words are adopted instead, and this
-ADR amended, only if the two-step fails and they pass; if both fail, nothing is wired and the
-numbers go to the owner.
+### What was measured (`bench/decisive/words-probe*.json`, `bench/logs/words-probe-v[1-4].json`)
+
+The words were measured before they were wired, on the same packets, the arms interleaved request
+by request so the host's version could not tell them apart, with the lines and the rule choosing
+among the arms committed first. Arm 0 was the old words, arm 1 the case-only words, arm 2 the
+two-step. The three cases carried five versions each — shipped, defect, rewrite, hidden, and
+**helper**, made for this probe: the check moved into a helper that checks, the same call sites as
+hidden and the helper's body the only difference, so hidden and helper are told apart by the
+check's body or not at all.
+
+- **Version 1** (275 requests, 15 targets, three arms): arm 1 met every line — the three hidden
+  versions read as reaching the call (0.79–0.89), the three helpers as not (0.88–1.00), every
+  shipped, rewrite and defect as before. Arm 2 read ten of eleven check values right and one
+  wrong: grovedb#500's hidden `heights_need_rewrite`, whose body is `true`, as `false` three
+  times of three (0.91) — a three-line body under a doc comment ("whether the heights … have to
+  be rewritten") and a double-negative sentence, and Jev went by those. Arm 0 read moltis#1064's
+  hidden version as holding (0.86–0.89) and grovedb#500's as reaching in one run of three.
+- The outside line — on calls of pull requests the rules were not written on, of the runs the old
+  words read as holding, none turned into a listing and at most 30 % into not settled — needed ten
+  such runs and got 6 of 33 (**version 2**, a stand-in sentence: 116 requests), 2 of 58 (**version
+  3**, the stand-in on more calls: 282 requests) and 4 of 141 (**version 4**'s predecessor — one
+  real sentence per pull request: 282 requests): under the old words, only the call the sentence's
+  own check guards holds. **Version 4** (twelve sentences, each from a real guard in a changed
+  function of four unseen pull requests; 174 requests) reached 25 such runs. Of them arm 1 held 21,
+  read 2 under the bar as holding, 1 under the bar as reaching, and read **one as reaching at
+  exactly 0.60**: the snapshot's `decode` under the sentence about mutations — a call the sentence
+  does not govern, which the old words themselves held in only two runs of three. The line said
+  none; the owner ruled (2026-09-25) that this one is the line's coarseness — it counted
+  observations without the mapping, which would set that call aside — and adopted arm 1 with the
+  exception written here and in `docs/local-check-cli.md`.
+
+What the probe does not show: that Jev evaluates rather than skims in general. It shows that on
+these three functions, given the checks' bodies and the case, it read the helper's body both ways;
+and that on twelve sentences over four unseen pull requests the new words listed nothing the old
+words held, at one reading at the bar. The dev set (#80) is where this is measured on more.
 
 ## Alternatives considered
 

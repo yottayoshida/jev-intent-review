@@ -122,15 +122,15 @@ async function check2(acceptance: string) {
 }
 
 /**
- * Check 3: the target's outcome in each run of bench/logs/check-before-action-real-v3.json and
+ * Check 3: the target's outcome in each run of bench/logs/check-before-action-real-v4.json and
  * -v2.json (the constructed case) against `check3.rows`. A row is "satisfies 3/3", "violates 3/3" or
  * "violates in at least 2 of 3"; a run where the target is not checked fails whatever the row says.
  */
 export function check3(): { lines: string[]; pass: boolean } {
   type Run = { observed: { key: string; outcome: string }[]; unchecked: { key: string; why: string }[] };
   const expected = readJson<{ check3: { rows: Record<string, Record<string, string>> } }>(join(ROOT, "bench/decisive/expected.json")).check3.rows;
-  const real = readJson<{ cases: Record<string, Record<string, { runs: Run[] }>> }>(join(ROOT, "bench/logs/check-before-action-real-v3.json"));
-  const constructed = readJson<{ versions: Record<string, { runs: Run[] }> }>(join(ROOT, "bench/logs/check-before-action-v2.json"));
+  const real = readJson<{ cases: Record<string, Record<string, { runs: Run[] }>> }>(join(ROOT, "bench/logs/check-before-action-real-v4.json"));
+  const constructed = readJson<{ versions: Record<string, { runs: Run[] }> }>(join(ROOT, "bench/logs/check-before-action-v3.json"));
   const targetOf = (id: string) => (id === "constructed" ? "open_session · create_session(store, &record)" : (() => {
     const t = readJson<{ target: { function: string; call: string } }>(join(ROOT, "bench/forms/real", id, "case.json")).target;
     return `${t.function} · ${t.call}`;

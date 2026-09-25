@@ -206,13 +206,17 @@ const checkBeforeAction: Form = {
   }),
   observationKey: "in_forbidden_case",
   // The case is the requirement's: the packet carries its text, and the question points at it rather
-  // than restating it. Nothing here writes what the check is — that would be this tool guessing.
+  // than restating it. Nothing here writes what the check is — that would be this tool guessing, and
+  // the question does not say "the check does not pass" either (ADR 0020): told that, Jev took a
+  // helper whose body was sent for the check and its name for its body. The bodies of the checks the
+  // form named are under `evidence.related` (ADR 0019), and the case is all that is assumed. Measured
+  // wording (`bench/decisive/words-probe.json`, arm 1): a word changed here is a changed measurement.
   observationQuestions: (fn, call) => ({
     in_forbidden_case: {
       type: "choice",
       instructions:
-        `\`code\` is the body of \`${fn.name}\`. The entries under \`evidence.related\` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. ` +
-        `Assume exactly this and nothing else: \`${fn.name}\` is called in a case where \`requirement.text\` says the call \`${named(call)}\` must not be made, because the check it asks for does not pass. ` +
+        `\`code\` is the body of \`${fn.name}\`. The entries under \`evidence.related\` are the bodies of functions \`${fn.name}\` calls, given so that what those calls do can be read. ` +
+        `Assume exactly this and nothing else: \`${fn.name}\` is called in the case \`requirement.text\` describes, the one in which it says the call \`${named(call)}\` must not be made; every other operation the function reaches succeeds, unless the case itself decides it otherwise. ` +
         `Under that condition: does \`${fn.name}\` go on to make the call \`${named(call)}\`?`,
       criteria: REACH_CRITERIA,
     },
@@ -220,10 +224,10 @@ const checkBeforeAction: Form = {
   violates: ["reaches_it"],
   keeps: ["does_not_reach"],
   words: {
-    intro: `Two questions are put to Jev about each call, separately: whether the requirement requires that a check pass before the call is made, and whether the function still makes the call in a case the requirement forbids it. The bar for each is ${BAR}.`,
+    intro: `Two questions are put to Jev about each call, separately: whether the requirement requires that a check pass before the call is made, and whether the function still makes the call in the case the requirement forbids it, with the bodies of the checks named above the call sent along. The bar for each is ${BAR}.`,
     asks: "Jev, on whether the function still makes the call",
-    observed: "in a case the requirement forbids it",
-    assumed: (fn, call) => `\`${fn.name}\` is called in a case where the requirement says \`${named(call)}\` must not be made, because the check it asks for does not pass.`,
+    observed: "in the case the requirement forbids it",
+    assumed: (fn, call) => `\`${fn.name}\` is called in the case the requirement describes, in which it says \`${named(call)}\` must not be made; every other operation it reaches succeeds, unless the case itself decides it otherwise.`,
     reading: {
       reaches_it: "the call is made in a case the requirement forbids it",
       does_not_reach: "the call is not made in a case the requirement forbids it",
