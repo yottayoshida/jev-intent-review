@@ -1,84 +1,103 @@
-# 0017. A reading that turns on code not sent is not settled
+# 0017. The code that decides a reading is sent, or the call is not asked about
 
 Status: Accepted
 
 ## Context
 
 The local check sends Jev the body of the function a call is in, and nothing else: its related
-code is read only above a `max_related_chars` of 0, which no run uses. Jev is not told what a
-function the body calls does, and it still answers as if it knew. On the acceptance set's two
-hidden versions (#36) — the decision moved into a helper whose body is not sent, so the body alone
-allows either answer — the failure form read `returns_error` at 0.91–0.96 in every run of both
-cases, and the call was read as holding (`bench/logs/acceptance-v4.json`). The check-before-action
-form did the same on moltis#1064's hidden version (`does_not_reach` 1.00, three runs of three) and
-on the constructed case. The packet says `truncated: true` in every one of these runs; that flag
-did not lower any answer.
+code is read only above a `max_related_chars` of 0, which no run uses. Jev still answers as if it
+had read what the body calls. On the acceptance set's hidden versions (#36) — the decision moved
+into a helper whose body is not sent — the failure form read `returns_error` at 0.91–0.96 in every
+run of both cases, and the call was read as holding (`bench/logs/acceptance-v4.json`). The
+check-before-action form read moltis#1064's hidden version as holding at 1.00, and the constructed
+case's the same. The packet says `truncated: true` every time; that did not lower an answer.
 
-The helpers in those versions pass their argument through unchanged, so `returns_error` is what
-the code does. The reading was right and had nothing under it: the same body with a helper that
-swallows the failure is the same packet, and would get the same answer. `docs/dependency-check.md`
-measured the same thing on omamori#553: without the callee, two versions with opposite behaviour
-are one input.
+The helpers in the failure form's hidden versions pass their argument through, so the reading was
+right and had nothing under it: a helper that swallows the failure is the same packet.
+`docs/dependency-check.md` measured the same on omamori#553.
 
-The report already warns that holding "can agree and be wrong" where what decides it was not sent.
-A warning on every holding is not a reading of any one of them.
+**Asking Jev whether the code sent is enough was measured first, and failed** (#82's first
+approach; `bench/evidence-settles/`, `bench/logs/evidence-settles-probe-v1.json`, 87 requests, lines
+committed before any). Hidden versions read as turning on code not sent in 9 of 15 runs (the line
+was 13): grovedb#500's failure form at 0.49–0.53 whether asked with the observation or alone,
+moltis#1064's check-before-action as settled at 0.61–0.64. And it stopped 7 of 51 runs of code the
+table said was settled — all of them grovedb#500's check-before-action, whose shipped code and
+rewrite decide on `self.verify_height(grove_version)`, a body that was not sent either. Read again,
+that answer was right and the table was not: with the check a call whose body is not sent, the
+shipped code is not settled by what was sent any more than the hidden version is. What Jev could
+not do was tell which unsent call decides.
 
 ## Decision
 
-Jev is asked, about each call it reads, a third question: whether what the function does with the
-call, under the form's assumption, can be worked out from the code sent, or turns on what a
-function whose body was not sent does. The question is one for every form: its wording takes from
-the form only `words.case`, the form's assumption without "every other operation succeeds" — with
-that sentence, what an unsent helper does would read as fixed by the assumption. It says that
-`evidence.related` may be empty. It is sent in the same request as the observation, so a run sends
-no more requests than before.
+Which code decides a reading is found from the code, not asked of Jev. It differs by form, and
+each form says it as data (ADR 0006), next to `askable`:
 
-The rule (`review/outcome.ts`) reads it: a call that the mapping and the observation would put in
-*worth checking* or *holding* is *not settled* when this answer says it turns on code not sent, at
-or above the bar of 0.6. Under the bar, `cannot_determine` or no answer leaves the outcome as the
-other two answers put it. The report prints the answer next to the observation, apart from it —
-how sure Jev is of the behaviour, and whether the code sent settles it, are two readings.
+- **`failure_propagation`**: the failure decides the reading when the failure the call returns
+  reaches repository code before it reaches `?` — a function that takes the call as an argument
+  (`step_outcome(self.rewrite_heights(v))?`), whose name has a definition in the repository outside
+  the tests and is not in a fixed table of names every repository has (`Ok`, `Some`, `Err`, `new`,
+  `from`, `into`, `timeout`, `spawn`, `spawn_blocking`, `block_on`, `drop`). Such a call is not asked
+  about: it is held before its question, and *Not checked* says through which function. A call whose
+  failure is returned first (`extend(unpack(x)?)`), or passes through a method chained after it, is
+  asked as before: grovedb#500 defines its own `map_err` and `map`, moltis#1064 its own `context`,
+  `with_context`, `ok` and `timeout`, so whether a method's name is defined in the repository does
+  not tell it from the standard library's. The expression is read with its whitespace collapsed, so
+  one rustfmt split over lines is the same expression. Nothing is added to the packet.
+- **`check_before_action`**: the check decides the reading. A check is a call before the target in
+  its function that is in a condition (`if`, `while`, `match` and its guards, `let … else`, or the
+  outermost call of a statement that `?`-s its result and binds nothing, `check(x)?;` — a read such
+  as `let v = get_version(..)?;` is not a check), whose own name meets the requirement's words (the rule ADR 0016
+  orders by), that does not start with a capital (a variant or a tuple struct), and that is not a
+  call of the target's own name. A function the change touched can be a check: a helper the pull
+  request added is the likeliest place for a check that does nothing. Each check's body is sent
+  with the packet when its name has exactly one definition outside the tests and the body fits
+  (4,000 characters each, 8,000 in all). With more than one definition, or too long, the call is
+  held before its question, and *Not checked* says which check could not be sent and why. With none
+  (`path.exists()`, a dependency's check) there is nothing in the repository to send, and the call
+  is asked as before, as the failure form treats a name the repository does not define. The functions a sent check calls, each with
+  exactly one definition, are sent too while they fit — a second level, not required: grovedb#500's
+  `verify_height` hands the decision to `verify_tree_height`. A target with no check before it is
+  asked as before.
 
-A call not settled this way is not a finding, so it does not change the exit code under
-`policy.fail_on: [finding]`. The Action counts it as left to look at: a run with one is not green,
-so a call that was worth checking does not turn a check run green by dropping out.
+The report lists, under a call read, each body that was sent with it. `--json` carries the same on
+each observed call (`sent`), and a call held for this reason in `unchecked` with its `why`. A held
+call is left to look at, so the Action's check run is not green (as for every call not checked).
 
-This was chosen before #80's dev set exists and before #83's resolution contract, and is measured
-first on the acceptance set's cases. It does not close #82: its Done-when evaluates on #80's
-dev/sealed protocol.
+Finding the one definition goes through one function in `src/evidence/builder.ts`, which uses the
+repository search the builder already uses. It is by name. #82 says an approach that needs the exact
+callee waits for #83's resolution contract; the owner chose not to wait (2026-09-25), so #83 is not
+a prerequisite, and that function is where #83's contract replaces this lookup.
 
 ## Alternatives considered
 
-- **Decide it mechanically from the call graph** (#82's second approach): a call whose value
-  passes through a repository function whose body is not in the packet is not settled. It needs to
-  know which definition a call reaches; today that is the name heuristic #83 replaces, and the
-  issue asks that it not be copied into this decision. Revisit once #83's contract is merged.
-- **Send the callee's body** (#82's third approach): `buildEvidence` can already add one hop of
-  definitions. It changes every packet — every measurement is taken again — and needs the same
-  callee identity from #83; where the body does not fit, a rule like this one is still needed.
-- **Choose after #80's dev set.** The issue's order. Deferred on the owner's ruling (2026-09-25):
-  the typed question does not depend on #80 or #83, and a probe on the acceptance set decides
-  whether it works before anything is wired.
-- **Ask it in a request of its own.** Keeps the observation's request byte for byte what it was,
-  at half again as many requests. Chosen against unless the probe shows the shared request moves
-  the observation's answers, or that this question's answers differ when it is asked alone: the
-  observation's question in the same request still says every other operation succeeds, which
-  could read as fixing what an unsent helper does. The probe asks the hidden versions both ways.
-- **Allow a holding or a finding only when the code sent is read as settling it** (at or above
-  the bar). Stricter, and it would erase the other two readings whenever the answer to this
-  question is merely unsure. Not chosen; the probe and the measurements record what it would have
-  given beside what this rule gives.
-- **Treat `truncated: true` in the packet as not settled.** It is true of every packet the local
-  check sends, so it would leave nothing settled.
+- **Ask Jev whether the code sent is enough** (#82's first approach). Measured above; not adopted.
+- **Find the check by its name alone** (any call before the target whose name meets the words).
+  Tried on the three cases' code before measuring: it took grovedb#500's
+  `Error::ChunkRestoringError`, moltis#1064's `values_to_chat_messages` (defined twice, once under
+  `benches/`) and the constructed case's `load_key`, and would have held the shipped code and the
+  only real defect of the form as *Not checked*. The condition position is what separates them.
+- **Send every callee's body** (the builder's one hop, `max_related_chars` above 0). Every packet
+  changes and grows, every measurement is taken again, and most of what is sent decides nothing.
+- **Send the failure form's wrapper too**, instead of holding the call. It would settle the
+  failure form's hidden versions (their helpers pass the failure through). Not now: the owner chose
+  to decide the failure form from its shape (2026-09-25), and a wrapper sent is the same lookup by
+  name that #83 may replace. Revisit with #83.
+- **Hold every check-before-action call with any unsent call before its target.** Honest and
+  simple, and it holds nearly every call of real code: moltis#1064's function reads a session store,
+  metadata and a registry before its target, each a call whose body is not sent and decides nothing
+  the requirement names.
+- **Stop saying "holding".** It changes what the report is called, not what it rests on.
+- **Wait for #80's dev set to compare.** The owner chose to go on (2026-09-25); #80's protocol
+  measures this before #82 is closed.
 
 ## Consequences
 
-- The questions' fingerprint (`QUESTIONS_HASH`) moves, and every answer kept for a pull request
-  (ADR 0013) is asked again once.
-- The claim is one way: a call Jev reads as turning on code not sent is not settled. It does not
-  claim the code sent was enough for every holding: Jev may read an answer as settled when it is
-  not, as it read the behaviour, and the two answers come from one request. The report keeps its
-  measured warning under *Read as holding*. What is left is for the mechanical check after #83.
-- If the probe shows Jev reads almost every call as turning on code not sent, the check says
-  little. That is what the probe measures on the shipped, defect and rewrite versions before this
-  is wired.
+- The failure form's hidden versions are not read confidently; they are *Not checked*. A decision
+  hidden in a helper spread over several statements (`let r = call(); let s = wrap(r); s?`) is not
+  found by a shape read in one expression, and is read as before. #83's parser is where that grows.
+- Check-before-action readings rest on the check's body where one was named, and a hidden check
+  that does nothing is read as what it is: the call is made where the requirement forbids it.
+- The questions do not change, so no answer kept for a pull request (ADR 0013) is invalidated
+  except those whose packet now carries a check's body.
+- A check whose name does not meet the requirement's words is not found. The reading then rests on
+  what was sent, as before this decision, and the report's warning under *Read as holding* stays.

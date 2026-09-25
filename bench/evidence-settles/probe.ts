@@ -31,7 +31,8 @@ import { endpointFromEnv, JevClient, jevModel } from "../../src/judgments/client
 import { JevProvider } from "../../src/judgments/jev.ts";
 import { QUESTIONS_HASH } from "../../src/judgments/questions.ts";
 import { enumerate } from "../../src/plan/candidates.ts";
-import { EVIDENCE_KEY, evidenceQuestion, FORMS, NOT_SENT, type Form } from "../../src/plan/forms.ts";
+import { FORMS, type Form } from "../../src/plan/forms.ts";
+import { EVIDENCE_KEY, evidenceQuestion, NOT_SENT } from "./question.ts";
 import { Git } from "../../src/repository/git.ts";
 import { DEFAULT_LOCAL_CHECK } from "../../src/review/local-check-run.ts";
 import type { ChoiceAnswer, Candidate } from "../../src/types.ts";
@@ -235,8 +236,8 @@ async function send(acceptance: string, constructed: string, limit: number) {
       if (log.records.some((r) => r.id === item.id && r.run === run && r.error === undefined)) continue;
       const record: Record_ = { id: item.id, run };
       try {
-        record.shared = await provider.judge(evidence.packet, { ...form.observationQuestions(fn, call), ...evidenceQuestion(form, fn, call) });
-        if (item.alone) record.alone = await provider.judge(evidence.packet, evidenceQuestion(form, fn, call));
+        record.shared = await provider.judge(evidence.packet, { ...form.observationQuestions(fn, call), ...evidenceQuestion(form.name, fn, call) });
+        if (item.alone) record.alone = await provider.judge(evidence.packet, evidenceQuestion(form.name, fn, call));
       } catch (error) {
         record.error = error instanceof Error ? `${error.name}: ${error.message.slice(0, 200)}` : String(error);
       }
