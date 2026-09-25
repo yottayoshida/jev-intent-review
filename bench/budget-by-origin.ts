@@ -54,6 +54,8 @@ function copyOf(from: "before" | "after", uncapped: boolean): string {
     cpSync(join(HERE, "package.json"), join(dir, "package.json"));
   }
   symlinkSync(join(HERE, "node_modules"), join(dir, "node_modules"));
+  // The Rust grammar `src/syntax/rust.ts` loads from `../../vendor` (#83), for a tool that has one.
+  if (existsSync(join(HERE, "vendor"))) symlinkSync(join(HERE, "vendor"), join(dir, "vendor"));
   if (uncapped) {
     for (const [file, pattern, line] of CAPS) {
       const path = join(dir, file);

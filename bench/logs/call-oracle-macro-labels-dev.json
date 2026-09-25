@@ -1,0 +1,857 @@
+{
+ "note": "Seed 83 sample of the calls listed inside macro invocations on #80's dev material (docs/call-oracle.md): 30 from the listing after #83 ('new') and 30 from the listing before it ('old', the comparison), mixed and shown to three fresh subagent annotators without the side. Each answered whether the name is the callee of a real call written in the macro's arguments as ordinary code. All three gave the same answers.",
+ "bar": "new: at most 1 of 30 majority-labelled not a call; old must show some, or the annotators did not tell calls apart",
+ "result": {
+  "new": {
+   "items": 30,
+   "notACall": 0
+  },
+  "old": {
+   "items": 30,
+   "notACall": 4
+  },
+  "unanimous": 60
+ },
+ "items": [
+  {
+   "item": 1,
+   "side": "new",
+   "path": "merk/src/element/get.rs",
+   "function": "get_with_value_hash",
+   "line": 358,
+   "column": 21,
+   "name": "root_key",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 2,
+   "side": "old",
+   "path": "crates/gateway/src/voice/tts_service.rs",
+   "function": "status",
+   "line": 193,
+   "column": 33,
+   "name": "map",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 3,
+   "side": "old",
+   "path": "crates/gateway/src/voice/mod.rs",
+   "function": "migrate_voice_keys_to_key_store",
+   "line": 136,
+   "column": 44,
+   "name": "as_ref",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 4,
+   "side": "new",
+   "path": "crates/tools/src/sandbox/docker.rs",
+   "function": "network_run_args",
+   "line": 183,
+   "column": 60,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 5,
+   "side": "old",
+   "path": "core/indexer/src/bitcoin_follower/listener.rs",
+   "function": "run_event_loop",
+   "line": 174,
+   "column": 40,
+   "name": "send",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 6,
+   "side": "old",
+   "path": "crates/httpd/src/ngrok_routes.rs",
+   "function": "ngrok_error",
+   "line": 24,
+   "column": 23,
+   "name": "into",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 7,
+   "side": "old",
+   "path": "src/commands/maintenance.rs",
+   "function": "run_doctor",
+   "line": 72,
+   "column": 68,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 8,
+   "side": "new",
+   "path": "src/control_plane/handlers/finished_jobs.rs",
+   "function": "finished_jobs",
+   "line": 69,
+   "column": 37,
+   "name": "num_minutes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 9,
+   "side": "new",
+   "path": "crates/gateway/src/voice/stt_service.rs",
+   "function": "list_providers",
+   "line": 273,
+   "column": 61,
+   "name": "is_some",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 10,
+   "side": "new",
+   "path": "grovedb-query/src/lib.rs",
+   "function": "hex_to_ascii",
+   "line": 68,
+   "column": 48,
+   "name": "hex::encode",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 11,
+   "side": "new",
+   "path": "crates/tools/src/sandbox/containers.rs",
+   "function": "apple_container_run_args",
+   "line": 126,
+   "column": 17,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 12,
+   "side": "new",
+   "path": "crates/browser/src/container.rs",
+   "function": "start_with_backend",
+   "line": 484,
+   "column": 30,
+   "name": "cli",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 13,
+   "side": "new",
+   "path": "crates/webhooks/src/profiles/gitlab.rs",
+   "function": "event_catalog",
+   "line": 27,
+   "column": 49,
+   "name": "into",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 14,
+   "side": "old",
+   "path": "crates/gateway/src/server/helpers.rs",
+   "function": "validate_proxy_tls_configuration",
+   "line": 422,
+   "column": 113,
+   "name": "tls",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 15,
+   "side": "new",
+   "path": "grovedb/src/batch/estimated_costs/average_case_costs.rs",
+   "function": "update_base_merk_root_key",
+   "line": 430,
+   "column": 16,
+   "name": "GroveDb::add_average_case_get_merk_at_path",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 16,
+   "side": "new",
+   "path": "grovedb/src/operations/delete/average_case.rs",
+   "function": "average_case_delete_operations_for_delete_up_tree_while_empty",
+   "line": 101,
+   "column": 37,
+   "name": "subtree_with_feature_and_flags_size",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 17,
+   "side": "new",
+   "path": "grovedb/src/operations/proof/verify.rs",
+   "function": "verify_layer_proof",
+   "line": 1433,
+   "column": 80,
+   "name": "value",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 18,
+   "side": "new",
+   "path": "crates/config/src/validate/semantic.rs",
+   "function": "check_semantic_warnings",
+   "line": 626,
+   "column": 39,
+   "name": "join",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 19,
+   "side": "new",
+   "path": "crates/tools/src/checkpoints.rs",
+   "function": "classify_source_kind",
+   "line": 455,
+   "column": 15,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 20,
+   "side": "new",
+   "path": "src/scheduler.rs",
+   "function": "upsert_task",
+   "line": 39,
+   "column": 30,
+   "name": "clone",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 21,
+   "side": "old",
+   "path": "src/mcp/tools/maintenance.rs",
+   "function": "call_audit",
+   "line": 1228,
+   "column": 31,
+   "name": "count_at_severity",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 22,
+   "side": "old",
+   "path": "grovedb/src/operations/delete/mod.rs",
+   "function": "delete_with_sectional_storage_function",
+   "line": 360,
+   "column": 19,
+   "name": "as_ref",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 23,
+   "side": "old",
+   "path": "crates/node-host/src/runner.rs",
+   "function": "default",
+   "line": 59,
+   "column": 31,
+   "name": "into",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 24,
+   "side": "old",
+   "path": "grovedb/src/element/path_query_push_args.rs",
+   "function": "fmt",
+   "line": 110,
+   "column": 17,
+   "name": "map",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 25,
+   "side": "old",
+   "path": "src/commands/project.rs",
+   "function": "init_project",
+   "line": 134,
+   "column": 27,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 26,
+   "side": "new",
+   "path": "merk/src/proofs/query/verify.rs",
+   "function": "fmt",
+   "line": 529,
+   "column": 48,
+   "name": "unwrap_or_else",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 27,
+   "side": "old",
+   "path": "src/commands/run.rs",
+   "function": "run_script",
+   "line": 376,
+   "column": 86,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 28,
+   "side": "old",
+   "path": "crates/providers/src/github_copilot/provider.rs",
+   "function": "stream_chat_completions",
+   "line": 1288,
+   "column": 47,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 29,
+   "side": "old",
+   "path": "crates/providers/src/openai_codex.rs",
+   "function": "stream_with_tools",
+   "line": 875,
+   "column": 17,
+   "name": "collect",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 30,
+   "side": "old",
+   "path": "crates/matrix/src/outbound.rs",
+   "function": "send_stream",
+   "line": 634,
+   "column": 52,
+   "name": "is_some",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 31,
+   "side": "new",
+   "path": "crates/matrix/src/handler/implementation.rs",
+   "function": "handle_audio_message",
+   "line": 768,
+   "column": 20,
+   "name": "audio_kind_label",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 32,
+   "side": "new",
+   "path": "src/commands/maintenance.rs",
+   "function": "run_doctor",
+   "line": 117,
+   "column": 35,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 33,
+   "side": "new",
+   "path": "grovedb/src/operations/bulk_append_tree.rs",
+   "function": "bulk_get_value",
+   "line": 217,
+   "column": 21,
+   "name": "get_chunk_value",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 34,
+   "side": "new",
+   "path": "merk/src/element/get.rs",
+   "function": "get_optional_from_storage_v1",
+   "line": 492,
+   "column": 60,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 35,
+   "side": "old",
+   "path": "crates/providers/src/github_copilot/provider.rs",
+   "function": "stream_chat_completions",
+   "line": 1224,
+   "column": 66,
+   "name": "collect",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 36,
+   "side": "old",
+   "path": "crates/cli/src/node_commands.rs",
+   "function": "handle_node",
+   "line": 375,
+   "column": 44,
+   "name": "into",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 37,
+   "side": "old",
+   "path": "src/engine/hook.rs",
+   "function": "emit_json_error",
+   "line": 2146,
+   "column": 83,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 38,
+   "side": "new",
+   "path": "crates/webhooks/src/profiles/stripe.rs",
+   "function": "normalize_payload",
+   "line": 138,
+   "column": 29,
+   "name": "to_uppercase",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 39,
+   "side": "new",
+   "path": "grovedb/src/estimated_costs/average_case_costs.rs",
+   "function": "average_case_merk_replace_tree_v0",
+   "line": 128,
+   "column": 17,
+   "name": "map_err",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 40,
+   "side": "new",
+   "path": "crates/oauth/src/flow.rs",
+   "function": "exchange",
+   "line": 88,
+   "column": 38,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 41,
+   "side": "new",
+   "path": "grovedb-element/src/reference_path/mod.rs",
+   "function": "invert",
+   "line": 121,
+   "column": 57,
+   "name": "map",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 42,
+   "side": "new",
+   "path": "crates/gateway/src/node_exec.rs",
+   "function": "ssh_target_node_info",
+   "line": 147,
+   "column": 40,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 43,
+   "side": "new",
+   "path": "grovedb/src/operations/delete/mod.rs",
+   "function": "delete_internal_on_transaction",
+   "line": 841,
+   "column": 20,
+   "name": "Element::delete_with_sectioned_removal_bytes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 44,
+   "side": "old",
+   "path": "grovedb/src/lib.rs",
+   "function": "propagate_changes_with_transaction",
+   "line": 613,
+   "column": 21,
+   "name": "open_transactional_merk_at_path",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 45,
+   "side": "old",
+   "path": "src/mcp/tools/maintenance.rs",
+   "function": "call_lint",
+   "line": 250,
+   "column": 98,
+   "name": "unwrap_or",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 46,
+   "side": "old",
+   "path": "core/indexer/src/main.rs",
+   "function": "main",
+   "line": 38,
+   "column": 63,
+   "name": "column",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 47,
+   "side": "new",
+   "path": "crates/voice/src/tts/google.rs",
+   "function": "voices",
+   "line": 97,
+   "column": 20,
+   "name": "expose_secret",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 48,
+   "side": "new",
+   "path": "crates/tools/src/sandbox/paths.rs",
+   "function": "detect_host_data_dir",
+   "line": 41,
+   "column": 55,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 49,
+   "side": "old",
+   "path": "grovedb-element/src/element/mod.rs",
+   "function": "fmt",
+   "line": 203,
+   "column": 38,
+   "name": "map_or",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 50,
+   "side": "new",
+   "path": "src/runtime.rs",
+   "function": "supported_versions",
+   "line": 381,
+   "column": 36,
+   "name": "to_string",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 51,
+   "side": "old",
+   "path": "crates/httpd/src/ssh_routes.rs",
+   "function": "scan_target_known_host",
+   "line": 1044,
+   "column": 17,
+   "name": "unwrap_or_default",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 52,
+   "side": "old",
+   "path": "src/client/app_state.rs",
+   "function": "fetch_app_state_with_retry_inner",
+   "line": 81,
+   "column": 42,
+   "name": "crate::appstate_sync::AppStateSyncError::KeyNotFound",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 53,
+   "side": "old",
+   "path": "wacore/binary/src/node.rs",
+   "function": "from",
+   "line": 282,
+   "column": 34,
+   "name": "itoa::Buffer::new",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 54,
+   "side": "old",
+   "path": "src/mcp/tools/maintenance.rs",
+   "function": "call_doctor",
+   "line": 114,
+   "column": 31,
+   "name": "display",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 55,
+   "side": "old",
+   "path": "crates/providers/src/openai/provider/streaming.rs",
+   "function": "stream_with_tools_sse",
+   "line": 195,
+   "column": 45,
+   "name": "retry_after_ms_from_headers",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 56,
+   "side": "old",
+   "path": "crates/agents/src/runner/non_streaming.rs",
+   "function": "run_agent_loop_with_context",
+   "line": 275,
+   "column": 51,
+   "name": "len",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 57,
+   "side": "new",
+   "path": "grovedb/src/batch/mod.rs",
+   "function": "process_reference",
+   "line": 1084,
+   "column": 17,
+   "name": "map_err",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 58,
+   "side": "old",
+   "path": "core/macros/src/root.rs",
+   "function": "init",
+   "line": 14,
+   "column": 53,
+   "name": "alloc::rc::Rc::new",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 59,
+   "side": "old",
+   "path": "core/macros/src/model.rs",
+   "function": "generate_enum",
+   "line": 362,
+   "column": 73,
+   "name": "as_ref",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 60,
+   "side": "new",
+   "path": "crates/gateway/src/server/workspace.rs",
+   "function": "warn_on_workspace_prompt_file_truncation",
+   "line": 39,
+   "column": 62,
+   "name": "join",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  }
+ ]
+}

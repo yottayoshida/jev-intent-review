@@ -23,6 +23,7 @@
 
 import { defines, definedName } from "../change/blocks.ts";
 import { isTestPath, type Discoverer } from "../discovery/discover.ts";
+import { cfgPredicate, testOnlyCfg } from "../syntax/cfg.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
 import { namesTheStandardLibrary, outsideResult } from "./outside-results.ts";
 import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
@@ -109,18 +110,150 @@ const testOnlyFiles = new WeakMap<Discoverer, Map<string, Promise<boolean>>>();
  * methods would resolve to a definition that no shipped code reaches, and the budget would be spent
  * asking about test code.
  */
-export function declaredForTestsOnly(discoverer: Discoverer, path: string): Promise<boolean> {
-  let answers = testOnlyFiles.get(discoverer);
+export function declaredForTestsOnly(discoverer: Discoverer, path: string, options: { forListing?: boolean } = {}): Promise<boolean> {
+  // Two answers, cached apart: the listing's reaches further than the definitions' (#83), and
+  // whichever is asked first must not answer for the other.
+  const cache = options.forListing ? testOnlyForListing : testOnlyFiles;
+  let answers = cache.get(discoverer);
   if (!answers) {
     answers = new Map();
-    testOnlyFiles.set(discoverer, answers);
+    cache.set(discoverer, answers);
   }
   let answer = answers.get(path);
   if (!answer) {
-    answer = readDeclaration(discoverer, path);
+    answer = options.forListing ? readDeclarationForListing(discoverer, path, new Set()) : readDeclaration(discoverer, path);
     answers.set(path, answer);
   }
   return answer;
+}
+
+const testOnlyForListing = new WeakMap<Discoverer, Map<string, Promise<boolean>>>();
+
+/** One place a file is declared as a module, and whether that declaration is compiled only for tests. */
+interface Declaration {
+  parent: string;
+  test: boolean;
+}
+
+const escapeForRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const PATH_ATTRIBUTE = /#\[\s*path\s*=\s*"([^"]+)"\s*\]/;
+const isCrateRoot = (path: string) => /(^|\/)(lib|main|build)\.rs$/.test(path) || /(^|\/)bin\/[^/]+\.rs$/.test(path);
+
+/** `a/b/../c/./d.rs` → `a/c/d.rs`. */
+function normalizePath(path: string): string {
+  const out: string[] = [];
+  for (const part of path.split("/")) {
+    if (part === "..") out.pop();
+    else if (part !== "." && part !== "") out.push(part);
+  }
+  return out.join("/");
+}
+
+const testAttribute = (attribute: string) => {
+  const predicate = cfgPredicate(attribute.trim());
+  return predicate !== null && testOnlyCfg(predicate);
+};
+
+/**
+ * Where a file is declared as a module: first in the places Rust looks for it (the directory's module
+ * file, the crate's root, the file named after the directory); when none declares it, a
+ * `#[path = "…"]` naming it, and a file of its directory loaded through `#[path]`, which keeps its
+ * children beside it.
+ */
+async function declarationsOf(discoverer: Discoverer, path: string): Promise<Declaration[]> {
+  if (isCrateRoot(path)) return [];
+  const parts = path.split("/");
+  let name = parts[parts.length - 1]!.replace(/\.rs$/, "");
+  let directory = parts.slice(0, -1);
+  if (name === "mod") {
+    name = directory[directory.length - 1] ?? "";
+    directory = directory.slice(0, -1);
+  }
+  if (name === "") return [];
+  const reader = returnTypesFor(discoverer);
+  const declares = (n: string) => new RegExp(`^(?:#\\[[^\\]]*\\]\\s*)*(?:pub(?:\\([^)]*\\))?\\s+)?mod\\s+${escapeForRegExp(n)}\\s*;`);
+  const found: Declaration[] = [];
+  const read = async (parent: string, line: number, wantPath: boolean) => {
+    const lines = await reader.codeLinesOf(parent);
+    if (!lines) return;
+    const attributes = [lines[line - 1]!, ...(await reader.attributes(parent, line))];
+    // A `#[path]` declaration names another file than the one Rust would look for.
+    if (attributes.some((a) => PATH_ATTRIBUTE.test(a)) !== wantPath) return;
+    found.push({ parent, test: attributes.some(testAttribute) });
+  };
+
+  const parents = [[...directory, "mod.rs"].join("/"), [...directory, "lib.rs"].join("/"), [...directory, "main.rs"].join("/")];
+  if (directory.length > 0) parents.push(`${directory.join("/")}.rs`);
+  for (const parent of parents) {
+    if (parent === path) continue;
+    const lines = await reader.codeLinesOf(parent);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) if (declares(name).test(lines[i]!)) await read(parent, i + 1, false);
+  }
+  if (found.length > 0) return found;
+
+  // A file of this directory loaded through `#[path]` keeps its children beside it. The `#[path]` that
+  // loads it into this directory can only be written in the file named after the directory or in the
+  // module files one level up, so those are read rather than searched: the directory's name
+  // (`handler`) is too common a word for a search to return in full.
+  const here = parts.slice(0, -1);
+  const up = here.slice(0, -1);
+  // At the repository's top there is no directory to load into: the search below still runs.
+  const writers = here.length === 0 ? [] : [`${here.join("/")}.rs`, ...["mod.rs", "lib.rs", "main.rs"].map((f) => [...up, f].join("/"))];
+  for (const writer of writers) {
+    // The raw lines: `codeLinesOf` blanks strings, and the path is one.
+    const lines = (await discoverer.index(writer))?.lines;
+    if (!lines) continue;
+    const dir = writer.slice(0, writer.lastIndexOf("/") + 1);
+    for (const line of lines) {
+      const named = PATH_ATTRIBUTE.exec(line);
+      if (!named) continue;
+      const loaded = normalizePath(`${dir}${named[1]}`);
+      if (loaded === path || loaded.slice(0, loaded.lastIndexOf("/")) !== here.join("/")) continue;
+      const loadedLines = await reader.codeLinesOf(loaded);
+      if (!loadedLines) continue;
+      for (let i = 0; i < loadedLines.length; i++) if (declares(name).test(loadedLines[i]!)) await read(loaded, i + 1, false);
+    }
+  }
+  if (found.length > 0) return found;
+
+  // `#[path = "…/this.rs"] mod x;` (the declaration on the attribute's line or the next few), found
+  // by the file's own name — a whole word that holds a dot, so
+  // the search is as narrow as the name (`read.rs`, not every `read`).
+  const base = parts[parts.length - 1]!;
+  // A search cut short may have missed a declaration that is not for tests: the answer is then
+  // "not for tests", which leaves the file in the listing, where it is seen.
+  const byName = await discoverer.search(base);
+  if (byName.more) return [];
+  for (const hit of byName.hits) {
+    const named = PATH_ATTRIBUTE.exec(hit.text);
+    if (!hit.path.endsWith(".rs") || !named) continue;
+    const dir = hit.path.slice(0, hit.path.lastIndexOf("/") + 1);
+    if (normalizePath(`${dir}${named[1]}`) !== path) continue;
+    const lines = await reader.codeLinesOf(hit.path);
+    if (!lines) continue;
+    for (let l = hit.line; l <= Math.min(lines.length, hit.line + 3); l++) {
+      if (/\bmod\s+\w+\s*;/.test(lines[l - 1]!)) {
+        await read(hit.path, l, true);
+        break;
+      }
+    }
+  }
+  return found;
+}
+
+/**
+ * The listing's answer (#83): a file is compiled only for tests when every declaration of it is a
+ * test-only one or sits in a file compiled only for tests. A search cut short finds fewer
+ * declarations and so answers "not for tests", which leaves the file in the listing, where it is seen.
+ */
+async function readDeclarationForListing(discoverer: Discoverer, path: string, seen: Set<string>): Promise<boolean> {
+  if (seen.has(path)) return false;
+  seen.add(path);
+  const declarations = await declarationsOf(discoverer, path);
+  if (declarations.length === 0) return false;
+  for (const d of declarations) if (!d.test && !(await readDeclarationForListing(discoverer, d.parent, seen))) return false;
+  return true;
 }
 
 async function readDeclaration(discoverer: Discoverer, path: string): Promise<boolean> {
@@ -415,6 +548,8 @@ export type CalleeLocation = { kind: "repository" | "versions"; path: string; li
 export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<{ result: Applicability; at: CalleeLocation }> {
   const reader = returnTypesFor(discoverer);
   const bare = call.callee.split("::").pop()!;
+  // `(self.f)(x)`, `make()(x)`: listed since #83, and no name to look a definition up by.
+  if (bare === "") return { result: { ok: false, kind: "callee_unresolved", reason: "the callee is not a name (a closure or a function value), so what it returns is not established here" }, at: null };
   const outside = outsideResult(call.callee);
   // A call that writes `std::` says which library it means, and no definition here is that library.
   if (outside && namesTheStandardLibrary(call.callee)) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };

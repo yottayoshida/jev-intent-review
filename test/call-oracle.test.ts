@@ -95,36 +95,31 @@ test("classifying the fixtures with today's listing gives the committed baseline
   }
 });
 
-test("the known shapes appear by name in the baseline", () => {
+test("the shapes #81 found wrong are read right by the parser (#83)", () => {
+  // #81 committed these as the listing's misses; #83's listing reads each one (docs/call-oracle.md,
+  // *The record after #83: the parser (dev)*). The baseline before is in git: `git show da285e3:test/fixtures/call-oracle/baseline.json`.
   const call = (path: string, last: string) => byPath(path).calls.find((c) => c.last === last)!;
-  const candidate = (path: string, callee: string) => byPath(path).candidates.find((c) => c.callee === callee)!;
+  const candidates = (path: string) => byPath(path).candidates;
 
-  assert.equal(call("turbofish.rs", "foo").class, "silent_miss");
   assert.equal(call("turbofish.rs", "foo").turbofish, "last");
-  assert.equal(call("turbofish.rs", "collect").class, "silent_miss");
-  assert.equal(call("turbofish.rs", "new").turbofish, "inner");
+  assert.equal(call("turbofish.rs", "foo").class, "detected");
+  assert.equal(call("turbofish.rs", "collect").class, "detected");
   assert.equal(call("turbofish.rs", "new").class, "detected");
-
-  assert.equal(candidate("comments.rs", "old_call").reason, "comment");
-  assert.equal(candidate("comments.rs", "trailing_note").reason, "comment");
-  assert.equal(candidate("comments.rs", "not_a_call").reason, "string");
-
-  assert.deepEqual(byPath("one_line.rs").calls.map((c) => c.class), ["silent_miss", "silent_miss"]);
-  assert.equal(call("multiline.rs", "compute").class, "silent_miss");
-
-  assert.equal(call("macro_names.rs", "write").class, "silent_miss");
-  assert.equal(call("macro_names.rs", "write").macroNameCollision, true);
-  assert.equal(candidate("macro_names.rs", "compute").class, "in_macro");
-  assert.equal(call("constructors.rs", "Ok").class, "declared_exclusion");
-  assert.equal(call("constructors.rs", "A").capitalized, true);
-  assert.equal(candidate("constructors.rs", "E::A").reason, "pattern");
-  assert.equal(candidate("types.rs", "Fn").reason, "type");
-
-  assert.equal(candidate("nested.rs", "inner").reason, "definition");
-  assert.equal(byPath("nested.rs").candidates.filter((c) => c.callee === "deep").map((c) => c.reason ?? c.class).sort().join(), "duplicate,matched");
+  assert.equal(call("multiline.rs", "compute").class, "detected");
+  assert.deepEqual(byPath("one_line.rs").calls.map((c) => c.class), ["detected", "detected"]);
+  assert.equal(call("macro_names.rs", "write").class, "detected");
+  assert.equal(call("macro_names.rs", "format").class, "detected");
+  assert.equal(call("raw.rs", "match").class, "detected");
   assert.equal(call("nested.rs", "deep").fn.name, "inner");
-  assert.equal(candidate("tests_and_cfg.rs", "check").reason, "test_only");
-  assert.equal(call("raw.rs", "type").class, "detected");
+  assert.equal(call("constructors.rs", "Ok").class, "declared_exclusion", "Ok, Err and Some are still refused on purpose");
+  assert.equal(call("constructors.rs", "A").capitalized, true);
+
+  // Nothing that is not a call: the comment, the string, the pattern, the type, the definition line,
+  // the nested function's second listing, the test function.
+  for (const f of baseline) assert.deepEqual(candidates(f.path).filter((c) => c.class === "false_positive"), [], f.path);
+  assert.deepEqual(candidates("comments.rs").map((c) => c.callee), ["real", "other"]);
+  assert.equal(candidates("macro_names.rs").find((c) => c.callee === "compute")?.class, "in_macro", "a call in `vec![…]` is listed, and outside the oracle's scope");
+  assert.ok(!candidates("tests_and_cfg.rs").some((c) => c.callee === "check"), "a #[test] function lists nothing");
 });
 
 test("taking the listing's method calls out moves exactly those calls from detected to silent_miss", () => {

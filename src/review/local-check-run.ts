@@ -46,9 +46,9 @@ import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import { applicabilityOf, definitionsOfName, functionDefinitionsOf } from "../plan/applicability.ts";
-import { enumerate, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
+import type { CallCandidate, Candidates, FunctionCandidate } from "../plan/candidates.ts";
 import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
-import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
+import { CandidateFiles, readListing, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR, type MappingAnswer, type MappingVerdict } from "../plan/mapping.ts";
 import { selectSiblings, selectSites, type Askability, type FunctionOrigin, type Selection, type Site, type SiteSource } from "../plan/select.ts";
@@ -401,13 +401,13 @@ export async function runLocalCheck(
   // the listing the run already has for its file — a sibling's file is listed here once, since it is
   // not among the change's sources — and whether the repository defines a name. Both depend on the
   // commit alone, so each is looked up once.
-  const listings = new Map<string, Promise<ReturnType<typeof enumerate> | null>>();
+  const listings = new Map<string, Promise<Candidates | null>>();
   const callsOf = async (fn: FunctionCandidate): Promise<CallCandidate[]> => {
     const own = fromChange.sources.get(fn.path)?.candidates;
     if (own) return own.calls.filter((c) => c.functionId === fn.id);
     let listing = listings.get(fn.path);
     if (!listing) {
-      listing = discoverer.index(fn.path).then((index) => (index ? enumerate(fn.path, index.lines.join("\n")) : null));
+      listing = readListing(discoverer, fn.path);
       listings.set(fn.path, listing);
     }
     const l = await listing;

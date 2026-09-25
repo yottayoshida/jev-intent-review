@@ -47,7 +47,7 @@ case "${1:-}" in
     work="$(mktemp -d "${RUNNER_TEMP:?}/jev-intent-review.XXXXXX")" || stop "could not make its working directory."
     # The artifact's directory is finish.ts's to make: only what it redacts is uploaded.
     if ! (cd "${ACTION_PATH:?}" && npm ci --omit=dev --ignore-scripts --no-audit --no-fund) > "$work/npm.txt" 2>&1; then
-      stop "could not install its one dependency (npm ci failed). Its output is kept out of the log."
+      stop "could not install its dependencies (npm ci failed). Its output is kept out of the log."
     fi
     output work "$work"
     output ready true

@@ -91,7 +91,7 @@ export const questionsFor = (c: Condition) =>
  * none means this version moved it, more than one means the condition does not say which.
  */
 export function locateCall(body: string, call: CallCandidate): { ok: boolean; found: number; reason?: string } {
-  if (!call.expressionComplete) return { ok: false, found: 0, reason: `the call does not close its parentheses within the scan, so it cannot be pointed at` };
+  if (!call.expressionComplete) return { ok: false, found: 0, reason: `the call is longer than the listing keeps of it, so it cannot be pointed at` };
   const flat = body.replace(/\s+/g, " ");
   // The body is the packet's, which is redacted; the expression is as the file has it. A call with
   // a long opaque argument matched nothing, and the reason given for withholding was "this version

@@ -7,34 +7,65 @@
   "Cargo.lock": "cc7e1f376173511677a6591ff86e00ca58a96f472052690fbfad94d380a601a9"
  },
  "listing": {
-  "src/plan/candidates.ts": "086fae0ff2f627a36f6d8baaa61b805e24adcb52bee763ed6da95f1549477e0e",
-  "src/change/blocks.ts": "4b8e8d7b48132adca6f3cb7f7f69be2e03e78208e2eb7951be3df24467918d77"
+  "src/plan/candidates.ts": "5c139e2f1517796a9f8334c4dfcca2db230a54ecc6d100ff52076b1e89079557",
+  "src/change/blocks.ts": "2bfa9c1a8d6d7a166b1bcc2854ee3d0f49bd9b696cf83657b01183e8a13b8e87",
+  "src/syntax/rust.ts": "3296fdd521cb29508c88186a2a1d19f7eda17d0029ca2a854c79b826cd269fa0",
+  "src/syntax/cfg.ts": "31af340870c3a65f784d77904f081b74cf4fb3a1c4106d4ae9adc7abb8ad6dc2",
+  "src/plan/from-diff.ts": "b4ecd8fe13fb2c3f89aab2f460ef4a64ab75f29c773d29addcd27858cdb8f239",
+  "src/plan/applicability.ts": "bab52af2eb92d575d622adba26103c25d3e0c3ee2c0e23b9ce2131f1469d8d43",
+  "vendor/tree-sitter-rust.wasm": "f65f354215611fd94ad34134b3427eb3d58cbb745df7b6509ba722184db73d57"
  },
- "detectedBefore": 136914,
- "detectedAfter": 37657,
- "silentBefore": 2071,
- "silentAfter": 101328,
+ "detectedBefore": 139021,
+ "detectedAfter": 38273,
+ "silentBefore": 0,
+ "silentAfter": 100748,
  "formsThatMoved": {
   "method": {
    "before": {
-    "detected": 94330,
-    "silent_miss": 684,
-    "omitted_cap": 3064
+    "detected": 95037,
+    "omitted_cap": 3041
    },
    "after": {
-    "silent_miss": 95014,
-    "omitted_cap": 3064
+    "silent_miss": 95037,
+    "omitted_cap": 3041
    }
   },
   "method multiline": {
    "before": {
-    "detected": 4927,
-    "silent_miss": 10,
-    "omitted_cap": 258
+    "detected": 4939,
+    "omitted_cap": 256
    },
    "after": {
-    "silent_miss": 4937,
-    "omitted_cap": 258
+    "silent_miss": 4939,
+    "omitted_cap": 256
+   }
+  },
+  "method turbofish=last": {
+   "before": {
+    "detected": 730,
+    "omitted_cap": 51
+   },
+   "after": {
+    "silent_miss": 730,
+    "omitted_cap": 51
+   }
+  },
+  "method turbofish=last multiline": {
+   "before": {
+    "detected": 27,
+    "omitted_cap": 18
+   },
+   "after": {
+    "silent_miss": 27,
+    "omitted_cap": 18
+   }
+  },
+  "method capitalized": {
+   "before": {
+    "detected": 15
+   },
+   "after": {
+    "silent_miss": 15
    }
   }
  }

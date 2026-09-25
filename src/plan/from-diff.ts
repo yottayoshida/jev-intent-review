@@ -15,7 +15,8 @@
 // functions that call the helper are where the behaviour the requirement describes is observed.
 
 import { isTestPath, refuseWord, type Discoverer } from "../discovery/discover.ts";
-import { enumerate, type Candidates } from "./candidates.ts";
+import { declaredForTestsOnly } from "./applicability.ts";
+import { emptyCandidates, enumerate, type Candidates } from "./candidates.ts";
 import type { SiteSource } from "./select.ts";
 
 /** How many functions the changed lines may contribute. */
@@ -31,6 +32,18 @@ const MAX_CALLER_FUNCTIONS = 20;
  */
 export const COMMON_FILES = 20;
 
+/**
+ * The listing of a file at the after commit, from the reading its `BlockIndex` already holds, so a
+ * file is parsed once (#83). A file a parent declares `#[cfg(test)] mod …;` lists nothing: it is test
+ * code, and the listing leaves test code out as it does a `#[cfg(test)]` block inside a file.
+ */
+export async function readListing(discoverer: Discoverer, path: string): Promise<Candidates | null> {
+  const index = await discoverer.index(path);
+  if (index === null) return null;
+  if (await declaredForTestsOnly(discoverer, path, { forListing: true })) return emptyCandidates(path);
+  return enumerate(path, index.lines.join("\n"), index.rust ? { parsed: index.rust } : {});
+}
+
 /** `enumerate` for a path at one commit, read once. Shared with whatever else opens the file. */
 export class CandidateFiles {
   readonly #discoverer: Discoverer;
@@ -43,7 +56,7 @@ export class CandidateFiles {
   of(path: string): Promise<Candidates | null> {
     let entry = this.#cache.get(path);
     if (!entry) {
-      entry = this.#discoverer.index(path).then((index) => (index === null ? null : enumerate(path, index.lines.join("\n"))));
+      entry = readListing(this.#discoverer, path);
       this.#cache.set(path, entry);
     }
     return entry;
@@ -92,6 +105,12 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
     const { functions: fnCap, calls: callCap } = candidates.omitted;
     if (fnCap > 0) left(`${path}: ${fnCap} functions were left out of the listing by its cap`);
     if (callCap > 0) left(`${path}: ${callCap} calls were left out of the listing by its cap`);
+    // What the parser could not read is not listed (#83): said the way a cap is, since calls may be
+    // there that nothing asks about. The macros whose arguments are not read are only counted: their
+    // calls were never promised (ADR 0022), and a count does not make a run look unread.
+    const { unreadLines, macros } = candidates.omitted;
+    if (unreadLines > 0) left(`${path}: ${unreadLines} lines the parser could not read were left out of the listing`);
+    if (macros > 0) notes.push(`${path}: ${macros} macro invocations whose arguments were not read as code (nor any function defined inside them)`);
     const fresh: SiteSource = { candidates, changed: [], callsChanged: [] };
     sources.set(path, fresh);
     return fresh;
@@ -152,6 +171,9 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
       continue;
     }
     for (const hit of outside) {
+      // Test code by a parent's declaration (#83) is left out as a test path is: its listing is empty,
+      // and a caller there is no caller the requirement governs.
+      if (await declaredForTestsOnly(discoverer, hit.path, { forListing: true })) continue;
       const source = await sourceFor(hit.path);
       if (!source) {
         unreadableCallers.add(hit.path);
@@ -160,8 +182,9 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
       const enclosing = source.candidates.functions.find((f) => hit.line >= f.startLine && hit.line <= f.endLine);
       if (!enclosing) {
         // A `use` line or a module-level item is a reference and not a call site — but so is a
-        // hit in anything `enumerate` did not list: an `impl` method, a macro body, a function
-        // past the cap. They are counted rather than described, because from here they look alike.
+        // hit in anything `enumerate` did not list: a macro body outside a function, a function past
+        // the cap, a place the parser could not read. They are counted rather than described,
+        // because from here they look alike.
         outsideAnyFunction += 1;
         continue;
       }
@@ -176,7 +199,7 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
     }
   }
   if (dropped > 0) left(`${dropped} more callers were found than the cap of ${MAX_CALLER_FUNCTIONS} functions allows`);
-  if (outsideAnyFunction > 0) left(`${outsideAnyFunction} references to a changed function are in no function this reads (a use line, an impl method, a macro body)`);
+  if (outsideAnyFunction > 0) left(`${outsideAnyFunction} references to a changed function are in no function this reads (a use line, a macro body, a function past the cap)`);
   if (unreadableCallers.size > 0) left(`${unreadableCallers.size} files referencing a changed function could not be read here: ${[...unreadableCallers].slice(0, 5).join(", ")}`);
 
   return { sources, notes, unreached };

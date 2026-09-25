@@ -93,7 +93,7 @@ export class Discoverer {
   index(path: string): Promise<BlockIndex | null> {
     let index = this.#indexes.get(path);
     if (!index) {
-      index = this.#allowed(path) ? this.#git.readText(this.#after, path).then((text) => (text === null ? null : new BlockIndex(text.split("\n")))) : Promise.resolve(null);
+      index = this.#allowed(path) ? this.#git.readText(this.#after, path).then((text) => (text === null ? null : new BlockIndex(text.split("\n"), { path }))) : Promise.resolve(null);
       this.#indexes.set(path, index);
     }
     return index;

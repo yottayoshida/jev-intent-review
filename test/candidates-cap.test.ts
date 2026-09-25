@@ -140,7 +140,12 @@ mod m {
   const listing = enumerate("src/e.rs", text);
   const ext = listing.functions.find((f) => f.name === "ext")!;
   assert.ok(ext.endLine <= 3, `a declaration does not run into the next block (it ends at ${ext.endLine}, the extern block closes at 3)`);
-  const bare = listing.functions.find((f) => f.name === "bare")!;
-  assert.ok(bare.endLine < 7, `it ends before \`impl Z {\` (line 7), at ${bare.endLine}`);
-  assert.ok(!listing.calls.some((c) => c.functionId === bare.id && c.callee === "inner"), "and holds none of its calls");
+  // `fn bare(x: u8) -> u8` followed by `impl Z {` is not Rust: the parser cannot read line 6, and its
+  // recovery gives `bare` the `impl` for a body (#83). What it could not read is left out and counted,
+  // `bare` with it, rather than listed with a body that is the next block's.
+  const bare = listing.functions.find((f) => f.name === "bare");
+  assert.ok(bare === undefined || bare.endLine < 7, `it is not listed, or ends before \`impl Z {\` (line 7): ${bare?.endLine}`);
+  assert.ok(listing.omitted.unreadLines > 0, "and the line the parser could not read is counted");
+  const inner = listing.calls.find((c) => c.callee === "inner")!;
+  assert.equal(listing.functions.find((f) => f.id === inner.functionId)?.name, "z", "`inner()` is the call of `z`, the function it is written in");
 });

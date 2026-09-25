@@ -84,7 +84,7 @@ export function testOnlyFiles(files: readonly Pick<OracleFile, "path" | "mods">[
   return out;
 }
 
-export type CallClass = "detected" | "wrong_function" | "omitted_cap" | "declared_exclusion" | "silent_miss";
+export type CallClass = "detected" | "wrong_function" | "omitted_cap" | "omitted_unread" | "declared_exclusion" | "silent_miss";
 export type CandidateClass = "matched" | "in_macro" | "false_positive";
 export type Reason = "comment" | "string" | "test_only" | "attribute" | "type" | "pattern" | "definition" | "keyword" | "outside_fn" | "duplicate" | "other";
 
@@ -201,6 +201,8 @@ export function classify(parsed: OracleFile, source: string, { capped, uncapped 
     let cls: CallClass;
     if (callPair[i] !== null) cls = stepOf[i] === 3 ? "wrong_function" : "detected";
     else if (DECLARED.has(c.last)) cls = "declared_exclusion";
+    // In lines the listing says its parser could not read (#83): left out, and said so.
+    else if ((capped.unread ?? []).some((u) => c.line >= u.startLine && c.line <= u.endLine)) cls = "omitted_unread";
     else if (capped.omitted.functions > 0 && allFns.has(c.fn.line) && !cappedFns.has(c.fn.line)) cls = "omitted_cap";
     else cls = "silent_miss";
     const row: CallRow = { ...c, class: cls };
@@ -264,7 +266,7 @@ export function emptyTotals(): Totals {
     files: 0,
     lines: 0,
     unparsed: { files: 0, lines: 0, candidates: 0 },
-    calls: { total: 0, detected: 0, wrong_function: 0, omitted_cap: 0, declared_exclusion: 0, silent_miss: 0, macroNameCollision: 0, fnNotListed: 0 },
+    calls: { total: 0, detected: 0, wrong_function: 0, omitted_cap: 0, omitted_unread: 0, declared_exclusion: 0, silent_miss: 0, macroNameCollision: 0, fnNotListed: 0 },
     candidates: { total: 0, matched: 0, in_macro: 0, false_positive: 0, byReason: {} },
     columnDisagreements: 0,
     silentMissRate: 0,

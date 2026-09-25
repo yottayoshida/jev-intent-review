@@ -19,7 +19,10 @@ import { basename, join, resolve } from "node:path";
 
 import { loadConfig } from "../src/config/config.ts";
 import { pathFilter } from "../src/config/glob.ts";
-import { isTestPath } from "../src/discovery/discover.ts";
+import { Discoverer, isTestPath } from "../src/discovery/discover.ts";
+import { declaredForTestsOnly } from "../src/plan/applicability.ts";
+import { enumerate } from "../src/plan/candidates.ts";
+import { readListing } from "../src/plan/from-diff.ts";
 import { isSensitivePath } from "../src/evidence/redact.ts";
 import { Git } from "../src/repository/git.ts";
 import { estimateOver } from "./eval/metrics.ts";
@@ -45,6 +48,20 @@ function runOracle(root: string, paths: string[]): OracleFile[] {
   const files = JSON.parse(out.stdout) as OracleFile[];
   if (files.length !== paths.length) throw new Error(`call-oracle answered ${files.length} files of ${paths.length}`);
   return files;
+}
+
+/**
+ * The product's listing of a file and the same file with no cap on functions, which `omitted_cap`
+ * needs. A file the product declares test-only lists nothing either way.
+ */
+async function productListings(discoverer: Discoverer, path: string): Promise<Listings> {
+  const capped = await readListing(discoverer, path);
+  const index = await discoverer.index(path);
+  if (!capped || !index) throw new Error(`${path}: the product cannot read this file`);
+  const uncapped = (await declaredForTestsOnly(discoverer, path, { forListing: true })) ? capped : enumerate(path, index.lines.join("\n"), { maxFunctions: Number.POSITIVE_INFINITY, ...(index.rust ? { parsed: index.rust } : {}) });
+  // docs/call-oracle.md: a file that reaches the per-function cap stops the measurement.
+  if (uncapped.omitted.calls > 0) throw new Error(`${path}: the listing's cap of calls per function fired; classify it before measuring`);
+  return { capped, uncapped };
 }
 
 /** The listing with every method call taken out. */
@@ -126,6 +143,7 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
   const all = tally();
   const byCase: Record<string, Tally & { repo: string; commit: string; skippedDuplicates: number }> = {};
   const unparsed: { case: string; path: string; lines: number; candidates: number; error: string }[] = [];
+  const notRead: { case: string; path: string; lines: number; calls: number }[] = [];
   const rows: { case: string; path: string; result: FileResult }[] = [];
   /** Per file: its blob, so a later run can tell the same file from a changed one, and its counts. */
   const perFile: { case: string; path: string; blob: string; lines: number; calls: Record<string, number>; candidates: Record<string, number> }[] = [];
@@ -134,6 +152,9 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
     const dir = checkout(k.repo, k.commit);
     const { config } = await loadConfig(new Git(dir), k.commit, k.commit);
     const include = pathFilter(config.repository.include, config.repository.ignore);
+    // The listing as the product reads it (#83): through the Discoverer, a file declared test-only by
+    // a parent listing nothing. The scope stays the oracle's own (docs/call-oracle.md).
+    const discoverer = new Discoverer(new Git(dir), k.commit, { include });
     const entries = git(dir, "ls-tree", "-r", k.commit)
       .split("\n")
       .filter(Boolean)
@@ -154,7 +175,13 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
     const files = everything.filter((o) => blobOf.has(o.path));
     for (const o of files) {
       const source = readFileSync(join(dir, o.path), "utf8");
-      let l = listings(o.path, source);
+      // A file the product does not read at all — too large, or binary (`Git.readText`) — is taken
+      // out on both sides and counted, as a file the oracle cannot parse is (docs/call-oracle.md).
+      if ((await discoverer.index(o.path)) === null) {
+        notRead.push({ case: k.case, path: o.path, lines: o.lines, calls: o.calls?.length ?? 0 });
+        continue;
+      }
+      let l = await productListings(discoverer, o.path);
       if (broken) l = withoutMethods(source, l);
       if (!o.parsed) {
         unparsed.push({ case: k.case, path: o.path, lines: o.lines, candidates: l.capped.calls.length, error: o.error ?? "" });
@@ -189,7 +216,8 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
 
   const base = join(HERE, "bench/logs", `call-oracle-${material.name}`);
   // The listing the record was made with: #83 compares against it unchanged.
-  const listing = Object.fromEntries(["src/plan/candidates.ts", "src/change/blocks.ts"].map((f) => [f, sha256(readFileSync(join(HERE, f)))]));
+  // Everything the listing is decided by since #83: the parser, its grammar, the file-level test rule.
+  const listing = Object.fromEntries(["src/plan/candidates.ts", "src/change/blocks.ts", "src/syntax/rust.ts", "src/syntax/cfg.ts", "src/plan/from-diff.ts", "src/plan/applicability.ts", "vendor/tree-sitter-rust.wasm"].map((f) => [f, sha256(readFileSync(join(HERE, f)))]));
   if (broken) {
     // The pairing check (docs/call-oracle.md, *Is the oracle right?*): what moved, against the record.
     const record = JSON.parse(readFileSync(`${base}.json`, "utf8")) as { totals: Totals; byForm: Record<string, Record<string, number>> };
@@ -211,7 +239,7 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
     silentMiss: over((t) => t.calls.silent_miss, (t) => t.calls.total),
     falsePositive: over((t) => t.candidates.false_positive, (t) => t.candidates.total - t.candidates.in_macro),
   };
-  const summary = { material: material.name, status: material.status, oracle: oracleSources(), listing, estimates, totals: all.totals, testOnlyFiles: all.testOnlyFiles, byForm: all.byForm, byCase, unparsed, perFile };
+  const summary = { material: material.name, status: material.status, oracle: oracleSources(), listing, estimates, totals: all.totals, testOnlyFiles: all.testOnlyFiles, notReadByTheProduct: notRead, byForm: all.byForm, byCase, unparsed, perFile };
   writeFileSync(`${base}.json`, `${JSON.stringify(summary, null, 1)}\n`);
   // One line per call and per candidate. Tens of megabytes, so not committed: the commits are pinned
   // and the classification is deterministic, so the same command writes the same lines again.
