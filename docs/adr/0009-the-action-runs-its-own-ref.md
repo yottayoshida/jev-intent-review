@@ -1,6 +1,8 @@
 # 0009. The Action runs its own ref, keeps the command's output out of the log, and reports in a check run
 
-Status: Accepted
+Status: Accepted, amended by [0021](0021-the-check-run-holds-what-decides.md) (the check run and
+the job summary hold what decides, with the audit counted; the artifact holds the same report the
+command prints)
 
 ## Context
 

@@ -376,8 +376,12 @@ without an answer and how many notes say what was not read, in the same numbers 
 title, and the check run is not green. `--json` carries the counts these are drawn from, and per
 requirement `unreached`: the notes, of `notes`, that say something was not read.
 
-Each requirement's section names its form and, after the counts, how the calls read came out. Every
-call read is in exactly one of the first four sections; the label of the function's answer
+Each requirement's section names its form and, after the counts, how the calls read came out, in the
+order a reader decides from ([ADR 0021](adr/0021-the-check-run-holds-what-decides.md)): *Worth
+checking*, *Not settled*, the requirement's *Notes*, and then the audit — *Read as holding*, *Read,
+but not required of by the requirement*, *Every call read* and *Not checked*. Every call read is in
+exactly one of *Worth checking*, *Not settled*, *Read as holding* and *Read, but not required of*; the
+label of the function's answer
 (`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and
 `when that call fails` / `in the case the requirement forbids it` in the list of calls read) is the
 form's.
@@ -385,11 +389,18 @@ form's.
 | section | what it holds |
 |---|---|
 | **Worth checking** | the requirement read as applying, and the function's answer against it, both over the bar |
-| **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
-| **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
-| **Read, but not required of by the requirement** | `does_not_apply` over the bar |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
+| **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which, with both answers and the bodies sent with it |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
+| **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
+| **Read, but not required of by the requirement** | `does_not_apply` over the bar |
+| **Every call read** | each call read, with the function's answer and the bodies sent with it |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
+
+The command prints all of it. The GitHub Action's check run and job summary print everything up to
+the audit, and in its place one line of counts — so many read as holding, so many not required of,
+so many not checked — and the report's first line says the reasons are in the full report, which is
+`report.md` in the Action's artifact. A requirement that read no call keeps its *Not checked* lines
+in both.
 
 None of the four is a requirement verdict: each is what two answers about one call came to. A
 listed call rests on two Jev readings that do not check each other. Everything either of them used
