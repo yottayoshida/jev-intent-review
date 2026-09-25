@@ -25,7 +25,7 @@ jev-intent-review \
 
 `--skip-change-check` reads the calls and leaves the changes unasked. `--pr`, `--issue`, `--intent` and `--intent-file` take the requirements from the issue, the pull request or the text given, in the forms described under [Intent](usage.md#intent).
 
-Use `--json` for the full machine-readable report (`version: 2`; see [docs/local-check-cli.md](local-check-cli.md)).
+Use `--json` for the full machine-readable report (`version: 2`; see [docs/local-check-cli.md](local-check-cli.md)). Its `metadata.modelIdentity` says which versions of Jev answered the run, as the host named them, beside the alias that was sent.
 
 The report states no requirement verdict: each call it read is *worth checking*, *holding*, *not settled* or *not required of by the requirement*, and a call worth checking leaves the exit code at 0. A repository that wants CI to fail on one sets `policy.fail_on: [finding]` in `.jev-intent-review.yml`.
 
@@ -68,7 +68,7 @@ export TYPESAFE_API_KEY=...
 
 Without `JEV_PROVIDER`, the Cloudflare pair alone still selects Cloudflare, as before, and `JEV_API_URL` with `JEV_API_TOKEN` selects an endpoint of your own that serves the Workers AI run request. `TYPESAFE_API_KEY` or `AI_GATEWAY_API_KEY` on its own selects nothing: a key kept in the environment for something else does not start sending your code anywhere.
 
-**Only Cloudflare has been called for real.** The TypeSafe and Vercel requests follow their documentation ([TypeSafe](https://docs.typesafe.ai/api), [Vercel](https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe)) and are tested against a stand-in, but the maintainer has no key for either: both addresses were checked with a deliberately invalid key, and each refused it with a JSON `authentication_error` (401) at the documented path and answered 404 one path segment off, but no judgment has been received from either. If a run fails there, the error names the host and what it answered; please [open an issue](https://github.com/yottayoshida/jev-intent-review/issues) with it. The published measurements were taken with `typesafe/jev` on Cloudflare; `jev-latest` may be a different version of Jev.
+**Only Cloudflare has been called for real.** The TypeSafe and Vercel requests follow their documentation ([TypeSafe](https://docs.typesafe.ai/api), [Vercel](https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe)) and are tested against a stand-in, but the maintainer has no key for either: both addresses were checked with a deliberately invalid key, and each refused it with a JSON `authentication_error` (401) at the documented path and answered 404 one path segment off, but no judgment has been received from either. If a run fails there, the error names the host and what it answered; please [open an issue](https://github.com/yottayoshida/jev-intent-review/issues) with it. The published measurements were taken with `typesafe/jev` on Cloudflare; `jev-latest` may be a different version of Jev. Cloudflare named the version that answered as `jev-1.13.0` on 2026-09-25; from #84 on, every run records the versions named in `metadata.modelIdentity`, and the logs published before it record only the alias.
 
 No other model is sent requests by this tool.
 

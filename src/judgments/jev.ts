@@ -2,7 +2,7 @@
 // https://docs.typesafe.ai/api · https://developers.cloudflare.com/ai/models/typesafe/jev/
 
 import type { ChoiceAnswer } from "../types.ts";
-import { ProviderError, type JevClient } from "./client.ts";
+import { ProviderError, unwrapModel, type JevClient } from "./client.ts";
 import type { JudgmentProvider, Questions } from "./provider.ts";
 import { traceFromEnv, type TraceWriter } from "./trace.ts";
 
@@ -18,17 +18,6 @@ export function unwrapAnswers(payload: unknown): Record<string, unknown> | null 
     node = obj.result;
   }
   return null;
-}
-
-/** The gateway may report a concrete version; it remains absent when it did not. */
-export function unwrapModel(payload: unknown): string | undefined {
-  let node: unknown = payload;
-  for (let depth = 0; depth < 5 && node && typeof node === "object"; depth++) {
-    const obj = node as Record<string, unknown>;
-    if (typeof obj.model === "string" && obj.model !== "") return obj.model;
-    node = obj.result;
-  }
-  return undefined;
 }
 
 /** A probability: a finite number from 0 to 1. `1e999` parses to Infinity and is not one. */

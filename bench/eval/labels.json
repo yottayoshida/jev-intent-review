@@ -1,0 +1,1185 @@
+{
+  "acceptance-v1:yottayoshida/omamori#556": {
+    "label": "records_or_handles_locally",
+    "votes": [
+      "swallows_as_success",
+      "records_or_handles_locally",
+      "records_or_handles_locally"
+    ],
+    "quotes": [
+      "falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write.",
+      "falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write.",
+      "a line whose `chain_version` is unrecognized **and** whose `seq` is\nnot a number fails the peek, falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#461": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "the *next* verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace.",
+      "the *next* verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace.",
+      "Auto-prune silently \"heals\" an unverifiable chain state."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#514": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "cannot_label"
+    ],
+    "quotes": [
+      "A log that opens for reading and refuses writing leaves `AuditSummary::path_error` empty, because `audit_summary` reaches it through `open_read_nofollow` — `O_RDONLY`, which succeeds.",
+      "A log that opens for reading and refuses writing leaves `AuditSummary::path_error` empty",
+      "and every append then fails."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#490": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**",
+      "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**",
+      "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#483": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`.",
+      "`omamori config add qa-probe --command foo --action log-only --match-any zzz` succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`.",
+      "`omamori config add qa-probe --command foo --action log-only --match-any zzz` succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#506": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "Two paths reach the same outcome by returning `Err` before the comparison can run, and were left out of that fix:",
+      "Both exit 2 and say nothing about the tail, on a store whose tail is gone.",
+      "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#487": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "propagates"
+    ],
+    "quotes": [
+      "| running `audit key rotate` again | `omamori: no audit secret found — nothing to rotate` — reads as \"there was nothing to do\" |",
+      "`aggregate_report` maps every\n`Err` other than the ones it names to `ChainStatus::Unavailable`; and `Unavailable.needs_attention()`\nreturns `false`",
+      "`omamori: key rotation failed: <errno>` — one line. Not what state the store is in now."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#391": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "the code treats a canonicalize failure as \"we'll catch it at runtime\"",
+      "the code treats a canonicalize failure as \"we'll catch it at runtime\"",
+      "A nonexistent subdirectory under a blocked prefix (e.g. `/etc/made-up-name`) silently passes this check"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#114": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Several error paths silently swallow failures, potentially masking tampering or misconfiguration.",
+      "Several error paths silently swallow failures, potentially masking tampering or misconfiguration.",
+      "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#111": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "falls_back_or_degrades",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "- `lib.rs` hook-check: malformed input → raw string → allowed",
+      "`lib.rs` hook-check: malformed input → raw string → allowed",
+      "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open)."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#99": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information.",
+      "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information.",
+      "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#75": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。",
+      "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。",
+      "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#60": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "The user gets no warning that the cursor snippet was not updated.",
+      "if `std::env::current_exe()` fails, the cursor hooks snippet is silently not regenerated",
+      "In `regenerate_hooks()` (`installer.rs`), if `std::env::current_exe()` fails, the cursor hooks snippet is silently not regenerated:"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#323": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"` — scattering security-state files into the process CWD",
+      "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"`",
+      "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"` — scattering security-state files into the process CWD"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#182": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している。",
+      "未認識 tool 名を受け取ると無条件で allow 応答を返している。",
+      "`src/engine/hook.rs:256-260` の `HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している。"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#271": {
+    "label": "logs_or_warns",
+    "votes": [
+      "logs_or_warns",
+      "logs_or_warns",
+      "logs_or_warns"
+    ],
+    "quotes": [
+      "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)",
+      "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)",
+      "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#387": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v1:oxidezap/whatsapp-rust#759": {
+    "label": "logs_or_warns",
+    "votes": [
+      "logs_or_warns",
+      "logs_or_warns",
+      "logs_or_warns"
+    ],
+    "quotes": [
+      "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations",
+      "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations",
+      "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations"
+    ]
+  },
+  "acceptance-v1:moltis-org/moltis#1064": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.",
+      "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.",
+      "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+    ]
+  },
+  "acceptance-v1:KontorProtocol/Kontor#385": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped.",
+      "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped.",
+      "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped."
+    ]
+  },
+  "acceptance-v1:Naoray/instruckt-tauri#9": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content",
+      "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content",
+      "so clients receive an error response instead of empty content"
+    ]
+  },
+  "acceptance-v1:dashpay/grovedb#501": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`.",
+      "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`.",
+      "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`."
+    ]
+  },
+  "acceptance-v1:dashpay/grovedb#500": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`.",
+      "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`.",
+      "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`."
+    ]
+  },
+  "acceptance-v1:TyRoXx/NonlocalityOS#433": {
+    "label": "cannot_label",
+    "votes": [
+      "cannot_label",
+      "cannot_label",
+      "cannot_label"
+    ],
+    "quotes": [
+      "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics.",
+      "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics.",
+      "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+    ]
+  },
+  "acceptance-v1:iotaledger/iota#10136": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Properly propagates errors instead of silently swallowing them with `.ok()`",
+      "Properly propagates errors instead of silently swallowing them with `.ok()`",
+      "Properly propagates errors instead of silently swallowing them with `.ok()`"
+    ]
+  },
+  "acceptance-v1:armaxri/termiHub#2751": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "remaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites #2733",
+      "handling the\nremaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites",
+      "finishes the \"no silent failures\" cleanup by handling the\nremaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites #2733\nenumerated"
+    ]
+  },
+  "acceptance-v1:armaxri/termiHub#2732": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "made a failed destructive action look like it\nsucceeded",
+      "where a `.catch(() => {})` (often paired\nwith an optimistic row removal) made a failed destructive action look like it\nsucceeded.",
+      "where a `.catch(() => {})` (often paired\nwith an optimistic row removal) made a failed destructive action look like it\nsucceeded."
+    ]
+  },
+  "acceptance-v1:ratazzi/quebec#136": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs.",
+      "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs.",
+      "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs."
+    ]
+  },
+  "acceptance-v1:VOID-TECHNOLOGY-INC/PyBun#428": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping",
+      "entry.file_type() failures in collect_inputs_recursive were\n  mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping\n  the entry from the build cache-key hash.",
+      "mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping\n  the entry from the build cache-key hash."
+    ]
+  },
+  "acceptance-v1:beboite/boite-legacy#187": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "three `let _ =` that swallowed the failure of the thing they were doing.",
+      "three `let _ =` that swallowed the failure of the thing they were doing.",
+      "three `let _ =` that swallowed the failure of the thing they were doing."
+    ]
+  },
+  "acceptance-v1:Diogo-Esteves/polyVocal#60": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently",
+      "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently",
+      "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently"
+    ]
+  },
+  "acceptance-v1:cavi-ai/bobby-browser#163": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "are now logged instead of silently ignored.",
+      "are now logged instead of silently ignored.",
+      "are now logged instead of silently ignored."
+    ]
+  },
+  "acceptance-v1:dolang-org/dolang#337": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "cannot_label",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Avoid swallowing error output from unknown docker errors",
+      "Avoid swallowing error output from unknown docker errors",
+      "Avoid swallowing error output from unknown docker errors"
+    ]
+  },
+  "acceptance-v1:TumbleOwlee/ferrowl#127": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "and server views and the Modbus views dropped `let _ = backend.stop()/start().await` on",
+      "dropped `let _ = backend.stop()/start().await` on\n  settings changes",
+      "The OCPP client\n  and server views and the Modbus views dropped `let _ = backend.stop()/start().await` on\n  settings changes"
+    ]
+  },
+  "acceptance-v1:MarshalX/python-libipld#117": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`",
+      "swallowed errors in `decode_dag_cbor_multi`",
+      "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`"
+    ]
+  },
+  "acceptance-v1:getappz/agentflare#229": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises.",
+      "Fixes three places where errors that matter were silently swallowed",
+      "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises."
+    ]
+  },
+  "acceptance-v1:dsx-ai-factory/infra-controller#3469": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all",
+      "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all",
+      "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all"
+    ]
+  },
+  "acceptance-v1:Davidslv/cce-rust#168": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "swallows_as_success",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \"never pulled\"",
+      "conflated an ABSENT manifest (simply not a workspace) with a PRESENT-but-corrupt one, silently degrading to single-directory mode.",
+      "`cmd_doctor`'s `Manifest::load` `Err(_)` arm conflated an ABSENT manifest (simply not a workspace) with a PRESENT-but-corrupt one, silently degrading to single-directory mode."
+    ]
+  },
+  "acceptance-v1:liveask/liveask#127": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "fix swallowing error on fetch",
+      "fix swallowing error on fetch",
+      "fix swallowing error on fetch"
+    ]
+  },
+  "acceptance-v1:AndreaBozzo/dataprof#370": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "swallows_as_success",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "an error is discarded and silently becomes \"missing data.\"",
+      "This audit ensures decode paths surface errors instead of folding them into default values.",
+      "This audit ensures decode paths surface errors instead of folding them into default values."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#465": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail",
+      "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail",
+      "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail and is not new in #177."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#468": {
+    "label": "other",
+    "votes": [
+      "other",
+      "other",
+      "other"
+    ],
+    "quotes": [
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the",
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict",
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the\noutcome is decided by the host's hook-timeout policy rather than by omamori."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#470": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted",
+      "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted\ntail at all**.",
+      "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted\ntail at all**."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#474": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)` and",
+      "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)`",
+      "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)` and\nthen suggests `verify chain: omamori audit verify`."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#477": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "swallows_as_success",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "When `read_dir` fails, `max_index()` returns 0, so rotation targets slot `.1.retired` and reports `retired_key_id = \"default\"` / `new_key_id = \"key-2\"` regardless of the store's real epoch.",
+      "`rotate_key_locked` computes `let max_retired = scan_key_dir(&secret_path).max_index();` and discards `KeyDirScan.unreadable` entirely.",
+      "When `read_dir` fails, `max_index()` returns 0, so rotation targets slot `.1.retired`"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#482": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "swallows_as_success",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway",
+      "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway",
+      "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#485": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips",
+      "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips\nper-entry errors with `continue`.",
+      "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips\nper-entry errors with `continue`."
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#494": {
+    "label": "logs_or_warns",
+    "votes": [
+      "logs_or_warns",
+      "logs_or_warns",
+      "logs_or_warns"
+    ],
+    "quotes": [
+      "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer, choosing between messages on internal state.",
+      "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer",
+      "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer"
+    ]
+  },
+  "acceptance-v1:yottayoshida/omamori#526": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:risingwavelabs/risingwave#26399": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read",
+      "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read",
+      "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read"
+    ]
+  },
+  "acceptance-v2:mandubian/autonoetic#901": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`.",
+      "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`.",
+      "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`."
+    ]
+  },
+  "acceptance-v2:vybestack/llxprt-jefe#416": {
+    "label": "records_or_handles_locally",
+    "votes": [
+      "records_or_handles_locally",
+      "records_or_handles_locally",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "On restart Jefe marked the agent `Dead`, cleared its binding, could not reattach, and pressing `l` spawned a duplicate `--continue` worker leaving the first process tree orphaned.",
+      "On restart Jefe marked the agent `Dead`, cleared its binding, could not reattach",
+      ""
+    ]
+  },
+  "acceptance-v2:SG-devel/tailtriage#1097": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:Extra-Chill/homeboy#9526": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:edge-toolkit/core#84": {
+    "label": "cannot_label",
+    "votes": [
+      "cannot_label",
+      "cannot_label",
+      "cannot_label"
+    ],
+    "quotes": [
+      "Improved error reporting when telemetry logger initialization fails.",
+      "Improved error reporting when telemetry logger initialization fails.",
+      "Improved error reporting when telemetry logger initialization fails."
+    ]
+  },
+  "acceptance-v2:thedoublejay/gather-step#67": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:git-ai-project/git-ai#1717": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize.",
+      "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize.",
+      "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize."
+    ]
+  },
+  "acceptance-v2:pnpm/pnpm#12506": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:iii-hq/workers#292": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:qdrant/qdrant#9429": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:vox-foundation/vox#346": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`parse_registry_file()` propagates errors instead of silently returning an empty set.",
+      "`parse_registry_file()` propagates errors instead of silently returning an empty set.",
+      "`parse_registry_file()` propagates errors instead of silently returning an empty set."
+    ]
+  },
+  "acceptance-v2:ng/yggdrasil#103": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:andrewdavidmackenzie/flow#2680": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:ben1009/mini-lsm#76": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:snowflakedb/drivers#911": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding.",
+      "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding.",
+      "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding."
+    ]
+  },
+  "acceptance-v2:zeroclaw-labs/zeroclaw#6512": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)",
+      "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)",
+      "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)"
+    ]
+  },
+  "acceptance-v2:AgentWorkforce/burn#426": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:kennguy3n/knowledge#32": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "propagates"
+    ],
+    "quotes": [
+      "",
+      "",
+      "`generate()` now returns `RouterError::Unavailable` instead of `InferenceFailure` when the MLX runtime is not linked"
+    ]
+  },
+  "acceptance-v2:shubhattin/lipilekhika#127": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null.",
+      "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null.",
+      "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+    ]
+  },
+  "acceptance-v2:BoundaryML/baml#3464": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:Jonathangadeaharder/pytest-linter#17": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:nilesh32236/vector-mcp-rust#29": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "cannot_label",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "Server now falls back to an available port if the configured port is in use.",
+      ""
+    ]
+  },
+  "acceptance-v2:dobesv/harnx#353": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:oxicrab/oxicrab#155": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "OAuth refresh returns Err on failure (no more silent stale tokens)",
+      "OAuth refresh returns Err on failure (no more silent stale tokens)",
+      "OAuth refresh returns Err on failure (no more silent stale tokens)"
+    ]
+  },
+  "acceptance-v2:infraweave-io/infraweave#307": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "silently continuing when all claims fail",
+      "silently continuing when all claims fail",
+      "silently continuing when all claims fail"
+    ]
+  },
+  "acceptance-v2:bindreams/skuld#33": {
+    "label": "other",
+    "votes": [
+      "other",
+      "other",
+      "other"
+    ],
+    "quotes": [
+      "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`",
+      "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`\nunder heavy contention",
+      "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`\nunder heavy contention"
+    ]
+  },
+  "acceptance-v2:ChainSafe/forest#6788": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:insight-platform/savant-rs#293": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "acceptance-v2:navicore/anz#5": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "corpus:yottayoshida/omamori#551": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "corpus:yottayoshida/omamori#553": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`."
+    ]
+  },
+  "corpus:yottayoshida/omamori#554": {
+    "label": "logs_or_warns",
+    "votes": [
+      "logs_or_warns",
+      "logs_or_warns",
+      "logs_or_warns"
+    ],
+    "quotes": [
+      "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)",
+      "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)",
+      "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)"
+    ]
+  },
+  "corpus:yottayoshida/omamori#557": {
+    "label": "falls_back_or_degrades",
+    "votes": [
+      "falls_back_or_degrades",
+      "falls_back_or_degrades",
+      "falls_back_or_degrades"
+    ],
+    "quotes": [
+      "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain",
+      "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain\nentry.",
+      "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain\nentry."
+    ]
+  },
+  "corpus:yottayoshida/omamori#558": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "A halt stops authentication. It used to stop these two checks with it, and neither needs a key",
+      "A halt stops authentication. It used to stop these two checks with it, and neither needs a key",
+      "When `audit verify` stops because a key is unavailable, a break in the `seq`/`prev_hash` continuity"
+    ]
+  },
+  "corpus:yottayoshida/sideeye#594": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "corpus:yottayoshida/sideeye#602": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "corpus:yottayoshida/sideeye#609": {
+    "label": "propagates",
+    "votes": [
+      "propagates",
+      "propagates",
+      "propagates"
+    ],
+    "quotes": [
+      "After this PR: **when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`",
+      "when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`",
+      "when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`"
+    ]
+  },
+  "corpus:yottayoshida/sideeye#626": {
+    "label": "cannot_label",
+    "votes": [
+      "propagates",
+      "cannot_label",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines",
+      "each time refusing `kill_did_not_land` after a complete recording, each time green on re-run.",
+      ""
+    ]
+  },
+  "corpus:yottayoshida/sideeye#627": {
+    "label": "not_failure_handling",
+    "votes": [
+      "not_failure_handling",
+      "not_failure_handling",
+      "not_failure_handling"
+    ],
+    "quotes": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "fixture:yottayoshida/omamori#468": {
+    "label": "other",
+    "votes": [
+      "other",
+      "other",
+      "other"
+    ],
+    "quotes": [
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the",
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict",
+      "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the\noutcome is decided by the host's hook-timeout policy rather than by omamori."
+    ]
+  },
+  "fixture:yottayoshida/omamori#553": {
+    "label": "swallows_as_success",
+    "votes": [
+      "swallows_as_success",
+      "swallows_as_success",
+      "swallows_as_success"
+    ],
+    "quotes": [
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+      "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`."
+    ]
+  }
+}

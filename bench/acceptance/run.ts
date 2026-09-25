@@ -17,7 +17,7 @@
 // it is imported at run time and only types come from src/. No test imports this file.
 
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import type * as Main from "../../src/cli/main.ts";
@@ -52,7 +52,7 @@ type LogName = keyof typeof LOGS;
 const RUNS = 3;
 const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
-const JUDGES_COPIED_FROM = "src/cli/main.ts defaultJudges (JevClient, JevProvider, LimitedProvider concurrency 8)";
+const JUDGES_COPIED_FROM = "src/cli/main.ts defaultJudges (JevClient, JevProvider, LimitedProvider concurrency 8, the client's identity)";
 
 const load = async <T>(path: string): Promise<T> => (await import(new URL(path, DIST).href)) as T;
 
@@ -190,8 +190,18 @@ function distil(r: LocalCheck.LocalCheckResult) {
   return { requirementId: r.requirementId, observed: r.observed, mappings: r.mappings, findings: r.findings, unchecked: r.unchecked.filter(inBudget), counts: r.counts, notes: r.notes };
 }
 
-async function measure(id: string, clone: string, limit: number, which: LogName) {
-  const LOG = LOGS[which].file;
+/** Where `measure` writes: a log file, and the claim `replay.ts` holds its table to (if any). */
+export interface LogTarget {
+  file: string;
+  claim?: string;
+}
+
+/**
+ * Measures one case into `log`. Exported for bench/eval/run.ts, which names its own log (`eval-dev`);
+ * the command line below names one of `LOGS` as before.
+ */
+export async function measure(id: string, clone: string, limit: number, log: LogTarget) {
+  const LOG = log.file;
   const d = await dist();
   // The log names Cloudflare's model; a run sent elsewhere (another JEV_PROVIDER, or JEV_API_URL)
   // would make that untrue. The environment's values are not repeated.
@@ -206,20 +216,20 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
   const dirty = (await self.text(["status", "--porcelain", "--", ".", `:(exclude)${relative(join(HERE, "..", ".."), LOG)}`])).trim();
   if (dirty !== "") throw new Error(`the working tree has uncommitted changes besides the log; commit them first:\n${dirty}`);
   const c = readCase(id);
-  const log: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
+  const book: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
   const toolCommit = (await self.text(["rev-parse", "HEAD"])).trim();
   // Every file a question's words come from. `plan/forms.js` joined when questions became forms; a log
   // started before it names a different set, and is not appended to.
   const questions = Object.fromEntries(["plan/local-check.js", "plan/mapping.js", "plan/forms.js", "judgments/questions.js"].map((p) => [p, sha256(readFileSync(new URL(p, DIST)))]));
-  const conditions = { ...(LOGS[which].claim === undefined ? {} : { claim: LOGS[which].claim }), tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
-  if (Object.keys(log.conditions).length > 0 && JSON.stringify(log.conditions) !== JSON.stringify(conditions)) {
-    throw new Error(`the log was started under other conditions:\n${JSON.stringify(log.conditions)}\nnow:\n${JSON.stringify(conditions)}`);
+  const conditions = { ...(log.claim === undefined ? {} : { claim: log.claim }), tool: { repo: "yottayoshida/jev-intent-review", commit: toolCommit }, questionFiles: questions, model: d.client.jevModel("cloudflare"), settings: { ...d.local.DEFAULT_LOCAL_CHECK, bar: 0.6, mappingBar: 0.6 }, judges: JUDGES_COPIED_FROM, runsPerLiveBranch: RUNS };
+  if (Object.keys(book.conditions).length > 0 && JSON.stringify(book.conditions) !== JSON.stringify(conditions)) {
+    throw new Error(`the log was started under other conditions:\n${JSON.stringify(book.conditions)}\nnow:\n${JSON.stringify(conditions)}`);
   }
-  log.conditions = conditions;
+  book.conditions = conditions;
   let spent = 0;
-  for (const cc of Object.values(log.cases)) for (const v of Object.values(cc.versions)) for (const run of v.runs as (RunRecord & { requests?: number })[]) spent += run.requests ?? 0;
+  for (const cc of Object.values(book.cases)) for (const v of Object.values(cc.versions)) for (const run of v.runs as (RunRecord & { requests?: number })[]) spent += run.requests ?? 0;
 
-  const entry = (log.cases[id] ??= { versions: {} });
+  const entry = (book.cases[id] ??= { versions: {} });
   // The role the case had when it was measured: tuning with it later does not make this run tuned.
   if (entry.role !== undefined && entry.role !== c.role) throw new Error(`${id} was measured in this log as ${entry.role} and its case.json now says ${c.role}`);
   entry.role = c.role;
@@ -233,7 +243,7 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
     const v: VersionLog = (entry.versions[versionId] ??= { base: version.base, head: version.head, enumeration: keepForTargets({ ...enumeration, targetApplicability }, Object.values(version.targets)), runs: [] });
     if (!isLive(version, enumeration)) {
       console.log(`${id} ${versionId}: no target inside the budget; settled by the enumeration, nothing sent`);
-      writeJson(LOG, log);
+      writeJson(LOG, book);
       continue;
     }
     let attempts = v.runs.length;
@@ -262,7 +272,7 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
               }
             },
           };
-          return { provider, sent: () => ({ ...client!.sent }), origin: client.origin };
+          return { provider, sent: () => ({ ...client!.sent }), origin: client.origin, identity: () => client!.identity() };
         },
       };
       const started = new Date().toISOString();
@@ -278,17 +288,19 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
       } catch {
         finished = false;
       }
-      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
-      writeJson(LOG, log);
+      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, modelIdentity: client ? d.client.modelIdentityOf(client.host, client.identity()) : null, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
+      writeJson(LOG, book);
       console.log(`${id} ${versionId} run ${v.runs.length}: exit ${code}, ${counted.requests} requests, finished=${finished}, ${spent}/${limit} spent`);
     }
   }
 }
 
 const [mode, id, clone, limit, which] = process.argv.slice(2);
-if (mode === "precheck" && id && clone) await precheck(id, clone);
+if (process.argv[1] === undefined || realpathSync(process.argv[1]) !== fileURLToPath(import.meta.url)) {
+  // Imported (bench/eval/run.ts): no command line to read.
+} else if (mode === "precheck" && id && clone) await precheck(id, clone);
 else if (mode === "estimate") console.log(`planned at most ${estimate(id)} requests across the live branches${id ? ` of ${id}` : ""}`);
-else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again")) await measure(id, clone, Number(limit), which);
+else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again")) await measure(id, clone, Number(limit), LOGS[which]);
 else {
   console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again>");
   process.exitCode = 2;

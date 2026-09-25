@@ -11,6 +11,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { readRequirements } from "../src/intent/compiler.ts";
+import { modelIdentityOf } from "../src/judgments/client.ts";
 import { intentSection, note, renderMarkdown } from "../src/report/markdown.ts";
 import type { LocalCheckResult } from "../src/review/local-check-run.ts";
 import type { IntentSource, ReviewReport } from "../src/types.ts";
@@ -103,7 +104,7 @@ test("text from an issue or a pull request cannot start a line of its own in the
     requirements: [result],
     unexpectedChanges: [],
     sent: { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 },
-    metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", questionsHash: "abc", configSource: "defaults", notes: [] },
+    metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", modelIdentity: modelIdentityOf("cloudflare", { returned: new Map([["jev-1.13.0", 4]]), notReturned: 0, unreadable: 0 }), questionsHash: "abc", configSource: "defaults", notes: [] },
   };
   for (const text of [renderMarkdown(report), intentSection(reading.spec, sources).join("\n")]) {
     const lines = text.split("\n");
