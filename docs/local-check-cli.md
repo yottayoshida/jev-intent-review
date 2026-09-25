@@ -82,15 +82,15 @@ every sentence as `R1`; the run sends the requirement's own id), and its calls a
 the form Jev chose at the bar, or under `failure_propagation` when Jev read neither form or was not
 sure. A spec's requirement is not asked; nor is one on a run that read no function.
 
-| | `failure_propagation` | `check_before_action` |
-|---|---|---|
-| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
-| the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
-| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) |
-| what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
-| against the requirement | `returns_success` | `reaches_it` |
+| | `failure_propagation` | `check_before_action` | `failure_handling` (a spec names it) |
+|---|---|---|---|
+| a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own | its callee settles as for `failure_propagation`, whatever the function returns — one that returns `()` included (a sibling of the change still returns a `Result`) |
+| the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made | a failure of this call not be turned silently into a success |
+| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) | as for `failure_propagation`, word for word |
+| what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` | `propagates` / `reports_locally` / `continues_silently` / `cannot_determine` |
+| against the requirement | `returns_success` | `reaches_it` | `continues_silently` |
 
-**Every call asked about is read by one rule, the same for both forms**, into one of four:
+**Every call asked about is read by one rule, the same for every form**, into one of four:
 
 - the requirement `applies` at 0.6 or more, and the function's answer at 0.6 or more is the one
   against the requirement → **worth checking**; the one keeping it → **holding**; anything else
@@ -1530,7 +1530,7 @@ What this does not measure:
 **The form's observation question tells a function that drops a failure from one that logs it and
 goes on, and from one that returns it — on these four places, three runs of three each.** The question
 is `src/plan/handling.ts`'s, sent on the packets the run builds, before the form was wired; the versions,
-the expected answers and the lines were committed first (`bench/handling/probe.json`, log
+the expected answers and the lines were committed first (packets built as the run builds them, with one fixed requirement sentence; `bench/handling/probe.json`, log
 `bench/logs/handling-probe-v1.json`, `typesafe/jev` on Cloudflare, 2026-09-25). *reported* is a
 defect version with the failure logged where it is dropped; *decoy* is a defect version with a line
 that logs something else in the same function, the failure still dropped; moltis#1064's
@@ -1546,7 +1546,8 @@ returning an empty title (*logged*), and *silent* takes those two away.
 
 Both lines hold: every version that is not shipped or rewritten got its expected answer at the bar in
 three runs of three, and no shipped or rewritten version was answered `continues_silently`. What this
-does not show: how the form does on pull requests it was not built on, its mapping question (not sent
+does not show: how it answers in a function that returns `()` — all four functions here return a
+`Result`, and the form asks in one that does not, which the probe did not reach —, how the form does on pull requests it was not built on, its mapping question (not sent
 by the probe), or how often it lists a call that is not a defect there. Two repositories and four
 places are the whole of it; the form is used only where a spec names it.
 
@@ -1557,8 +1558,8 @@ rows, three fresh annotators per form, in separate sessions, read the pull reque
 and said whether its requirement could be written as `failure_propagation` (a) and, apart, as
 `failure_handling` (a′). On the rows of Rust repositories whose code before the fix swallowed the
 failure (`swallows_as_success`, 37 rows, 23 repositories), (a) could write 21 (56.8 %, mean over
-repositories 52.7 %) and (a) or (a′) 28 (75.7 %, mean 64.9 %); on every failure-handling row (67
-rows, 35 repositories), 32 and 43. Agreement: (a) unanimous on 72 rows, (a′) on 81; the annotators'
+repositories 52.7 %) and (a) or (a′) 28 (75.7 %, mean 64.9 %); on every row not labelled
+`not_failure_handling` (67 rows, 35 repositories, `other` and `cannot_label` among them), 32 and 43. Agreement: (a) unanimous on 72 rows, (a′) on 81; the annotators'
 (a) says what the case choice's own verdict said on 57 of the 70 rows that have one. This counts
 sentences, not what the run reaches: whether the tool reaches the call in those pull requests is not
 measured. The six annotators worked in one directory, and one kept its notes there; no other

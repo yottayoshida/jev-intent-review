@@ -14,7 +14,8 @@
 //   2. every call in every one of those functions is added — the diff says which body, and the
 //      defect is usually a different call in it
 //   3. the form says which calls are askable — for failures, a callee resolving here to something
-//      returning a `Result` — and the rest are held, with the reason, in the report
+//      returning a `Result`, in a function that returns one when the form asks what is returned —
+//      and the rest are held, with the reason, in the report
 //   4. two judgment budgets for the requirement (ADR 0015) — the functions the change touched, and
 //      their callers one hop out, asked when the command asks for them (`askCallers`), after the
 //      changes' questions — each spent round-robin over functions, so neither a busy body nor a

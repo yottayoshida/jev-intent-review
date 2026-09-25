@@ -559,3 +559,23 @@ test("a call the rules cannot tell from another of the same text is held, not as
     assert.ok(!("hold" in once), `${form.name}: once, and nothing the repository defines around it, is not held`);
   }
 });
+
+test("failure_handling end to end: a function that returns () is asked about its callee's failure, where failure_propagation holds it (#85)", async () => {
+  const LOG = "pub fn record(store: &Store) {\n    write_entry(store);\n    touch(store);\n}\n\npub fn write_entry(store: &Store) -> Result<(), Error> {\n    store.put()\n}\n\npub fn touch(store: &Store) {\n    store.mark();\n}\n";
+  const git = fakeRepo({ "src/log.rs": LOG }, { "src/log.rs": LOG.replace("    touch(store);\n", "") }, hunk("src/log.rs", LOG, "touch(store);", "store.mark();"));
+  const requirement = (form: RequirementForm): Requirement => ({ id: "R1", text: "A failure to write an entry is returned, logged or recorded, not dropped.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [], form });
+  const [handling] = await complete(runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [requirement("failure_handling")], jev(), () => true, DEFAULT_LOCAL_CHECK)).then((x) => x.requirements);
+  const [propagation] = await complete(runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [requirement("failure_propagation")], jev(), () => true, DEFAULT_LOCAL_CHECK)).then((x) => x.requirements);
+  assert.deepEqual(asked(handling!), ["write_entry"], "the callee that can fail is asked about; touch cannot fail");
+  assert.deepEqual(asked(propagation!), [], "the failure form holds it: record returns ()");
+  assert.ok(propagation!.unchecked.some((u) => u.call.startsWith("write_entry") && /does not return a Result/.test(u.why)));
+});
+
+test("failure_handling holds a call whose failure goes to this repository's own function, in its own words", async () => {
+  const body = "log_err(write_entry(store));";
+  const call = { id: "c", functionId: "f", line: 1, column: 1, text: body, callee: "write_entry", expression: "write_entry(store)", expressionComplete: true } as CallCandidate;
+  const decided = await FORMS.failure_handling.decisive({ requirement: {} as Requirement, fn: {} as never, call, body, calls: [call], defined: async () => true });
+  assert.ok("hold" in decided && /whether the failure is returned, leaves a trace or is dropped is `log_err`'s to say/.test(decided.hold), JSON.stringify(decided));
+  // The control: not defined here, so nothing decides it elsewhere and the call is asked.
+  assert.deepEqual(await FORMS.failure_handling.decisive({ requirement: {} as Requirement, fn: {} as never, call, body, calls: [call], defined: async () => false }), { send: [] });
+});

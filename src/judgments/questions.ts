@@ -35,7 +35,7 @@ export const CHANGE_QUESTIONS = {
   },
 } as const satisfies Questions;
 
-/** Everything a run can send: the change question and the two forms' questions, as their wording is. */
+/** Everything a run can send: the change question and every form's questions, as their wording is. */
 export const QUESTIONS_HASH = createHash("sha256")
   .update(JSON.stringify([CHANGE_QUESTIONS, FORMS_FINGERPRINT]))
   .digest("hex")

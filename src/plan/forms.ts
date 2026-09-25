@@ -267,9 +267,14 @@ const failureHandling: Form = {
   // What a function does with a failure is asked of any function: one that returns nothing can still
   // go on as if nothing had failed. Only the callee has to be able to fail.
   askable: ({ fn, call, calleeResultOf }) => calleeResultOf(fn, call),
-  // The same as `failure_propagation`: passed to this repository's own code, what happens to the
-  // failure is that code's to say, and its body is not sent.
-  decisive: (context) => failurePropagation.decisive(context),
+  // As `failure_propagation`: passed to this repository's own code, what happens to the failure is
+  // that code's to say, and its body is not sent — said in this form's terms.
+  decisive: async ({ body, call, defined }) => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
+    const wrapper = wrapperOf(body, call);
+    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
+    return { hold: `its failure is passed to \`${wrapper}\` before anything else is done with it, and \`${wrapper}\` is this repository's own function, whose body is not sent: whether the failure is returned, leaves a trace or is dropped is \`${wrapper}\`'s to say` };
+  },
   mappingQuestion: (fn, call) => handlingMappingFor(fn, call, named(call)),
   observationKey: HANDLING_KEY,
   observationQuestions: (fn, call) => handlingQuestionsFor(conditionFor(fn, call)),

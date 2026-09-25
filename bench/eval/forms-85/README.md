@@ -1,6 +1,8 @@
 # Which form could each row's requirement be written in (#85)
 
 Written and committed before any annotator ran and before any request with the new form was sent.
+`count.ts`, which carries out *Counting* below, was committed after the judgments were in; the rule it
+carries out is this file's, unchanged.
 Nothing below changes after the first judgment is read; a change makes `forms-85-v2`.
 
 ## What is judged

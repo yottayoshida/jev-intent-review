@@ -63,7 +63,8 @@ or rewritten version answered `continues_silently`.
 - `--json`'s `form` can be `failure_handling`; the report names it and its words. `metadata.questionsHash`
   moves (`FORMS_FINGERPRINT` holds every form's questions), but no kept answer (ADR 0013) is asked again:
   its key is the request, and the other two forms' requests do not change a byte.
-- What is not claimed: that more of the tool's reach is covered on real pull requests, its precision
+- What is not claimed: how the question is answered in a function that returns `()` — all four functions
+  of the probe return a `Result`, and the form asks in one that does not; that more of the tool's reach is covered on real pull requests, its precision
   there, or its stability over runs beyond the probe's three — those are measured on #80's sets. How
   many of the 91 rows' requirements the new sentence can write is recorded in `bench/eval/forms-85/`.
 - A sibling of the change (ADR 0005) is still only a function that returns a `Result`, whatever the
