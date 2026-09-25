@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "capturedAt": "2026-09-25T01:14:19.314Z",
+  "toolCommit": "05171a0f70aad65e8e95986d340c57a6741f2f45",
+  "questionsHash": "846b48c56e39",
+  "split": "59d961def06930b94dd5f8b77a692cdfa2aa64a11a09b992c6d83b66d78b3bee",
+  "pairs": 57,
+  "byCase": {
+    "grovedb-500": 28,
+    "moltis-1064": 29
+  },
+  "packets": "a2db6d5f771ed4fdde0177049003a7a3d2a9bddd19f831f92e84b0c77d6301d8"
+}
