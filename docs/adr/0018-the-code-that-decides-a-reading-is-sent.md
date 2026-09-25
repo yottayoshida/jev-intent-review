@@ -1,4 +1,4 @@
-# 0017. The code that decides a reading is sent, or the call is not asked about
+# 0018. The code that decides a reading is sent, or the call is not asked about
 
 Status: Accepted
 

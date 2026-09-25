@@ -442,3 +442,80 @@ test("readOption: an offered option at the bar, under it, or none; chooseForm re
   assert.deepEqual(chooseForm(a("failure_propagation", 0.59)), { form: "failure_propagation", by: "default", verdict: "failure_propagation", probability: 0.59 });
   assert.deepEqual(chooseForm(undefined), { form: "failure_propagation", by: "default", verdict: "no_answer", probability: 0 });
 });
+
+// --- The code a reading turns on (ADR 0018) --------------------------------------------------------
+
+/** The packets the function's own question was asked with, by the call it named. */
+function recording() {
+  const inner = jev();
+  const packets = new Map<string, { path: string; code: string }[]>();
+  const provider: JudgmentProvider = {
+    model: inner.model,
+    async judge(state: unknown, questions: Questions) {
+      const key = Object.keys(questions)[0]!;
+      if (key === "in_forbidden_case" || key === "on_error_result") {
+        const named = /(?:the call|reaches the call) `([^`]+)`/.exec((questions as unknown as Record<string, { instructions: string }>)[key]!.instructions)?.[1] ?? "";
+        packets.set(named, (state as { evidence: { related: { path: string; code: string }[] } }).evidence.related);
+      }
+      return inner.judge(state, questions);
+    },
+  };
+  return { packets, provider };
+}
+const runOn = (git: Git, requirements: Requirement[], provider: JudgmentProvider) =>
+  complete(runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, requirements, provider, () => true, DEFAULT_LOCAL_CHECK)).then((x) => x.requirements);
+const withAuth = (auth: string, extra: Record<string, string> = {}) =>
+  fakeRepo({ "src/auth.rs": auth, "src/store.rs": STORE, ...extra }, { "src/auth.rs": auth.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", auth, "audit(store)?;", "record_use(store)?;"));
+const byCall = <T extends { call: string }>(xs: readonly T[], prefix: string): T | undefined => xs.find((x) => x.call.startsWith(prefix));
+
+/** The check moved into a helper the change added, which does nothing: the hidden versions' shape. */
+const AUTH_HIDDEN = `${AUTH.replace("    if is_disabled(&record) {\n        return Err(AuthError::Disabled);\n    }\n", "    reject_disabled(&record)?;\n")}
+fn reject_disabled(_record: &KeyRecord) -> Result<(), AuthError> {
+    Ok(())
+}
+`;
+
+test("check_before_action: the check's body goes with the packet, and the report says so", async () => {
+  const { packets, provider } = recording();
+  const [r] = await runOn(withAuth(AUTH), [GUARD], provider);
+  const create = byCall(r!.observed, "create_session");
+  assert.equal(create?.outcome, "satisfies");
+  assert.deepEqual(create?.sent?.map((s) => [s.name, s.path, s.depth]), [["is_disabled", "src/store.rs", 1]]);
+  assert.ok(packets.get("create_session(store, &record)")?.some((x) => x.path === "src/store.rs" && x.code.includes("record.disabled")), "the body itself is in the packet");
+  assert.equal(byCall(r!.observed, "load_key")?.sent, undefined, "a call with no check above it is sent as before");
+  assert.match(requirementSection(r!).join("\n"), /sent with it: the body of `is_disabled` \(src\/store\.rs:5-7\), a check before the call/);
+});
+
+test("check_before_action: a check the pull request added is sent too, the hidden versions' shape", async () => {
+  const { packets, provider } = recording();
+  const [r] = await runOn(withAuth(AUTH_HIDDEN), [GUARD], provider);
+  const create = byCall(r!.observed, "create_session");
+  assert.deepEqual(create?.sent?.map((s) => [s.name, s.path]), [["reject_disabled", "src/auth.rs"]], "not left out for being a function the change reached");
+  assert.ok(packets.get("create_session(store, &record)")?.some((x) => x.code.includes("fn reject_disabled")));
+});
+
+test("check_before_action: a check with two definitions, or too long, holds the call; one with none leaves it as it was", async () => {
+  const [two] = await runOn(withAuth(AUTH, { "src/legacy.rs": "pub fn is_disabled(record: &Legacy) -> bool {\n    false\n}\n" }), [GUARD], recording().provider);
+  assert.equal(byCall(two!.observed, "create_session"), undefined, "not asked");
+  assert.match(byCall(two!.unchecked, "create_session")?.why ?? "", /`is_disabled` has 2 definitions in this repository/);
+  // Words, not one repeated letter: `redact` folds a long run of one letter into 29 characters.
+  const long = STORE.replace("    record.disabled\n", `    // ${"the heights are checked here ".repeat(150)}\n    record.disabled\n`);
+  const [tooLong] = await runOn(fakeRepo({ "src/auth.rs": AUTH, "src/store.rs": long }, { "src/auth.rs": AUTH.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", AUTH, "audit(store)?;", "record_use(store)?;")), [GUARD], recording().provider);
+  assert.match(byCall(tooLong!.unchecked, "create_session")?.why ?? "", /does not fit the 4000 characters/);
+  const none = STORE.replace("pub fn is_disabled(record: &KeyRecord) -> bool {\n    record.disabled\n}\n", "");
+  const [external] = await runOn(fakeRepo({ "src/auth.rs": AUTH, "src/store.rs": none }, { "src/auth.rs": AUTH.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", AUTH, "audit(store)?;", "record_use(store)?;")), [GUARD], recording().provider);
+  const asked = byCall(external!.observed, "create_session");
+  assert.equal(asked?.outcome, "satisfies", "asked as before");
+  assert.equal(asked?.sent, undefined);
+});
+
+test("failure_propagation: a failure passed to the repository's own function first is not asked about; to one it does not define, it is", async () => {
+  const wrapped = AUTH.replace("let session = create_session(store, &record)?;", "let session = settle(create_session(store, &record))?;");
+  const settle = "\nfn settle<T>(r: Result<T, StoreError>) -> Result<T, StoreError> {\n    r\n}\n";
+  const [held] = await runOn(withAuth(`${wrapped}${settle}`), [FAILURES], recording().provider);
+  assert.equal(byCall(held!.observed, "create_session"), undefined);
+  assert.match(byCall(held!.unchecked, "create_session")?.why ?? "", /its failure is passed to `settle` before it is returned, and `settle` is this repository's own function/);
+  assert.ok(byCall(held!.observed, "load_key"), "the function's other calls are asked as before");
+  const [asked] = await runOn(withAuth(wrapped), [FAILURES], recording().provider);
+  assert.ok(byCall(asked!.observed, "create_session"), "with no `fn settle` here, the failure passes to code that is not this repository's, and the call is asked");
+});

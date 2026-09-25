@@ -21,6 +21,7 @@ import { redact } from "../evidence/redact.ts";
 import type { Questions } from "../judgments/provider.ts";
 import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
+import { checksBefore, wrapperOf } from "./decisive.ts";
 import { BAR, conditionFor, questionsFor } from "./local-check.ts";
 import { MAPPING_PROPERTY, mappingQuestionFor, type MappingAnswer, whyListed } from "./mapping.ts";
 import type { Askability } from "./select.ts";
@@ -47,6 +48,25 @@ export interface AskContext {
   readHere: (callee: string) => Promise<FunctionCandidate | null>;
 }
 
+/** What a form is given to name the code that decides a reading (ADR 0018). */
+export interface DecisiveContext {
+  requirement: Requirement;
+  fn: FunctionCandidate;
+  call: CallCandidate;
+  /** The function's body as the packet carries it. */
+  body: string;
+  /** Every call the listing has in the function, the target among them. */
+  calls: readonly CallCandidate[];
+  /** Whether the repository defines a function of this name outside the tests. */
+  defined: (name: string) => Promise<boolean>;
+}
+
+/**
+ * The code a reading turns on: not asked about, and why; or the names of the functions whose bodies
+ * are sent with the packet — none when the body sent is all the reading needs.
+ */
+export type Decisive = { hold: string } | { send: readonly string[] };
+
 export interface Form {
   name: RequirementForm;
   /** What the mapping asks the requirement to require of the call, as a stable name for the record. */
@@ -58,6 +78,8 @@ export interface Form {
    */
   says: string;
   askable(context: AskContext): Promise<Askability>;
+  /** The code the reading turns on, from the body's text (ADR 0018). Decided after the budget. */
+  decisive(context: DecisiveContext): Promise<Decisive>;
   /** Always keyed `requirement_governs`, with the options `applies`, `does_not_apply`, `unknown`. */
   mappingQuestion(fn: FunctionCandidate, call: CallCandidate): Questions;
   /** The key of the observation answer the rule reads. The request may carry other, diagnostic ones. */
@@ -91,6 +113,13 @@ const failurePropagation: Form = {
   property: MAPPING_PROPERTY,
   says: "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
   askable: ({ fn, call, resultOf }) => resultOf(fn, call),
+  // The failure decides the reading. Passed to this repository's own code before it is returned, what
+  // the function returns is that code's to say, and its body is not sent: the call is not asked about.
+  decisive: async ({ body, call, defined }) => {
+    const wrapper = wrapperOf(body, call);
+    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
+    return { hold: `its failure is passed to \`${wrapper}\` before it is returned, and \`${wrapper}\` is this repository's own function, whose body is not sent: what the function returns is \`${wrapper}\`'s to say` };
+  },
   mappingQuestion: (fn, call) => mappingQuestionFor(fn, call, named(call)),
   observationKey: "on_error_result",
   observationQuestions: (fn, call) => questionsFor(conditionFor(fn, call)),
@@ -145,6 +174,15 @@ const checkBeforeAction: Form = {
     // words only through a receiver or the rest of its path takes its turn after a named one (#39).
     const names = [...calleeNameTerms(call)].some((c) => [...wanted].some((w) => termsMeet(c, w)));
     return { ok: true, names };
+  },
+  // The check decides the reading: a call above the target, in a condition, whose own name meets the
+  // requirement. Its body goes with the packet. A function the change touched is not left out, as
+  // `readHere` leaves out a target's: a helper the pull request added is where a check that does
+  // nothing is likeliest to be.
+  decisive: async ({ requirement, body, call, calls }) => {
+    const wanted = requirementTerms(requirement);
+    const meets = (c: CallCandidate) => [...calleeNameTerms(c)].some((t) => [...wanted].some((w) => termsMeet(t, w)));
+    return { send: checksBefore(body, call, calls, meets) };
   },
   mappingQuestion: (fn, call) => ({
     requirement_governs: {

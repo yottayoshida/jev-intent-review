@@ -11,6 +11,7 @@ import { defines } from "../change/blocks.ts";
 import { calledNames, identifiers } from "../change/seeds.ts";
 import { IMPORT_LINE, isTestPath, type Discoverer } from "../discovery/discover.ts";
 import type { Candidate, Cut, Location, Requirement } from "../types.ts";
+import { functionDefinitionsOf } from "../plan/applicability.ts";
 import type { GrepHit } from "../repository/git.ts";
 import { cut, redact } from "./redact.ts";
 
@@ -213,4 +214,92 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
     redactions,
     callSites,
   };
+}
+
+// --- The code a reading turns on (docs/adr/0018) ---------------------------------------------------
+//
+// The only place a check's name is looked up. It is by name — exactly one definition outside the
+// tests — because nothing here resolves a call to its definition; #83 decides what resolution is
+// trusted, and its contract replaces this lookup and nothing else.
+
+export const DECISIVE_LIMITS = { each: 4000, total: 8000 } as const;
+
+export interface SentBody {
+  name: string;
+  path: string;
+  lines: string;
+  /** 1: a check the form named. 2: a function a sent check calls, sent while there was room. */
+  depth: 1 | 2;
+}
+
+export type DecisiveBodies =
+  | { hold: string }
+  | { related: Related[]; sent: SentBody[]; locations: Location[]; redactions: number; notSent: string[] };
+
+/**
+ * The bodies of the checks a form named, and of the functions they call, one level down.
+ *
+ * A check with more than one definition, whose search was cut, or whose body does not fit is not
+ * sent, and neither is the call: its reading would rest on a body that was not sent. A name the
+ * repository does not define (the standard library's, a dependency's) has nothing to send and is
+ * left as it was. The second level is sent while it fits and is not required: what did not fit is
+ * named in `notSent`.
+ */
+export async function decisiveBodies(discoverer: Discoverer, names: readonly string[], asked: { path: string; startLine: number; endLine: number }, limits: { each: number; total: number } = DECISIVE_LIMITS): Promise<DecisiveBodies> {
+  const related: Related[] = [];
+  const sent: SentBody[] = [];
+  const locations: Location[] = [];
+  const notSent: string[] = [];
+  let used = 0;
+  let redactions = 0;
+  const taken = new Set<string>();
+
+  /** One definition's body, or why it cannot be sent. `null`: the repository does not define it. */
+  const bodyOf = async (name: string): Promise<{ code: string; path: string; start: number; end: number } | { why: string } | null> => {
+    const { found, more } = await functionDefinitionsOf(discoverer, name);
+    if (found.length === 0 && !more) return null;
+    if (found.length !== 1 || more) return { why: `\`${name}\` has ${found.length}${more ? " or more" : ""} definitions in this repository, so which one is called here is not known` };
+    const def = found[0]!;
+    const index = await discoverer.index(def.path);
+    if (!index) return { why: `\`${name}\` (${def.path}) could not be read` };
+    const block = index.enclosing(def.line);
+    if (block.windowed) return { why: `the body of \`${name}\` (${def.path}:${def.line}) is too long to take` };
+    if (def.path === asked.path && block.startLine >= asked.startLine && block.endLine <= asked.endLine) return { why: `\`${name}\` is defined inside the function asked about` };
+    const r = redact(slice(index.lines, block.startLine, block.endLine));
+    redactions += r.count;
+    return { code: r.text, path: def.path, start: block.startLine, end: block.endLine };
+  };
+  const take = (name: string, b: { code: string; path: string; start: number; end: number }, depth: 1 | 2) => {
+    used += b.code.length;
+    taken.add(name);
+    related.push({ path: b.path, lines: span(b.start, b.end), code: b.code });
+    locations.push({ path: b.path, startLine: b.start, endLine: b.end });
+    sent.push({ name, path: b.path, lines: span(b.start, b.end), depth });
+  };
+
+  const checks: { name: string; code: string }[] = [];
+  for (const name of names) {
+    if (taken.has(name)) continue;
+    const b = await bodyOf(name);
+    if (b === null) continue;
+    if ("why" in b) return { hold: `the check ${b.why}; the reading would rest on a body that was not sent` };
+    if (b.code.length > limits.each || used + b.code.length > limits.total) {
+      return { hold: `the body of the check \`${name}\` (${b.path}:${span(b.start, b.end)}) does not fit the ${b.code.length > limits.each ? limits.each : limits.total} characters it may take; the reading would rest on a body that was not sent` };
+    }
+    take(name, b, 1);
+    checks.push({ name, code: b.code });
+  }
+  for (const check of checks) {
+    for (const name of calledNames(withoutStrings(check.code))) {
+      if (taken.has(name) || name === check.name || /^[A-Z]/.test(name)) continue;
+      const b = await bodyOf(name);
+      if (b === null) continue;
+      if ("why" in b || b.code.length > limits.each || used + b.code.length > limits.total) {
+        notSent.push(name);
+        continue;
+      }
+      take(name, b, 2);
+    }
+  }
+  return { related, sent, locations, redactions, notSent: [...new Set(notSent)] };
 }

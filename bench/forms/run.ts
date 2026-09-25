@@ -23,7 +23,8 @@ import { join } from "node:path";
 import { meets, once, type Distilled, type Row } from "./common.ts";
 
 const HERE = new URL("./check-before-action/", import.meta.url).pathname;
-const LOG = new URL("../logs/check-before-action-v1.json", import.meta.url).pathname;
+// v1 is the measurement before the check's body was sent with the packet; v2 after it (#82, ADR 0018).
+const LOG = new URL("../logs/check-before-action-v2.json", import.meta.url).pathname;
 const VERSIONS = ["shipped", "defect", "rewrite", "hidden", "caller"] as const;
 type Version = (typeof VERSIONS)[number];
 
