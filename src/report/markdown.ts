@@ -420,10 +420,23 @@ export function renderMarkdown(report: ReviewReport): string {
   }
 
   out.push("## Sent to the judgment model", "");
-  out.push(`- ${plural(report.sent.requests, "request")}, ${plural(report.sent.answered, "answer")}${report.sent.reused > 0 ? `, ${plural(report.sent.reused, "answer")} reused (${report.sent.reusedFromEarlierRuns} kept from earlier runs, the rest repeats within this one)` : ""}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
+  out.push(`- ${plural(report.sent.requests, "request")}, ${plural(report.sent.answered, "answer")}${report.sent.reused > 0 ? `, ${plural(report.sent.reused, "answer")} reused (${report.sent.reusedFromEarlierRuns} kept from earlier runs, the rest repeats within this one)` : ""}, ${report.sent.bytes.toLocaleString("en-US")} bytes, model ${codeSpan(m.model)}${answeredAs(m.modelIdentity)}, questions ${codeSpan(m.questionsHash)}, config ${codeSpan(m.configSource)}`);
   if (report.sent.endpoint !== undefined) out.push(`- Endpoint: ${codeSpan(report.sent.endpoint)}${report.sent.host === undefined ? "" : ` (${hostName(report.sent.host)})`}`);
   out.push("");
   return out.join("\n");
+}
+
+/**
+ * Which versions answered, as the host named them (#84): what `model` alone cannot say, since every
+ * host's name for Jev is an alias that moves. An answer kept from an earlier run has no known version, and is said.
+ */
+function answeredAs(identity: ReviewReport["metadata"]["modelIdentity"]): string {
+  const parts = identity.returned.map((r) => `${codeSpan(r.model)} ×${r.responses}`);
+  const unnamed = identity.notReturned + identity.unreadable;
+  if (unnamed > 0) parts.push(`no version named for ${plural(unnamed, "response")}`);
+  if (identity.named === "not_recorded") parts.push("versions not recorded");
+  if (identity.reusedFromEarlierRuns > 0) parts.push(`${plural(identity.reusedFromEarlierRuns, "answer")} kept from earlier runs, of unknown version`);
+  return parts.length === 0 ? "" : ` (answered as ${parts.join(", ")})`;
 }
 
 export function renderJson(report: ReviewReport): string {

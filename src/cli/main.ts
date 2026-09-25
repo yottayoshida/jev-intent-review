@@ -8,7 +8,7 @@ import { loadConfig, type Config } from "../config/config.ts";
 import { onlyFromPullRequest, readingBlockers, readRequirements, type Reading } from "../intent/compiler.ts";
 import { GitHub, githubToken, parseRepository, type PullRequest } from "../intent/github.ts";
 import { issuesNotListed, resolveIntent } from "../intent/resolver.ts";
-import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, namedProvider, PROVIDER_KEYS, ProviderError, type Endpoint } from "../judgments/client.ts";
+import { JevClient, endpointFromEnv, EndpointError, hostName, jevModel, modelIdentityOf, namedProvider, PROVIDER_KEYS, ProviderError, type Endpoint, type Host, type ModelIdentity, type ReturnedModels } from "../judgments/client.ts";
 import { JevProvider } from "../judgments/jev.ts";
 import { LimitedProvider, type JudgmentProvider } from "../judgments/provider.ts";
 import { QUESTIONS_HASH } from "../judgments/questions.ts";
@@ -129,7 +129,8 @@ function flat(text: string): string {
 
 /** What talks to the outside world; tests pass scripted ones. */
 export interface Deps {
-  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; sent: () => { requests: number; bytes: number }; origin: string };
+  /** `identity` is the transport's count of the versions that answered; without it the report says `not_recorded`. */
+  judges?: (endpoint: Endpoint, config: Config, deadline: number) => { provider: JudgmentProvider; sent: () => { requests: number; bytes: number }; origin: string; identity?: () => ReturnedModels };
   /** The network under the real client: a test stands in for a host here and keeps the wiring from host to request shape. */
   fetch?: typeof fetch;
   github?: (env: NodeJS.ProcessEnv) => Promise<GitHub>;
@@ -181,6 +182,7 @@ function defaultJudges(endpoint: Endpoint, config: Config, deadline: number, env
     provider: new LimitedProvider(new JevProvider(client, { env }), { concurrency: 8, deadline }),
     sent: () => ({ ...client.sent }),
     origin: client.origin,
+    identity: () => client.identity(),
   };
 }
 
@@ -280,13 +282,17 @@ interface ReportParts {
   sent?: ReviewReport["sent"];
   notes: string[];
   prAuthor?: string | undefined;
+  /** Absent when nothing was sent: the report then says no response came back. */
+  modelIdentity?: ModelIdentity;
 }
 
 /**
  * The one report shape, whichever way the run ended (ADR 0007). A skipped or stopped run still says
  * what would have been checked and what could not be read.
  */
-function reportOf(revisions: Revisions, repository: string, configSource: string, model: string, parts: ReportParts): ReviewReport {
+function reportOf(revisions: Revisions, repository: string, configSource: string, host: Host, parts: ReportParts): ReviewReport {
+  const model = jevModel(host);
+  const modelIdentity = parts.modelIdentity ?? modelIdentityOf(host, { returned: new Map(), notReturned: 0, unreadable: 0 });
   return {
     version: 2,
     tool: { name: "jev-intent-review", version: VERSION },
@@ -298,7 +304,7 @@ function reportOf(revisions: Revisions, repository: string, configSource: string
     requirements: parts.requirements ?? [],
     unexpectedChanges: parts.unexpectedChanges ?? [],
     sent: parts.sent ?? { requests: 0, bytes: 0, answered: 0, reused: 0, reusedFromEarlierRuns: 0 },
-    metadata: { repository, base: revisions.before, head: revisions.after, model, questionsHash: QUESTIONS_HASH, configSource, notes: parts.notes, ...(parts.prAuthor ? { pullRequestAuthor: parts.prAuthor } : {}) },
+    metadata: { repository, base: revisions.before, head: revisions.after, model, modelIdentity, questionsHash: QUESTIONS_HASH, configSource, notes: parts.notes, ...(parts.prAuthor ? { pullRequestAuthor: parts.prAuthor } : {}) },
   };
 }
 
@@ -339,7 +345,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // the named host's even when its key is missing. And what is missing, said as exactly as it can
     // be: a secret name mistyped in a workflow is otherwise a green run that judged nothing.
     const named = namedProvider(io.env);
-    const model = jevModel(endpoint?.host ?? named ?? "cloudflare");
+    const host: Host = endpoint?.host ?? named ?? "cloudflare";
     const needed =
       named === undefined
         ? "JEV_PROVIDER and that host's key, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN, or JEV_API_URL and JEV_API_TOKEN"
@@ -378,7 +384,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     const loaded = await loadConfig(git, revisions.before, revisions.after);
     const config = loaded.config;
     trace(`config: ${loaded.source}`);
-    const report = (parts: ReportParts) => reportOf(revisions, repository, loaded.source, model, parts);
+    const report = (parts: ReportParts) => reportOf(revisions, repository, loaded.source, host, parts);
     if (args["experimental-local-check"]) io.stderr("jev-intent-review: --experimental-local-check is the run now; the report and the exit code are the same without it\n");
 
     const resolved = await resolveIntent(
@@ -615,6 +621,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
         sent: { requests: sent.requests, bytes: sent.bytes, answered: run.answered + run.form.answered + changes.answered + callers.answered + siblings.answered - reused, reused, reusedFromEarlierRuns, endpoint: judges.origin, host: endpoint.host },
         notes,
         prAuthor,
+        modelIdentity: modelIdentityOf(endpoint.host, judges.identity?.(), reusedFromEarlierRuns),
       }),
     );
   } catch (error) {

@@ -1,6 +1,7 @@
 // A report of every part the Markdown and the Action read, for tests that start from a report rather
 // than from a run: one requirement, one call worth checking, one holding, one not checked.
 
+import { modelIdentityOf } from "../../src/judgments/client.ts";
 import type { LocalCheckResult } from "../../src/review/local-check-run.ts";
 import type { ReviewReport } from "../../src/types.ts";
 import { VERSION } from "../../src/version.ts";
@@ -92,7 +93,7 @@ export function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
     requirements: [localCheckResult()],
     unexpectedChanges: [],
     sent: { requests: 4, bytes: 12345, answered: 4, reused: 0, reusedFromEarlierRuns: 0 },
-    metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", questionsHash: "abc", configSource: "defaults", notes: [] },
+    metadata: { repository: "o/r", base: "a".repeat(40), head: "b".repeat(40), model: "typesafe/jev", modelIdentity: modelIdentityOf("cloudflare", { returned: new Map([["jev-1.13.0", 4]]), notReturned: 0, unreadable: 0 }), questionsHash: "abc", configSource: "defaults", notes: [] },
     ...overrides,
   };
 }

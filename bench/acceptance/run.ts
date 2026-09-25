@@ -52,7 +52,7 @@ type LogName = keyof typeof LOGS;
 const RUNS = 3;
 const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
-const JUDGES_COPIED_FROM = "src/cli/main.ts defaultJudges (JevClient, JevProvider, LimitedProvider concurrency 8)";
+const JUDGES_COPIED_FROM = "src/cli/main.ts defaultJudges (JevClient, JevProvider, LimitedProvider concurrency 8, the client's identity)";
 
 const load = async <T>(path: string): Promise<T> => (await import(new URL(path, DIST).href)) as T;
 
@@ -262,7 +262,7 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
               }
             },
           };
-          return { provider, sent: () => ({ ...client!.sent }), origin: client.origin };
+          return { provider, sent: () => ({ ...client!.sent }), origin: client.origin, identity: () => client!.identity() };
         },
       };
       const started = new Date().toISOString();
@@ -278,7 +278,7 @@ async function measure(id: string, clone: string, limit: number, which: LogName)
       } catch {
         finished = false;
       }
-      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
+      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, modelIdentity: client ? d.client.modelIdentityOf(client.host, client.identity()) : null, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
       writeJson(LOG, log);
       console.log(`${id} ${versionId} run ${v.runs.length}: exit ${code}, ${counted.requests} requests, finished=${finished}, ${spent}/${limit} spent`);
     }
