@@ -1,6 +1,6 @@
 # 0017. A repository is one observation, and the sealed set is opened on main first
 
-Status: Proposed
+Status: Accepted
 
 ## Context
 

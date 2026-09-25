@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { openSealed, Refused, runSealed, type SealedDeps } from "../bench/eval/run.ts";
+import { PROTOCOL_VERSION } from "../bench/eval/split.ts";
 
 /** A world where every condition holds, with a log in memory and a count of the requests sent. */
 function world(over: Partial<SealedDeps> = {}) {
@@ -92,7 +93,8 @@ test("each repository's count goes up with every opening, across versions of the
   assert.deepEqual(openSealed(w.deps, "first").opened, { "x/one": 1, "x/two": 1 });
   assert.deepEqual(openSealed(w.deps, "second").opened, { "x/one": 2, "x/two": 2 });
   // A later version of the protocol (a line written by it) does not start the count again.
-  const bumped = w.log.replace(/"protocolVersion":1/g, '"protocolVersion":2');
+  const bumped = w.log.replaceAll(`"protocolVersion":${PROTOCOL_VERSION}`, `"protocolVersion":${PROTOCOL_VERSION + 1}`);
+  assert.notEqual(bumped, w.log, "the lines must carry the version the test raises");
   const later = world({ readAccessLog: () => bumped, sealedRepos: () => ["x/one", "x/three"] });
   assert.deepEqual(openSealed(later.deps, "third").opened, { "x/one": 3, "x/three": 1 });
 });

@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /**
  * How the code before the fix handled the failure the pull request is about (PROTOCOL.md, "Labels").
