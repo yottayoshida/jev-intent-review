@@ -1,0 +1,14 @@
+[package]
+name = "call-oracle"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "The reference list of calls in a Rust file, from syn, for measuring the listing (#81)"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+proc-macro2 = { version = "1", features = ["span-locations"] }
+syn = { version = "2", default-features = false, features = ["full", "visit", "parsing", "printing"] }
+serde_json = "1"
+
+[workspace]

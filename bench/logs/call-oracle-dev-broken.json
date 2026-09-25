@@ -1,0 +1,41 @@
+{
+ "material": "dev",
+ "broken": "the listing's method calls taken out (isMethodCandidate)",
+ "oracle": {
+  "src/main.rs": "a15dec5b7dd62807541388d9a3d647f137be145d6b9582033f1c5bab1213d4be",
+  "Cargo.toml": "f12d2bbdae786011e40dd85157ca57bb8a71f545b9847b7b16695f75a03484a1",
+  "Cargo.lock": "cc7e1f376173511677a6591ff86e00ca58a96f472052690fbfad94d380a601a9"
+ },
+ "listing": {
+  "src/plan/candidates.ts": "086fae0ff2f627a36f6d8baaa61b805e24adcb52bee763ed6da95f1549477e0e",
+  "src/change/blocks.ts": "4b8e8d7b48132adca6f3cb7f7f69be2e03e78208e2eb7951be3df24467918d77"
+ },
+ "detectedBefore": 136914,
+ "detectedAfter": 37657,
+ "silentBefore": 2071,
+ "silentAfter": 101328,
+ "formsThatMoved": {
+  "method": {
+   "before": {
+    "detected": 94330,
+    "silent_miss": 684,
+    "omitted_cap": 3064
+   },
+   "after": {
+    "silent_miss": 95014,
+    "omitted_cap": 3064
+   }
+  },
+  "method multiline": {
+   "before": {
+    "detected": 4927,
+    "silent_miss": 10,
+    "omitted_cap": 258
+   },
+   "after": {
+    "silent_miss": 4937,
+    "omitted_cap": 258
+   }
+  }
+ }
+}

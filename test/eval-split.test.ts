@@ -15,7 +15,7 @@ test("the committed split holds, and pool.json and split.json are what build-poo
   execFileSync(process.execPath, [fileURLToPath(new URL("../bench/eval/build-pool.ts", import.meta.url)), "--check"], { stdio: "pipe" });
 });
 
-test("every repository of protocol v1 is dev, and none is sealed", () => {
+test("every repository in the pool before any sealed case is dev, and none is sealed", () => {
   assert.equal(split.repos.filter((r) => r.side === "sealed").length, 0);
   for (const r of ["yottayoshida/omamori", "yottayoshida/sideeye", "moltis-org/moltis", "dashpay/grovedb", "kontorprotocol/kontor", "oxidezap/whatsapp-rust", "naoray/instruckt-tauri", "void-technology-inc/pybun", "ratazzi/quebec", "burntsushi/ripgrep"]) {
     assert.equal(split.repos.find((e) => e.repo === r)?.side, "dev", r);

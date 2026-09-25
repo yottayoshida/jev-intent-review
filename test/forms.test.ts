@@ -102,7 +102,7 @@ test("a form's sides are lists of its own answer names, not code", () => {
 
 // --- Which calls `check_before_action` asks about -------------------------------------------------
 
-const call = (text: string, callee: string): CallCandidate => ({ id: "x:call-1", functionId: "x:function-1", line: 1, text, callee, expression: `${callee}()`, expressionComplete: true });
+const call = (text: string, callee: string): CallCandidate => ({ id: "x:call-1", functionId: "x:function-1", line: 1, text, callee, column: 0, expression: `${callee}()`, expressionComplete: true });
 const meets = (requirement: string, c: CallCandidate, hints: string[] = []) => {
   const wanted = requirementTerms({ text: requirement, searchHints: hints });
   return [...callTerms(c)].some((w) => [...wanted].some((r) => termsMeet(w, r)));

@@ -54,6 +54,12 @@ export interface CallCandidate {
   /** The name being called, as written. */
   callee: string;
   /**
+   * Where the callee starts on its line, in UTF-16 code units from 0. Not in the listing a model
+   * sees: the call oracle (#81, docs/call-oracle.md) pairs candidates with calls by it when a line
+   * holds the same name twice.
+   */
+  column: number;
+  /**
    * The call itself, from the callee through its closing parenthesis — `read_limited(&path, MAX)`.
    *
    * The callee alone is not enough to say which call is meant. Two calls to the same function in
@@ -152,7 +158,9 @@ function callExpression(source: string, at: number): { text: string; complete: b
  * Both lists are capped, and what was left out is counted rather than dropped quietly — a model
  * choosing from a list that is short without saying so would be choosing from a different file.
  */
-export function enumerate(path: string, source: string): Candidates {
+export function enumerate(path: string, source: string, options: { maxFunctions?: number } = {}): Candidates {
+  // The call oracle (#81) runs the listing again without the cap, to know which functions it cut.
+  const maxFunctions = options.maxFunctions ?? MAX_FUNCTIONS;
   const lines = source.split("\n");
   const tests = testRegions(lines);
   const inTest = (line: number) => tests.some((r) => line >= r.start && line <= r.end);
@@ -167,7 +175,7 @@ export function enumerate(path: string, source: string): Candidates {
     if (!name || !isRustFunction(line, name)) continue;
     const startLine = i + 1;
     if (inTest(startLine)) continue;
-    if (functions.length >= MAX_FUNCTIONS) {
+    if (functions.length >= maxFunctions) {
       omittedFunctions += 1;
       continue;
     }
@@ -203,7 +211,7 @@ export function enumerate(path: string, source: string): Candidates {
         // offset into this line, which is where the window starts.
         const window = lines.slice(l - 1, Math.min(fn.endLine, l + 5)).join("\n");
         const expression = callExpression(window, m.index);
-        calls.push({ id: `${path}:call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee, expression: expression.text, expressionComplete: expression.complete });
+        calls.push({ id: `${path}:call-${calls.length + 1}`, functionId: fn.id, line: l, text: trimmed.slice(0, 200), callee, column: m.index!, expression: expression.text, expressionComplete: expression.complete });
         taken += 1;
       }
     }
