@@ -11,7 +11,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { changedFunctions } from "../acceptance/changed-functions.ts";
 import { loadCases } from "../acceptance/replay.ts";
@@ -230,13 +230,30 @@ export function readRun(stdout: string): BaselineRun {
   return { counted: true, findings: findings.slice(0, MAX_FINDINGS), listed: findings.length, ...base };
 }
 
-/** The command line, in the empty directory `cwd`: no tools, no MCP, no user settings, a fixed system prompt. */
-export function claudeArgs(prompt: string): string[] {
-  return ["-p", prompt, "--model", MODEL, "--effort", EFFORT, "--tools", "", "--strict-mcp-config", "--system-prompt", SYSTEM_PROMPT, "--setting-sources", "project", "--no-session-persistence", "--output-format", "json"];
+/**
+ * The command line, in the empty directory `cwd`: no tools, no MCP, no user settings, a fixed system
+ * prompt — the baseline's unless another is given (the annotators of `retro/prompts.ts`, #89, run the same way).
+ */
+export function claudeArgs(prompt: string, systemPrompt: string = SYSTEM_PROMPT): string[] {
+  return ["-p", prompt, "--model", MODEL, "--effort", EFFORT, "--tools", "", "--strict-mcp-config", "--system-prompt", systemPrompt, "--setting-sources", "project", "--no-session-persistence", "--output-format", "json"];
+}
+
+/**
+ * Refuses a directory where a repository or settings would reach the model: one that holds `.git` or
+ * `.claude`, or that is inside a repository — `claude` finds a repository and its `CLAUDE.md` above the
+ * directory it starts in.
+ */
+export function assertEmptyDir(cwd: string): void {
+  if (existsSync(join(cwd, ".git")) || existsSync(join(cwd, ".claude"))) throw new Error(`${cwd} must be an empty directory: a repository or settings there would reach the model`);
+  for (let dir = resolve(cwd); dirname(dir) !== dir; dir = dirname(dir)) {
+    const up = dirname(dir);
+    if (existsSync(join(up, ".git"))) throw new Error(`${cwd} is inside a repository (${up}): its branch and CLAUDE.md would reach the model`);
+    if (existsSync(join(up, "CLAUDE.md")) || existsSync(join(up, ".claude"))) throw new Error(`${cwd} is under ${up}, whose CLAUDE.md or .claude would reach the model`);
+  }
 }
 
 export function runClaude(prompt: string, cwd: string): BaselineRun {
-  if (existsSync(join(cwd, ".git")) || existsSync(join(cwd, ".claude"))) throw new Error(`${cwd} must be an empty directory: a repository or settings there would reach the model`);
+  assertEmptyDir(cwd);
   const r = spawnSync("claude", claudeArgs(prompt), { cwd, encoding: "utf8", input: "", maxBuffer: 64 * 1024 * 1024, timeout: 15 * 60_000 });
   if (r.status !== 0) return { counted: false, why: `claude exited ${r.status}`, findings: [], listed: 0, model: [], costUsd: null, inputTokens: null, outputTokens: null, durationMs: null };
   return readRun(r.stdout);
