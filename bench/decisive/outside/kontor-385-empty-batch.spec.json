@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "kontorprotocol/kontor#385 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading process_decided_batch in core/indexer/src/reactor/batches.rs at the pull request's head, before any request of version 4: an empty batch is recorded and returned before any transaction is parsed (if batch_txs.is_empty()).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The transactions of an empty decided batch must not be parsed.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["parse_transaction"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

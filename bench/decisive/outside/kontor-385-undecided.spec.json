@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "kontorprotocol/kontor#385 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading handle_get_value in core/indexer/src/reactor/batches.rs at the pull request's head, before any request of version 4: a value is made only when no undecided proposal exists for the height and round (if let Some(existing) = self.consensus.undecided.get(..) takes the other branch).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A new value must not be made for a height and round that already has an undecided proposal.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["make_value"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

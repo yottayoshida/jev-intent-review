@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "pybun#428 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading python_which in src/commands/python.rs at the pull request's head, before any request of version 4: the binary's path is looked up only for an installed version (if manager.is_installed(version), a method of the repository whose body the run can send).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The path of a Python binary must not be looked up for a version that is not installed.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["python_binary"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

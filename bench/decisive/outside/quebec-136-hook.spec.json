@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "ratazzi/quebec#136 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading enqueue_job in src/scheduler.rs at the pull request's head, before any request of version 4: before_enqueue is called on the instance only when the class defines that hook (if hooks.before_enqueue).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The before_enqueue hook must not be called for a job class that does not define it.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["call_method0"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}
