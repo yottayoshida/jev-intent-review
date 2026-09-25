@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   review:
-    # The same condition and name the README gives, on this repository itself: a pull request from
+    # The same condition and name docs/quickstart.md gives, on this repository itself: a pull request from
     # another repository is given no secrets, so the job is skipped under a name that says why.
     name: intent review (same-repository pull requests only)
     if: github.event.pull_request.head.repo.full_name == github.repository
