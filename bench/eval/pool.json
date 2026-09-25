@@ -1,0 +1,3058 @@
+{
+  "protocolVersion": 1,
+  "what": "Every candidate the records of bench/ name, with where it came from and what was decided about it. Built by build-pool.ts; do not edit by hand.",
+  "rows": [
+    {
+      "id": "yottayoshida/omamori#556",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 1,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The call that fails is a typed peek, and it fails legitimately on a genuinely torn line. The requirement is to classify a line that declares an unrecognised chain version, not to return a failed call as an error.",
+      "requirement": null,
+      "label": {
+        "label": "records_or_handles_locally",
+        "votes": [
+          "swallows_as_success",
+          "records_or_handles_locally",
+          "records_or_handles_locally"
+        ],
+        "quotes": [
+          "falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write.",
+          "falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write.",
+          "a line whose `chain_version` is unrecognized **and** whose `seq` is\nnot a number fails the peek, falls through to `result.torn_lines += 1`, and verification continues as if\nthe line were a torn write."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#461",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 2,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A design concern about pruning past unverifiable entries; no failed call is turned into a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "the *next* verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace.",
+          "the *next* verify call reports exit 0 (\"chain intact\") — the fact that a chunk of the chain was once unverifiable leaves no trace.",
+          "Auto-prune silently \"heals\" an unverifiable chain state."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#514",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 3,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A predicate that asks readability where writability is meant; not a failed call reaching the caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "cannot_label"
+        ],
+        "quotes": [
+          "A log that opens for reading and refuses writing leaves `AuditSummary::path_error` empty, because `audit_summary` reaches it through `open_read_nofollow` — `O_RDONLY`, which succeeds.",
+          "A log that opens for reading and refuses writing leaves `AuditSummary::path_error` empty",
+          "and every append then fails."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#490",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 4,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The suggested fix carries the failed write in the result and keeps returning success, so the two options of the v0.1 question cannot tell the fixed code from the defect.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**",
+          "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**",
+          "`write_hwm` refuses a symlinked path at `src/audit/mod.rs:521` (`reject_symlink(hwm_path, \"final\")?`). Pinned by `write_hwm_rejects_symlink` (`src/audit/mod.rs:6131`). **The error is discarded.**"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#483",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 5,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A recording-policy decision; the issue rejects returning an error on these paths.",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`.",
+          "`omamori config add qa-probe --command foo --action log-only --match-any zzz` succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`.",
+          "`omamori config add qa-probe --command foo --action log-only --match-any zzz` succeeds and appends `{action: config-add, key_id: \"unresolved\", seq: 2}`."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#506",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 6,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The opposite direction: the fix turns an error into a partial result that reports truncation.",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "Two paths reach the same outcome by returning `Err` before the comparison can run, and were left out of that fix:",
+          "Both exit 2 and say nothing about the tail, on a store whose tail is gone.",
+          "Both exit 2 and say nothing about the tail, on a store whose tail is gone."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#487",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 7,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "How a state is reported on three surfaces, not a failed call returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "propagates"
+        ],
+        "quotes": [
+          "| running `audit key rotate` again | `omamori: no audit secret found — nothing to rotate` — reads as \"there was nothing to do\" |",
+          "`aggregate_report` maps every\n`Err` other than the ones it names to `ChainStatus::Unavailable`; and `Unavailable.needs_attention()`\nreturns `false`",
+          "`omamori: key rotation failed: <errno>` — one line. Not what state the store is in now."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#391",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 8,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The proposed fix resolves the nearest existing ancestor instead of returning an error, and the check returns a boolean.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "the code treats a canonicalize failure as \"we'll catch it at runtime\"",
+          "the code treats a canonicalize failure as \"we'll catch it at runtime\"",
+          "A nonexistent subdirectory under a blocked prefix (e.g. `/etc/made-up-name`) silently passes this check"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#114",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 9,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Read with PR #127: an audit write failure becomes a warning and the command continues, returning success, unless strict mode is on. In the default mode the fixed code and the defect both return success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Several error paths silently swallow failures, potentially masking tampering or misconfiguration.",
+          "Several error paths silently swallow failures, potentially masking tampering or misconfiguration.",
+          "Several error paths silently swallow failures, potentially masking tampering or misconfiguration."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#111",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 10,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Read with PR #125: malformed input is classified into a variant that blocks (exit 2). The fix is a classification that blocks, not an error returned to the caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "falls_back_or_degrades",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "- `lib.rs` hook-check: malformed input → raw string → allowed",
+          "`lib.rs` hook-check: malformed input → raw string → allowed",
+          "When hook-check receives malformed JSON or missing required fields, the current implementation falls through to allow (fail-open)."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#99",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 11,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "One error mapped to another error; nothing becomes a success.",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information.",
+          "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information.",
+          "`verify_chain()` maps all `read_secret()` errors to `AuditError::SecretUnavailable`, discarding the specific symlink information."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#75",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 12,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Same shape as #111: the fix answers deny, which is a result, not an error returned to the caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。",
+          "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。",
+          "`omamori cursor-hook` は stdin の JSON パースに失敗すると allow レスポンスを返す。"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#60",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 13,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The fix adds a warning; the skip stays a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "The user gets no warning that the cursor snippet was not updated.",
+          "if `std::env::current_exe()` fails, the cursor hooks snippet is silently not regenerated",
+          "In `regenerate_hooks()` (`installer.rs`), if `std::env::current_exe()` fails, the cursor hooks snippet is silently not regenerated:"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#323",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 14,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The failure is an absent environment variable (an Option), not a failed call returning a Result.",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"` — scattering security-state files into the process CWD",
+          "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"`",
+          "When `HOME` is unset, `staging_dir()` and `state_file_path()` fall back to `\".\"` — scattering security-state files into the process CWD"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#182",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 15,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "An unrecognised tool name routed to allow; no call fails.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している。",
+          "未認識 tool 名を受け取ると無条件で allow 応答を返している。",
+          "`src/engine/hook.rs:256-260` の `HookInput::UnknownTool` branch が未認識 tool 名を受け取ると無条件で allow 応答を返している。"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#271",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 16,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Environment findings in a sandbox; no code path turns a failure into a success.",
+      "requirement": null,
+      "label": {
+        "label": "logs_or_warns",
+        "votes": [
+          "logs_or_warns",
+          "logs_or_warns",
+          "logs_or_warns"
+        ],
+        "quotes": [
+          "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)",
+          "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)",
+          "omamori warning: failed to record Layer 2 hook deny event ... Operation not permitted (os error 1)"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#387",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 17,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A missing backstop rule; no failed call.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "oxidezap/whatsapp-rust#759",
+      "repo": "oxidezap/whatsapp-rust",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 18,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If downloading or decoding an external snapshot or mutation blob fails during app state sync, the failure must reach the caller as an error. It must not return a successful result that leaves the blob's mutations empty.",
+      "label": {
+        "label": "logs_or_warns",
+        "votes": [
+          "logs_or_warns",
+          "logs_or_warns",
+          "logs_or_warns"
+        ],
+        "quotes": [
+          "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations",
+          "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations",
+          "`download_external_blobs` logged and skipped a failed external snapshot/mutation fetch, leaving the patch with empty mutations"
+        ]
+      }
+    },
+    {
+      "id": "moltis-org/moltis#1064",
+      "repo": "moltis-org/moltis",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 19,
+      "verdicts": {
+        "a": "pass",
+        "b": "pass",
+        "c": "pass",
+        "d": "pass"
+      },
+      "why": null,
+      "requirement": "If generating a session's automatic title fails, the failure must reach the caller as an error. It must not return a successful result with no label.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.",
+          "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure.",
+          "Propagate session auto-title generation failures through RPC and channel commands instead of returning `label: null` on failure."
+        ]
+      }
+    },
+    {
+      "id": "KontorProtocol/Kontor#385",
+      "repo": "kontorprotocol/kontor",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 20,
+      "verdicts": {
+        "a": "pass",
+        "b": "pass",
+        "c": "fail",
+        "d": "not checked"
+      },
+      "why": null,
+      "requirement": "If parsing a transaction, querying the database, or encoding a value or a certificate fails, the failure must reach the caller as an error. It must not skip the item that failed and return a successful result.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped.",
+          "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped.",
+          "so failures in tx parsing, DB queries, protobuf/value encoding, and certificate encoding no longer get silently dropped."
+        ]
+      }
+    },
+    {
+      "id": "Naoray/instruckt-tauri#9",
+      "repo": "naoray/instruckt-tauri",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 21,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If serializing a tool call's result to JSON fails, the failure must reach the client as an error. It must not return a successful response with empty content.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content",
+          "Replace `unwrap_or_default()` on JSON serialization in MCP server handlers with proper error propagation via `McpError::internal_error`, so clients receive an error response instead of empty content",
+          "so clients receive an error response instead of empty content"
+        ]
+      }
+    },
+    {
+      "id": "dashpay/grovedb#501",
+      "repo": "dashpay/grovedb",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 22,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If setting the base root key fails while a chunk is being restored, the failure must reach the caller as an error. The restorer must not carry on as though it had succeeded.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`.",
+          "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`.",
+          "returned a `CostResult<(), Error>` that was silently discarded via `let _ =`."
+        ]
+      }
+    },
+    {
+      "id": "dashpay/grovedb#500",
+      "repo": "dashpay/grovedb",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 23,
+      "verdicts": {
+        "a": "pass",
+        "b": "pass",
+        "c": "pass",
+        "d": "pass"
+      },
+      "why": null,
+      "requirement": "If loading the root node or rewriting tree heights fails while a restore is being finalized, the failure must reach the caller as an error. It must not be discarded and the restore reported as finished.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`.",
+          "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`.",
+          "had three `let _ =` patterns that silently discarded errors from `load_base_root` and `rewrite_heights`."
+        ]
+      }
+    },
+    {
+      "id": "TyRoXx/NonlocalityOS#433",
+      "repo": "tyroxx/nonlocalityos",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 24,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "On a failed move the fix compares content hashes and cleans up; it is not a failure returned to the caller as an error.",
+      "requirement": null,
+      "label": {
+        "label": "cannot_label",
+        "votes": [
+          "cannot_label",
+          "cannot_label",
+          "cannot_label"
+        ],
+        "quotes": [
+          "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics.",
+          "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics.",
+          "Improved file-move handling: on move failures the system now compares content hashes, cleans up duplicate sources when confirmed, and logs clearer, lower-severity diagnostics."
+        ]
+      }
+    },
+    {
+      "id": "iotaledger/iota#10136",
+      "repo": "iotaledger/iota",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 25,
+      "verdicts": {
+        "a": "pass",
+        "b": "not checked with the tool",
+        "c": "fail"
+      },
+      "why": null,
+      "requirement": "If reading state to answer a gRPC request fails, the failure must reach the caller as an error. It must not be swallowed and answered as though the value were absent.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Properly propagates errors instead of silently swallowing them with `.ok()`",
+          "Properly propagates errors instead of silently swallowing them with `.ok()`",
+          "Properly propagates errors instead of silently swallowing them with `.ok()`"
+        ]
+      }
+    },
+    {
+      "id": "armaxri/termiHub#2751",
+      "repo": "armaxri/termihub",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 26,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The fixed sites are TypeScript .catch(() => {}) calls in the frontend, and the fix logs them; no Rust call returns its failure to the caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "remaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites #2733",
+          "handling the\nremaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites",
+          "finishes the \"no silent failures\" cleanup by handling the\nremaining swallowed `.catch(() => {})` / `.catch(() => undefined)` sites #2733\nenumerated"
+        ]
+      }
+    },
+    {
+      "id": "armaxri/termiHub#2732",
+      "repo": "armaxri/termihub",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 27,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "TypeScript frontend; failures are now logged and shown as a toast, not returned to a caller as an error.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "made a failed destructive action look like it\nsucceeded",
+          "where a `.catch(() => {})` (often paired\nwith an optimistic row removal) made a failed destructive action look like it\nsucceeded.",
+          "where a `.catch(() => {})` (often paired\nwith an optimistic row removal) made a failed destructive action look like it\nsucceeded."
+        ]
+      }
+    },
+    {
+      "id": "ratazzi/quebec#136",
+      "repo": "ratazzi/quebec",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 28,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If resolving a recurring job's concurrency constraint fails, the failure must reach the caller as an error. It must not enqueue the job without the constraint and report success.",
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs.",
+          "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs.",
+          "Recurring enqueue swallowed errors from resolving a job's concurrency constraint and inserted unrestricted ready jobs."
+        ]
+      }
+    },
+    {
+      "id": "VOID-TECHNOLOGY-INC/PyBun#428",
+      "repo": "void-technology-inc/pybun",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 29,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If reading the type of a directory entry fails while the build inputs are collected, the failure must reach the caller as an error. It must not drop the entry and return a successful result.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping",
+          "entry.file_type() failures in collect_inputs_recursive were\n  mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping\n  the entry from the build cache-key hash.",
+          "mapped via unwrap_or(false) to \"neither dir nor file\", silently dropping\n  the entry from the build cache-key hash."
+        ]
+      }
+    },
+    {
+      "id": "beboite/boite-legacy#187",
+      "repo": "beboite/boite-legacy",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 30,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The swallowed results are now printed to stderr, not returned; the rest of the pull request is not failure handling.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "three `let _ =` that swallowed the failure of the thing they were doing.",
+          "three `let _ =` that swallowed the failure of the thing they were doing.",
+          "three `let _ =` that swallowed the failure of the thing they were doing."
+        ]
+      }
+    },
+    {
+      "id": "Diogo-Esteves/polyVocal#60",
+      "repo": "diogo-esteves/polyvocal",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 31,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The swallowed audio-callback errors now log through tracing; nothing is returned to a caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently",
+          "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently",
+          "Poisoned mutex, failed\nresample, and full-channel `try_send` all failed silently"
+        ]
+      }
+    },
+    {
+      "id": "cavi-ai/bobby-browser#163",
+      "repo": "cavi-ai/bobby-browser",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 32,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The swallowed page-runtime errors are now logged; the other findings are ordering, bounds and escaping, not a failure returned as an error.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "are now logged instead of silently ignored.",
+          "are now logged instead of silently ignored.",
+          "are now logged instead of silently ignored."
+        ]
+      }
+    },
+    {
+      "id": "dolang-org/dolang#337",
+      "repo": "dolang-org/dolang",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 33,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The pull request has no text, and the title is about error output being shown, not a failure turned into a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "cannot_label",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Avoid swallowing error output from unknown docker errors",
+          "Avoid swallowing error output from unknown docker errors",
+          "Avoid swallowing error output from unknown docker errors"
+        ]
+      }
+    },
+    {
+      "id": "TumbleOwlee/ferrowl#127",
+      "repo": "tumbleowlee/ferrowl",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 34,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Discarded start and stop failures are now reported in a message log, not returned to the caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "and server views and the Modbus views dropped `let _ = backend.stop()/start().await` on",
+          "dropped `let _ = backend.stop()/start().await` on\n  settings changes",
+          "The OCPP client\n  and server views and the Modbus views dropped `let _ = backend.stop()/start().await` on\n  settings changes"
+        ]
+      }
+    },
+    {
+      "id": "MarshalX/python-libipld#117",
+      "repo": "marshalx/python-libipld",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 35,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The pull request has no text; the title names swallowed errors without saying what they became, so no requirement can be written from the text.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`",
+          "swallowed errors in `decode_dag_cbor_multi`",
+          "Fix decode error handling: `PyList` leak, unbounded preallocation, and swallowed errors in `decode_dag_cbor_multi`"
+        ]
+      }
+    },
+    {
+      "id": "getappz/agentflare#229",
+      "repo": "getappz/agentflare",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 36,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If flushing, syncing or setting the permissions of a credential file fails during an atomic write, the failure must reach the caller as an error. It must not return a successful result.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises.",
+          "Fixes three places where errors that matter were silently swallowed",
+          "Fixes three places where errors that matter were silently swallowed, defeating the durability/integrity guarantees the surrounding code advertises."
+        ]
+      }
+    },
+    {
+      "id": "dsx-ai-factory/infra-controller#3469",
+      "repo": "dsx-ai-factory/infra-controller",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 37,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The swallowed failures now warn and are counted; none is returned to a caller.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all",
+          "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all",
+          "A handful of fallible operations were silent in both pipelines -- no log, no metric -- so observability couldn't see them at all"
+        ]
+      }
+    },
+    {
+      "id": "Davidslv/cce-rust#168",
+      "repo": "davidslv/cce-rust",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 38,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If the sync marker exists but cannot be read, the failure must reach the caller as an error. It must not be treated as a missing marker and the pull allowed to overwrite the index.",
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "swallows_as_success",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "`SyncState::load`'s `.ok()` mapped a present-but-corrupt `.cce/synced.json` to `None`, indistinguishable from \"never pulled\"",
+          "conflated an ABSENT manifest (simply not a workspace) with a PRESENT-but-corrupt one, silently degrading to single-directory mode.",
+          "`cmd_doctor`'s `Manifest::load` `Err(_)` arm conflated an ABSENT manifest (simply not a workspace) with a PRESENT-but-corrupt one, silently degrading to single-directory mode."
+        ]
+      }
+    },
+    {
+      "id": "liveask/liveask#127",
+      "repo": "liveask/liveask",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 39,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The pull request has no text; the title does not say what the swallowed fetch error became.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "fix swallowing error on fetch",
+          "fix swallowing error on fetch",
+          "fix swallowing error on fetch"
+        ]
+      }
+    },
+    {
+      "id": "AndreaBozzo/dataprof#370",
+      "repo": "andreabozzo/dataprof",
+      "source": "acceptance-v1",
+      "stage": "examined",
+      "order": 40,
+      "verdicts": {
+        "a": "pass",
+        "b": "fail"
+      },
+      "why": null,
+      "requirement": "If decoding a value fails, the failure must reach the caller as an error. It must not be folded into a default value that is reported as the profile.",
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "swallows_as_success",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "an error is discarded and silently becomes \"missing data.\"",
+          "This audit ensures decode paths surface errors instead of folding them into default values.",
+          "This audit ensures decode paths surface errors instead of folding them into default values."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#465",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 557, in bench/corpus",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail",
+          "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail",
+          "This mirrors `read_chain_state`'s pre-existing genesis-fallback behavior for any unparseable tail and is not new in #177."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#468",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "the measurement v0.1 was tuned on (bench/fixtures/omamori-468)",
+      "requirement": null,
+      "label": {
+        "label": "other",
+        "votes": [
+          "other",
+          "other",
+          "other"
+        ],
+        "quotes": [
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the",
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict",
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the\noutcome is decided by the host's hook-timeout policy rather than by omamori."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#470",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 558, whose read loop bench/local-check-propagation.ts was tuned on",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted",
+          "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted\ntail at all**.",
+          "Result: exit 2, \"cannot verify from entry #1\", and **no mention of the deleted\ntail at all**."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#474",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 559, named in bench/",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)` and",
+          "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)`",
+          "Non-verbose prints `Audit log: cannot verify (key \"key-3\" not in keyring)` and\nthen suggests `verify chain: omamori audit verify`."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#477",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "the ReadDir truncation family the development case omamori-553-r2 comes from",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "swallows_as_success",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "When `read_dir` fails, `max_index()` returns 0, so rotation targets slot `.1.retired` and reports `retired_key_id = \"default\"` / `new_key_id = \"key-2\"` regardless of the store's real epoch.",
+          "`rotate_key_locked` computes `let max_retired = scan_key_dir(&secret_path).max_index();` and discards `KeyDirScan.unreadable` entirely.",
+          "When `read_dir` fails, `max_index()` returns 0, so rotation targets slot `.1.retired`"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#482",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "same family as 477",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "swallows_as_success",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway",
+          "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway",
+          "When the key directory cannot be enumerated, `rotate_key_locked` proceeds anyway"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#485",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 553, the development case",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips",
+          "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips\nper-entry errors with `continue`.",
+          "`gather_staging_info` returns `StagingInfo::default()` on four different failures and skips\nper-entry errors with `continue`."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#494",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 554, in bench/corpus",
+      "requirement": null,
+      "label": {
+        "label": "logs_or_warns",
+        "votes": [
+          "logs_or_warns",
+          "logs_or_warns",
+          "logs_or_warns"
+        ],
+        "quotes": [
+          "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer, choosing between messages on internal state.",
+          "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer",
+          "`load_signing_key_locked` (`src/audit/secret.rs`) prints operator prose with `eprintln!` from the key-store layer"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#526",
+      "repo": "yottayoshida/omamori",
+      "source": "acceptance-v1",
+      "stage": "excluded",
+      "order": null,
+      "verdicts": {},
+      "why": "closed by PR 551, in bench/corpus",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "limn-works/scp#736",
+      "repo": "limn-works/scp",
+      "source": "acceptance-v1",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license (NOASSERTION)",
+      "requirement": null
+    },
+    {
+      "id": "risingwavelabs/risingwave#26399",
+      "repo": "risingwavelabs/risingwave",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 1,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "The fix makes a constructor return an Option for values it cannot represent: an absence is what the fix returns, which (a) counts as the failure's wrong shape. The requirement is an invariant at construction, not a failure reaching a caller as an error.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read",
+          "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read",
+          "Untrusted / arithmetic call sites propagate errors instead of silently accepting values that panic on read"
+        ]
+      }
+    },
+    {
+      "id": "mandubian/autonoetic#901",
+      "repo": "mandubian/autonoetic",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 2,
+      "verdicts": {
+        "a": "pass",
+        "s": "pass",
+        "d": "fail"
+      },
+      "why": "The tool reported `{\"ok\":true,\"status\":\"delivered\"}` for a message to a closed session: a failed delivery returned as a success.",
+      "requirement": "Sending a message to a target session that has already closed must reach the caller as a failure, not be reported as delivered.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`.",
+          "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`.",
+          "`target_session_id` queued to any bound session and returned `{\"ok\":true,\"status\":\"delivered\",\"recipients_count\":1}`."
+        ]
+      }
+    },
+    {
+      "id": "vybestack/llxprt-jefe#416",
+      "repo": "vybestack/llxprt-jefe",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 3,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Reaping orphaned worker process trees on Windows; no call's failure is returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "records_or_handles_locally",
+        "votes": [
+          "records_or_handles_locally",
+          "records_or_handles_locally",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "On restart Jefe marked the agent `Dead`, cleared its binding, could not reattach, and pressing `l` spawned a duplicate `--continue` worker leaving the first process tree orphaned.",
+          "On restart Jefe marked the agent `Dead`, cleared its binding, could not reattach",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "SG-devel/tailtriage#1097",
+      "repo": "sg-devel/tailtriage",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 4,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "An API consolidation; no failure is turned into a success.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "Extra-Chill/homeboy#9526",
+      "repo": "extra-chill/homeboy",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 5,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A false positive in a static detector's rule; the fix is to the detector's matching, not to a failure's handling.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "edge-toolkit/core#84",
+      "repo": "edge-toolkit/core",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 6,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Assorted fixes to lint alerts across the code base; no one requirement about a failure reaching its caller.",
+      "requirement": null,
+      "label": {
+        "label": "cannot_label",
+        "votes": [
+          "cannot_label",
+          "cannot_label",
+          "cannot_label"
+        ],
+        "quotes": [
+          "Improved error reporting when telemetry logger initialization fails.",
+          "Improved error reporting when telemetry logger initialization fails.",
+          "Improved error reporting when telemetry logger initialization fails."
+        ]
+      }
+    },
+    {
+      "id": "thedoublejay/gather-step#67",
+      "repo": "thedoublejay/gather-step",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 7,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A feature release (confidence bands, staleness, telemetry).",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "git-ai-project/git-ai#1717",
+      "repo": "git-ai-project/git-ai",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 8,
+      "verdicts": {
+        "a": "pass",
+        "s": "fail"
+      },
+      "why": "The fix removes in-memory fallbacks: bash history now fails closed when its file-backed fallback cannot initialise, where it used to fall back silently.",
+      "requirement": "If a SQLite database cannot be opened with its file-backed limits, the failure must reach the caller as an error, not be replaced by an in-memory connection.",
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize.",
+          "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize.",
+          "Removed Rust `open_in_memory` fallbacks; bash history now fails closed if even its file-backed fallback cannot initialize."
+        ]
+      }
+    },
+    {
+      "id": "pnpm/pnpm#12506",
+      "repo": "pnpm/pnpm",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 9,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new feature (an OSV index that blocks vulnerable versions); failing closed is part of the feature, not a failure that was being returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "iii-hq/workers#292",
+      "repo": "iii-hq/workers",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 10,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new feature (a Telegram bot).",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "qdrant/qdrant#9429",
+      "repo": "qdrant/qdrant",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 11,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A refactor for batched reads, for speed.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "vox-foundation/vox#346",
+      "repo": "vox-foundation/vox",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 12,
+      "verdicts": {
+        "a": "pass",
+        "s": "fail"
+      },
+      "why": "The pull request says `parse_registry_file()` now propagates errors instead of silently returning an empty set.",
+      "requirement": "If the config registry file cannot be read or parsed, the failure must reach the caller as an error, not be returned as an empty set.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`parse_registry_file()` propagates errors instead of silently returning an empty set.",
+          "`parse_registry_file()` propagates errors instead of silently returning an empty set.",
+          "`parse_registry_file()` propagates errors instead of silently returning an empty set."
+        ]
+      }
+    },
+    {
+      "id": "ng/yggdrasil#103",
+      "repo": "ng/yggdrasil",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 13,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Raising a tool's timeout and isolating a signal; no failure returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "andrewdavidmackenzie/flow#2680",
+      "repo": "andrewdavidmackenzie/flow",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 14,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A buffer size and a GUI layout, with a new example.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "ben1009/mini-lsm#76",
+      "repo": "ben1009/mini-lsm",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 15,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new module (a value log).",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "snowflakedb/drivers#911",
+      "repo": "snowflakedb/drivers",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 16,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "State-machine correctness and input validation for an ODBC call; no failure was being returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding.",
+          "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding.",
+          "`accumulate_put_data` now returns `OdbcResult<()>` and propagates errors instead of silently proceeding."
+        ]
+      }
+    },
+    {
+      "id": "zeroclaw-labs/zeroclaw#6512",
+      "repo": "zeroclaw-labs/zeroclaw",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 17,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Four email-channel defects (a default subject, Markdown as plain text, zero-byte attachments because a file was never read, lost threading); none is a failed call returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)",
+          "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)",
+          "propagate `fs::read` errors via `map_err()?` instead of `unwrap_or_default()` (silent zero-byte attachment bug)"
+        ]
+      }
+    },
+    {
+      "id": "AgentWorkforce/burn#426",
+      "repo": "agentworkforce/burn",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 18,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new SDK function.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "kennguy3n/knowledge#32",
+      "repo": "kennguy3n/knowledge",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 19,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A six-workstream implementation (encryption, CI, routing, FFI, docs); no one failure returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "propagates"
+        ],
+        "quotes": [
+          "",
+          "",
+          "`generate()` now returns `RouterError::Unavailable` instead of `InferenceFailure` when the MLX runtime is not linked"
+        ]
+      }
+    },
+    {
+      "id": "shubhattin/lipilekhika#127",
+      "repo": "shubhattin/lipilekhika",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 20,
+      "verdicts": {
+        "a": "pass",
+        "s": "fail"
+      },
+      "why": "The pull request introduces an error enum so that errors are surfaced across the bindings instead of being silently ignored or returned as null.",
+      "requirement": "When transliteration fails, the error must reach the caller as an error, not be ignored or returned as null.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null.",
+          "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null.",
+          "Errors are now consistently surfaced across platforms and bindings instead of being silently ignored or returned as null."
+        ]
+      }
+    },
+    {
+      "id": "BoundaryML/baml#3464",
+      "repo": "boundaryml/baml",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 21,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A revert of a feature.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "Jonathangadeaharder/pytest-linter#17",
+      "repo": "jonathangadeaharder/pytest-linter",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 22,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "New lint rules.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "nilesh32236/vector-mcp-rust#29",
+      "repo": "nilesh32236/vector-mcp-rust",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 23,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new frontend and search features.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "cannot_label",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "Server now falls back to an available port if the configured port is in use.",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "dobesv/harnx#353",
+      "repo": "dobesv/harnx",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 24,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new crate (git-backed history and rollback).",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "oxicrab/oxicrab#155",
+      "repo": "oxicrab/oxicrab",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 25,
+      "verdicts": {
+        "a": "pass",
+        "s": "pass",
+        "d": "fail"
+      },
+      "why": "Among its 13 findings the pull request says OAuth refresh now returns Err on failure, with no more silent stale tokens.",
+      "requirement": "If an OAuth token refresh fails, the failure must reach the caller as an error, not be returned as the stale token.",
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "OAuth refresh returns Err on failure (no more silent stale tokens)",
+          "OAuth refresh returns Err on failure (no more silent stale tokens)",
+          "OAuth refresh returns Err on failure (no more silent stale tokens)"
+        ]
+      }
+    },
+    {
+      "id": "infraweave-io/infraweave#307",
+      "repo": "infraweave-io/infraweave",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 26,
+      "verdicts": {
+        "a": "pass",
+        "s": "pass",
+        "d": "fail"
+      },
+      "why": "Beside the new destroy-from-file feature, the pull request says plan and apply now propagate errors instead of silently continuing when all claims fail.",
+      "requirement": "When every claim fails in plan or apply, the failure must reach the caller as an error, not let the command continue as if it succeeded.",
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "silently continuing when all claims fail",
+          "silently continuing when all claims fail",
+          "silently continuing when all claims fail"
+        ]
+      }
+    },
+    {
+      "id": "bindreams/skuld#33",
+      "repo": "bindreams/skuld",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 27,
+      "verdicts": {
+        "a": "pass",
+        "s": "fail"
+      },
+      "why": "The pull request says can_start's row iterator now propagates errors instead of silently dropping them via filter_map(|r| r.ok()).",
+      "requirement": "If reading a row of the running set fails, the error must reach the caller, not be dropped so that the caller sees a truncated set.",
+      "label": {
+        "label": "other",
+        "votes": [
+          "other",
+          "other",
+          "other"
+        ],
+        "quotes": [
+          "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`",
+          "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`\nunder heavy contention",
+          "`coordinate()` panicked when `busy_timeout` expired on `BEGIN EXCLUSIVE`\nunder heavy contention"
+        ]
+      }
+    },
+    {
+      "id": "ChainSafe/forest#6788",
+      "repo": "chainsafe/forest",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 28,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "Nonce calculation and serialisation of concurrent pushes; no failure was being returned as a success.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "insight-platform/savant-rs#293",
+      "repo": "insight-platform/savant-rs",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 29,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "A new RTSP backend and Python module.",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "navicore/anz#5",
+      "repo": "navicore/anz",
+      "source": "acceptance-v2",
+      "stage": "examined",
+      "order": 30,
+      "verdicts": {
+        "a": "fail"
+      },
+      "why": "New features (client secrets, a groups claim).",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "goldsky-io/streamling#106",
+      "repo": "goldsky-io/streamling",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license NOASSERTION",
+      "requirement": null
+    },
+    {
+      "id": "oneiron-dev/oneiron#738",
+      "repo": "oneiron-dev/oneiron",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "title: move-only refactor",
+      "requirement": null
+    },
+    {
+      "id": "anchapin/fluxion#3008",
+      "repo": "anchapin/fluxion",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license NOASSERTION",
+      "requirement": null
+    },
+    {
+      "id": "Smicry/rosregview#5",
+      "repo": "smicry/rosregview",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license GPL-2.0",
+      "requirement": null
+    },
+    {
+      "id": "0xckruger/arbiter_v2#3",
+      "repo": "0xckruger/arbiter_v2",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "no license",
+      "requirement": null
+    },
+    {
+      "id": "beagleboard/bb-imager-rs#653",
+      "repo": "beagleboard/bb-imager-rs",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "title: tests only",
+      "requirement": null
+    },
+    {
+      "id": "openfootmanager/openfootmanager#229",
+      "repo": "openfootmanager/openfootmanager",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license GPL-3.0",
+      "requirement": null
+    },
+    {
+      "id": "leynos/netsuke#335",
+      "repo": "leynos/netsuke",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license ISC",
+      "requirement": null
+    },
+    {
+      "id": "DawnLandTeam/dawnland-launcher#17",
+      "repo": "dawnlandteam/dawnland-launcher",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "title: a version bump",
+      "requirement": null
+    },
+    {
+      "id": "jrollin/cartog#80",
+      "repo": "jrollin/cartog",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "title: refactor",
+      "requirement": null
+    },
+    {
+      "id": "oven-sh/bun#31496",
+      "repo": "oven-sh/bun",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license NOASSERTION",
+      "requirement": null
+    },
+    {
+      "id": "guacsec/trustify#2366",
+      "repo": "guacsec/trustify",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "title: documentation",
+      "requirement": null
+    },
+    {
+      "id": "aptos-labs/aptos-core#19649",
+      "repo": "aptos-labs/aptos-core",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license NOASSERTION",
+      "requirement": null
+    },
+    {
+      "id": "aptos-labs/aptos-core#19592",
+      "repo": "aptos-labs/aptos-core",
+      "source": "acceptance-v2",
+      "stage": "screened_out",
+      "order": null,
+      "verdicts": {},
+      "why": "license NOASSERTION",
+      "requirement": null
+    },
+    {
+      "id": "yottayoshida/omamori#551",
+      "repo": "yottayoshida/omamori",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#553",
+      "repo": "yottayoshida/omamori",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#554",
+      "repo": "yottayoshida/omamori",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "logs_or_warns",
+        "votes": [
+          "logs_or_warns",
+          "logs_or_warns",
+          "logs_or_warns"
+        ],
+        "quotes": [
+          "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)",
+          "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)",
+          "The audit layer printed its own operator warnings (a key store it cannot use, an append that failed, a high-water-mark it could not advance)"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#557",
+      "repo": "yottayoshida/omamori",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "falls_back_or_degrades",
+        "votes": [
+          "falls_back_or_degrades",
+          "falls_back_or_degrades",
+          "falls_back_or_degrades"
+        ],
+        "quotes": [
+          "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain",
+          "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain\nentry.",
+          "restart the chain from genesis at `seq 0` whenever it found none or found one that was not a chain\nentry."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#558",
+      "repo": "yottayoshida/omamori",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "A halt stops authentication. It used to stop these two checks with it, and neither needs a key",
+          "A halt stops authentication. It used to stop these two checks with it, and neither needs a key",
+          "When `audit verify` stops because a key is unavailable, a break in the `seq`/`prev_hash` continuity"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#594",
+      "repo": "yottayoshida/sideeye",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#602",
+      "repo": "yottayoshida/sideeye",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#609",
+      "repo": "yottayoshida/sideeye",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "propagates",
+        "votes": [
+          "propagates",
+          "propagates",
+          "propagates"
+        ],
+        "quotes": [
+          "After this PR: **when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`",
+          "when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`",
+          "when a Linux run under `--observe wrappers` refuses `oracle_missed_operation`, `next_step` names re-running under `--observe syscalls`"
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#626",
+      "repo": "yottayoshida/sideeye",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "cannot_label",
+        "votes": [
+          "propagates",
+          "cannot_label",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "a failing run of `spike/thread-kill-lands.sh` prints the report's `message` and `next_step` and the transcript's opening lines",
+          "each time refusing `kill_did_not_land` after a complete recording, each time green on re-run.",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/sideeye#627",
+      "repo": "yottayoshida/sideeye",
+      "source": "corpus",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/corpus: requirements written by the tool's model and repaired (corpus/README.md)",
+      "requirement": null,
+      "label": {
+        "label": "not_failure_handling",
+        "votes": [
+          "not_failure_handling",
+          "not_failure_handling",
+          "not_failure_handling"
+        ],
+        "quotes": [
+          "",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#468",
+      "repo": "yottayoshida/omamori",
+      "source": "fixture",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/fixtures/omamori-468: a development case",
+      "requirement": null,
+      "label": {
+        "label": "other",
+        "votes": [
+          "other",
+          "other",
+          "other"
+        ],
+        "quotes": [
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the",
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict",
+          "`hook-check` hanging is the serious case: it stops **before** printing its deny verdict, so the\noutcome is decided by the host's hook-timeout policy rather than by omamori."
+        ]
+      }
+    },
+    {
+      "id": "yottayoshida/omamori#553",
+      "repo": "yottayoshida/omamori",
+      "source": "fixture",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/fixtures/omamori-553-r2: a development case",
+      "requirement": null,
+      "label": {
+        "label": "swallows_as_success",
+        "votes": [
+          "swallows_as_success",
+          "swallows_as_success",
+          "swallows_as_success"
+        ],
+        "quotes": [
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`.",
+          "Before this PR, `gather_staging_info` returned an empty result on four different failures and skipped per-entry errors with `continue`."
+        ]
+      }
+    },
+    {
+      "id": "BurntSushi/ripgrep#1207",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1293",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1455",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1550",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1703",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1847",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1875",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1918",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1962",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#1990",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#2095",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#2111",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "BurntSushi/ripgrep#2130",
+      "repo": "burntsushi/ripgrep",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6325",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6330",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6338",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6356",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6370",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6378",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6396",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6413",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6417",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6426",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6432",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6452",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "alacritty/alacritty#6455",
+      "repo": "alacritty/alacritty",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4327",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4342",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4362",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4392",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4396",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4400",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4409",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4410",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4411",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "clap-rs/clap#4431",
+      "repo": "clap-rs/clap",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11000",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11041",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11085",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11101",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11143",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11234",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "rust-lang/cargo#11261",
+      "repo": "rust-lang/cargo",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2128",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2151",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2166",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2170",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2185",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2227",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2307",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2359",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "sharkdp/bat#2378",
+      "repo": "sharkdp/bat",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5020",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5031",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5039",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5041",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5049",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5080",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5088",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5098",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5109",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5122",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5123",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    },
+    {
+      "id": "tokio-rs/tokio#5129",
+      "repo": "tokio-rs/tokio",
+      "source": "sentence-choice",
+      "stage": "used",
+      "order": null,
+      "verdicts": {},
+      "why": "bench/sentence-choice: an issue whose sentences were read to choose how requirements are read (#40)",
+      "requirement": null
+    }
+  ]
+}
