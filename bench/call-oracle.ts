@@ -22,6 +22,7 @@ import { pathFilter } from "../src/config/glob.ts";
 import { isTestPath } from "../src/discovery/discover.ts";
 import { isSensitivePath } from "../src/evidence/redact.ts";
 import { Git } from "../src/repository/git.ts";
+import { estimateOver } from "./eval/metrics.ts";
 import { add, classify, emptyTotals, formOf, isMethodCandidate, listings, testOnlyFiles, type FileResult, type Listings, type OracleFile, type Totals } from "./call-oracle/classify.ts";
 
 const HERE = resolve(import.meta.dirname, "..");
@@ -202,7 +203,15 @@ async function measure(materialPath: string, broken: boolean): Promise<void> {
     console.log(JSON.stringify(out, null, 1));
     return;
   }
-  const summary = { material: material.name, status: material.status, oracle: oracleSources(), listing, totals: all.totals, testOnlyFiles: all.testOnlyFiles, byForm: all.byForm, byCase, unparsed, perFile };
+  // bench/eval/PROTOCOL.md, *The interval and the gates*: calls of one repository are not independent,
+  // so each rate is the mean over repositories of each repository's own rate, with its interval.
+  const over = (hits: (t: Totals) => number, units: (t: Totals) => number) => estimateOver(Object.values(byCase).map((c) => ({ repo: c.repo.replace(/^https:\/\/github\.com\//, ""), hits: hits(c.totals), units: units(c.totals) })));
+  const estimates = {
+    detected: over((t) => t.calls.detected, (t) => t.calls.total),
+    silentMiss: over((t) => t.calls.silent_miss, (t) => t.calls.total),
+    falsePositive: over((t) => t.candidates.false_positive, (t) => t.candidates.total - t.candidates.in_macro),
+  };
+  const summary = { material: material.name, status: material.status, oracle: oracleSources(), listing, estimates, totals: all.totals, testOnlyFiles: all.testOnlyFiles, byForm: all.byForm, byCase, unparsed, perFile };
   writeFileSync(`${base}.json`, `${JSON.stringify(summary, null, 1)}\n`);
   // One line per call and per candidate. Tens of megabytes, so not committed: the commits are pinned
   // and the classification is deterministic, so the same command writes the same lines again.
@@ -270,7 +279,7 @@ function sample(rowsPath: string, seed: number, material: string): void {
 const [command, ...rest] = process.argv.slice(2);
 if (command === "fixtures") fixtures();
 else if (command === "measure") await measure(rest[0]!, rest.includes("--broken"));
-else if (command === "sample") sample(rest[0]!, Number(rest[1] ?? 81), rest[2] ?? join(CRATE, "material.provisional.json"));
+else if (command === "sample") sample(rest[0]!, Number(rest[1] ?? 81), rest[2] ?? join(CRATE, "material.dev.json"));
 else {
   console.error("usage: node bench/call-oracle.ts fixtures | measure <material.json> [--broken] | sample <rows.jsonl> [seed] [material.json]");
   process.exit(2);

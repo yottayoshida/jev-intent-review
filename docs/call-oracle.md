@@ -81,10 +81,10 @@ file loaded through `#[path]` keeps its children beside it, `a.rs` keeps them un
 A file the oracle cannot parse is taken out on both sides and reported: files, lines, and the
 listing's candidates in them.
 
-Only the **dev** part of #80's evaluation material is measured. Until #80 is merged the material is
-provisional — the nine acceptance cases in `bench/acceptance/` over eight repositories
-(`bench/call-oracle/material.provisional.json`), which #80 has placed in dev — and every file and
-table that comes from it says so.
+Only the **dev** part of #80's evaluation material is measured (`bench/eval/PROTOCOL.md`,
+*Contamination*, names #81). The material is the dev cases: the nine cases of
+`bench/acceptance/cases/` over eight repositories (`bench/call-oracle/material.dev.json`), each
+repository dev in `bench/eval/split.json`.
 
 ## The classes
 
@@ -148,19 +148,19 @@ first line's columns differ by one. Pairing step 2 absorbs it; `columnDisagreeme
 
 ```sh
 cargo build --release --manifest-path bench/call-oracle/Cargo.toml
-node bench/call-oracle.ts measure bench/call-oracle/material.provisional.json
-node bench/call-oracle.ts measure bench/call-oracle/material.provisional.json --broken
+node bench/call-oracle.ts measure bench/call-oracle/material.dev.json
+node bench/call-oracle.ts measure bench/call-oracle/material.dev.json --broken
 node bench/call-oracle.ts fixtures      # rewrites test/fixtures/call-oracle/oracle.json and baseline.json
 ```
 
-## The record (provisional material)
+## The record (dev)
 
-`bench/logs/call-oracle-provisional.json`: 1,816 files, 827,921 lines, every file parsed. It holds
+`bench/logs/call-oracle-dev.json`: 1,816 files, 827,921 lines, every file parsed. It holds
 the sha256 of the listing's code it was made with (`src/plan/candidates.ts`, `src/change/blocks.ts`)
 and of the oracle, and every file's blob and counts; the line-by-line classification (60 MB) is
-written again by the same command from the pinned commits and is not committed. **Provisional:
-measured on the acceptance cases before #80's dev material exists. #81 closes when #80's dev
-material is measured.**
+written again by the same command from the pinned commits and is not committed. It was first
+measured as provisional, on the same cases and commits, before #80 was merged; the counts did not
+change when the material became dev.
 
 76 files are test-only because a parent declares them so, or a test-only file declares them; their 2,576 calls are out of scope.
 
@@ -216,19 +216,30 @@ definition line, 37 in a comment, 5 in a type, 8 other.
 | whatsapp-rust-759 | 291 | 24,659 | 19,121 | 1,439 | 3,909 | 190 | 24,045 | 3,720 |
 
 The files are not independent observations — one repository's style repeats across its files, and
-moltis alone is 53% of the calls. The rates above are counts over this material, not estimates with
-an interval; #80 decides how uncertainty is stated for the dev material.
+moltis alone is 53% of the calls. The rates above are pooled counts, for diagnosis. As estimates
+(`bench/eval/PROTOCOL.md`, *The interval and the gates*: the mean over repositories of each
+repository's own rate, Clopper–Pearson at 95 % with n the number of repositories; `estimates` in the
+record):
+
+| Rate | Estimate | 95 % interval | Repositories | Units |
+|---|---:|---:|---:|---:|
+| in-scope calls detected | 83.3% | 42.9% – 99.1% | 8 | 160,118 calls |
+| in-scope calls dropped silently | 1.3% | 0.0% – 38.8% | 8 | 160,118 calls |
+| candidates outside macros that are not in-scope calls | 11.9% | 0.3% – 52.0% | 8 | 163,790 candidates |
+
+Eight repositories give intervals this wide whatever the counts; the pooled counts are what #83
+compares against, file by file.
 
 ### Is the oracle right?
 
 - **Fixtures**: the oracle's count equals the hand count in all 13.
-- **Broken on purpose** (`bench/logs/call-oracle-provisional-broken.json`): taking every method call
+- **Broken on purpose** (`bench/logs/call-oracle-dev-broken.json`): taking every method call
   out of the listing moves exactly the 99,257 detected method calls to `silent_miss` (detected
   136,914 → 37,657, silent 2,071 → 101,328) and no other form. A pairing that matched on the wrong
   key would move other forms too, or not all of these. Its first run moved 322 more — `..Default::default()`,
   whose `..` the check read as a method's dot, and `.r#type(` — which is how the check itself was
   corrected.
-- **Annotated sample** (`bench/logs/call-oracle-labels-provisional.json`, seed 81): 70 items — 20
+- **Annotated sample** (`bench/logs/call-oracle-labels-dev.json`, seed 81): 70 items — 20
   `detected`, 20 `silent_miss`, 20 `false_positive`, 10 `declared_exclusion`; no `wrong_function` to
   draw. Three annotators agreed with the oracle on all 70, unanimously. An annotator who answered
   "yes" to everything would have agreed on 50. The sample was drawn from the first run, before the files declared

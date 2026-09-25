@@ -1,5 +1,5 @@
 {
- "note": "Seed 81 sample of bench/logs/call-oracle-provisional.json (node bench/call-oracle.ts sample). Three fresh subagent annotators, each shown the position, the function and the source context but not the class, answered whether the name is the callee of an in-scope call in that function (docs/call-oracle.md, *Checking the oracle*). wrong_function had no rows to draw. Drawn from the first run; the record was measured again after files a parent declares test-only were taken out of scope, and none of the 70 changed class.",
+ "note": "Seed 81 sample of bench/logs/call-oracle-dev.json (then named call-oracle-provisional.json; same cases and commits) (node bench/call-oracle.ts sample). Three fresh subagent annotators, each shown the position, the function and the source context but not the class, answered whether the name is the callee of an in-scope call in that function (docs/call-oracle.md, *Checking the oracle*). wrong_function had no rows to draw. Drawn from the first run; the record was measured again after files a parent declares test-only were taken out of scope, and none of the 70 changed class.",
  "threshold": "majority agrees with the oracle on more than 95% of items",
  "result": {
   "items": 70,

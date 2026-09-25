@@ -1,6 +1,6 @@
 {
- "material": "provisional",
- "status": "provisional: the nine acceptance cases in bench/acceptance, at the head commits bench/acceptance/precheck-shipped.json records (omamori-468: its `correct` branch). #80 places all eight repositories in dev. Replaced by #80's dev material when it is merged.",
+ "material": "dev",
+ "status": "#80 dev material for #81 (bench/eval/PROTOCOL.md, *Contamination*: #81 is measured on dev only): the nine cases of bench/acceptance/cases, at the head commits bench/acceptance/precheck-shipped.json records (omamori-468: its `correct` branch). All eight repositories are dev in bench/eval/split.json.",
  "oracle": {
   "src/main.rs": "a15dec5b7dd62807541388d9a3d647f137be145d6b9582033f1c5bab1213d4be",
   "Cargo.toml": "f12d2bbdae786011e40dd85157ca57bb8a71f545b9847b7b16695f75a03484a1",
@@ -9,6 +9,29 @@
  "listing": {
   "src/plan/candidates.ts": "086fae0ff2f627a36f6d8baaa61b805e24adcb52bee763ed6da95f1549477e0e",
   "src/change/blocks.ts": "4b8e8d7b48132adca6f3cb7f7f69be2e03e78208e2eb7951be3df24467918d77"
+ },
+ "estimates": {
+  "detected": {
+   "estimate": 0.8330212666372219,
+   "lower": 0.4290427028829811,
+   "upper": 0.9905376082462283,
+   "repos": 8,
+   "units": 160118
+  },
+  "silentMiss": {
+   "estimate": 0.012959047566250732,
+   "lower": 2.842170943040401e-14,
+   "upper": 0.38818220880889953,
+   "repos": 8,
+   "units": 160118
+  },
+  "falsePositive": {
+   "estimate": 0.11907490312360605,
+   "lower": 0.0025646973942059503,
+   "upper": 0.5199770163946766,
+   "repos": 8,
+   "units": 163790
+  }
  },
  "totals": {
   "files": 1816,

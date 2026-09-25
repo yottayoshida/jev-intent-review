@@ -1,5 +1,5 @@
 {
- "material": "provisional",
+ "material": "dev",
  "broken": "the listing's method calls taken out (isMethodCandidate)",
  "oracle": {
   "src/main.rs": "a15dec5b7dd62807541388d9a3d647f137be145d6b9582033f1c5bab1213d4be",
