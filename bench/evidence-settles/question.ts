@@ -1,9 +1,9 @@
-// The question the probe of #82's first approach sent (ADR 0018, not adopted): whether the code sent
+// The question the probe of #82's first approach sent (ADR 0019, not adopted): whether the code sent
 // settles an answer. It was in src/plan/forms.ts at 131e218, where the probe's log was taken
 // (`bench/logs/evidence-settles-probe-v1.json`, whose `questionsHash` is that commit's); it is kept
 // here word for word, because the log is about these words, and nothing in src sends it.
 // `plan.json` (and the line of `probe.ts` that wrote it) says "ADR 0017": the number this ADR had
-// before main took 0017 for #80. The file is what the log's sha256 is of, so it is left as written.
+// before main took 0017 for #80 and 0018 for #84; it is 0019 now. The file is what the log's sha256 is of, so it is left as written.
 
 import { redact } from "../../src/evidence/redact.ts";
 import type { Questions } from "../../src/judgments/provider.ts";

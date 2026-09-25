@@ -1,5 +1,5 @@
 {
-  "about": "#82 (ADR 0018): what the rule that names the code a reading turns on must do, written from the source before the implementation was run on any of it and before any request. The checks each case's rule finds and their definitions were read on 2026-09-25 with a throwaway script over the clones (condition position, own name meets the requirement, no capital, not the target's name; `fn <name>` outside tests and benches). Nothing here is changed after a result is seen; a change is a new version.",
+  "about": "#82 (ADR 0019): what the rule that names the code a reading turns on must do, written from the source before the implementation was run on any of it and before any request. The checks each case's rule finds and their definitions were read on 2026-09-25 with a throwaway script over the clones (condition position, own name meets the requirement, no capital, not the target's name; `fn <name>` outside tests and benches). Nothing here is changed after a result is seen; a change is a new version.",
   "check1": {
     "what": "The failure form, no request: the rule applied to every call bench/logs/acceptance-v4.json read with a confident outcome (satisfies or violates in at least one run), at that version's head.",
     "held": [

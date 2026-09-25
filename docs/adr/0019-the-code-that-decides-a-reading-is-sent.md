@@ -1,4 +1,4 @@
-# 0018. The code that decides a reading is sent, or the call is not asked about
+# 0019. The code that decides a reading is sent, or the call is not asked about
 
 Status: Accepted
 
@@ -44,9 +44,10 @@ each form says it as data (ADR 0006), next to `askable`:
   not tell it from the standard library's. The expression is read with its whitespace collapsed, so
   one rustfmt split over lines is the same expression. Nothing is added to the packet.
 - **`check_before_action`**: the check decides the reading. A check is a call before the target in
-  its function that is in a condition (`if`, `while`, `match` and its guards, `let … else`, or the
-  outermost call of a statement that `?`-s its result and binds nothing, `check(x)?;` — a read such
-  as `let v = get_version(..)?;` is not a check), whose own name meets the requirement's words (the rule ADR 0016
+  its function that is in a condition (`if`, `while`, `match` and its guards, `ensure!` and
+  `assert!`, `let … else`, or the outermost call of a statement that `?`-s its result — through
+  methods chained on it — and binds nothing, `check(x)?;` or `let _ = check(x)?;` — a read such as
+  `let v = get_version(..)?;` is not a check), whose own name meets the requirement's words (the rule ADR 0016
   orders by), that does not start with a capital (a variant or a tuple struct), and that is not a
   call of the target's own name. A function the change touched can be a check: a helper the pull
   request added is the likeliest place for a check that does nothing. Each check's body is sent
@@ -55,7 +56,8 @@ each form says it as data (ADR 0006), next to `askable`:
   held before its question, and *Not checked* says which check could not be sent and why. With none
   (`path.exists()`, a dependency's check) there is nothing in the repository to send, and the call
   is asked as before, as the failure form treats a name the repository does not define. The functions a sent check calls, each with
-  exactly one definition, are sent too while they fit — a second level, not required: grovedb#500's
+  exactly one definition, are sent too while they fit — a second level, not required, and what did
+  not go is named under the call (`notSent`): grovedb#500's
   `verify_height` hands the decision to `verify_tree_height`. A target with no check before it is
   asked as before.
 

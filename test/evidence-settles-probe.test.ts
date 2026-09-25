@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { score, WRAP, wrappedByACall } from "../bench/evidence-settles/probe.ts";
 import type { ChoiceAnswer } from "../src/types.ts";
 
-// The probe's lines are fixed before any request (#82, ADR 0018). These hold the scorer to them: an
+// The probe's lines are fixed before any request (#82, ADR 0019). These hold the scorer to them: an
 // answer that is always the same, whichever it is, must not pass.
 
 type Item = Parameters<typeof score>[0][number];

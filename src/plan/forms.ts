@@ -21,7 +21,7 @@ import { redact } from "../evidence/redact.ts";
 import type { Questions } from "../judgments/provider.ts";
 import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
-import { checksBefore, wrapperOf } from "./decisive.ts";
+import { checksBefore, occurrences, wrapperOf } from "./decisive.ts";
 import { BAR, conditionFor, questionsFor } from "./local-check.ts";
 import { MAPPING_PROPERTY, mappingQuestionFor, type MappingAnswer, whyListed } from "./mapping.ts";
 import type { Askability } from "./select.ts";
@@ -48,7 +48,7 @@ export interface AskContext {
   readHere: (callee: string) => Promise<FunctionCandidate | null>;
 }
 
-/** What a form is given to name the code that decides a reading (ADR 0018). */
+/** What a form is given to name the code that decides a reading (ADR 0019). */
 export interface DecisiveContext {
   requirement: Requirement;
   fn: FunctionCandidate;
@@ -78,7 +78,7 @@ export interface Form {
    */
   says: string;
   askable(context: AskContext): Promise<Askability>;
-  /** The code the reading turns on, from the body's text (ADR 0018). Decided after the budget. */
+  /** The code the reading turns on, from the body's text (ADR 0019). Decided after the budget. */
   decisive(context: DecisiveContext): Promise<Decisive>;
   /** Always keyed `requirement_governs`, with the options `applies`, `does_not_apply`, `unknown`. */
   mappingQuestion(fn: FunctionCandidate, call: CallCandidate): Questions;
@@ -108,6 +108,13 @@ export interface Form {
 /** The call as the questions name it: redacted, and with no backtick left to close a code span. */
 const named = (call: CallCandidate) => redact(call.expression).text.replace(/`/g, "");
 
+/**
+ * Why a call is held when the rules cannot tell it from another in the body they read (ADR 0019): the
+ * code it turns on cannot be named, so it is not asked about. `locateCall` has already found it once
+ * in the packet's body; this is the net for a reading of the text that makes two of it.
+ */
+const UNTOLD = (call: CallCandidate) => `\`${named(call)}\` could not be told apart from another call of the same text in the body, so the code its reading turns on could not be named`;
+
 const failurePropagation: Form = {
   name: "failure_propagation",
   property: MAPPING_PROPERTY,
@@ -116,6 +123,7 @@ const failurePropagation: Form = {
   // The failure decides the reading. Passed to this repository's own code before it is returned, what
   // the function returns is that code's to say, and its body is not sent: the call is not asked about.
   decisive: async ({ body, call, defined }) => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
     const wrapper = wrapperOf(body, call);
     if (wrapper === null || !(await defined(wrapper))) return { send: [] };
     return { hold: `its failure is passed to \`${wrapper}\` before it is returned, and \`${wrapper}\` is this repository's own function, whose body is not sent: what the function returns is \`${wrapper}\`'s to say` };
@@ -180,6 +188,7 @@ const checkBeforeAction: Form = {
   // `readHere` leaves out a target's: a helper the pull request added is where a check that does
   // nothing is likeliest to be.
   decisive: async ({ requirement, body, call, calls }) => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
     const wanted = requirementTerms(requirement);
     const meets = (c: CallCandidate) => [...calleeNameTerms(c)].some((t) => [...wanted].some((w) => termsMeet(t, w)));
     return { send: checksBefore(body, call, calls, meets) };

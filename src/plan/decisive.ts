@@ -1,4 +1,4 @@
-// Which code decides a reading, found from the code and not asked of Jev (docs/adr/0018).
+// Which code decides a reading, found from the code and not asked of Jev (docs/adr/0019).
 //
 // The local check sends the body of the function a call is in. What the body calls is not sent, and
 // Jev answers as if it had read it: a decision moved into a helper was read as holding at 0.91–0.96
@@ -14,7 +14,27 @@
 import { redact } from "../evidence/redact.ts";
 import type { CallCandidate } from "./candidates.ts";
 
-const flat = (text: string) => text.replace(/\s+/g, " ");
+/**
+ * The text with its comments dropped and, inside its string and character literals (raw ones
+ * included), the characters that shape code — `{ } ; ( ) [ ]` — made `_`; then its whitespace
+ * collapsed. A `;` in a string does not end a statement and an `if` in a comment is no condition,
+ * while `load("a")` and `load("b")` stay two calls: emptying the strings made them one, and the
+ * wrong one was read (the second review of #82). The body and every call's expression go through it
+ * alike, so an expression still meets itself in the body.
+ */
+const flat = (text: string) =>
+  text
+    .replace(/(?<!\w)r(#*)"[\s\S]*?"\1|"(?:[^"\\]|\\.)*"|'(?:[^'\\\n]|\\.)'|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (m) => (m.startsWith("/") ? " " : m.replace(/[{};()[\]]/g, "_")))
+    .replace(/\s+/g, " ");
+
+/** How often a call's expression occurs in a body, read as the rules read it. */
+export function occurrences(body: string, call: CallCandidate): number {
+  const text = flat(body);
+  const needle = needleOf(call);
+  let n = 0;
+  for (let at = text.indexOf(needle); at >= 0; at = text.indexOf(needle, at + 1)) n++;
+  return n;
+}
 const needleOf = (call: CallCandidate) => flat(redact(call.expression).text);
 const lastOf = (callee: string) => callee.split("::").pop() ?? callee;
 
@@ -67,9 +87,10 @@ export function wrapperOf(body: string, call: CallCandidate): string | null {
 
 /**
  * Whether the occurrence of a call at `at` in `text` is in a condition: in an `if`, `while` or
- * `match` (and its guards) of its statement, in the expression of a `let … else`, or the outermost
- * call of a statement that `?`-s its result and binds nothing (`check(x)?;`). A read such as
- * `let v = get_version(n)?;` is not a condition: it binds.
+ * `match` (and its guards) of its statement, in an `ensure!`, `assert!` or `debug_assert!`, in the
+ * expression of a `let … else`, or the outermost call of a statement that `?`-s its result — through
+ * any methods chained on it, `check(x).map_err(E::from)?;` — and binds nothing, `let _ =` included.
+ * A read such as `let v = get_version(n)?;` is not a condition: it binds.
  *
  * ponytail: the statement is read back to the nearest `;`, `{` or `}` outside parentheses, so a guard
  * on an earlier arm of the same `match` puts every later arm "in a condition". A parser (#83) reads
@@ -89,15 +110,20 @@ function inCondition(text: string, at: number, needle: string): boolean {
     }
   }
   const prefix = text.slice(start, at);
-  if (/\b(if|while|match)\b/.test(prefix)) return true;
+  if (/\b(if|while|match)\b|\b(?:ensure|assert|debug_assert) ?! ?\(/.test(prefix)) return true;
   const end = text.indexOf(";", at);
   const rest = text.slice(at + needle.length, end < 0 ? undefined : end);
   if (/^ ?let\b/.test(prefix) && /\belse ?\{/.test(rest)) return true;
-  return /^ ?(?:[A-Za-z_]\w* ?\. ?)*$/.test(prefix) && /^(?: |\.await\b)*\? ?$/.test(rest);
+  return UNBOUND.test(prefix) && QUESTIONED.test(rest);
 }
 
+/** Before the call: nothing but its receivers, or `let _ =` and its receivers. */
+const UNBOUND = /^ ?(?:let _ ?= ?)?(?:[A-Za-z_]\w* ?\. ?)*$/;
+/** After it, to the statement's end: `.await` and methods (arguments two parentheses deep), then `?`. */
+const QUESTIONED = /^(?: |\.await\b|\. ?[A-Za-z_]\w*(?: ?:: ?<[^<>;]*>)? ?\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))*\? ?$/;
+
 /**
- * The checks before `target` in its function (ADR 0018): the other calls of the function, above it,
+ * The checks before `target` in its function (ADR 0019): the other calls of the function, above it,
  * in a condition, whose own name `meets` the requirement, that do not start with a capital (a variant
  * or a tuple struct) and are not calls of the target's own name. Each name once, in the body's order.
  */

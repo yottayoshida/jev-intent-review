@@ -1,4 +1,4 @@
-// Checks 1 and 2 of #82's rule naming the code a reading turns on (ADR 0018, bench/decisive/expected.json).
+// Checks 1 and 2 of #82's rule naming the code a reading turns on (ADR 0019, bench/decisive/expected.json).
 // No request: the rules are the product's (`Form.decisive`, `decisiveBodies`), applied to real code.
 //
 //   node bench/decisive/check.ts <acceptance dir>
@@ -121,8 +121,43 @@ async function check2(acceptance: string) {
   return out;
 }
 
+/**
+ * Check 3: the target's outcome in each run of bench/logs/check-before-action-real-v3.json and
+ * -v2.json (the constructed case) against `check3.rows`. A row is "satisfies 3/3", "violates 3/3" or
+ * "violates in at least 2 of 3"; a run where the target is not checked fails whatever the row says.
+ */
+export function check3(): { lines: string[]; pass: boolean } {
+  type Run = { observed: { key: string; outcome: string }[]; unchecked: { key: string; why: string }[] };
+  const expected = readJson<{ check3: { rows: Record<string, Record<string, string>> } }>(join(ROOT, "bench/decisive/expected.json")).check3.rows;
+  const real = readJson<{ cases: Record<string, Record<string, { runs: Run[] }>> }>(join(ROOT, "bench/logs/check-before-action-real-v3.json"));
+  const constructed = readJson<{ versions: Record<string, { runs: Run[] }> }>(join(ROOT, "bench/logs/check-before-action-v2.json"));
+  const targetOf = (id: string) => (id === "constructed" ? "open_session · create_session(store, &record)" : (() => {
+    const t = readJson<{ target: { function: string; call: string } }>(join(ROOT, "bench/forms/real", id, "case.json")).target;
+    return `${t.function} · ${t.call}`;
+  })());
+  const lines: string[] = [];
+  let pass = true;
+  for (const [id, rows] of Object.entries(expected)) {
+    const key = targetOf(id);
+    for (const [version, row] of Object.entries(rows)) {
+      const runs = (id === "constructed" ? constructed.versions[version]?.runs : real.cases[id]?.[version]?.runs) ?? [];
+      const got = runs.map((r) => r.observed.find((o) => o.key === key)?.outcome ?? (r.unchecked.some((u) => u.key === key) ? "not checked" : "not read"));
+      const want = row.startsWith("satisfies") ? "satisfies" : "violates";
+      const need = /at least (\d)/.exec(row)?.[1] ? Number(/at least (\d)/.exec(row)![1]) : 3;
+      const ok = runs.length === 3 && got.filter((g) => g === want).length >= need && !got.includes("not checked");
+      if (!ok) pass = false;
+      lines.push(`${ok ? "ok  " : "MISS"} ${id} ${version}: ${got.join(", ") || "no run"} (expected ${row})`);
+    }
+  }
+  return { lines, pass };
+}
+
 const [acceptance] = process.argv.slice(2);
-if (!acceptance) {
+if (acceptance === "check3") {
+  const { lines, pass } = check3();
+  for (const l of lines) console.log(l);
+  console.log(`check 3: ${pass ? "PASS" : "FAIL"}`);
+} else if (!acceptance) {
   console.error("usage: check.ts <acceptance dir>");
   process.exitCode = 2;
 } else {

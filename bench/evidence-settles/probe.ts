@@ -1,4 +1,4 @@
-// Whether Jev can tell that an answer turns on code that was not sent (#82, ADR 0018), measured on the
+// Whether Jev can tell that an answer turns on code that was not sent (#82, ADR 0019), measured on the
 // target calls alone before anything is wired.
 //
 //   node bench/evidence-settles/probe.ts plan  <acceptance dir> <constructed repo>          sends nothing; writes plan.json

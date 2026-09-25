@@ -13,9 +13,13 @@ import type { Outcome } from "../review/outcome.ts";
 import type { IntentSource, IntentSpec, Location, ReviewReport } from "../types.ts";
 import type { SentBody } from "../evidence/builder.ts";
 
-/** The bodies a reading was given because it turns on them (ADR 0018), where each is. */
+/** The bodies a reading was given because it turns on them (ADR 0019), where each is. */
 const sentWords = (sent: readonly SentBody[]) =>
   sent.map((s) => `the body of \`${s.name}\` (${s.path}:${s.lines})${s.depth === 2 ? ", which a check calls" : ", a check before the call"}`).join("; ");
+
+/** The second level a check calls that did not go with it: named, since the reading may turn on it. */
+const notSentWords = (names: readonly string[]) =>
+  `${names.map((n) => `\`${n}\``).join(", ")}, which a sent check calls: more than one definition, or no room left, so what they do is not in the packet`;
 
 /** The longest run of backticks. A loop: spreading every run into Math.max overflows on long text. */
 function longestBacktickRun(text: string): number {
@@ -263,6 +267,7 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
       lines.push(`- **Jev, on whether the requirement requires it here**: ${f.mapping.verdict} (${f.mapping.probability.toFixed(2)})`);
       lines.push(`- **${form.words.asks}**: ${f.observation} (${f.probability.toFixed(2)})`);
       if (f.sent) lines.push(`- **Sent with it**: ${sentWords(f.sent)}`);
+      if (f.notSent) lines.push(`- **Not sent**: ${notSentWords(f.notSent)}`);
       lines.push(`- **Why it is listed**: ${f.why}`, "");
     }
   }
@@ -284,6 +289,7 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
     lines.push(`- **${o.file} · ${o.function}** — \`${o.call}\` _(${ORIGIN_WORDS[o.origin]})_`);
     lines.push(`  - ${form.words.observed}: **${o.result.observation}** (${o.result.probability.toFixed(2)}) — ${o.result.why}`);
     if (o.sent) lines.push(`  - sent with it: ${sentWords(o.sent)}`);
+    if (o.notSent) lines.push(`  - not sent: ${notSentWords(o.notSent)}`);
   }
   // Every call read is in exactly one of these, or under "Worth checking" above: all come off the
   // outcome the rule gave it, so a call cannot be in two readings or in none.

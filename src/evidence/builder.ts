@@ -216,7 +216,7 @@ export async function buildEvidence(discoverer: Discoverer, requirement: Require
   };
 }
 
-// --- The code a reading turns on (docs/adr/0018) ---------------------------------------------------
+// --- The code a reading turns on (docs/adr/0019) ---------------------------------------------------
 //
 // The only place a check's name is looked up. It is by name — exactly one definition outside the
 // tests — because nothing here resolves a call to its definition; #83 decides what resolution is
@@ -264,7 +264,9 @@ export async function decisiveBodies(discoverer: Discoverer, names: readonly str
     if (!index) return { why: `\`${name}\` (${def.path}) could not be read` };
     const block = index.enclosing(def.line);
     if (block.windowed) return { why: `the body of \`${name}\` (${def.path}:${def.line}) is too long to take` };
-    if (def.path === asked.path && block.startLine >= asked.startLine && block.endLine <= asked.endLine) return { why: `\`${name}\` is defined inside the function asked about` };
+    // Defined inside the function asked about: its body is already the packet's, and there is
+    // nothing more to send.
+    if (def.path === asked.path && block.startLine >= asked.startLine && block.endLine <= asked.endLine) return null;
     const r = redact(slice(index.lines, block.startLine, block.endLine));
     redactions += r.count;
     return { code: r.text, path: def.path, start: block.startLine, end: block.endLine };

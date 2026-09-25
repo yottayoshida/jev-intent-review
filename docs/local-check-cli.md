@@ -388,13 +388,55 @@ form's.
 | **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
 | **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
 | **Read, but not required of by the requirement** | `does_not_apply` over the bar |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, or the budget was spent |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
 None of the four is a requirement verdict: each is what two answers about one call came to. A
 listed call rests on two Jev readings that do not check each other. Everything either of them used
 is printed so it can be thrown out. `--json` carries the form, every mapping, every reading with its
 `outcome` (`violates` / `satisfies` / `unknown` / `aside`), and every option's probability.
+
+### The code a reading turns on
+
+**A call is read as worth checking or as holding only when the code its form names as deciding the
+reading was sent to Jev. A call whose deciding code could not be sent is not asked about: it is under
+*Not checked*, which says what was not sent** (ADR 0019). Jev is sent the body of the function a call
+is in; each form names, from that body's text and without asking Jev, what else the reading turns on:
+
+- **`failure_propagation`**: a failure passed to this repository's own function before it reaches `?`
+  — `step_outcome(self.rewrite_heights(v))?` — is that function's to return, and its body is not
+  sent, so the call is not asked about. The function is one the call is an argument of, whose name
+  the repository defines outside its tests and is not one every repository has (`Ok`, `Some`, `Err`,
+  `new`, `from`, `into`, `timeout`, `spawn`, `spawn_blocking`, `block_on`, `drop`).
+- **`check_before_action`**: the checks above the call — calls in an `if`, `while` or `match` (and its
+  guards), in an `ensure!`, `assert!` or `debug_assert!`, in a `let … else`, or the whole of a
+  statement that `?`-s its result, through methods chained on it, and binds nothing (`check(x)?;`,
+  `check(x).map_err(E::from)?;`, `let _ = check(x)?;`), whose own name meets the requirement's words
+  and does not start with a capital — are sent with the packet: each body when its name has exactly
+  one definition outside the tests and it fits 4,000 characters (8,000 for all of them). A check with
+  more than one definition, or too long, holds the call; one defined inside the function asked about
+  is already in the packet. A report lists under each call the bodies that went with it.
+
+Beyond the checks, the functions a sent check calls, one level down, go with it while there is room
+and their names have one definition — grovedb#500's `verify_height` decides in `verify_tree_height`.
+**That second level is not promised**: what did not go is named under the call (`not sent: …`), and
+the call is asked all the same.
+
+What it does not name, and so does not promise: a failure passed on through a method
+(`.map_err(…)`, `.ok()`: the repositories measured define their own `map_err`, `context`, `ok`, so a
+method's name does not tell theirs from the standard library's), through a constructor, a tuple, an
+array or a macro first (`wrap(Some(call()))`), or through a variable over several statements; a check
+that is not in a condition — a `?` statement whose chain has a `?` before its last, a method
+argument with a `;` in it (a closure with a block), or a typed `let _: T =` is not read as one —,
+whose name does not meet the words, or that the repository does not
+define (a dependency's, the standard library's), and whatever decides from the second level down.
+Those readings rest on what was sent, as before, and *Read as holding*'s warning holds for them.
+Which definition a name reaches is found by the name alone, among the files the run reads
+(`repository.include`): #83 is where that is resolved. A name the repository shares with a library
+(`join`, `retry`) is taken for the repository's, which holds a call that could have been asked — the
+cautious side. `--json` carries, on an observed call and on a finding, `sent` (each body's `name`,
+`path`, `lines` and `depth`) and `notSent` (the names of the second level that did not go), each
+absent when empty; a held call is in `unchecked` with its `why`.
 
 ## Exit codes
 

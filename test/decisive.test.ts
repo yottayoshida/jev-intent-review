@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { CallCandidate } from "../src/plan/candidates.ts";
-import { checksBefore, EVERYWHERE, wrapperOf } from "../src/plan/decisive.ts";
+import { checksBefore, EVERYWHERE, occurrences, wrapperOf } from "../src/plan/decisive.ts";
 
-// The rules that name the code a reading turns on (ADR 0018), on bodies written as the measured
+// The rules that name the code a reading turns on (ADR 0019), on bodies written as the measured
 // cases have them. Every rule that holds has a case beside it where it must not.
 
 let n = 0;
@@ -70,4 +70,37 @@ test("the condition may be a guard, a `while`, a `let … else`; a variant and t
   assert.deepEqual(checksBefore(variant, target, [call("Error::ChunkRestoringError(\"restore\".to_string())"), target], meets), [], "grovedb#500's variant");
   const again = "generate_title(provider, &old)?; generate_title(provider, &msgs)";
   assert.deepEqual(checksBefore(again, target, [call("generate_title(provider, &old)"), target], meets), [], "the target's own name above it");
+});
+
+test("a `?` statement is still a check through methods chained before `?`, through `let _ =`, and in `ensure!`", () => {
+  const target = call("create_session(store, &record)", 9);
+  const check = call("verify_key(&record)", 3);
+  const meets = (c: CallCandidate) => c.callee === "verify_key";
+  const at = (line: string) => checksBefore(`${line}\n let session = create_session(store, &record)?;`, target, [check, target], meets);
+  assert.deepEqual(at("self.verify_key(&record).map_err(AuthError::from)?;"), ["verify_key"]);
+  assert.deepEqual(at("verify_key(&record).context(\"a disabled key\")?;"), ["verify_key"]);
+  assert.deepEqual(at("verify_key(&record).map_err(|e| AuthError::from(e.into()))?;"), ["verify_key"], "a closure in the method's arguments");
+  assert.deepEqual(at("let _ = verify_key(&record)?;"), ["verify_key"]);
+  assert.deepEqual(at("ensure!(verify_key(&record), AuthError::Disabled);"), ["verify_key"]);
+  assert.deepEqual(at("let v = verify_key(&record).map_err(AuthError::from)?;"), [], "and a read that binds its result is still not a check");
+});
+
+test("strings and comments are not the code's: a brace in a string, an `if` in a comment", () => {
+  assert.equal(wrapperOf('log_err("{ oops;", parse(x))', call("parse(x)")), "log_err", "the string's `{` and `;` do not end the statement");
+  const target = call("create_session(store, &record)", 9);
+  const check = call("verify_key(&record)", 3);
+  const body = "// if the key is disabled we stop here\n verify_key(&record);\n let session = create_session(store, &record)?;";
+  assert.deepEqual(checksBefore(body, target, [check, target], () => true), [], "a comment's `if` puts nothing in a condition");
+});
+
+test("calls that differ only in a string stay two calls; a raw string does not swallow the rest", () => {
+  // The second review of #82: emptying strings made `load("a")` and `load("b")` one call, and the
+  // rules read the first where the target was the second.
+  assert.equal(wrapperOf('let a = load("a")?; settle(load("b"))?;', call('load("b")')), "settle");
+  const target = call('create("b")', 9);
+  const verify = call("verify(&r)", 5);
+  assert.deepEqual(checksBefore('create("a")?; verify(&r)?; create("b")?;', target, [call('create("a")', 1), verify, target], (c) => c.callee === "verify"), ["verify"]);
+  assert.equal(occurrences('load("a")?; load("b")?;', call('load("b")')), 1);
+  assert.equal(wrapperOf('let s = r#"say "hi"; {"#; settle(load(x))?;', call("load(x)")), "settle", "a raw string with a quote and a brace in it");
+  assert.equal(wrapperOf('let s = br"x;"; settle(load(x))?;', call("load(x)")), "settle", "a raw byte string");
 });

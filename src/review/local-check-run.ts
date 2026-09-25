@@ -103,8 +103,10 @@ export interface Observed {
   result: LocalResult;
   /** What the one rule made of the mapping and this reading, for this call only. */
   outcome: Outcome;
-  /** The bodies sent with the packet because the reading turns on them (ADR 0018). Absent: none. */
+  /** The bodies sent with the packet because the reading turns on them (ADR 0019). Absent: none. */
   sent?: SentBody[];
+  /** Functions a sent check calls whose bodies were not sent (more than one definition, or no room): named, not required. */
+  notSent?: string[];
 }
 
 export interface Unchecked {
@@ -147,8 +149,10 @@ export interface Finding {
   probability: number;
   /** Assembled from the parts above. No sentence here was written by a model. */
   why: string;
-  /** The bodies sent with the packet because the reading turns on them (ADR 0018). Absent: none. */
+  /** The bodies sent with the packet because the reading turns on them (ADR 0019). Absent: none. */
   sent?: SentBody[];
+  /** Functions a sent check calls whose bodies were not sent (more than one definition, or no room): named, not required. */
+  notSent?: string[];
 }
 
 /**
@@ -393,7 +397,7 @@ export async function runLocalCheck(
     return enumerated.find((fn) => fn.name === callee && fn.path === def.path && def.line >= fn.startLine && def.line <= fn.endLine) ?? null;
   };
 
-  // What a form is given to name the code a reading turns on (ADR 0018): the function's calls, from
+  // What a form is given to name the code a reading turns on (ADR 0019): the function's calls, from
   // the same listing the run reads, and whether the repository defines a name. Both depend on the
   // commit alone, so each is looked up once.
   const listings = new Map<string, Promise<ReturnType<typeof enumerate> | null>>();
@@ -442,7 +446,7 @@ export async function runLocalCheck(
       into.unchecked.push({ ...placeOf(site), why: located.reason ?? "the call could not be located in the body read here" });
       return tally;
     }
-    // The code the reading turns on (ADR 0018): sent with the packet, or the call is not asked about.
+    // The code the reading turns on (ADR 0019): sent with the packet, or the call is not asked about.
     // Held here, after the budget, as a body that did not fit is: the budget and its counts do not move.
     const decisive = await form.decisive({ requirement, fn: site.fn, call: site.call, body, calls: await callsOf(site.fn), defined });
     if ("hold" in decisive) {
@@ -450,6 +454,7 @@ export async function runLocalCheck(
       return tally;
     }
     let sent: SentBody[] = [];
+    let notSent: string[] = [];
     if (decisive.send.length > 0) {
       const bodies = await decisiveBodies(discoverer, decisive.send, site.fn);
       if ("hold" in bodies) {
@@ -460,6 +465,7 @@ export async function runLocalCheck(
       evidence.sent.push(...bodies.locations);
       evidence.redactions += bodies.redactions;
       sent = bodies.sent;
+      notSent = bodies.notSent;
     }
     const place = placeOf(site);
 
@@ -505,7 +511,7 @@ export async function runLocalCheck(
       form,
       { mapping: MAPPING_BAR, observation: BAR },
     );
-    into.observed.push({ ...place, callId: site.call.id, result, outcome, ...(sent.length > 0 ? { sent } : {}) });
+    into.observed.push({ ...place, callId: site.call.id, result, outcome, ...(sent.length > 0 ? { sent } : {}), ...(notSent.length > 0 ? { notSent } : {}) });
 
     if (outcome === "violates") {
       into.findings.push({
@@ -524,6 +530,7 @@ export async function runLocalCheck(
         probability: result.probability,
         why: form.words.whyListed(site.fn.name, mapping, result.observation, result.probability),
         ...(sent.length > 0 ? { sent } : {}),
+        ...(notSent.length > 0 ? { notSent } : {}),
       });
     }
     return tally;

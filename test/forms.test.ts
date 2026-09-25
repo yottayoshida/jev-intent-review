@@ -443,7 +443,7 @@ test("readOption: an offered option at the bar, under it, or none; chooseForm re
   assert.deepEqual(chooseForm(undefined), { form: "failure_propagation", by: "default", verdict: "no_answer", probability: 0 });
 });
 
-// --- The code a reading turns on (ADR 0018) --------------------------------------------------------
+// --- The code a reading turns on (ADR 0019) --------------------------------------------------------
 
 /** The packets the function's own question was asked with, by the call it named. */
 function recording() {
@@ -518,4 +518,39 @@ test("failure_propagation: a failure passed to the repository's own function fir
   assert.ok(byCall(held!.observed, "load_key"), "the function's other calls are asked as before");
   const [asked] = await runOn(withAuth(wrapped), [FAILURES], recording().provider);
   assert.ok(byCall(asked!.observed, "create_session"), "with no `fn settle` here, the failure passes to code that is not this repository's, and the call is asked");
+});
+
+test("check_before_action: a second level that cannot be sent is named; a check defined inside the function asked about holds nothing", async () => {
+  const twice = STORE.replace("    record.disabled\n", "    flag_of(record)\n") + "\npub fn flag_of(record: &KeyRecord) -> bool {\n    record.disabled\n}\n";
+  const [r] = await runOn(fakeRepo({ "src/auth.rs": AUTH, "src/store.rs": twice, "src/legacy.rs": "pub fn flag_of(record: &Legacy) -> bool {\n    false\n}\n" }, { "src/auth.rs": AUTH.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", AUTH, "audit(store)?;", "record_use(store)?;")), [GUARD], recording().provider);
+  const create = byCall(r!.observed, "create_session");
+  assert.deepEqual(create?.sent?.map((s) => s.name), ["is_disabled"], "the check itself is sent");
+  assert.deepEqual(create?.notSent, ["flag_of"], "what it calls, defined twice, is named");
+  assert.match(requirementSection(r!).join("\n"), /not sent: `flag_of`, which a sent check calls/);
+  const nested = AUTH.replace("    Ok(session)\n}\n", "    Ok(session)\n}\n").replace("pub fn open_session(store: &mut Store, key: &ApiKey) -> Result<Session, AuthError> {\n", "pub fn open_session(store: &mut Store, key: &ApiKey) -> Result<Session, AuthError> {\n    fn is_disabled(record: &KeyRecord) -> bool {\n        record.disabled\n    }\n");
+  const none = STORE.replace("pub fn is_disabled(record: &KeyRecord) -> bool {\n    record.disabled\n}\n", "");
+  const [inner] = await runOn(fakeRepo({ "src/auth.rs": nested, "src/store.rs": none }, { "src/auth.rs": nested.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", nested, "audit(store)?;", "record_use(store)?;")), [GUARD], recording().provider);
+  const asked = byCall(inner!.observed, "create_session");
+  assert.ok(asked, "asked: the check's body is already in the packet");
+  assert.equal(asked?.sent, undefined);
+});
+
+test("failure_propagation: the same rule holds a call in a caller one hop out", async () => {
+  const settle = "\nfn settle<T>(r: Result<T, AuthError>) -> Result<T, AuthError> {\n    r\n}\n";
+  const caller = `${AUTH.replace("let session = open_session(store, key)?;", "let session = settle(open_session(store, key))?;")}${settle}`;
+  const [r] = await runOn(withAuth(caller), [FAILURES], recording().provider);
+  const held = r!.unchecked.find((u) => u.function === "login" && u.call.startsWith("open_session"));
+  assert.match(held?.why ?? "", /passed to `settle`/, "the caller's call is held as the changed function's would be");
+  assert.equal(r!.observed.find((o) => o.function === "login" && o.call.startsWith("open_session")), undefined);
+});
+
+test("a call the rules cannot tell from another of the same text is held, not asked, under either form", async () => {
+  const target: CallCandidate = { id: "t", functionId: "f", line: 2, text: "", callee: "load", expression: "load(x)", expressionComplete: true };
+  const fn = { id: "f", path: "src/a.rs", name: "f", startLine: 1, endLine: 3, signature: "fn f() -> Result<(), E>" } as never;
+  for (const form of Object.values(FORMS)) {
+    const twice = await form.decisive({ requirement: GUARD, fn, call: target, body: "load(x)?; settle(load(x))?;", calls: [target], defined: async () => true });
+    assert.match("hold" in twice ? twice.hold : "", /could not be told apart/, form.name);
+    const once = await form.decisive({ requirement: GUARD, fn, call: target, body: "settle(load(x))?;", calls: [target], defined: async () => false });
+    assert.ok(!("hold" in once), `${form.name}: once, and nothing the repository defines around it, is not held`);
+  }
 });
