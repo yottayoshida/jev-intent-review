@@ -1,0 +1,1936 @@
+{
+  "conditions": {
+    "files": {
+      "expected.json": "faaf4e51072b2e4338f2031d23657d887faea6dd20a98cfde4597d16cbbbe259",
+      "spec.json": "c0075eec8834bcf3ad11acf0c39a29eab5c08cabefa8147f6d177a75eb72e484",
+      "store.rs": "ce7ef482568385bea0e00d5ebb3250f2b5c62491eddea74b314844864cb118aa",
+      "base.rs": "0e652d8917d097b2de6eb0b182d53c50feb479450e8ee6ecd71ac5b241a9cc07",
+      "main.rs": "835dd6a4ea9ca74e002dffb2a55004a25c456db4eeed5538f3ed75944a40318c",
+      "shipped.rs": "440a3074a6bc9653f9fbe939628df5fdd43bdabc26e134cd9104165763e2aeb2",
+      "defect.rs": "02a63fda76a15c7293e12b23d0685ab1a2fe7458b46eb34e9e5f41c9c490c387",
+      "rewrite.rs": "3188dff04766cd00f60c785c901ea992e00965eecbe277871a538b0b5745cce7",
+      "hidden.rs": "009dd3f329ce8ea82ce228dfba5b011759e135efe16caba6159bcbec659614e9",
+      "caller.rs": "0490449a5d6e5b635ffba47733099d245064c37fd3f12b586a9de7c7d3586d87"
+    },
+    "runsPerVersion": 3,
+    "provider": "cloudflare"
+  },
+  "tool": {
+    "head": "b560af013e5c43618a8260a82a84e68bd999dfb8",
+    "source": {
+      "src/plan/forms.ts": "fb747469f9541754ea4d5ce4187bb51135dd3d459ba94984158c7e7b54e0bed9",
+      "src/review/outcome.ts": "aa5855a11123275dae3c73926de529fbe2e33293ef0842fb823cb3a95c61f054",
+      "src/review/local-check-run.ts": "e568c5ea0b7b1f8c193023b72e61755ec36d68733cec5c33456e8880daf220ee",
+      "src/plan/local-check.ts": "aa861575e328d6d604f43d14cebb148bf9dba1ea091f298706941092d47a8dc8",
+      "src/plan/mapping.ts": "08dccc297854c6c7043d4e80ac81a46324c4989ad977b16c0028a92e2f40fb7a"
+    },
+    "note": "the source was uncommitted when measured; `source` is the sha256 of each file as it ran"
+  },
+  "versions": {
+    "shipped": {
+      "base": "9873acc9826102f2795ba9fd88e13acb013029f4",
+      "head": "450ccd3868eacdc45b9029c98d86ff0961dc738e",
+      "runs": [
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.66",
+              "observation": "reaches_it 0.92"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.89",
+              "observation": "reaches_it 0.78"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 0.98",
+              "observation": "does_not_reach 0.99"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.63",
+              "observation": "reaches_it 0.93"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.90",
+              "observation": "reaches_it 0.83"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 0.98",
+              "observation": "does_not_reach 0.98"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.78",
+              "observation": "reaches_it 0.94"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.88",
+              "observation": "reaches_it 0.83"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 0.99",
+              "observation": "does_not_reach 0.99"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        }
+      ]
+    },
+    "defect": {
+      "base": "9873acc9826102f2795ba9fd88e13acb013029f4",
+      "head": "21e7d54a43a81ff0de8bcfae8fa2aa4ab70e975a",
+      "runs": [
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.83",
+              "observation": "reaches_it 0.95"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.95",
+              "observation": "reaches_it 0.98"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.99",
+              "observation": "reaches_it 0.99"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.84",
+              "observation": "reaches_it 0.95"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.92",
+              "observation": "reaches_it 0.98"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.98",
+              "observation": "reaches_it 1.00"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.86",
+              "observation": "reaches_it 0.97"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.93",
+              "observation": "reaches_it 0.97"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.98",
+              "observation": "reaches_it 1.00"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        }
+      ]
+    },
+    "rewrite": {
+      "base": "9873acc9826102f2795ba9fd88e13acb013029f4",
+      "head": "252251338870e00ea3c395859a5a5391050fb7eb",
+      "runs": [
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.73",
+              "observation": "reaches_it 0.94"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.89",
+              "observation": "reaches_it 0.87"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 1.00",
+              "observation": "does_not_reach 0.93"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.78",
+              "observation": "reaches_it 0.95"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.91",
+              "observation": "reaches_it 0.88"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 1.00",
+              "observation": "does_not_reach 0.94"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 6,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.81",
+              "observation": "reaches_it 0.95"
+            },
+            {
+              "key": "open_session · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.88",
+              "observation": "reaches_it 0.88"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "satisfies",
+              "mapping": "applies 1.00",
+              "observation": "does_not_reach 0.88"
+            }
+          ],
+          "findings": [],
+          "unchecked": [
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 1,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 3,
+            "asked": 3,
+            "mapped": 3,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 0,
+              "satisfies": 1,
+              "unknown": 0,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 1,
+                "calls": 4,
+                "applicable": 3,
+                "asked": 3,
+                "mapped": 3,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 1,
+                  "unknown": 0,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 27,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        }
+      ]
+    },
+    "hidden": {
+      "base": "9873acc9826102f2795ba9fd88e13acb013029f4",
+      "head": "c2477517d1edbaa0057cd193a97264abc8c6c0aa",
+      "runs": [
+        {
+          "exit": 0,
+          "requests": 4,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.68",
+              "observation": "reaches_it 0.90"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.98",
+              "observation": "reaches_it 0.83"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · reject_disabled(&record)",
+              "why": "`reject_disabled` (src/auth.rs:27) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 2,
+            "asked": 2,
+            "mapped": 2,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 3,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 1
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 4,
+                "applicable": 2,
+                "asked": 2,
+                "mapped": 2,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 28,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 4,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.68",
+              "observation": "reaches_it 0.91"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.98",
+              "observation": "reaches_it 0.80"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · reject_disabled(&record)",
+              "why": "`reject_disabled` (src/auth.rs:27) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 2,
+            "asked": 2,
+            "mapped": 2,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 3,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 1
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 4,
+                "applicable": 2,
+                "asked": 2,
+                "mapped": 2,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 28,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 4,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.66",
+              "observation": "reaches_it 0.90"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.98",
+              "observation": "reaches_it 0.81"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "open_session · reject_disabled(&record)",
+              "why": "`reject_disabled` (src/auth.rs:27) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            },
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:19) is read on its own in this run, so a check before what it does is asked about inside it"
+            }
+          ],
+          "wouldAsk": [
+            "open_session · load_key(store, key)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 1
+            },
+            "calls": 5,
+            "applicable": 2,
+            "asked": 2,
+            "mapped": 2,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 3,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 0,
+              "aside": 1
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 4,
+                "applicable": 2,
+                "asked": 2,
+                "mapped": 2,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 1
+                }
+              },
+              "calls_changed": {
+                "budget": 28,
+                "functions": 1,
+                "calls": 1,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 1,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "record_use",
+                "audit",
+                "create_session",
+                "load_key"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        }
+      ]
+    },
+    "caller": {
+      "base": "9873acc9826102f2795ba9fd88e13acb013029f4",
+      "head": "def0fb01e72d8a5d12d4b259fb77cbde45276d15",
+      "runs": [
+        {
+          "exit": 0,
+          "requests": 8,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "login · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.71",
+              "observation": "reaches_it 0.91"
+            },
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "unknown",
+              "mapping": "does_not_apply 0.52",
+              "observation": "reaches_it 0.90"
+            },
+            {
+              "key": "login · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.93",
+              "observation": "reaches_it 0.81"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.92",
+              "observation": "reaches_it 0.87"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:23) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            }
+          ],
+          "wouldAsk": [
+            "login · load_key(store, key)",
+            "open_session · load_key(store, key)",
+            "login · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 0
+            },
+            "calls": 6,
+            "applicable": 4,
+            "asked": 4,
+            "mapped": 4,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 1,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 6,
+                "applicable": 4,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 1,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 26,
+                "functions": 0,
+                "calls": 0,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 0,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "load_key",
+                "record_use",
+                "audit",
+                "create_session"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 8,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "login · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.67",
+              "observation": "reaches_it 0.89"
+            },
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "unknown",
+              "mapping": "does_not_apply 0.52",
+              "observation": "reaches_it 0.92"
+            },
+            {
+              "key": "login · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.93",
+              "observation": "reaches_it 0.80"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.95",
+              "observation": "reaches_it 0.88"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:23) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            }
+          ],
+          "wouldAsk": [
+            "login · load_key(store, key)",
+            "open_session · load_key(store, key)",
+            "login · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 0
+            },
+            "calls": 6,
+            "applicable": 4,
+            "asked": 4,
+            "mapped": 4,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 1,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 6,
+                "applicable": 4,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 1,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 26,
+                "functions": 0,
+                "calls": 0,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 0,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "load_key",
+                "record_use",
+                "audit",
+                "create_session"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "exit": 0,
+          "requests": 8,
+          "origins": [
+            "https://api.cloudflare.com"
+          ],
+          "observed": [
+            {
+              "key": "login · load_key(store, key)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.74",
+              "observation": "reaches_it 0.94"
+            },
+            {
+              "key": "open_session · load_key(store, key)",
+              "outcome": "unknown",
+              "mapping": "unknown 0.49",
+              "observation": "reaches_it 0.88"
+            },
+            {
+              "key": "login · is_disabled(&record)",
+              "outcome": "aside",
+              "mapping": "does_not_apply 0.92",
+              "observation": "reaches_it 0.82"
+            },
+            {
+              "key": "open_session · create_session(store, &record)",
+              "outcome": "violates",
+              "mapping": "applies 0.96",
+              "observation": "reaches_it 0.87"
+            }
+          ],
+          "findings": [
+            "open_session · create_session(store, &record)"
+          ],
+          "unchecked": [
+            {
+              "key": "login · open_session(store, key)",
+              "why": "`open_session` (src/auth.rs:23) is read on its own in this run, so a check before what it does is asked about inside it"
+            },
+            {
+              "key": "open_session · audit(store)",
+              "why": "no word of `audit(store)`'s name is in the requirement or its search hints, so a check before it is not asked about"
+            }
+          ],
+          "wouldAsk": [
+            "login · load_key(store, key)",
+            "open_session · load_key(store, key)",
+            "login · is_disabled(&record)",
+            "open_session · create_session(store, &record)"
+          ],
+          "counts": {
+            "budget": 30,
+            "functions": {
+              "changed": 2,
+              "calls_changed": 0
+            },
+            "calls": 6,
+            "applicable": 4,
+            "asked": 4,
+            "mapped": 4,
+            "governed": 1,
+            "overBudget": 0,
+            "notApplicable": 2,
+            "outcomes": {
+              "violates": 1,
+              "satisfies": 0,
+              "unknown": 1,
+              "aside": 2
+            },
+            "byOrigin": {
+              "changed": {
+                "budget": 20,
+                "functions": 2,
+                "calls": 6,
+                "applicable": 4,
+                "asked": 4,
+                "mapped": 4,
+                "governed": 1,
+                "overBudget": 0,
+                "notApplicable": 2,
+                "outcomes": {
+                  "violates": 1,
+                  "satisfies": 0,
+                  "unknown": 1,
+                  "aside": 2
+                }
+              },
+              "calls_changed": {
+                "budget": 26,
+                "functions": 0,
+                "calls": 0,
+                "applicable": 0,
+                "asked": 0,
+                "mapped": 0,
+                "governed": 0,
+                "overBudget": 0,
+                "notApplicable": 0,
+                "outcomes": {
+                  "violates": 0,
+                  "satisfies": 0,
+                  "unknown": 0,
+                  "aside": 0
+                }
+              }
+            },
+            "siblings": {
+              "budget": 10,
+              "seeds": [
+                "load_key",
+                "record_use",
+                "audit",
+                "create_session"
+              ],
+              "functions": 0,
+              "calls": 0,
+              "applicable": 0,
+              "asked": 0,
+              "mapped": 0,
+              "governed": 0,
+              "overBudget": 0,
+              "notApplicable": 0,
+              "outcomes": {
+                "violates": 0,
+                "satisfies": 0,
+                "unknown": 0,
+                "aside": 0
+              }
+            }
+          },
+          "stderr": ""
+        }
+      ]
+    }
+  }
+}

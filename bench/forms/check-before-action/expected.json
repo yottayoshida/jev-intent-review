@@ -1,5 +1,5 @@
 {
-  "about": "What a right reading is, per version, written before any request was sent. `run.ts` records this file's sha256 at the head of the log and refuses to add to a log started under another one. Keys are `function · call` as the report prints them. `not_violates` is any outcome but violates; `*` is every other call read in that run.",
+  "about": "What a right reading is, per version, written before any request was sent. `run.ts` records this file's sha256 at the head of the log and refuses to add to a log started under another one. Keys are `function · call` as the report prints them. `not_violates` is any outcome but violates; `*` is every other call read in that run. Version 2 (2026-09-25, ADR 0020): `hidden` is scored as the defect it is — the check's body goes with the packet and its value is read from it — and `helper`, the same call with a check that checks, is scored as holding; `caller` stays recorded.",
   "requirement": "R1",
   "scored": {
     "shipped": {
@@ -14,18 +14,22 @@
     "rewrite": {
       "open_session · create_session(store, &record)": "satisfies",
       "*": "not_violates"
+    },
+    "hidden": {
+      "open_session · create_session(store, &record)": "violates",
+      "open_session · load_key(store, key)": "not_violates"
+    },
+    "helper": {
+      "open_session · create_session(store, &record)": "satisfies",
+      "*": "not_violates"
     }
   },
   "recorded": {
-    "hidden": {
-      "open_session · create_session(store, &record)": "unknown",
-      "why": "The check is `reject_disabled`, whose body is not sent (maxRelatedChars 0) and does not check. No confident reading is right; a confident `satisfies` is the same miss #36 measured for the failure form, and is recorded as one."
-    },
     "caller": {
       "open_session · create_session(store, &record)": "violates",
       "why": "The check is in `login`. Read alone, `open_session` makes the call for a disabled key (and does, when called directly), so the local reading there goes against the requirement. `login`'s own call into `open_session` is not asked about: `open_session` is read on its own in the run (the second log; in the first, that call was read as violating in every version, the shipped one included)."
     }
   },
   "passes": "Every scored version meets its row in each of three runs.",
-  "history": "check-before-action-v0.json: the first measurement, before a call into a function the run reads on its own was held. shipped and rewrite listed `login · open_session` 3/3 each; every other row read as this table says."
+  "history": "check-before-action-v0.json: the first measurement, before a call into a function the run reads on its own was held. shipped and rewrite listed `login · open_session` 3/3 each; every other row read as this table says. check-before-action-v1.json and -v2.json: the table before version 2 recorded `hidden` as `unknown` (no confident reading right); v1 read it as holding 3/3 with no body sent, v2 as violates 3/3 with the body sent (ADR 0019)."
 }

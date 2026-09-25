@@ -1,0 +1,2643 @@
+{
+  "conditions": {
+    "tool": "131e21800db3652a15f6d083928d57549549f1f4",
+    "plan": "795d9bb6a95bd79e34d711bfcd179d84d18b41113e14fe45a616a42032656a15",
+    "questionsHash": "443ebf862db1",
+    "model": "typesafe/jev",
+    "limits": {
+      "maxPrimaryChars": 8000,
+      "maxRelatedChars": 0
+    },
+    "runs": 3
+  },
+  "records": [
+    {
+      "id": "grovedb-500 shipped finalize",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.87,
+          "probabilities": {
+            "settled_by_code_sent": 0.87,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.12
+          },
+          "confidence": 0.8
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped finalize",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "confidence": 0.98
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.83,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "turns_on_code_not_sent": 0.15,
+            "settled_by_code_sent": 0.83
+          },
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped finalize",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.84,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.84,
+            "turns_on_code_not_sent": 0.14
+          },
+          "confidence": 0.76
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 defect-A finalize",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 0.93,
+          "probabilities": {
+            "returns_error": 0.05,
+            "returns_success": 0.93,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.88
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.95,
+          "probabilities": {
+            "stops_there": 0.03,
+            "keeps_going": 0.95,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.93
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.66,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.28,
+            "settled_by_code_sent": 0.66,
+            "cannot_determine": 0.05
+          },
+          "confidence": 0.5
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 defect-A finalize",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 0.92,
+          "probabilities": {
+            "returns_error": 0.07,
+            "cannot_determine": 0.01,
+            "returns_success": 0.92
+          },
+          "confidence": 0.87
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.96,
+          "probabilities": {
+            "keeps_going": 0.96,
+            "stops_there": 0.03,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.62,
+          "probabilities": {
+            "settled_by_code_sent": 0.62,
+            "cannot_determine": 0.05,
+            "turns_on_code_not_sent": 0.33
+          },
+          "confidence": 0.44
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 defect-A finalize",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_error": 0.04,
+            "returns_success": 0.94
+          },
+          "confidence": 0.91
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.95,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "keeps_going": 0.95,
+            "stops_there": 0.04
+          },
+          "confidence": 0.93
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.58,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "turns_on_code_not_sent": 0.37,
+            "settled_by_code_sent": 0.58
+          },
+          "confidence": 0.37
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 rewrite-A finalize",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          },
+          "confidence": 0.98
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.91,
+            "turns_on_code_not_sent": 0.08
+          },
+          "confidence": 0.86
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 rewrite-A finalize",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 1,
+            "returns_success": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0.01,
+            "stops_there": 0.99
+          },
+          "confidence": 0.98
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.89,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.1,
+            "settled_by_code_sent": 0.89
+          },
+          "confidence": 0.83
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 rewrite-A finalize",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0,
+            "returns_error": 1
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "cannot_determine": 0,
+            "keeps_going": 0.01
+          },
+          "confidence": 0.98
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.9,
+          "probabilities": {
+            "settled_by_code_sent": 0.9,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.09
+          },
+          "confidence": 0.86
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 hidden-A finalize",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.95,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_error": 0.95,
+            "returns_success": 0.03
+          },
+          "confidence": 0.92
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.95,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "keeps_going": 0.03,
+            "stops_there": 0.95
+          },
+          "confidence": 0.93
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.53,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.42,
+            "turns_on_code_not_sent": 0.53
+          },
+          "confidence": 0.3
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.52,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.43,
+            "turns_on_code_not_sent": 0.52
+          },
+          "confidence": 0.28
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 hidden-A finalize",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.96,
+          "probabilities": {
+            "returns_success": 0.02,
+            "returns_error": 0.96,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.93
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.95,
+          "probabilities": {
+            "keeps_going": 0.04,
+            "stops_there": 0.95,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.92
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.49,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.47,
+            "cannot_determine": 0.04,
+            "settled_by_code_sent": 0.49
+          },
+          "confidence": 0.23
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.48,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.48,
+            "settled_by_code_sent": 0.48
+          },
+          "confidence": 0.23
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 hidden-A finalize",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.94,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_error": 0.94,
+            "returns_success": 0.04
+          },
+          "confidence": 0.91
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "stops_there": 0.93,
+            "keeps_going": 0.04
+          },
+          "confidence": 0.9
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.49,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.49,
+            "settled_by_code_sent": 0.47
+          },
+          "confidence": 0.23
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.48,
+          "probabilities": {
+            "settled_by_code_sent": 0.48,
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.48
+          },
+          "confidence": 0.22
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped generate_title_for_session",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.88,
+            "turns_on_code_not_sent": 0.11
+          },
+          "confidence": 0.82
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped generate_title_for_session",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0,
+            "returns_error": 1
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.84,
+          "probabilities": {
+            "settled_by_code_sent": 0.84,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.15
+          },
+          "confidence": 0.75
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped generate_title_for_session",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_error": 0.99,
+            "returns_success": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "keeps_going": 0,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.84,
+          "probabilities": {
+            "settled_by_code_sent": 0.84,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.15
+          },
+          "confidence": 0.75
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped dispatch_command",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.94,
+          "probabilities": {
+            "returns_error": 0.94,
+            "cannot_determine": 0.05,
+            "returns_success": 0.01
+          },
+          "confidence": 0.92
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.88,
+          "probabilities": {
+            "keeps_going": 0.04,
+            "stops_there": 0.88,
+            "cannot_determine": 0.08
+          },
+          "confidence": 0.83
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.52,
+          "probabilities": {
+            "settled_by_code_sent": 0.52,
+            "turns_on_code_not_sent": 0.45,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.27
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped dispatch_command",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_success": 0,
+            "returns_error": 0.97
+          },
+          "confidence": 0.95
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.93,
+          "probabilities": {
+            "stops_there": 0.93,
+            "cannot_determine": 0.05,
+            "keeps_going": 0.02
+          },
+          "confidence": 0.89
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.54,
+          "probabilities": {
+            "settled_by_code_sent": 0.54,
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.42
+          },
+          "confidence": 0.32
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped dispatch_command",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.97,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "returns_error": 0.97,
+            "returns_success": 0
+          },
+          "confidence": 0.95
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "keeps_going": 0.03,
+            "stops_there": 0.91
+          },
+          "confidence": 0.87
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.53,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "settled_by_code_sent": 0.43,
+            "turns_on_code_not_sent": 0.53
+          },
+          "confidence": 0.3
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-A generate_title_for_session",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 1,
+            "returns_error": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.91,
+          "probabilities": {
+            "stops_there": 0.91,
+            "cannot_determine": 0,
+            "keeps_going": 0.09
+          },
+          "confidence": 0.86
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.92,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.92,
+            "turns_on_code_not_sent": 0.07
+          },
+          "confidence": 0.88
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-A generate_title_for_session",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 0,
+            "returns_success": 1,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.86,
+          "probabilities": {
+            "stops_there": 0.86,
+            "cannot_determine": 0,
+            "keeps_going": 0.14
+          },
+          "confidence": 0.79
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.92,
+          "probabilities": {
+            "settled_by_code_sent": 0.92,
+            "turns_on_code_not_sent": 0.07,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.88
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-A generate_title_for_session",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 1,
+            "returns_error": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.96,
+          "probabilities": {
+            "stops_there": 0.96,
+            "cannot_determine": 0,
+            "keeps_going": 0.04
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.91,
+            "turns_on_code_not_sent": 0.08
+          },
+          "confidence": 0.87
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 rewrite-A generate_title_for_session",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          },
+          "confidence": 1
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.92,
+          "probabilities": {
+            "settled_by_code_sent": 0.92,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.07
+          },
+          "confidence": 0.88
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 rewrite-A generate_title_for_session",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "returns_success": 0,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.93,
+          "probabilities": {
+            "settled_by_code_sent": 0.93,
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.06
+          },
+          "confidence": 0.89
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 rewrite-A generate_title_for_session",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          },
+          "confidence": 1
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.91,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.08,
+            "settled_by_code_sent": 0.91,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.87
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 hidden-A generate_title_for_session",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "returns_success": 0.03,
+            "returns_error": 0.91
+          },
+          "confidence": 0.87
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.96,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "cannot_determine": 0.03,
+            "stops_there": 0.96
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.7,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.7,
+            "settled_by_code_sent": 0.26
+          },
+          "confidence": 0.55
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.74,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.74,
+            "settled_by_code_sent": 0.22,
+            "cannot_determine": 0.04
+          },
+          "confidence": 0.6
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 hidden-A generate_title_for_session",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "returns_error": 0.93,
+            "returns_success": 0.02
+          },
+          "confidence": 0.9
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.97,
+          "probabilities": {
+            "stops_there": 0.97,
+            "cannot_determine": 0.02,
+            "keeps_going": 0.01
+          },
+          "confidence": 0.95
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.76,
+          "probabilities": {
+            "settled_by_code_sent": 0.21,
+            "cannot_determine": 0.03,
+            "turns_on_code_not_sent": 0.76
+          },
+          "confidence": 0.64
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.81,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "settled_by_code_sent": 0.15,
+            "turns_on_code_not_sent": 0.81
+          },
+          "confidence": 0.71
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 hidden-A generate_title_for_session",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.93,
+          "probabilities": {
+            "returns_error": 0.93,
+            "returns_success": 0.02,
+            "cannot_determine": 0.05
+          },
+          "confidence": 0.89
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.96,
+          "probabilities": {
+            "keeps_going": 0.01,
+            "stops_there": 0.96,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.69,
+          "probabilities": {
+            "settled_by_code_sent": 0.27,
+            "turns_on_code_not_sent": 0.69,
+            "cannot_determine": 0.04
+          },
+          "confidence": 0.54
+        }
+      },
+      "alone": {
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.71,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.71,
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.24
+          },
+          "confidence": 0.57
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-B dispatch_command",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "returns_success": 1,
+            "cannot_determine": 0,
+            "returns_error": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.9,
+          "probabilities": {
+            "keeps_going": 0.9,
+            "cannot_determine": 0.01,
+            "stops_there": 0.09
+          },
+          "confidence": 0.86
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.87,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.87,
+            "turns_on_code_not_sent": 0.12
+          },
+          "confidence": 0.81
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-B dispatch_command",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 0,
+            "returns_success": 1
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "keeps_going": 0.91,
+            "stops_there": 0.08
+          },
+          "confidence": 0.86
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.86,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "settled_by_code_sent": 0.86,
+            "turns_on_code_not_sent": 0.13
+          },
+          "confidence": 0.78
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 defect-B dispatch_command",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_success",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 0,
+            "returns_success": 1
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "keeps_going",
+          "probability": 0.85,
+          "probabilities": {
+            "stops_there": 0.14,
+            "cannot_determine": 0.01,
+            "keeps_going": 0.85
+          },
+          "confidence": 0.78
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.83,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "turns_on_code_not_sent": 0.16,
+            "settled_by_code_sent": 0.83
+          },
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.85,
+          "probabilities": {
+            "does_not_reach": 0.85,
+            "reaches_it": 0.14,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.78
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.72,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.72,
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.26
+          },
+          "confidence": 0.58
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.9,
+          "probabilities": {
+            "does_not_reach": 0.9,
+            "reaches_it": 0.09,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.85
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.76,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.76,
+            "settled_by_code_sent": 0.21,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.65
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 shipped",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.83,
+          "probabilities": {
+            "reaches_it": 0.16,
+            "cannot_determine": 0.01,
+            "does_not_reach": 0.83
+          },
+          "confidence": 0.74
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.76,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.76,
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.21
+          },
+          "confidence": 0.64
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.93,
+          "probabilities": {
+            "reaches_it": 0.93,
+            "cannot_determine": 0.02,
+            "does_not_reach": 0.05
+          },
+          "confidence": 0.9
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.5599999999999999,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.5599999999999999,
+            "cannot_determine": 0.14,
+            "settled_by_code_sent": 0.3
+          },
+          "confidence": 0.35
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.96,
+          "probabilities": {
+            "reaches_it": 0.96,
+            "does_not_reach": 0.02,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.93
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.6,
+          "probabilities": {
+            "settled_by_code_sent": 0.28,
+            "turns_on_code_not_sent": 0.6,
+            "cannot_determine": 0.12
+          },
+          "confidence": 0.39
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 defect",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.94,
+          "probabilities": {
+            "reaches_it": 0.94,
+            "cannot_determine": 0.02,
+            "does_not_reach": 0.04
+          },
+          "confidence": 0.91
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.47,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.47,
+            "cannot_determine": 0.13,
+            "settled_by_code_sent": 0.4
+          },
+          "confidence": 0.21
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.7,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "reaches_it": 0.28,
+            "does_not_reach": 0.7
+          },
+          "confidence": 0.56
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.83,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.14,
+            "turns_on_code_not_sent": 0.83
+          },
+          "confidence": 0.75
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.67,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "reaches_it": 0.32,
+            "does_not_reach": 0.67
+          },
+          "confidence": 0.5
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.76,
+          "probabilities": {
+            "settled_by_code_sent": 0.21,
+            "cannot_determine": 0.03,
+            "turns_on_code_not_sent": 0.76
+          },
+          "confidence": 0.64
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 rewrite",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.68,
+          "probabilities": {
+            "does_not_reach": 0.68,
+            "reaches_it": 0.3,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.52
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.78,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.78,
+            "settled_by_code_sent": 0.19,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.68
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.66,
+          "probabilities": {
+            "reaches_it": 0.66,
+            "cannot_determine": 0.03,
+            "does_not_reach": 0.31
+          },
+          "confidence": 0.49
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.88,
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.09
+          },
+          "confidence": 0.83
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.52,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "reaches_it": 0.52,
+            "does_not_reach": 0.46
+          },
+          "confidence": 0.27
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "settled_by_code_sent": 0.09,
+            "cannot_determine": 0.03,
+            "turns_on_code_not_sent": 0.88
+          },
+          "confidence": 0.83
+        }
+      }
+    },
+    {
+      "id": "cba grovedb-500 hidden",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.58,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "reaches_it": 0.58,
+            "does_not_reach": 0.4
+          },
+          "confidence": 0.37
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.87,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.11,
+            "turns_on_code_not_sent": 0.87
+          },
+          "confidence": 0.8
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.99,
+          "probabilities": {
+            "reaches_it": 0.01,
+            "cannot_determine": 0,
+            "does_not_reach": 0.99
+          },
+          "confidence": 0.98
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.87,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.1,
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.87
+          },
+          "confidence": 0.8
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "reaches_it": 0,
+            "does_not_reach": 1,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.91,
+          "probabilities": {
+            "settled_by_code_sent": 0.91,
+            "turns_on_code_not_sent": 0.07,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.86
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 shipped",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "does_not_reach": 1,
+            "reaches_it": 0,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.1,
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.88
+          },
+          "confidence": 0.82
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.96,
+          "probabilities": {
+            "reaches_it": 0.96,
+            "cannot_determine": 0.02,
+            "does_not_reach": 0.02
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.58,
+          "probabilities": {
+            "cannot_determine": 0.1,
+            "settled_by_code_sent": 0.58,
+            "turns_on_code_not_sent": 0.32
+          },
+          "confidence": 0.36
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.95,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "reaches_it": 0.95,
+            "does_not_reach": 0.03
+          },
+          "confidence": 0.93
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.48,
+          "probabilities": {
+            "settled_by_code_sent": 0.48,
+            "cannot_determine": 0.14,
+            "turns_on_code_not_sent": 0.38
+          },
+          "confidence": 0.23
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 defect",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_reach": 0.02,
+            "reaches_it": 0.97,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.95
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.58,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.3,
+            "settled_by_code_sent": 0.58,
+            "cannot_determine": 0.12
+          },
+          "confidence": 0.36
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "reaches_it": 0.01,
+            "does_not_reach": 0.99
+          },
+          "confidence": 0.98
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.93,
+            "turns_on_code_not_sent": 0.05
+          },
+          "confidence": 0.9
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.98,
+          "probabilities": {
+            "does_not_reach": 0.98,
+            "reaches_it": 0.02,
+            "cannot_determine": 0
+          },
+          "confidence": 0.96
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.9,
+          "probabilities": {
+            "settled_by_code_sent": 0.9,
+            "cannot_determine": 0.03,
+            "turns_on_code_not_sent": 0.07
+          },
+          "confidence": 0.85
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 rewrite",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.98,
+          "probabilities": {
+            "reaches_it": 0.02,
+            "cannot_determine": 0,
+            "does_not_reach": 0.98
+          },
+          "confidence": 0.96
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.92,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.06,
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.92
+          },
+          "confidence": 0.88
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "does_not_reach": 1,
+            "cannot_determine": 0,
+            "reaches_it": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.62,
+          "probabilities": {
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.34,
+            "settled_by_code_sent": 0.62
+          },
+          "confidence": 0.43
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "reaches_it": 0,
+            "cannot_determine": 0,
+            "does_not_reach": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.64,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.31,
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.64
+          },
+          "confidence": 0.46
+        }
+      }
+    },
+    {
+      "id": "cba moltis-1064 hidden",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "reaches_it": 0,
+            "does_not_reach": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.61,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.36,
+            "settled_by_code_sent": 0.61,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.4
+        }
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "does_not_reach": 1,
+            "reaches_it": 0,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.88,
+            "turns_on_code_not_sent": 0.09
+          },
+          "confidence": 0.82
+        }
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "reaches_it": 0,
+            "does_not_reach": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.85,
+          "probabilities": {
+            "settled_by_code_sent": 0.85,
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.11
+          },
+          "confidence": 0.77
+        }
+      }
+    },
+    {
+      "id": "constructed shipped",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "does_not_reach": 0.99,
+            "reaches_it": 0.01
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.8,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.8,
+            "turns_on_code_not_sent": 0.15
+          },
+          "confidence": 0.7
+        }
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_reach": 0,
+            "cannot_determine": 0.01,
+            "reaches_it": 0.99
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.47,
+          "probabilities": {
+            "settled_by_code_sent": 0.47,
+            "cannot_determine": 0.12,
+            "turns_on_code_not_sent": 0.41
+          },
+          "confidence": 0.21
+        }
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.99,
+          "probabilities": {
+            "does_not_reach": 0,
+            "reaches_it": 0.99,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.55,
+          "probabilities": {
+            "settled_by_code_sent": 0.55,
+            "cannot_determine": 0.1,
+            "turns_on_code_not_sent": 0.35
+          },
+          "confidence": 0.33
+        }
+      }
+    },
+    {
+      "id": "constructed defect",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "reaches_it",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0.01,
+            "reaches_it": 0.99,
+            "does_not_reach": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.58,
+          "probabilities": {
+            "cannot_determine": 0.09,
+            "settled_by_code_sent": 0.58,
+            "turns_on_code_not_sent": 0.33
+          },
+          "confidence": 0.37
+        }
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.9,
+          "probabilities": {
+            "does_not_reach": 0.9,
+            "cannot_determine": 0,
+            "reaches_it": 0.1
+          },
+          "confidence": 0.85
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.84,
+          "probabilities": {
+            "settled_by_code_sent": 0.84,
+            "cannot_determine": 0.03,
+            "turns_on_code_not_sent": 0.13
+          },
+          "confidence": 0.76
+        }
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.91,
+          "probabilities": {
+            "reaches_it": 0.09,
+            "cannot_determine": 0,
+            "does_not_reach": 0.91
+          },
+          "confidence": 0.85
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.85,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.85,
+            "turns_on_code_not_sent": 0.12
+          },
+          "confidence": 0.78
+        }
+      }
+    },
+    {
+      "id": "constructed rewrite",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.91,
+          "probabilities": {
+            "reaches_it": 0.09,
+            "does_not_reach": 0.91,
+            "cannot_determine": 0
+          },
+          "confidence": 0.86
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.88,
+          "probabilities": {
+            "settled_by_code_sent": 0.88,
+            "turns_on_code_not_sent": 0.1,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.82
+        }
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 1,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.96,
+          "probabilities": {
+            "reaches_it": 0.01,
+            "does_not_reach": 0.96,
+            "cannot_determine": 0.03
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.75,
+          "probabilities": {
+            "settled_by_code_sent": 0.14,
+            "cannot_determine": 0.11,
+            "turns_on_code_not_sent": 0.75
+          },
+          "confidence": 0.62
+        }
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 2,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.97,
+          "probabilities": {
+            "does_not_reach": 0.97,
+            "reaches_it": 0.01,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.96
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.76,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.76,
+            "cannot_determine": 0.12,
+            "settled_by_code_sent": 0.12
+          },
+          "confidence": 0.65
+        }
+      }
+    },
+    {
+      "id": "constructed hidden",
+      "run": 3,
+      "shared": {
+        "in_forbidden_case": {
+          "choice": "does_not_reach",
+          "probability": 0.96,
+          "probabilities": {
+            "cannot_determine": 0.03,
+            "does_not_reach": 0.96,
+            "reaches_it": 0.01
+          },
+          "confidence": 0.94
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.77,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.77,
+            "cannot_determine": 0.1,
+            "settled_by_code_sent": 0.13
+          },
+          "confidence": 0.65
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(packed_global_chunk_ids)",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.98,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "returns_error": 0.98,
+            "returns_success": 0
+          },
+          "confidence": 0.97
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "cannot_determine": 0,
+            "keeps_going": 0,
+            "stops_there": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.7,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.7,
+            "turns_on_code_not_sent": 0.28
+          },
+          "confidence": 0.56
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(packed_global_chunk_ids)",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          },
+          "confidence": 1
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.68,
+          "probabilities": {
+            "settled_by_code_sent": 0.68,
+            "cannot_determine": 0.02,
+            "turns_on_code_not_sent": 0.3
+          },
+          "confidence": 0.52
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(packed_global_chunk_ids)",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0,
+            "stops_there": 1
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.64,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.33,
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.64
+          },
+          "confidence": 0.47
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(iter_packed_chunks.as_slice())",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "cannot_determine": 0.01,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "keeps_going": 0,
+            "cannot_determine": 0.01,
+            "stops_there": 0.99
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.67,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "settled_by_code_sent": 0.67,
+            "turns_on_code_not_sent": 0.31
+          },
+          "confidence": 0.51
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(iter_packed_chunks.as_slice())",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_error": 0.99,
+            "returns_success": 0,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 1,
+          "probabilities": {
+            "stops_there": 1,
+            "cannot_determine": 0,
+            "keeps_going": 0
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.7,
+          "probabilities": {
+            "settled_by_code_sent": 0.7,
+            "cannot_determine": 0.02,
+            "turns_on_code_not_sent": 0.28
+          },
+          "confidence": 0.55
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · unpack_nested_bytes(iter_packed_chunks.as_slice())",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "returns_success": 0,
+            "returns_error": 0.99,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.98
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.99,
+          "probabilities": {
+            "stops_there": 0.99,
+            "keeps_going": 0,
+            "cannot_determine": 0.01
+          },
+          "confidence": 0.99
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.74,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.24,
+            "settled_by_code_sent": 0.74,
+            "cannot_determine": 0.02
+          },
+          "confidence": 0.61
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · discover_new_subtrees_metadata(&completed_path, grove_version)",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.91,
+          "probabilities": {
+            "returns_error": 0.91,
+            "cannot_determine": 0.06,
+            "returns_success": 0.03
+          },
+          "confidence": 0.87
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.88,
+          "probabilities": {
+            "keeps_going": 0.08,
+            "stops_there": 0.88,
+            "cannot_determine": 0.04
+          },
+          "confidence": 0.82
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.6,
+          "probabilities": {
+            "settled_by_code_sent": 0.32,
+            "turns_on_code_not_sent": 0.6,
+            "cannot_determine": 0.08
+          },
+          "confidence": 0.41
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · discover_new_subtrees_metadata(&completed_path, grove_version)",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.9,
+          "probabilities": {
+            "cannot_determine": 0.07,
+            "returns_success": 0.03,
+            "returns_error": 0.9
+          },
+          "confidence": 0.86
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.82,
+          "probabilities": {
+            "stops_there": 0.82,
+            "cannot_determine": 0.07,
+            "keeps_going": 0.11
+          },
+          "confidence": 0.73
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.58,
+          "probabilities": {
+            "settled_by_code_sent": 0.34,
+            "cannot_determine": 0.08,
+            "turns_on_code_not_sent": 0.58
+          },
+          "confidence": 0.37
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · discover_new_subtrees_metadata(&completed_path, grove_version)",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "returns_success": 0.02,
+            "returns_error": 0.93
+          },
+          "confidence": 0.9
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.88,
+          "probabilities": {
+            "keeps_going": 0.07,
+            "stops_there": 0.88,
+            "cannot_determine": 0.05
+          },
+          "confidence": 0.83
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.6,
+          "probabilities": {
+            "settled_by_code_sent": 0.33,
+            "turns_on_code_not_sent": 0.6,
+            "cannot_determine": 0.07
+          },
+          "confidence": 0.41
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · set_new_transaction()",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.89,
+          "probabilities": {
+            "returns_error": 0.89,
+            "returns_success": 0.02,
+            "cannot_determine": 0.09
+          },
+          "confidence": 0.84
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.87,
+          "probabilities": {
+            "stops_there": 0.87,
+            "cannot_determine": 0.08,
+            "keeps_going": 0.05
+          },
+          "confidence": 0.81
+        },
+        "evidence_settles": {
+          "choice": "turns_on_code_not_sent",
+          "probability": 0.52,
+          "probabilities": {
+            "settled_by_code_sent": 0.44,
+            "cannot_determine": 0.04,
+            "turns_on_code_not_sent": 0.52
+          },
+          "confidence": 0.28
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · set_new_transaction()",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.9,
+          "probabilities": {
+            "returns_success": 0.02,
+            "cannot_determine": 0.08,
+            "returns_error": 0.9
+          },
+          "confidence": 0.85
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.86,
+          "probabilities": {
+            "stops_there": 0.86,
+            "cannot_determine": 0.09,
+            "keeps_going": 0.05
+          },
+          "confidence": 0.79
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.51,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.44,
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.51
+          },
+          "confidence": 0.27
+        }
+      }
+    },
+    {
+      "id": "grovedb-500 shipped apply_chunk · set_new_transaction()",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.93,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "returns_error": 0.93,
+            "returns_success": 0.01
+          },
+          "confidence": 0.9
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.91,
+          "probabilities": {
+            "cannot_determine": 0.06,
+            "stops_there": 0.91,
+            "keeps_going": 0.03
+          },
+          "confidence": 0.87
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.5599999999999999,
+          "probabilities": {
+            "cannot_determine": 0.05,
+            "settled_by_code_sent": 0.5599999999999999,
+            "turns_on_code_not_sent": 0.39
+          },
+          "confidence": 0.35
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped handle_title · crate::session::title::generate_title_for_session(state, session_key)",
+      "run": 1,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_success": 0.01,
+            "returns_error": 0.99
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.97,
+          "probabilities": {
+            "cannot_determine": 0,
+            "stops_there": 0.97,
+            "keeps_going": 0.03
+          },
+          "confidence": 0.95
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.77,
+          "probabilities": {
+            "cannot_determine": 0.02,
+            "turns_on_code_not_sent": 0.21,
+            "settled_by_code_sent": 0.77
+          },
+          "confidence": 0.64
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped handle_title · crate::session::title::generate_title_for_session(state, session_key)",
+      "run": 2,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 1,
+          "probabilities": {
+            "returns_error": 1,
+            "returns_success": 0,
+            "cannot_determine": 0
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.98,
+          "probabilities": {
+            "keeps_going": 0.02,
+            "cannot_determine": 0,
+            "stops_there": 0.98
+          },
+          "confidence": 0.97
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.72,
+          "probabilities": {
+            "turns_on_code_not_sent": 0.25,
+            "cannot_determine": 0.03,
+            "settled_by_code_sent": 0.72
+          },
+          "confidence": 0.58
+        }
+      }
+    },
+    {
+      "id": "moltis-1064 shipped handle_title · crate::session::title::generate_title_for_session(state, session_key)",
+      "run": 3,
+      "shared": {
+        "on_error_result": {
+          "choice": "returns_error",
+          "probability": 0.99,
+          "probabilities": {
+            "cannot_determine": 0,
+            "returns_error": 0.99,
+            "returns_success": 0.01
+          },
+          "confidence": 0.99
+        },
+        "on_error_control": {
+          "choice": "stops_there",
+          "probability": 0.98,
+          "probabilities": {
+            "stops_there": 0.98,
+            "cannot_determine": 0,
+            "keeps_going": 0.02
+          },
+          "confidence": 0.96
+        },
+        "evidence_settles": {
+          "choice": "settled_by_code_sent",
+          "probability": 0.8,
+          "probabilities": {
+            "settled_by_code_sent": 0.8,
+            "cannot_determine": 0.02,
+            "turns_on_code_not_sent": 0.18
+          },
+          "confidence": 0.7
+        }
+      }
+    }
+  ]
+}

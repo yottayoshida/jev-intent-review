@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "pybun#428 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading collect_inputs_recursive in src/build.rs at the pull request's head, before any request of version 4: a path goes into the inputs only when its entry is a file (else if file_type.is_file()).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "An entry that is not a file must not go into the inputs.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["push"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

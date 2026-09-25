@@ -23,9 +23,10 @@ import { meets, once, type Distilled, type Row } from "./common.ts";
 
 const HERE = new URL("./real/", import.meta.url).pathname;
 // v1 is the measurement with the tool before calls named by the requirement took their turns first
-// (#39, ADR 0016); a later tool writes a later version.
-const LOG = new URL("../logs/check-before-action-real-v2.json", import.meta.url).pathname;
-const VERSIONS = ["shipped", "defect", "rewrite", "hidden"] as const;
+// (#39, ADR 0016), v2 the one after it; v3 the one after the check's body is sent with the packet
+// (#82, ADR 0019). A later tool writes a later version.
+const LOG = new URL("../logs/check-before-action-real-v4.json", import.meta.url).pathname;
+const VERSIONS = ["shipped", "defect", "rewrite", "hidden", "helper"] as const;
 type Version = (typeof VERSIONS)[number];
 
 export interface RealCase {
@@ -142,12 +143,29 @@ async function measure(acceptance: string, runs: number) {
   console.log(score(log, runs).join("\n"));
 }
 
+/**
+ * The table a log was taken under: the log records `expected.json`'s sha256, and a table replaced
+ * since is kept byte for byte as `expected-v<n>.json` (version 1: hidden recorded, not scored). A log
+ * whose sha matches none — one written by hand — scores under the current table.
+ */
+function tableOf(dir: string, c: RealCase, log: Log): { scored: Record<string, Row>; recorded: Record<string, Row> } {
+  const recorded = log.conditions.files?.[c.id]?.["expected.json"];
+  const names = ["expected.json", ...readdirSync(dir).filter((n) => /^expected-v\d+\.json$/.test(n))];
+  const name = names.find((n) => sha256(readFileSync(join(dir, n), "utf8")) === recorded);
+  // A log whose recorded table matches none kept here — a table replaced without its
+  // `expected-v<n>.json` kept — is scored under the current one, and says so rather than passing
+  // quietly. A log that records no table at all (one written by hand, in a test) is scored under
+  // the current one without a word: it has nothing to match.
+  if (name === undefined && recorded !== undefined) console.error(`${c.id}: the log's expected.json (${recorded.slice(0, 12)}…) matches no table in ${dir}; scoring under the current one`);
+  return JSON.parse(readFileSync(join(dir, name ?? "expected.json"), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
+}
+
 /** Each case's scored and recorded rows against the log, and whether every scored version passed. */
 export function score(log: Log, runs: number, cases = loadRealCases()): string[] {
   const lines: string[] = [];
   let all = true;
   for (const { dir, c } of cases) {
-    const expected = JSON.parse(readFileSync(join(dir, "expected.json"), "utf8")) as { scored: Record<string, Row>; recorded: Record<string, Row> };
+    const expected = tableOf(dir, c, log);
     for (const [part, rows] of [["scored", expected.scored], ["recorded, not scored", expected.recorded]] as const) {
       lines.push(`${c.id} ${part}:`);
       for (const [v, row] of Object.entries(rows)) {

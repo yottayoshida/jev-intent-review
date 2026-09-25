@@ -12,6 +12,9 @@ The check in the shipped code is the match guard `Ok(h) if h.len() >= MIN_MESSAG
 | defect | `defect.head.patch` | gone: every session gets a title |
 | rewrite | `rewrite.head.patch` | the same check as an `if` after the read |
 | hidden | `hidden.base-helper.patch` on the base, `hidden.head.patch` on the head | `has_enough_messages(&h)`, whose body returns `true` |
+| helper | `helper.base-helper.patch` on the base, `helper.head.patch` on the head | `has_enough_messages(&h)`, whose body is `h.len() >= MIN_MESSAGES_FOR_TITLE` — the same call sites as `hidden` |
+
+`expected.json` is version 2 (2026-09-25): `hidden` scored as the defect it is and `helper` as holding. Its `about` says the check's value "is read from it by a question of its own" — the two-step ADR 0020 was drafted for, which was measured and not adopted; under the words adopted the check's body goes with the packet and the case is assumed, and no value is read apart. The file is not rewritten, since the logs record its sha256; `expected-v1.json` is the table the earlier logs were scored under.
 
 The behaviour, observed before any request (`probe.patch` adds one test: a session with one message,
 the existing mock provider; `probe.sh`, `cargo test -p moltis-gateway --no-default-features --features voice --lib acceptance_probe_one_message -- --nocapture`,
@@ -23,6 +26,7 @@ the existing mock provider; `probe.sh`, `cargo test -p moltis-gateway --no-defau
 | defect | `Some("Probe Title")` |
 | rewrite | `None` |
 | hidden | `Some("Probe Title")` |
+| helper | `None` (2026-09-25) |
 
 `probe.sh`, as it printed:
 
@@ -31,6 +35,7 @@ shipped test_rc=0 acceptance-probe: one message -> None
 defect test_rc=0 acceptance-probe: one message -> Some("Probe Title")
 rewrite test_rc=0 acceptance-probe: one message -> None
 hidden test_rc=0 acceptance-probe: one message -> Some("Probe Title")
+helper test_rc=0 acceptance-probe: one message -> None
 ```
 
 With the tool the measurement ran (`14ec498`, whose source differs from `7703ab9` in comments only)

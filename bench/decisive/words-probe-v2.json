@@ -1,0 +1,911 @@
+{
+  "about": "#82 (ADR 0020): version 2 of the probe, written after version 1's log was seen (bench/logs/words-probe-v1.json): the outside line could not be measured there — arm 0 read 6 of 33 outside runs as holding, under the 10 the line requires — and, by version 1's rule, nothing was adopted and the outside part is redesigned here. Version 1's target lines stand as measured: arm 2 failed the check-value line (grovedb-500 hidden: `heights_need_rewrite`, whose body is `true`, read as returns_false_or_err 0.91 three times of three — the doc comment and the sentence's double negative over a three-line body), arm 1 met the hidden, defect and settled lines on all 15 targets. So only arms 0 and 1 are sent here, once each, on more calls: for each of the five pull requests the rules were not written on, the first 12 calls the run asks (whatever their checks), by the same stand-in requirement. The outside line is version 1's; the arm adopted is arm 1 if it meets it, else nothing.",
+  "wording": {
+    "function": "`code` is the body of `{F}`. The entries under `evidence.related` are the bodies of functions `{F}` calls, given so that what those calls do can be read. Assume exactly this and nothing else: `{F}` is called in the case `requirement.text` describes, the one in which it says the call `{X}` must not be made{VALUES}; every other operation the function reaches succeeds, unless the case itself decides it otherwise. Under that condition: does `{F}` go on to make the call `{X}`?",
+    "value_clause": "; in that case `{C}` returns {V}",
+    "value_words": {
+      "returns_true_or_ok": "`true` (or `Ok`)",
+      "returns_false_or_err": "`false` (or `Err`)"
+    },
+    "check": "`code` is the body of `{CNAME}`, which `{F}` calls as `{C}`. The entries under `evidence.related` are the bodies of functions `{CNAME}` calls, given so that what those calls do can be read. Take the case `requirement.text` describes, the one in which it says the call `{X}`, made in `{F}`, must not be made. In that case, what does `{C}` return?",
+    "check_criteria": {
+      "returns_true_or_ok": "`true`, or an `Ok` value.",
+      "returns_false_or_err": "`false`, or an `Err` value.",
+      "cannot_determine": "The code shown does not settle which."
+    },
+    "function_criteria": "REACH_CRITERIA as src has them (read from the old question at run time, so the three answers are the same words in every arm)"
+  },
+  "arms": {
+    "0": "old: src/plan/forms.ts checkBeforeAction.observationQuestions as committed (assume the case, because the check it asks for does not pass)",
+    "1": "case only: the function's question of arm 2 without any check clause (no check is read); 'unless the case itself decides it otherwise' included; nothing about names"
+  },
+  "send": [
+    0,
+    1
+  ],
+  "bar": 0.6,
+  "runs": 1,
+  "order": "for each outside call, run 1: arm 0, arm 1",
+  "lines": {
+    "outside": "of the outside runs arm 0 read as does_not_reach at or above 0.6 (at least 10 runs, or the probe is redesigned and nothing is adopted), the adopted arm reads none as reaches_it at or above 0.6, and at most 30% as cannot_determine, under the bar, or held"
+  },
+  "adoption": "arm 1 if it meets the outside line (at least 10 runs arm 0 read as holding; none of them turned to reaches_it; at most 30% to cannot_determine, under the bar, or held); else nothing is wired and the numbers go to the owner. Arm 2 is out by version 1's check-value line.",
+  "targets": [],
+  "outside": [
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "download_external_blobs",
+      "call": "wa::SyncdSnapshot::decode(data.as_slice())",
+      "checks": [],
+      "requirement": "The operation `decode` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "decode"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 process_parsed_patch_list · download_external_blobs(&mut pl, &download)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "process_parsed_patch_list",
+      "call": "download_external_blobs(&mut pl, &download)",
+      "checks": [],
+      "requirement": "The operation `download_external_blobs` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "download_external_blobs"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 process_patch_lists · download_external_blobs(&mut pl, download)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "process_patch_lists",
+      "call": "download_external_blobs(&mut pl, download)",
+      "checks": [],
+      "requirement": "The operation `download_external_blobs` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "download_external_blobs"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdMutations::decode(data.as_slice())",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "download_external_blobs",
+      "call": "wa::SyncdMutations::decode(data.as_slice())",
+      "checks": [],
+      "requirement": "The operation `decode` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "decode"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "process_parsed_patch_list",
+      "call": "process_patch_list(pl, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_patch_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_patch_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "process_patch_lists",
+      "call": "process_patch_list(pl, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_patch_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_patch_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 decode_patch_list_ref · process_parsed_patch_list(pl, download, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "decode_patch_list_ref",
+      "call": "process_parsed_patch_list(pl, download, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_parsed_patch_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_parsed_patch_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 decode_patch_list · process_parsed_patch_list(pl, download, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "decode_patch_list",
+      "call": "process_parsed_patch_list(pl, download, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_parsed_patch_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_parsed_patch_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · process_patch_lists(patch_lists, download, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "decode_multi_patch_list_ref",
+      "call": "process_patch_lists(patch_lists, download, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_patch_lists` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_patch_lists"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 decode_multi_patch_list · process_patch_lists(patch_lists, download, validate_macs)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "decode_multi_patch_list",
+      "call": "process_patch_lists(patch_lists, download, validate_macs)",
+      "checks": [],
+      "requirement": "The operation `process_patch_lists` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_patch_lists"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 process_app_state_sync_task · process_parsed_patch_list(pl, &download, true)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "src/client/app_state.rs",
+      "function": "process_app_state_sync_task",
+      "call": "process_parsed_patch_list(pl, &download, true)",
+      "checks": [],
+      "requirement": "The operation `process_parsed_patch_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_parsed_patch_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "case": "whatsapp-rust-759",
+      "repo": "whatsapp-rust",
+      "head": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+      "file": "wacore/src/appstate_sync.rs",
+      "function": "decode_patch_list_ref",
+      "call": "parse_patch_list_ref(stanza_root)",
+      "checks": [],
+      "requirement": "The operation `parse_patch_list_ref` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "parse_patch_list_ref"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 collect_inputs_recursive · collect_inputs_recursive(&path, ignore, inputs)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/build.rs",
+      "function": "collect_inputs_recursive",
+      "call": "collect_inputs_recursive(&path, ignore, inputs)",
+      "checks": [],
+      "requirement": "The operation `collect_inputs_recursive` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "collect_inputs_recursive"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 python_which · Cache::new()",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/python.rs",
+      "function": "python_which",
+      "call": "Cache::new()",
+      "checks": [],
+      "requirement": "The operation `new` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "new"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 collect_inputs_recursive · fs::read_dir(current)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/build.rs",
+      "function": "collect_inputs_recursive",
+      "call": "fs::read_dir(current)",
+      "checks": [],
+      "requirement": "The operation `read_dir` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "read_dir"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 collect_build_inputs · collect_inputs_recursive(project_root, &ignore, &mut inputs)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/build.rs",
+      "function": "collect_build_inputs",
+      "call": "collect_inputs_recursive(project_root, &ignore, &mut inputs)",
+      "checks": [],
+      "requirement": "The operation `collect_inputs_recursive` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "collect_inputs_recursive"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 handle_python_command · python_which(args)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/python.rs",
+      "function": "handle_python_command",
+      "call": "python_which(args)",
+      "checks": [],
+      "requirement": "The operation `python_which` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "python_which"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 handle_python_command · python_list(args)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/python.rs",
+      "function": "handle_python_command",
+      "call": "python_list(args)",
+      "checks": [],
+      "requirement": "The operation `python_list` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "python_list"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 run_drift · std::env::current_dir()",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/project.rs",
+      "function": "run_drift",
+      "call": "std::env::current_dir()",
+      "checks": [],
+      "requirement": "The operation `current_dir` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "current_dir"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 call_drift · std::env::current_dir()",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/mcp/tools/maintenance.rs",
+      "function": "call_drift",
+      "call": "std::env::current_dir()",
+      "checks": [],
+      "requirement": "The operation `current_dir` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "current_dir"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 run_python_code · find_python_interpreter()",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/run.rs",
+      "function": "run_python_code",
+      "call": "find_python_interpreter()",
+      "checks": [],
+      "requirement": "The operation `find_python_interpreter` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "find_python_interpreter"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 handle_python_command · python_install(args)",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/python.rs",
+      "function": "handle_python_command",
+      "call": "python_install(args)",
+      "checks": [],
+      "requirement": "The operation `python_install` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "python_install"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 call_drift · serde_json::to_string(&json!({ \"error\": \"pyproject.toml not found\", \"undeclared_imports\": [], \"unused_declarations\": [], \"analysis_notes\": [\"pyproject.toml not found\"], \"files_scanned\": 0",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/mcp/tools/maintenance.rs",
+      "function": "call_drift",
+      "call": "serde_json::to_string(&json!({ \"error\": \"pyproject.toml not found\", \"undeclared_imports\": [], \"unused_declarations\": [], \"analysis_notes\": [\"pyproject.toml not found\"], \"files_scanned\": 0",
+      "checks": [],
+      "requirement": "The operation `to_string` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "to_string"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "pybun-428 run_python_code · sandbox::apply_python_sandbox( &mut cmd, sandbox::SandboxConfig { allow_network, allow_read: args.allow_read.clone(), allow_write: args.allow_write.clone(),",
+      "case": "pybun-428",
+      "repo": "pybun",
+      "head": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+      "file": "src/commands/run.rs",
+      "function": "run_python_code",
+      "call": "sandbox::apply_python_sandbox( &mut cmd, sandbox::SandboxConfig { allow_network, allow_read: args.allow_read.clone(), allow_write: args.allow_write.clone(),",
+      "checks": [],
+      "requirement": "The operation `apply_python_sandbox` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "apply_python_sandbox"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/control_plane/handlers/recurring_jobs.rs",
+      "function": "do_run_recurring_job",
+      "call": "get_db()",
+      "checks": [],
+      "requirement": "The operation `get_db` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "get_db"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 perform_later · get_db()",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/core.rs",
+      "function": "perform_later",
+      "call": "get_db()",
+      "checks": [],
+      "requirement": "The operation `get_db` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "get_db"
+      ]
+    },
+    {
+      "set": "outside-check",
+      "id": "quebec-136 do_run_recurring_job · NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/control_plane/handlers/recurring_jobs.rs",
+      "function": "do_run_recurring_job",
+      "call": "NotifyManager::send_notify(&state.ctx.name, db, queue)",
+      "checks": [
+        "should_send_notify"
+      ],
+      "requirement": "The operation `send_notify` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "send_notify"
+      ]
+    },
+    {
+      "set": "outside-check",
+      "id": "quebec-136 perform_later · NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/core.rs",
+      "function": "perform_later",
+      "call": "NotifyManager::send_notify(&self.ctx.name, &*db, &job_model.queue_name)",
+      "checks": [
+        "should_notify",
+        "should_send_notify"
+      ],
+      "requirement": "The operation `send_notify` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "send_notify"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/core.rs",
+      "function": "enqueue_job",
+      "call": "query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "checks": [],
+      "requirement": "The operation `insert_returning` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "insert_returning"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 insert_all_returning · insert_returning( db, table_config, &row.queue_name, &row.class_name, row.arguments.as_deref(),",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/query_builder.rs",
+      "function": "insert_all_returning",
+      "call": "insert_returning( db, table_config, &row.queue_name, &row.class_name, row.arguments.as_deref(),",
+      "checks": [],
+      "requirement": "The operation `insert_returning` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "insert_returning"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/core.rs",
+      "function": "handle_concurrency_conflict",
+      "call": "query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "checks": [],
+      "requirement": "The operation `mark_finished` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "mark_finished"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/entities/quebec_failed_executions.rs",
+      "function": "route_retried_job",
+      "call": "query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "checks": [],
+      "requirement": "The operation `mark_finished` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "mark_finished"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/entities/quebec_failed_executions.rs",
+      "function": "discard",
+      "call": "query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "checks": [],
+      "requirement": "The operation `mark_finished` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "mark_finished"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "quebec-136 enqueue_job · serde_json::from_str(&job.arguments)",
+      "case": "quebec-136",
+      "repo": "quebec",
+      "head": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+      "file": "src/core.rs",
+      "function": "enqueue_job",
+      "call": "serde_json::from_str(&job.arguments)",
+      "checks": [],
+      "requirement": "The operation `from_str` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "from_str"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_annotations · read_all()",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/commands.rs",
+      "function": "get_annotations",
+      "call": "read_all()",
+      "checks": [],
+      "requirement": "The operation `read_all` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "read_all"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 create_annotation · create_annotation(data)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/commands.rs",
+      "function": "create_annotation",
+      "call": "create_annotation(data)",
+      "checks": [],
+      "requirement": "The operation `create_annotation` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "create_annotation"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 update_annotation · update_annotation(&id, data)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/commands.rs",
+      "function": "update_annotation",
+      "call": "update_annotation(&id, data)",
+      "checks": [],
+      "requirement": "The operation `update_annotation` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "update_annotation"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_all_pending · get_pending()",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_all_pending",
+      "call": "get_pending()",
+      "checks": [],
+      "requirement": "The operation `get_pending` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "get_pending"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 resolve · update_annotation(&params.annotation_id, data)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "resolve",
+      "call": "update_annotation(&params.annotation_id, data)",
+      "checks": [],
+      "requirement": "The operation `update_annotation` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "update_annotation"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_source_location · get_annotation(&params.annotation_id)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_source_location",
+      "call": "get_annotation(&params.annotation_id)",
+      "checks": [],
+      "requirement": "The operation `get_annotation` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "get_annotation"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_component_stack · get_annotation(&params.annotation_id)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_component_stack",
+      "call": "get_annotation(&params.annotation_id)",
+      "checks": [],
+      "requirement": "The operation `get_annotation` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "get_annotation"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_project_structure · std::env::current_dir()",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_project_structure",
+      "call": "std::env::current_dir()",
+      "checks": [],
+      "requirement": "The operation `current_dir` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "current_dir"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_all_pending · serde_json::to_string_pretty(&result)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_all_pending",
+      "call": "serde_json::to_string_pretty(&result)",
+      "checks": [],
+      "requirement": "The operation `to_string_pretty` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "to_string_pretty"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 resolve · serde_json::to_string_pretty(&result)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "resolve",
+      "call": "serde_json::to_string_pretty(&result)",
+      "checks": [],
+      "requirement": "The operation `to_string_pretty` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "to_string_pretty"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_source_location · serde_json::to_string_pretty(&result)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_source_location",
+      "call": "serde_json::to_string_pretty(&result)",
+      "checks": [],
+      "requirement": "The operation `to_string_pretty` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "to_string_pretty"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "instruckt-tauri-9 get_component_stack · serde_json::to_string_pretty(&result)",
+      "case": "instruckt-tauri-9",
+      "repo": "instruckt-tauri",
+      "head": "a808734a5b264a433e74f96126b9a8159c19e641",
+      "file": "src/mcp/server.rs",
+      "function": "get_component_stack",
+      "call": "serde_json::to_string_pretty(&result)",
+      "checks": [],
+      "requirement": "The operation `to_string_pretty` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "to_string_pretty"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 validate_and_accept_proposal · validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/batches.rs",
+      "function": "validate_and_accept_proposal",
+      "call": "validate_batch( &conn, *anchor_height, *anchor_hash, &txid_strs, last_height,",
+      "checks": [],
+      "requirement": "The operation `validate_batch` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "validate_batch"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 try_fulfill_pending_proposal · make_value()",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/batches.rs",
+      "function": "try_fulfill_pending_proposal",
+      "call": "make_value()",
+      "checks": [],
+      "requirement": "The operation `make_value` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "make_value"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 handle_get_value · make_value()",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/batches.rs",
+      "function": "handle_get_value",
+      "call": "make_value()",
+      "checks": [],
+      "requirement": "The operation `make_value` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "make_value"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 handle_finalized · process_decided_batch( *anchor_height, *anchor_hash, certificate.height, &cert_bytes, &full_txs,",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/batches.rs",
+      "function": "handle_finalized",
+      "call": "process_decided_batch( *anchor_height, *anchor_hash, certificate.height, &cert_bytes, &full_txs,",
+      "checks": [],
+      "requirement": "The operation `process_decided_batch` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "process_decided_batch"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 rollback · refresh_validator_set()",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/blocks.rs",
+      "function": "rollback",
+      "call": "refresh_validator_set()",
+      "checks": [],
+      "requirement": "The operation `refresh_validator_set` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "refresh_validator_set"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 handle_block · refresh_validator_set()",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/blocks.rs",
+      "function": "handle_block",
+      "call": "refresh_validator_set()",
+      "checks": [],
+      "requirement": "The operation `refresh_validator_set` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "refresh_validator_set"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "get_decided_from_anchor",
+      "call": "select_batches_from_anchor(conn, from_anchor as i64)",
+      "checks": [],
+      "requirement": "The operation `select_batches_from_anchor` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "select_batches_from_anchor"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_block_latest(conn)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "load_raw_txs_if_unfinalized",
+      "call": "select_block_latest(conn)",
+      "checks": [],
+      "requirement": "The operation `select_block_latest` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "select_block_latest"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 batch_to_decided · decode_commit_certificate(proto)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "batch_to_decided",
+      "call": "decode_commit_certificate(proto)",
+      "checks": [],
+      "requirement": "The operation `decode_commit_certificate` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "decode_commit_certificate"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 get_decided_range · batch_to_decided(b)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "get_decided_range",
+      "call": "batch_to_decided(b)",
+      "checks": [],
+      "requirement": "The operation `batch_to_decided` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "batch_to_decided"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "min_decided_height",
+      "call": "select_min_batch_height(conn)",
+      "checks": [],
+      "requirement": "The operation `select_min_batch_height` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "select_min_batch_height"
+      ]
+    },
+    {
+      "set": "outside-none",
+      "id": "kontor-385 validate_batch · select_existing_txids(conn, txids)",
+      "case": "kontor-385",
+      "repo": "Kontor",
+      "head": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+      "file": "core/indexer/src/reactor/consensus_state.rs",
+      "function": "validate_batch",
+      "call": "select_existing_txids(conn, txids)",
+      "checks": [],
+      "requirement": "The operation `select_existing_txids` must not be performed unless the check before it passes.",
+      "searchHints": [
+        "select_existing_txids"
+      ]
+    }
+  ]
+}

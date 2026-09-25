@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "oxidezap/whatsapp-rust#759 — a check-before-action requirement written for the outside line of #82's probe of the words (version 3)",
+  "summary": "Written on 2026-09-25 after reading download_external_blobs in wacore/src/appstate_sync.rs at the pull request's head, before any request of version 3: the snapshot is downloaded only when the patch list has none (pl.snapshot.is_none()).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "An external snapshot must not be downloaded for a patch list that already has a snapshot.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["download"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

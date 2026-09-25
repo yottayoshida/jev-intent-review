@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "oxidezap/whatsapp-rust#759 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading process_app_state_sync_task in src/client/app_state.rs at the pull request's head, before any request of version 4: the task returns before reading the version when the client is shutting down (self.is_shutting_down(), a method of the repository whose body the run can send).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "The app state version must not be read from the backend while the client is shutting down.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["get_version", "backend"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

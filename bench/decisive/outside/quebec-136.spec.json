@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "ratazzi/quebec#136 — a check-before-action requirement written for the outside line of #82's probe of the words (version 3)",
+  "summary": "Written on 2026-09-25 after reading enqueue_job in src/scheduler.rs at the pull request's head, before any request of version 3: the concurrency constraint is resolved only for a class with concurrency control (ctx.has_concurrency_control), a method of the repository whose body the run can send.",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A concurrency constraint must not be resolved for a job class that has no concurrency control.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["get_concurrency_constraint", "get_runnable"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

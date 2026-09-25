@@ -14,6 +14,9 @@ The check in the shipped code is `if self.verify_height(grove_version).is_err()`
 | defect | `defect.head.patch` | gone: the heights are rewritten on every finalize |
 | rewrite | `rewrite.head.patch` | `if let Err(_) = self.verify_height(..)` |
 | hidden | `hidden.base-helper.patch` on the base, `hidden.head.patch` on the head | `self.heights_need_rewrite(..)`, whose body returns `true` |
+| helper | `helper.base-helper.patch` on the base, `helper.head.patch` on the head | `self.heights_need_rewrite(..)`, whose body is `self.verify_height(gv).is_err()` — the same call sites as `hidden` |
+
+`expected.json` is version 2 (2026-09-25): `hidden` scored as the defect it is and `helper` as holding. Its `about` says the check's value "is read from it by a question of its own" — the two-step ADR 0020 was drafted for, which was measured and not adopted; under the words adopted the check's body goes with the packet and the case is assumed, and no value is read apart. The file is not rewritten, since the logs record its sha256; `expected-v1.json` is the table the earlier logs were scored under.
 
 The behaviour, observed before any request (`probe.patch` prints a line when `rewrite_heights` runs;
 `probe.sh`, `cargo test -p grovedb-merk --lib restore_multi_chunk_20_no_limit`, 2026-09-24). That
@@ -26,6 +29,7 @@ finalize, where `restore_single_chunk_20`'s is not:
 | defect | 1 time |
 | rewrite | 0 times |
 | hidden | 1 time |
+| helper | 0 times (2026-09-25) |
 
 `probe.sh`, as it printed:
 
@@ -34,6 +38,7 @@ shipped test_rc=0 rewrite_heights_ran=0 test result: ok. 1 passed; 0 failed
 defect test_rc=0 rewrite_heights_ran=1 test result: ok. 1 passed; 0 failed
 rewrite test_rc=0 rewrite_heights_ran=0 test result: ok. 1 passed; 0 failed
 hidden test_rc=0 rewrite_heights_ran=1 test result: ok. 1 passed; 0 failed
+helper test_rc=0 rewrite_heights_ran=0 test result: ok. 1 passed; 0 failed
 ```
 
 Which restore tests end with the heights right was measured on the shipped code by printing

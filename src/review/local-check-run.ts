@@ -3,7 +3,7 @@
 // What the ordinary run does is ask, for each place discovery offers, whether the requirement
 // holds there. Measured over ten real pull requests that never produced a VERIFIED. This path asks
 // something smaller and answerable instead, about one call at a time — **when this call fails, does
-// this function return a success?**, or **in a case the requirement forbids it, is this call still
+// this function return a success?**, or **in the case the requirement forbids it, is this call still
 // made?** Which of those is the requirement's form (`plan/forms.ts`, docs/adr/0006). The bench that
 // settled the first wording is in `docs/`; what is new here is that a run can reach it from a pull
 // request rather than from a person naming a function and a call.
@@ -39,14 +39,14 @@
 
 import { analyzeChange, type ChangeAnalysis } from "../change/seeds.ts";
 import { Discoverer, isTestPath } from "../discovery/discover.ts";
-import { buildEvidence } from "../evidence/builder.ts";
+import { buildEvidence, decisiveBodies, type SentBody } from "../evidence/builder.ts";
 import { redact } from "../evidence/redact.ts";
 import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
-import { applicabilityOf, definitionsOfName } from "../plan/applicability.ts";
-import type { CallCandidate, FunctionCandidate } from "../plan/candidates.ts";
+import { applicabilityOf, definitionsOfName, functionDefinitionsOf } from "../plan/applicability.ts";
+import { enumerate, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
 import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
 import { BAR, describe, locateCall, type LocalResult } from "../plan/local-check.ts";
@@ -103,6 +103,10 @@ export interface Observed {
   result: LocalResult;
   /** What the one rule made of the mapping and this reading, for this call only. */
   outcome: Outcome;
+  /** The bodies sent with the packet because the reading turns on them (ADR 0019). Absent: none. */
+  sent?: SentBody[];
+  /** Functions a sent check calls whose bodies were not sent (more than one definition, or no room): named, not required. */
+  notSent?: string[];
 }
 
 export interface Unchecked {
@@ -145,6 +149,10 @@ export interface Finding {
   probability: number;
   /** Assembled from the parts above. No sentence here was written by a model. */
   why: string;
+  /** The bodies sent with the packet because the reading turns on them (ADR 0019). Absent: none. */
+  sent?: SentBody[];
+  /** Functions a sent check calls whose bodies were not sent (more than one definition, or no room): named, not required. */
+  notSent?: string[];
 }
 
 /**
@@ -389,6 +397,34 @@ export async function runLocalCheck(
     return enumerated.find((fn) => fn.name === callee && fn.path === def.path && def.line >= fn.startLine && def.line <= fn.endLine) ?? null;
   };
 
+  // What a form is given to name the code a reading turns on (ADR 0019): the function's calls, from
+  // the listing the run already has for its file — a sibling's file is listed here once, since it is
+  // not among the change's sources — and whether the repository defines a name. Both depend on the
+  // commit alone, so each is looked up once.
+  const listings = new Map<string, Promise<ReturnType<typeof enumerate> | null>>();
+  const callsOf = async (fn: FunctionCandidate): Promise<CallCandidate[]> => {
+    const own = fromChange.sources.get(fn.path)?.candidates;
+    if (own) return own.calls.filter((c) => c.functionId === fn.id);
+    let listing = listings.get(fn.path);
+    if (!listing) {
+      listing = discoverer.index(fn.path).then((index) => (index ? enumerate(fn.path, index.lines.join("\n")) : null));
+      listings.set(fn.path, listing);
+    }
+    const l = await listing;
+    // Ids are positional within a listing, so a function of another listing is matched by place.
+    const same = l?.functions.find((f) => f.name === fn.name && f.startLine === fn.startLine);
+    return same ? l!.calls.filter((c) => c.functionId === same.id) : [];
+  };
+  const definedNames = new Map<string, Promise<boolean>>();
+  const defined = (name: string): Promise<boolean> => {
+    let d = definedNames.get(name);
+    if (!d) {
+      d = functionDefinitionsOf(discoverer, name).then(({ found, more }) => found.length > 0 || more);
+      definedNames.set(name, d);
+    }
+    return d;
+  };
+
   // One call's two questions, in two requests, into one requirement's records. The same for the
   // calls the change reached and for its siblings, so a sibling is asked exactly as they are.
   const askSite = async (requirement: Requirement, form: Form, quote: string, site: Site, into: Collected): Promise<{ asked: number; mapped: number }> => {
@@ -413,6 +449,25 @@ export async function runLocalCheck(
     if (!located.ok) {
       into.unchecked.push({ ...placeOf(site), why: located.reason ?? "the call could not be located in the body read here" });
       return tally;
+    }
+    // The code the reading turns on (ADR 0019): sent with the packet, or the call is not asked about.
+    // Held here, after the budget, as a body that did not fit is: the budget and its counts do not move.
+    const decisive = await form.decisive({ requirement, fn: site.fn, call: site.call, body, calls: await callsOf(site.fn), defined });
+    if ("hold" in decisive) {
+      into.unchecked.push({ ...placeOf(site), why: decisive.hold });
+      return tally;
+    }
+    let sent: SentBody[] = [];
+    let notSent: string[] = [];
+    if (decisive.send.length > 0) {
+      const bodies = await decisiveBodies(discoverer, decisive.send, site.fn);
+      if ("hold" in bodies) {
+        into.unchecked.push({ ...placeOf(site), why: bodies.hold });
+        return tally;
+      }
+      evidence.packet.evidence.related.push(...bodies.related);
+      sent = bodies.sent;
+      notSent = bodies.notSent;
     }
     const place = placeOf(site);
 
@@ -458,7 +513,7 @@ export async function runLocalCheck(
       form,
       { mapping: MAPPING_BAR, observation: BAR },
     );
-    into.observed.push({ ...place, callId: site.call.id, result, outcome });
+    into.observed.push({ ...place, callId: site.call.id, result, outcome, ...(sent.length > 0 ? { sent } : {}), ...(notSent.length > 0 ? { notSent } : {}) });
 
     if (outcome === "violates") {
       into.findings.push({
@@ -476,6 +531,8 @@ export async function runLocalCheck(
         observation: result.observation,
         probability: result.probability,
         why: form.words.whyListed(site.fn.name, mapping, result.observation, result.probability),
+        ...(sent.length > 0 ? { sent } : {}),
+        ...(notSent.length > 0 ? { notSent } : {}),
       });
     }
     return tally;

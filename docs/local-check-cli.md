@@ -85,7 +85,7 @@ sure. A spec's requirement is not asked; nor is one on a run that read no functi
 |---|---|---|
 | a call can be asked about when | its callee settles to something that returns a `Result` — one `fn` of its name in the repository, the one the call's path or form picks out of several, a trait's method whose versions all return one, or, for a call that writes a path, a function of the table in *Functions this repository does not define* — and the function returns a `Result` too (see *Whether a function returns a `Result`* below) | a word of its name (its path and the receivers before it, split at `_` and at case changes) is a word of the requirement or of `searchHints`; and its callee is not a function this run reads on its own |
 | the requirement is asked whether it requires that | a failure of this call not reach the caller as a success | a check pass before this call is made |
-| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in a case the requirement says this call must not be made |
+| the function is asked, assuming that | this call returns an error and every other operation succeeds | the function is called in the case the requirement describes, in which it says this call must not be made, and every other operation succeeds unless the case itself decides it — with the bodies of the checks named above the call sent along (ADR 0019, ADR 0020) |
 | what the function does | `returns_error` / `returns_success` / `cannot_determine` | `does_not_reach` / `reaches_it` / `cannot_determine` |
 | against the requirement | `returns_success` | `reaches_it` |
 
@@ -379,7 +379,7 @@ requirement `unreached`: the notes, of `notes`, that say something was not read.
 Each requirement's section names its form and, after the counts, how the calls read came out. Every
 call read is in exactly one of the first four sections; the label of the function's answer
 (`Jev, on what the function returns` / `Jev, on whether the function still makes the call`, and
-`when that call fails` / `in a case the requirement forbids it` in the list of calls read) is the
+`when that call fails` / `in the case the requirement forbids it` in the list of calls read) is the
 form's.
 
 | section | what it holds |
@@ -388,13 +388,55 @@ form's.
 | **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
 | **Not settled** | a call read, and not settled either way: the mapping `unknown`, or under the bar, or unanswered; or the requirement applying and the function's answer `cannot_determine`, under the bar, or unanswered — each says which |
 | **Read, but not required of by the requirement** | `does_not_apply` over the bar |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, or the budget was spent |
+| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
 | **Notes** | caps that dropped candidates, files that could not be read, and what the change did not reach |
 
 None of the four is a requirement verdict: each is what two answers about one call came to. A
 listed call rests on two Jev readings that do not check each other. Everything either of them used
 is printed so it can be thrown out. `--json` carries the form, every mapping, every reading with its
 `outcome` (`violates` / `satisfies` / `unknown` / `aside`), and every option's probability.
+
+### The code a reading turns on
+
+**A call is read as worth checking or as holding only when the code its form names as deciding the
+reading was sent to Jev. A call whose deciding code could not be sent is not asked about: it is under
+*Not checked*, which says what was not sent** (ADR 0019). Jev is sent the body of the function a call
+is in; each form names, from that body's text and without asking Jev, what else the reading turns on:
+
+- **`failure_propagation`**: a failure passed to this repository's own function before it reaches `?`
+  — `step_outcome(self.rewrite_heights(v))?` — is that function's to return, and its body is not
+  sent, so the call is not asked about. The function is one the call is an argument of, whose name
+  the repository defines outside its tests and is not one every repository has (`Ok`, `Some`, `Err`,
+  `new`, `from`, `into`, `timeout`, `spawn`, `spawn_blocking`, `block_on`, `drop`).
+- **`check_before_action`**: the checks above the call — calls in an `if`, `while` or `match` (and its
+  guards), in an `ensure!`, `assert!` or `debug_assert!`, in a `let … else`, or the whole of a
+  statement that `?`-s its result, through methods chained on it, and binds nothing (`check(x)?;`,
+  `check(x).map_err(E::from)?;`, `let _ = check(x)?;`), whose own name meets the requirement's words
+  and does not start with a capital — are sent with the packet: each body when its name has exactly
+  one definition outside the tests and it fits 4,000 characters (8,000 for all of them). A check with
+  more than one definition, or too long, holds the call; one defined inside the function asked about
+  is already in the packet. A report lists under each call the bodies that went with it.
+
+Beyond the checks, the functions a sent check calls, one level down, go with it while there is room
+and their names have one definition — grovedb#500's `verify_height` decides in `verify_tree_height`.
+**That second level is not promised**: what did not go is named under the call (`not sent: …`), and
+the call is asked all the same.
+
+What it does not name, and so does not promise: a failure passed on through a method
+(`.map_err(…)`, `.ok()`: the repositories measured define their own `map_err`, `context`, `ok`, so a
+method's name does not tell theirs from the standard library's), through a constructor, a tuple, an
+array or a macro first (`wrap(Some(call()))`), or through a variable over several statements; a check
+that is not in a condition — a `?` statement whose chain has a `?` before its last, a method
+argument with a `;` in it (a closure with a block), or a typed `let _: T =` is not read as one —,
+whose name does not meet the words, or that the repository does not
+define (a dependency's, the standard library's), and whatever decides from the second level down.
+Those readings rest on what was sent, as before, and *Read as holding*'s warning holds for them.
+Which definition a name reaches is found by the name alone, among the files the run reads
+(`repository.include`): #83 is where that is resolved. A name the repository shares with a library
+(`join`, `retry`) is taken for the repository's, which holds a call that could have been asked — the
+cautious side. `--json` carries, on an observed call and on a finding, `sent` (each body's `name`,
+`path`, `lines` and `depth`) and `notSent` (the names of the second level that did not go), each
+absent when empty; a held call is in `unchecked` with its `why`.
 
 ## Exit codes
 
@@ -921,6 +963,82 @@ FAIL: every scored version meets its row in each of 3 runs
 - So on the code of both pull requests, the form separates the removed check from the shipped code
   and a rewrite in 17 of 18 scored runs; a check hidden in a helper it is not shown is, as for the
   failure form, not something it can see.
+
+### The checks' bodies sent, and the words that assume the case (#82)
+
+The hidden versions above were read as holding, or not settled, because the check's body was not
+sent. Sent (ADR 0019: the checks above the call in a condition whose name meets the requirement,
+one definition each, and what they call one level down), under the words above — "assume … the
+check it asks for does not pass" — the constructed case's hidden version turned from holding to the
+defect it is (`reaches_it` 0.80–0.83, three of three; `bench/logs/check-before-action-v2.json`),
+moltis#1064's moved and stayed holding (`does_not_reach` 1.00 → 0.83–0.88;
+`bench/logs/check-before-action-real-v3.json`), and grovedb#500's did not move
+(`cannot_determine` 0.50–0.57). A body is read when the function is eight lines; a seventy-line
+function with `debug!("auto-title: too few messages, skipping")` in its other arm is read by that.
+
+So the words changed (ADR 0020): the question assumes the case the requirement describes, says the
+bodies under `evidence.related` are those of functions the function calls, and that every other
+operation succeeds unless the case itself decides it — nothing about a check. Measured before it
+was wired, on the same packets, the old words as the control, the arms interleaved so the host's
+version cannot tell them apart, the lines fixed first (`bench/decisive/words-probe*.json`,
+`bench/logs/words-probe-v[1-4].json`, 848 requests over four versions): with a fifth version of each
+case, **helper** — the check moved into a helper that checks, the same call sites as hidden and the
+helper the only difference (its body, and its parameter's name: hidden's helper takes `_history`,
+`_grove_version`, `_record`, an underscore that says the parameter is unused and a cue a reader
+could go by without the body; the hidden versions were built and measured with it before this,
+and are not rebuilt) — the new words read every hidden version as reaching the call
+(0.79–0.99) and every helper as not (0.88–1.00), the shipped, rewrite and defect versions as before.
+A two-step that reads each check's value from its own body first (the ADR's draft) read
+grovedb#500's `heights_need_rewrite`, whose body is `true`, as `false` three times of three under
+its doc comment and the sentence's double negative, and is not adopted. On twelve
+check-before-action sentences written from real guards in four pull requests the rules were not
+written on (`bench/decisive/outside/`), of 25 runs the old words read as holding the new words held
+21, read 3 under the bar, and read one as reaching at exactly 0.60 — the snapshot's `decode` under
+the sentence about mutations, a call the sentence does not govern and the old words themselves
+held in two runs of three. The line said none; the owner ruled it the line's coarseness (it counted
+observations without the mapping, which sets that call aside) and adopted the words with this
+written down. What the probe does not show is that Jev evaluates rather than skims in general.
+
+Measured again under the adopted words, the same cases, patches and tables — with hidden scored as
+the defect it is and helper as holding (version 2 of each `expected.json`; the tables the earlier
+logs were scored under are kept as `expected-v1.json`) — three runs of every version
+(`bench/logs/check-before-action-real-v4.json`, `bench/logs/check-before-action-v3.json`):
+
+<!-- check-before-action-real-v4:begin -->
+```
+grovedb-500 scored:
+  shipped  3/3
+  defect   1/3
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+      finalize · rewrite_heights(grove_version): unknown, expected violates
+  rewrite  3/3
+  hidden   3/3
+  helper   3/3
+grovedb-500 recorded, not scored:
+moltis-1064 scored:
+  shipped  3/3
+  defect   3/3
+  rewrite  3/3
+  hidden   3/3
+  helper   3/3
+moltis-1064 recorded, not scored:
+FAIL: every scored version meets its row in each of 3 runs
+```
+<!-- check-before-action-real-v4:end -->
+
+- **Every hidden version is listed, every helper holds, in three runs of three** — grovedb#500's
+  `heights_need_rewrite` and moltis#1064's `has_enough_messages` with a body of `true`, the
+  constructed case's `reject_disabled` with `Ok(())`, each listed (`reaches_it` 0.81–0.99); the same
+  call sites with a helper that checks, each holding (`does_not_reach` 0.86–1.00). The shipped code
+  and the rewrite hold as before, moltis#1064's and the constructed case's defects are listed as
+  before (`bench/logs/check-before-action-v3.json`: shipped, defect, rewrite, hidden and helper three
+  of three, the caller version recorded as the table reads).
+- **grovedb#500's defect is listed in one run of three**: the observation read `reaches_it`
+  0.88–0.92 in every run — the line version 2 of `bench/decisive/expected.json` holds it to — and
+  the mapping, which #82 did not change, came back `applies` 0.63, 0.58, 0.59: under the bar twice,
+  as it had on 2026-09-25 under the old words (0.53–0.54) and had not the day before (0.61–0.62 in
+  two of three). The scorer above reads outcomes, so it says 1/3 and FAIL; the row's own line is
+  met. 832 requests over 30 runs, and 108 over 18 for the constructed case.
 
 ### The order inside a function
 

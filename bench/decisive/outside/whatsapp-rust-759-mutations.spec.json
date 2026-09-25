@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "oxidezap/whatsapp-rust#759 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading download_external_blobs in wacore/src/appstate_sync.rs at the pull request's head, before any request of version 4: a patch's external mutations are downloaded and decoded only when the patch has some (if let Some(ext) = &patch.external_mutations).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "External mutations must not be decoded for a patch that has no external mutations.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["decode"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}

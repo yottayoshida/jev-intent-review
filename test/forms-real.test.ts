@@ -24,16 +24,22 @@ test("each case asks with the sentence bench/forms/reach recorded, byte for byte
   }
 });
 
-test("every file a case names exists, and the table scores shipped, defect and rewrite and records hidden", () => {
+test("every file a case names exists, and the table scores shipped, defect, rewrite, hidden and helper (version 2, ADR 0020)", () => {
   for (const { dir, c } of loadRealCases()) {
     for (const name of Object.keys(caseFiles(dir, c))) if (!name.startsWith("spec: ")) assert.ok(existsSync(join(dir, name)), `${c.id} ${name}`);
     const expected = JSON.parse(readFileSync(join(dir, "expected.json"), "utf8")) as { scored: Record<string, Record<string, string>>; recorded: Record<string, Record<string, string>> };
     const target = `${c.target.function} · ${c.target.call}`;
-    assert.deepEqual(Object.keys(expected.scored).sort(), ["defect", "rewrite", "shipped"]);
+    assert.deepEqual(Object.keys(expected.scored).sort(), ["defect", "helper", "hidden", "rewrite", "shipped"]);
     assert.equal(expected.scored.defect![target], "violates");
     assert.equal(expected.scored.shipped![target], "satisfies");
     assert.equal(expected.scored.rewrite![target], "satisfies");
-    assert.deepEqual(Object.keys(expected.recorded), ["hidden"]);
+    assert.equal(expected.scored.hidden![target], "violates", "a check that does nothing, its body sent: the call is made in the case");
+    assert.equal(expected.scored.helper![target], "satisfies", "the same call sites with a check that checks");
+    assert.deepEqual(Object.keys(expected.recorded), []);
+    // The table the earlier logs were scored under is kept byte for byte, so they still score as they did.
+    const v1 = JSON.parse(readFileSync(join(dir, "expected-v1.json"), "utf8")) as { scored: Record<string, unknown>; recorded: Record<string, unknown> };
+    assert.deepEqual(Object.keys(v1.scored).sort(), ["defect", "rewrite", "shipped"]);
+    assert.deepEqual(Object.keys(v1.recorded), ["hidden"]);
   }
 });
 
@@ -42,7 +48,7 @@ test("a version whose target is not inside the budgets is not reached, and the m
   const target = `${one!.c.target.function} · ${one!.c.target.call}`;
   const run = (outcome: string): Distilled => ({ exit: 0, requests: 4, origins: [], observed: [{ key: target, outcome, mapping: "applies 0.9", observation: "x 0.9" }], findings: [], unchecked: [], wouldAsk: [target], counts: {} as Distilled["counts"], stderr: "" });
   const three = (outcome: string) => ({ base: "b", head: "h", runs: [run(outcome), run(outcome), run(outcome)] });
-  const right = { conditions: { files: {}, runsPerVersion: 3, provider: "" }, tool: { head: "" }, cases: { "grovedb-500": { shipped: three("satisfies"), defect: three("violates"), rewrite: three("satisfies"), hidden: three("satisfies") } } };
+  const right = { conditions: { files: {}, runsPerVersion: 3, provider: "" }, tool: { head: "" }, cases: { "grovedb-500": { shipped: three("satisfies"), defect: three("violates"), rewrite: three("satisfies"), hidden: three("violates"), helper: three("satisfies") } } };
   assert.equal(score(right, 3, [one!]).at(-1), "PASS: every scored version meets its row in each of 3 runs");
   const unreached = { ...right, cases: { "grovedb-500": { ...right.cases["grovedb-500"], defect: { base: "b", head: "h", runs: [], notInside: true as const } } } };
   const lines = score(unreached, 3, [one!]);
@@ -73,4 +79,19 @@ test("the table after ADR 0016 in docs/local-check-cli.md is exactly what check-
   assert.equal(block, score(log, 3).join("\n"));
   // Every version of both cases was asked this time: none is settled by the listing.
   for (const c of Object.values(log.cases)) for (const v of Object.values(c)) assert.ok(v && !v.notInside && v.runs.length === 3);
+});
+
+test("the table under the adopted words (ADR 0020) in docs/local-check-cli.md is exactly what check-before-action-real-v4.json scores to", () => {
+  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+  const begin = "<!-- check-before-action-real-v4:begin -->\n```\n";
+  const end = "\n```\n<!-- check-before-action-real-v4:end -->";
+  assert.equal(doc.split(begin).length - 1, 1, "exactly one table");
+  const block = doc.slice(doc.indexOf(begin) + begin.length, doc.indexOf(end));
+  const log = JSON.parse(readFileSync(new URL("../bench/logs/check-before-action-real-v4.json", import.meta.url), "utf8")) as Parameters<typeof score>[0];
+  assert.equal(block, score(log, 3).join("\n"));
+  // Every version of both cases, the helper version included, was asked: none is settled by the listing.
+  for (const c of Object.values(log.cases)) {
+    assert.deepEqual(Object.keys(c).sort(), ["defect", "helper", "hidden", "rewrite", "shipped"]);
+    for (const v of Object.values(c)) assert.ok(v && !v.notInside && v.runs.length === 3);
+  }
 });

@@ -1,0 +1,4923 @@
+{
+  "conditions": {
+    "tool": "5c8693fa0c2a1e582d5f3e6deb346d2c3126a430",
+    "plan": "fd418c5b0d20b115a652689c552aa17ec27c06a9dc48748d37fd49cd43477025",
+    "model": "typesafe/jev",
+    "bar": 0.6,
+    "runs": 3,
+    "limits": {
+      "each": 4000,
+      "total": 8000
+    }
+  },
+  "records": [
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 1,
+      "arm": 0,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "cannot_determine": 0.08,
+          "reaches_it": 0.86
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 1,
+      "arm": 1,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.95,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.95,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 2,
+      "arm": 0,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "does_not_reach": 0.06,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 2,
+      "arm": 1,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.04,
+          "reaches_it": 0.92,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.89
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 3,
+      "arm": 0,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.87,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_parsed_patch_list · process_patch_list(pl, validate_macs)",
+      "run": 3,
+      "arm": 1,
+      "packet": "455279472c68ad446b95e3b777e2b2ebeb43d76a6b65222db37be0896eff5a27",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.92,
+          "cannot_determine": 0.03
+        },
+        "confidence": 0.88
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 1,
+      "arm": 0,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.66,
+        "probabilities": {
+          "cannot_determine": 0.16,
+          "reaches_it": 0.66,
+          "does_not_reach": 0.18
+        },
+        "confidence": 0.49
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 1,
+      "arm": 1,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.7,
+          "does_not_reach": 0.28
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 2,
+      "arm": 0,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.67,
+        "probabilities": {
+          "does_not_reach": 0.18,
+          "reaches_it": 0.67,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.5
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 2,
+      "arm": 1,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.75,
+        "probabilities": {
+          "does_not_reach": 0.23,
+          "reaches_it": 0.75,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.63
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 3,
+      "arm": 0,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6,
+        "probabilities": {
+          "reaches_it": 0.6,
+          "cannot_determine": 0.17,
+          "does_not_reach": 0.23
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · process_patch_list(pl, validate_macs)",
+      "run": 3,
+      "arm": 1,
+      "packet": "83bd1596665de1aaf4b3edfb5c8638255d1255397dcade87a17940d7bcfb010f",
+      "sent": [
+        "download_external_blobs@1",
+        "download@2",
+        "decode@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "reaches_it": 0.69,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.29
+        },
+        "confidence": 0.54
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 1,
+      "arm": 0,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "reaches_it": 0.76,
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 1,
+      "arm": 1,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "cannot_determine": 0.14,
+          "reaches_it": 0.76,
+          "does_not_reach": 0.1
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 2,
+      "arm": 0,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.62,
+        "probabilities": {
+          "cannot_determine": 0.23,
+          "reaches_it": 0.62,
+          "does_not_reach": 0.15
+        },
+        "confidence": 0.43
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 2,
+      "arm": 1,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "reaches_it": 0.73,
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.6
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 3,
+      "arm": 0,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "reaches_it": 0.76,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_patch_lists · len()",
+      "run": 3,
+      "arm": 1,
+      "packet": "2bf50c5759a0bd698ad45631354d844a4f766d5c87f3fb3a0e5f28ac7448900c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 1,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "reaches_it": 0.94,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 1,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.96,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 2,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.94,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.94,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 2,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.95,
+        "probabilities": {
+          "reaches_it": 0.95,
+          "does_not_reach": 0.04,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.92
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 3,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.92,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.92,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.87
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · is_none()",
+      "run": 3,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.96,
+        "probabilities": {
+          "cannot_determine": 0.01,
+          "reaches_it": 0.96,
+          "does_not_reach": 0.03
+        },
+        "confidence": 0.94
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 1,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.85,
+        "probabilities": {
+          "does_not_reach": 0.85,
+          "reaches_it": 0.13,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 1,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.94,
+        "probabilities": {
+          "does_not_reach": 0.94,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.05
+        },
+        "confidence": 0.91
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 2,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.83,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.15
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 2,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.95,
+        "probabilities": {
+          "does_not_reach": 0.95,
+          "reaches_it": 0.04,
+          "cannot_determine": 0.01
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 3,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.13,
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.85
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · wa::SyncdSnapshot::decode(data.as_slice())",
+      "run": 3,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.96,
+        "probabilities": {
+          "does_not_reach": 0.96,
+          "cannot_determine": 0.01,
+          "reaches_it": 0.03
+        },
+        "confidence": 0.93
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 1,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6,
+        "probabilities": {
+          "reaches_it": 0.6,
+          "does_not_reach": 0.36,
+          "cannot_determine": 0.04
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 1,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.57,
+        "probabilities": {
+          "does_not_reach": 0.57,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.41
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 2,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.58,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.58,
+          "does_not_reach": 0.39
+        },
+        "confidence": 0.36
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 2,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.6,
+        "probabilities": {
+          "does_not_reach": 0.6,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.38
+        },
+        "confidence": 0.4
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 3,
+      "arm": 0,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6,
+        "probabilities": {
+          "reaches_it": 0.6,
+          "does_not_reach": 0.36,
+          "cannot_determine": 0.04
+        },
+        "confidence": 0.4
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 download_external_blobs · as_ref()",
+      "run": 3,
+      "arm": 1,
+      "packet": "3accdcb416e400f96f73bc5f72bf8ceb78857028fc35703b2c36ee1408763c6a",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.59,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "does_not_reach": 0.59,
+          "reaches_it": 0.38
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 1,
+      "arm": 0,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "cannot_determine": 0.05,
+          "reaches_it": 0.88,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 1,
+      "arm": 1,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "does_not_reach": 0.13,
+          "reaches_it": 0.74,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 2,
+      "arm": 0,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "reaches_it": 0.87,
+          "cannot_determine": 0.05,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 2,
+      "arm": 1,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "does_not_reach": 0.16,
+          "cannot_determine": 0.11,
+          "reaches_it": 0.73
+        },
+        "confidence": 0.6
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 3,
+      "arm": 0,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "cannot_determine": 0.05,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list_ref · parse_patch_list_ref(stanza_root)",
+      "run": 3,
+      "arm": 1,
+      "packet": "9398d3f42e8c9475a996dc1cf68f3001bee91ed7b8f6c6151eeb758232820424",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.75,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.75,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.63
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 1,
+      "arm": 0,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.07,
+          "reaches_it": 0.85
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 1,
+      "arm": 1,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "reaches_it": 0.77,
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 2,
+      "arm": 0,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "reaches_it": 0.87,
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 2,
+      "arm": 1,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.14,
+          "reaches_it": 0.78
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 3,
+      "arm": 0,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "cannot_determine": 0.07,
+          "reaches_it": 0.86,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_patch_list · parse_patch_list(stanza_root)",
+      "run": 3,
+      "arm": 1,
+      "packet": "519ec05505a709702227ab4938459e7c5fe5d275f4a9c32e945d1b6414cd9c69",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.08,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 1,
+      "arm": 0,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.88,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 1,
+      "arm": 1,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "reaches_it": 0.69,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.16
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 2,
+      "arm": 0,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.9,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.86
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 2,
+      "arm": 1,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.71,
+        "probabilities": {
+          "does_not_reach": 0.16,
+          "reaches_it": 0.71,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 3,
+      "arm": 0,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.87,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list_ref · parse_patch_lists_ref(stanza_root)",
+      "run": 3,
+      "arm": 1,
+      "packet": "f2f2a7fb47889d1532bf4352e66d38347cd93bfe4752770a2d4d5acc095bfce1",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.13,
+          "reaches_it": 0.74,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 1,
+      "arm": 0,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "does_not_reach": 0.04,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 1,
+      "arm": 1,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.8,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 2,
+      "arm": 0,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.89,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 2,
+      "arm": 1,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.15,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 3,
+      "arm": 0,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.87,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 decode_multi_patch_list · parse_patch_lists(stanza_root)",
+      "run": 3,
+      "arm": 1,
+      "packet": "7a034b30df364a20f5203482ca0382f04ee92ee662700d571fe50ed8fdc61649",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.78,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 1,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.89,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 1,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.83
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 2,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.89,
+        "probabilities": {
+          "cannot_determine": 0.07,
+          "reaches_it": 0.89,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 2,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.83,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 3,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.91,
+        "probabilities": {
+          "reaches_it": 0.91,
+          "does_not_reach": 0.04,
+          "cannot_determine": 0.05
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · wacore::appstate::patch_decode::parse_patch_list_ref(resp.get())",
+      "run": 3,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.08,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 1,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "does_not_reach": 0.04,
+          "reaches_it": 0.85,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 1,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "reaches_it": 0.86,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 2,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.11,
+          "reaches_it": 0.84,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 2,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.85,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 3,
+      "arm": 0,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.85,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "whatsapp-rust-759 process_app_state_sync_task · is_some()",
+      "run": 3,
+      "arm": 1,
+      "packet": "ebd3ea33f09c32fb15482fcd0a273ded4f817697326db58fc995e472042d4e9c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.05,
+          "reaches_it": 0.88
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 1,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "reaches_it": 0.77,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.17
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 1,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "does_not_reach": 0.17,
+          "reaches_it": 0.8
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 2,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.75,
+        "probabilities": {
+          "does_not_reach": 0.16,
+          "reaches_it": 0.75,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.63
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 2,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.15,
+          "reaches_it": 0.83,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 3,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "cannot_determine": 0.07,
+          "reaches_it": 0.77,
+          "does_not_reach": 0.16
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · contains(name.as_ref())",
+      "run": 3,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "reaches_it": 0.81,
+          "does_not_reach": 0.17,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 1,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.65,
+        "probabilities": {
+          "does_not_reach": 0.22,
+          "reaches_it": 0.65,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.47
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 1,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.89,
+        "probabilities": {
+          "reaches_it": 0.07,
+          "cannot_determine": 0.04,
+          "does_not_reach": 0.89
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 2,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "cannot_determine": 0.12,
+          "does_not_reach": 0.24,
+          "reaches_it": 0.64
+        },
+        "confidence": 0.45
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 2,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.89,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.08,
+          "does_not_reach": 0.89
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 3,
+      "arm": 0,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.58,
+        "probabilities": {
+          "does_not_reach": 0.28,
+          "reaches_it": 0.58,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.37
+      }
+    },
+    {
+      "id": "pybun-428 collect_inputs_recursive · push(path)",
+      "run": 3,
+      "arm": 1,
+      "packet": "8808a80325f98ccef0bece7d35bcbac846c115ead334d4a5619834c0975cbb64",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.9,
+        "probabilities": {
+          "reaches_it": 0.07,
+          "cannot_determine": 0.03,
+          "does_not_reach": 0.9
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 1,
+      "arm": 0,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "reaches_it": 0.84,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 1,
+      "arm": 1,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "reaches_it": 0.77,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.17
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 2,
+      "arm": 0,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.86,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 2,
+      "arm": 1,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.82,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 3,
+      "arm": 0,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.06,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · ignored_dirs()",
+      "run": 3,
+      "arm": 1,
+      "packet": "39aafe121841556fe6930fa22c156d345e84f65a844a8dbbc067a29e55967c1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.8,
+          "does_not_reach": 0.14
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 1,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "reaches_it": 0.81,
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 1,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.71,
+        "probabilities": {
+          "cannot_determine": 0.21,
+          "reaches_it": 0.71,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 2,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.17,
+          "reaches_it": 0.78
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 2,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.74,
+          "cannot_determine": 0.2
+        },
+        "confidence": 0.62
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 3,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.76,
+          "cannot_determine": 0.17
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListStart)",
+      "run": 3,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "cannot_determine": 0.16,
+          "reaches_it": 0.78
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 1,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.5,
+        "probabilities": {
+          "does_not_reach": 0.47,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.5
+        },
+        "confidence": 0.24
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 1,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.5700000000000001,
+        "probabilities": {
+          "cannot_determine": 0.24,
+          "reaches_it": 0.19,
+          "does_not_reach": 0.5700000000000001
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 2,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.51,
+        "probabilities": {
+          "cannot_determine": 0.04,
+          "reaches_it": 0.51,
+          "does_not_reach": 0.45
+        },
+        "confidence": 0.27
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 2,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.57,
+        "probabilities": {
+          "cannot_determine": 0.23,
+          "reaches_it": 0.2,
+          "does_not_reach": 0.57
+        },
+        "confidence": 0.36
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 3,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.51,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.51,
+          "does_not_reach": 0.47
+        },
+        "confidence": 0.26
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · error_with_code( \"E_DRIFT_NO_PYPROJECT\", format!(\"pyproject.toml not found in {}\", root.display()), \"Run `pybun init` to create a pyproject.toml, or specify a directory with `pybun drift --path <PATH>`.\", )",
+      "run": 3,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.54,
+        "probabilities": {
+          "does_not_reach": 0.54,
+          "cannot_determine": 0.25,
+          "reaches_it": 0.21
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 1,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.19,
+          "reaches_it": 0.73
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 1,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6,
+        "probabilities": {
+          "cannot_determine": 0.25,
+          "does_not_reach": 0.15,
+          "reaches_it": 0.6
+        },
+        "confidence": 0.4
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 2,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "cannot_determine": 0.21,
+          "reaches_it": 0.68,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 2,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.59,
+        "probabilities": {
+          "reaches_it": 0.59,
+          "cannot_determine": 0.28,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 3,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.66,
+        "probabilities": {
+          "reaches_it": 0.66,
+          "cannot_determine": 0.22,
+          "does_not_reach": 0.12
+        },
+        "confidence": 0.49
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · info(format!( \"sandbox enabled for inline code (allow_network={})\", allow_network ))",
+      "run": 3,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "reaches_it": 0.55,
+          "does_not_reach": 0.19,
+          "cannot_determine": 0.26
+        },
+        "confidence": 0.33
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 1,
+      "arm": 0,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "cannot_determine": 0.14,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 1,
+      "arm": 1,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "cannot_determine": 0.12,
+          "reaches_it": 0.78,
+          "does_not_reach": 0.1
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 2,
+      "arm": 0,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.11,
+          "reaches_it": 0.74
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 2,
+      "arm": 1,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "reaches_it": 0.76,
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 3,
+      "arm": 0,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.07,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "pybun-428 collect_build_inputs · sort()",
+      "run": 3,
+      "arm": 1,
+      "packet": "74562588dd8a91c3d877eb54a5e15cb5f5a0788202233210d76b1ab5f9d88f31",
+      "sent": [
+        "collect_inputs_recursive@1",
+        "path@2",
+        "contains@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 1,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "reaches_it": 0.86,
+          "cannot_determine": 0.1,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 1,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.72,
+        "probabilities": {
+          "reaches_it": 0.72,
+          "cannot_determine": 0.19,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 2,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "reaches_it": 0.86,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 2,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.16,
+          "reaches_it": 0.74,
+          "does_not_reach": 0.1
+        },
+        "confidence": 0.6
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 3,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.86,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "reaches_it": 0.86,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonListComplete)",
+      "run": 3,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "does_not_reach": 0.1,
+          "cannot_determine": 0.17,
+          "reaches_it": 0.73
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 1,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.72,
+        "probabilities": {
+          "does_not_reach": 0.1,
+          "reaches_it": 0.72,
+          "cannot_determine": 0.18
+        },
+        "confidence": 0.57
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 1,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "does_not_reach": 0.18,
+          "cannot_determine": 0.12,
+          "reaches_it": 0.7
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 2,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "reaches_it": 0.64,
+          "does_not_reach": 0.11,
+          "cannot_determine": 0.25
+        },
+        "confidence": 0.46
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 2,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.65,
+        "probabilities": {
+          "reaches_it": 0.65,
+          "cannot_determine": 0.18,
+          "does_not_reach": 0.17
+        },
+        "confidence": 0.47
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 3,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.71,
+        "probabilities": {
+          "does_not_reach": 0.11,
+          "reaches_it": 0.71,
+          "cannot_determine": 0.18
+        },
+        "confidence": 0.58
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · event(EventType::Custom)",
+      "run": 3,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.67,
+        "probabilities": {
+          "does_not_reach": 0.17,
+          "cannot_determine": 0.16,
+          "reaches_it": 0.67
+        },
+        "confidence": 0.51
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 1,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "does_not_reach": 0.25,
+          "cannot_determine": 0.2,
+          "reaches_it": 0.55
+        },
+        "confidence": 0.33
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 1,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.43,
+        "probabilities": {
+          "cannot_determine": 0.43,
+          "reaches_it": 0.27,
+          "does_not_reach": 0.3
+        },
+        "confidence": 0.14
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 2,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.62,
+        "probabilities": {
+          "does_not_reach": 0.2,
+          "cannot_determine": 0.18,
+          "reaches_it": 0.62
+        },
+        "confidence": 0.43
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 2,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.41000000000000003,
+        "probabilities": {
+          "does_not_reach": 0.27,
+          "cannot_determine": 0.41000000000000003,
+          "reaches_it": 0.32
+        },
+        "confidence": 0.11
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 3,
+      "arm": 0,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "does_not_reach": 0.25,
+          "reaches_it": 0.55,
+          "cannot_determine": 0.2
+        },
+        "confidence": 0.32
+      }
+    },
+    {
+      "id": "pybun-428 run_python_code · diagnostic( Diagnostic::error(format!( \"sandboxed process killed after exceeding --sandbox-timeout={}s\", args.sandbox_timeout )) .with_code(\"E_SANDBOX_TIMEOUT\")",
+      "run": 3,
+      "arm": 1,
+      "packet": "8c7d3b470b0f6ffc460ac8d5ebbeee5bf64ebb0edb3406302d7a6d25a56a46df",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.38,
+        "probabilities": {
+          "does_not_reach": 0.28,
+          "cannot_determine": 0.38,
+          "reaches_it": 0.34
+        },
+        "confidence": 0.06
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 1,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6799999999999999,
+        "probabilities": {
+          "reaches_it": 0.6799999999999999,
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.24
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 1,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.13,
+          "reaches_it": 0.78,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 2,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "reaches_it": 0.7,
+          "cannot_determine": 0.23,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 2,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "does_not_reach": 0.17,
+          "cannot_determine": 0.14,
+          "reaches_it": 0.69
+        },
+        "confidence": 0.54
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 3,
+      "arm": 0,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "reaches_it": 0.7,
+          "cannot_determine": 0.22,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "pybun-428 handle_python_command · event(EventType::PythonInstallStart)",
+      "run": 3,
+      "arm": 1,
+      "packet": "fe8fdc147aead05d89bd8d9954ab2c45b4f64eb48b7f3efebc45ffce34c342c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "reaches_it": 0.68,
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.16
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 1,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.56,
+        "probabilities": {
+          "does_not_reach": 0.14,
+          "reaches_it": 0.56,
+          "cannot_determine": 0.3
+        },
+        "confidence": 0.34
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 1,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.44,
+        "probabilities": {
+          "cannot_determine": 0.44,
+          "reaches_it": 0.36,
+          "does_not_reach": 0.2
+        },
+        "confidence": 0.17
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 2,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.6,
+        "probabilities": {
+          "cannot_determine": 0.31,
+          "does_not_reach": 0.09,
+          "reaches_it": 0.6
+        },
+        "confidence": 0.4
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 2,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.48,
+        "probabilities": {
+          "cannot_determine": 0.48,
+          "reaches_it": 0.35,
+          "does_not_reach": 0.17
+        },
+        "confidence": 0.21
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 3,
+      "arm": 0,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.56,
+        "probabilities": {
+          "does_not_reach": 0.11,
+          "cannot_determine": 0.32,
+          "reaches_it": 0.56
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "pybun-428 run_drift · diagnostic(Diagnostic { level: DiagnosticLevel::Warning, code: Some(\"W_DRIFT_UNDECLARED_IMPORT\".to_string()), message: format!( \"Package '{}' is imported but not declared in pyproject.toml\", u.package",
+      "run": 3,
+      "arm": 1,
+      "packet": "23f237f08277cc986f41a8caf6c0b87b83142b8aa6f60bbfa85641e99160c1c7",
+      "sent": [],
+      "answer": {
+        "choice": "cannot_determine",
+        "probability": 0.48,
+        "probabilities": {
+          "cannot_determine": 0.48,
+          "reaches_it": 0.37,
+          "does_not_reach": 0.15
+        },
+        "confidence": 0.22
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 1,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 1,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.81,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 2,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "reaches_it": 0.84,
+          "cannot_determine": 0.11,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 2,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "does_not_reach": 0.11,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 3,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.12,
+          "reaches_it": 0.84,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.75
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_db()",
+      "run": 3,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.12,
+          "reaches_it": 0.79
+        },
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 1,
+      "arm": 0,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.82,
+          "cannot_determine": 0.12
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 1,
+      "arm": 1,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.71,
+        "probabilities": {
+          "does_not_reach": 0.14,
+          "cannot_determine": 0.15,
+          "reaches_it": 0.71
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 2,
+      "arm": 0,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.13,
+          "reaches_it": 0.79
+        },
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 2,
+      "arm": 1,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "cannot_determine": 0.21,
+          "does_not_reach": 0.09,
+          "reaches_it": 0.7
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 3,
+      "arm": 0,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8099999999999999,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "reaches_it": 0.8099999999999999,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "quebec-136 perform_later · get_db()",
+      "run": 3,
+      "arm": 1,
+      "packet": "ece02127bf0cd28fbf5449d2833d92a6c39e33a630428075227b88d29c8acc87",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "does_not_reach": 0.1,
+          "cannot_determine": 0.2,
+          "reaches_it": 0.7
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 1,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "reaches_it": 0.79,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.69
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 1,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "cannot_determine": 0.14,
+          "does_not_reach": 0.07,
+          "reaches_it": 0.79
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 2,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.8,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 2,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "reaches_it": 0.76,
+          "cannot_determine": 0.15
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 3,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.18,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get(\"arguments\")",
+      "run": 3,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "reaches_it": 0.77,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 1,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.05,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 1,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.79
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 2,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.84,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 2,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 3,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.87,
+          "cannot_determine": 0.07
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · get_database_backend()",
+      "run": 3,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "reaches_it": 0.87,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.81
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 1,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "reaches_it": 0.76,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 1,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "does_not_reach": 0.22,
+          "reaches_it": 0.61,
+          "cannot_determine": 0.17
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 2,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "cannot_determine": 0.19,
+          "reaches_it": 0.69
+        },
+        "confidence": 0.54
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 2,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.59,
+        "probabilities": {
+          "cannot_determine": 0.2,
+          "reaches_it": 0.59,
+          "does_not_reach": 0.21
+        },
+        "confidence": 0.39
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 3,
+      "arm": 0,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "does_not_reach": 0.11,
+          "reaches_it": 0.73,
+          "cannot_determine": 0.16
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "quebec-136 parse_job_arguments_from_json · get_item(last_index)",
+      "run": 3,
+      "arm": 1,
+      "packet": "ff6aa5700f68057cb769a01b7e4940748c4066d5f0aa6282232165a41e10ec1c",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "does_not_reach": 0.2,
+          "reaches_it": 0.64,
+          "cannot_determine": 0.16
+        },
+        "confidence": 0.45
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 1,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.04,
+          "reaches_it": 0.88
+        },
+        "confidence": 0.83
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 1,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.75,
+        "probabilities": {
+          "reaches_it": 0.75,
+          "cannot_determine": 0.16,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.63
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 2,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "reaches_it": 0.9,
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.86
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 2,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "cannot_determine": 0.11,
+          "does_not_reach": 0.09,
+          "reaches_it": 0.8
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 3,
+      "arm": 0,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "does_not_reach": 0.03,
+          "cannot_determine": 0.07,
+          "reaches_it": 0.9
+        },
+        "confidence": 0.84
+      }
+    },
+    {
+      "id": "quebec-136 do_run_recurring_job · try_get(\"\", \"key\")",
+      "run": 3,
+      "arm": 1,
+      "packet": "79e1225e397f81fdc07e4c6f9ffa64321faeb2e5193ea2c045de1ade810899a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "cannot_determine": 0.11,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 1,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8099999999999999,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.12,
+          "reaches_it": 0.8099999999999999
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 1,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.14,
+          "reaches_it": 0.79
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 2,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.78,
+          "cannot_determine": 0.14
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 2,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.14,
+          "reaches_it": 0.81
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 3,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "cannot_determine": 0.14,
+          "reaches_it": 0.8,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · query_builder::jobs::insert_returning( txn, table_config, &job.queue_name, &job.class_name, Some(&params.to_string()),",
+      "run": 3,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "cannot_determine": 0.14,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 1,
+      "arm": 0,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "cannot_determine": 0.17,
+          "reaches_it": 0.76,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 1,
+      "arm": 1,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.53,
+        "probabilities": {
+          "does_not_reach": 0.11,
+          "reaches_it": 0.53,
+          "cannot_determine": 0.36
+        },
+        "confidence": 0.3
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 2,
+      "arm": 0,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.68,
+          "cannot_determine": 0.24
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 2,
+      "arm": 1,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.55,
+        "probabilities": {
+          "reaches_it": 0.55,
+          "cannot_determine": 0.34,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.33
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 3,
+      "arm": 0,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.7,
+          "cannot_determine": 0.22
+        },
+        "confidence": 0.56
+      }
+    },
+    {
+      "id": "quebec-136 handle_concurrency_conflict · query_builder::jobs::mark_finished(txn, table_config, job_id)",
+      "run": 3,
+      "arm": 1,
+      "packet": "5f451aa347b77a9f7d67add9163b3a42cbef328fbd567f014b8818daae262ec3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.51,
+        "probabilities": {
+          "cannot_determine": 0.36,
+          "reaches_it": 0.51,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.27
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 1,
+      "arm": 0,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.52,
+        "probabilities": {
+          "cannot_determine": 0.12,
+          "reaches_it": 0.36,
+          "does_not_reach": 0.52
+        },
+        "confidence": 0.28
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 1,
+      "arm": 1,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.73,
+        "probabilities": {
+          "does_not_reach": 0.73,
+          "cannot_determine": 0.15,
+          "reaches_it": 0.12
+        },
+        "confidence": 0.6
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 2,
+      "arm": 0,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.49,
+        "probabilities": {
+          "does_not_reach": 0.49,
+          "reaches_it": 0.39,
+          "cannot_determine": 0.12
+        },
+        "confidence": 0.23
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 2,
+      "arm": 1,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.81,
+          "cannot_determine": 0.11,
+          "reaches_it": 0.08
+        },
+        "confidence": 0.71
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 3,
+      "arm": 0,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.49,
+        "probabilities": {
+          "does_not_reach": 0.49,
+          "cannot_determine": 0.12,
+          "reaches_it": 0.39
+        },
+        "confidence": 0.23
+      }
+    },
+    {
+      "id": "quebec-136 route_retried_job · query_builder::jobs::mark_finished(txn, table_config, job.id)",
+      "run": 3,
+      "arm": 1,
+      "packet": "48245e58ae9fc8ec5ee9bfd292b0eebf5f646d3690c32a9a6fa637ec49058b92",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.76,
+          "reaches_it": 0.13,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 1,
+      "arm": 0,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.88
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 1,
+      "arm": 1,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.2
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 2,
+      "arm": 0,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "does_not_reach": 0.02,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 2,
+      "arm": 1,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "cannot_determine": 0.17,
+          "does_not_reach": 0.01,
+          "reaches_it": 0.82
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 3,
+      "arm": 0,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "cannot_determine": 0.1,
+          "reaches_it": 0.88,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "quebec-136 discard · query_builder::jobs::mark_finished(txn, table_config, self.job_id)",
+      "run": 3,
+      "arm": 1,
+      "packet": "7f6657f33984b77758b8a52d9322fee29c51bd299f44b5fd3637146475495e10",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.79,
+        "probabilities": {
+          "cannot_determine": 0.19,
+          "reaches_it": 0.79,
+          "does_not_reach": 0.02
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 1,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 1,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "cannot_determine": 0.07,
+          "reaches_it": 0.78,
+          "does_not_reach": 0.15
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 2,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.08,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 2,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "does_not_reach": 0.1,
+          "reaches_it": 0.84
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 3,
+      "arm": 0,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "reaches_it": 0.85,
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.06
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "quebec-136 enqueue_job · crate::utils::build_job_params(serde_json::json!({ \"job_class\": job.class_name, \"job_id\": job.active_job_id, \"provider_job_id\": job.active_job_id, \"queue_name\": job.queue_name, \"priority\": job.priority,",
+      "run": 3,
+      "arm": 1,
+      "packet": "0181a38b5b9ac5ad6ca06b86557cd62200a5b626f6777f045bc12420535c3a6b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.82,
+          "does_not_reach": 0.12
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 1,
+      "arm": 0,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "does_not_reach": 0.24,
+          "reaches_it": 0.74
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 1,
+      "arm": 1,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.58,
+        "probabilities": {
+          "does_not_reach": 0.58,
+          "cannot_determine": 0.02,
+          "reaches_it": 0.4
+        },
+        "confidence": 0.37
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 2,
+      "arm": 0,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "does_not_reach": 0.23,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.74
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 2,
+      "arm": 1,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.68,
+        "probabilities": {
+          "reaches_it": 0.3,
+          "does_not_reach": 0.68,
+          "cannot_determine": 0.02
+        },
+        "confidence": 0.51
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 3,
+      "arm": 0,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.71,
+        "probabilities": {
+          "does_not_reach": 0.26,
+          "cannot_determine": 0.03,
+          "reaches_it": 0.71
+        },
+        "confidence": 0.58
+      }
+    },
+    {
+      "id": "kontor-385 make_value · validate_transaction(raw_tx, parsed)",
+      "run": 3,
+      "arm": 1,
+      "packet": "e7db53781835a8ddedba8451e6ae73b83c6e2b8a07bf5528d2f66b2f78eac67e",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.64,
+        "probabilities": {
+          "cannot_determine": 0.02,
+          "reaches_it": 0.34,
+          "does_not_reach": 0.64
+        },
+        "confidence": 0.46
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 1,
+      "arm": 0,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.48,
+        "probabilities": {
+          "cannot_determine": 0.16,
+          "reaches_it": 0.36,
+          "does_not_reach": 0.48
+        },
+        "confidence": 0.21
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 1,
+      "arm": 1,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "does_not_reach": 0.26,
+          "reaches_it": 0.64,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.45
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 2,
+      "arm": 0,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.51,
+        "probabilities": {
+          "reaches_it": 0.35,
+          "cannot_determine": 0.14,
+          "does_not_reach": 0.51
+        },
+        "confidence": 0.27
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 2,
+      "arm": 1,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "reaches_it": 0.61,
+          "does_not_reach": 0.31,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 3,
+      "arm": 0,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.43,
+        "probabilities": {
+          "does_not_reach": 0.38,
+          "reaches_it": 0.43,
+          "cannot_determine": 0.19
+        },
+        "confidence": 0.15
+      }
+    },
+    {
+      "id": "kontor-385 validate_and_accept_proposal · parse_transaction(tx)",
+      "run": 3,
+      "arm": 1,
+      "packet": "ab7e3e05ee88db2b3df7b9fb539a25fc72a4fb80754df32773faa720f741aeb6",
+      "sent": [
+        "validate_batch@1",
+        "is_block@2",
+        "select_existing_txids@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.58,
+        "probabilities": {
+          "cannot_determine": 0.13,
+          "does_not_reach": 0.29,
+          "reaches_it": 0.58
+        },
+        "confidence": 0.37
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 1,
+      "arm": 0,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.68,
+        "probabilities": {
+          "cannot_determine": 0.03,
+          "reaches_it": 0.28,
+          "does_not_reach": 0.68
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 1,
+      "arm": 1,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.79,
+        "probabilities": {
+          "does_not_reach": 0.79,
+          "reaches_it": 0.13,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 2,
+      "arm": 0,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.56,
+        "probabilities": {
+          "cannot_determine": 0.05,
+          "reaches_it": 0.38,
+          "does_not_reach": 0.56
+        },
+        "confidence": 0.35
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 2,
+      "arm": 1,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.14,
+          "cannot_determine": 0.08,
+          "does_not_reach": 0.78
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 3,
+      "arm": 0,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.47,
+        "probabilities": {
+          "reaches_it": 0.46,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.47
+        },
+        "confidence": 0.21
+      }
+    },
+    {
+      "id": "kontor-385 try_fulfill_pending_proposal · Value::new_batch_raw(last_height, last_hash, vec![])",
+      "run": 3,
+      "arm": 1,
+      "packet": "2fdd9d4f969af2e89e4e793622e685ae0e92376b1d4576929dbc7ead02e5f576",
+      "sent": [],
+      "answer": {
+        "choice": "does_not_reach",
+        "probability": 0.85,
+        "probabilities": {
+          "cannot_determine": 0.04,
+          "reaches_it": 0.11,
+          "does_not_reach": 0.85
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 1,
+      "arm": 0,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.81
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 1,
+      "arm": 1,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "reaches_it": 0.68,
+          "cannot_determine": 0.2,
+          "does_not_reach": 0.12
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 2,
+      "arm": 0,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8200000000000001,
+        "probabilities": {
+          "reaches_it": 0.8200000000000001,
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 2,
+      "arm": 1,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "cannot_determine": 0.2,
+          "reaches_it": 0.69,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 3,
+      "arm": 0,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.82
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 handle_finalized · resolve_batch_txs(txs)",
+      "run": 3,
+      "arm": 1,
+      "packet": "61d827268960dc62cd16904a5ad8b7f9346a3c12365b39b205e0525edaa194de",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.75,
+        "probabilities": {
+          "reaches_it": 0.75,
+          "does_not_reach": 0.07,
+          "cannot_determine": 0.18
+        },
+        "confidence": 0.62
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 1,
+      "arm": 0,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.64,
+        "probabilities": {
+          "cannot_determine": 0.23,
+          "reaches_it": 0.64,
+          "does_not_reach": 0.13
+        },
+        "confidence": 0.45
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 1,
+      "arm": 1,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "reaches_it": 0.8,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 2,
+      "arm": 0,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "cannot_determine": 0.18,
+          "reaches_it": 0.7,
+          "does_not_reach": 0.12
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 2,
+      "arm": 1,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "reaches_it": 0.83,
+          "cannot_determine": 0.12
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 3,
+      "arm": 0,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.66,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.66,
+          "cannot_determine": 0.22
+        },
+        "confidence": 0.49
+      }
+    },
+    {
+      "id": "kontor-385 handle_block · len()",
+      "run": 3,
+      "arm": 1,
+      "packet": "6b99d2c28d1994a46f790af729bc3d220d578b9139f5c5d6be6b33eeddbe7f9a",
+      "sent": [
+        "refresh_validator_set@1",
+        "build_validator_set@2"
+      ],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.07,
+          "reaches_it": 0.78
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 1,
+      "arm": 0,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.11,
+          "reaches_it": 0.74
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 1,
+      "arm": 1,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "reaches_it": 0.88,
+          "cannot_determine": 0.07,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 2,
+      "arm": 0,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "cannot_determine": 0.15,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.68
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 2,
+      "arm": 1,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.88,
+          "cannot_determine": 0.06
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 3,
+      "arm": 0,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "cannot_determine": 0.11,
+          "does_not_reach": 0.11
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_from_anchor · select_batches_from_anchor(conn, from_anchor as i64)",
+      "run": 3,
+      "arm": 1,
+      "packet": "551cec49f4d529211865b61859f48aec2ca74f5c382ee7e555be92a627c6be03",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.08,
+          "reaches_it": 0.84,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 1,
+      "arm": 0,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.43,
+        "probabilities": {
+          "cannot_determine": 0.27,
+          "reaches_it": 0.43,
+          "does_not_reach": 0.3
+        },
+        "confidence": 0.14
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 1,
+      "arm": 1,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.7,
+        "probabilities": {
+          "cannot_determine": 0.15,
+          "reaches_it": 0.7,
+          "does_not_reach": 0.15
+        },
+        "confidence": 0.55
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 2,
+      "arm": 0,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.38,
+        "probabilities": {
+          "does_not_reach": 0.29,
+          "reaches_it": 0.38,
+          "cannot_determine": 0.33
+        },
+        "confidence": 0.08
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 2,
+      "arm": 1,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "does_not_reach": 0.16,
+          "cannot_determine": 0.16,
+          "reaches_it": 0.68
+        },
+        "confidence": 0.52
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 3,
+      "arm": 0,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.45,
+        "probabilities": {
+          "cannot_determine": 0.29,
+          "reaches_it": 0.45,
+          "does_not_reach": 0.26
+        },
+        "confidence": 0.17
+      }
+    },
+    {
+      "id": "kontor-385 load_raw_txs_if_unfinalized · select_unconfirmed_batch_txs(conn, consensus_height)",
+      "run": 3,
+      "arm": 1,
+      "packet": "3c2678f865597156faf2a1fed23448daf7224ce85fdfe6458b31d8a1ff17d1a3",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.69,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "reaches_it": 0.69,
+          "cannot_determine": 0.19
+        },
+        "confidence": 0.53
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 1,
+      "arm": 0,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.56,
+        "probabilities": {
+          "reaches_it": 0.56,
+          "cannot_determine": 0.28,
+          "does_not_reach": 0.16
+        },
+        "confidence": 0.34
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 1,
+      "arm": 1,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.73,
+        "probabilities": {
+          "reaches_it": 0.73,
+          "cannot_determine": 0.19,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 2,
+      "arm": 0,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "reaches_it": 0.61,
+          "cannot_determine": 0.23,
+          "does_not_reach": 0.16
+        },
+        "confidence": 0.43
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 2,
+      "arm": 1,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.72,
+        "probabilities": {
+          "reaches_it": 0.72,
+          "cannot_determine": 0.2,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.59
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 3,
+      "arm": 0,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.58,
+        "probabilities": {
+          "cannot_determine": 0.25,
+          "does_not_reach": 0.17,
+          "reaches_it": 0.58
+        },
+        "confidence": 0.36
+      }
+    },
+    {
+      "id": "kontor-385 batch_to_decided · Value::new_batch(b.anchor_height as u64, anchor_hash, txids)",
+      "run": 3,
+      "arm": 1,
+      "packet": "dbc7da8a7814c2dad575ba2fdb6b713d57a8466fa6971cb2efa69097181324ca",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.06,
+          "reaches_it": 0.76,
+          "cannot_determine": 0.18
+        },
+        "confidence": 0.65
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 1,
+      "arm": 0,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.81,
+        "probabilities": {
+          "reaches_it": 0.81,
+          "does_not_reach": 0.09,
+          "cannot_determine": 0.1
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 1,
+      "arm": 1,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "cannot_determine": 0.1,
+          "reaches_it": 0.85,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 2,
+      "arm": 0,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.77,
+        "probabilities": {
+          "does_not_reach": 0.12,
+          "cannot_determine": 0.11,
+          "reaches_it": 0.77
+        },
+        "confidence": 0.66
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 2,
+      "arm": 1,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "cannot_determine": 0.12,
+          "does_not_reach": 0.06,
+          "reaches_it": 0.82
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 3,
+      "arm": 0,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "cannot_determine": 0.1,
+          "reaches_it": 0.82
+        },
+        "confidence": 0.72
+      }
+    },
+    {
+      "id": "kontor-385 get_decided_range · select_batches_in_range(conn, start.as_u64() as i64, end.as_u64() as i64)",
+      "run": 3,
+      "arm": 1,
+      "packet": "6371346734a269e33b5f6018e85f703f4e3c02e9361ab7a6070019d46701a92b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.8,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.8,
+          "cannot_determine": 0.13
+        },
+        "confidence": 0.7
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 1,
+      "arm": 0,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.82,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 1,
+      "arm": 1,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.9,
+        "probabilities": {
+          "cannot_determine": 0.06,
+          "reaches_it": 0.9,
+          "does_not_reach": 0.04
+        },
+        "confidence": 0.85
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 2,
+      "arm": 0,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.83,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.08,
+          "reaches_it": 0.83
+        },
+        "confidence": 0.74
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 2,
+      "arm": 1,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.84,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "reaches_it": 0.84,
+          "does_not_reach": 0.07
+        },
+        "confidence": 0.76
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 3,
+      "arm": 0,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.82,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.82,
+          "cannot_determine": 0.11
+        },
+        "confidence": 0.73
+      }
+    },
+    {
+      "id": "kontor-385 min_decided_height · select_min_batch_height(conn)",
+      "run": 3,
+      "arm": 1,
+      "packet": "6b836262290493ac3ba62f548901f83064afb0b25e28e911ee45b4ff971b0191",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "does_not_reach": 0.07,
+          "reaches_it": 0.85,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 1,
+      "arm": 0,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.67,
+        "probabilities": {
+          "reaches_it": 0.67,
+          "cannot_determine": 0.25,
+          "does_not_reach": 0.08
+        },
+        "confidence": 0.51
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 1,
+      "arm": 1,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.74,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.21,
+          "reaches_it": 0.74
+        },
+        "confidence": 0.61
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 2,
+      "arm": 0,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.67,
+        "probabilities": {
+          "does_not_reach": 0.08,
+          "reaches_it": 0.67,
+          "cannot_determine": 0.25
+        },
+        "confidence": 0.5
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 2,
+      "arm": 1,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.76,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.19,
+          "reaches_it": 0.76
+        },
+        "confidence": 0.64
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 3,
+      "arm": 0,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "reaches_it": 0.61,
+          "cannot_determine": 0.3,
+          "does_not_reach": 0.09
+        },
+        "confidence": 0.42
+      }
+    },
+    {
+      "id": "kontor-385 build_validator_set · Validator::new(public_key, voting_power)",
+      "run": 3,
+      "arm": 1,
+      "packet": "040e4037b6b0f4428fbf5c5bc5bec082abf2f9d4e3fd154928d192aaa18cea1b",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.78,
+        "probabilities": {
+          "reaches_it": 0.78,
+          "cannot_determine": 0.17,
+          "does_not_reach": 0.05
+        },
+        "confidence": 0.67
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 1,
+      "arm": 0,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.88,
+        "probabilities": {
+          "does_not_reach": 0.04,
+          "reaches_it": 0.88,
+          "cannot_determine": 0.08
+        },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 1,
+      "arm": 1,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.68,
+        "probabilities": {
+          "reaches_it": 0.68,
+          "cannot_determine": 0.1,
+          "does_not_reach": 0.22
+        },
+        "confidence": 0.51
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 2,
+      "arm": 0,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.87,
+        "probabilities": {
+          "does_not_reach": 0.05,
+          "cannot_determine": 0.08,
+          "reaches_it": 0.87
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 2,
+      "arm": 1,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "reaches_it": 0.61,
+          "cannot_determine": 0.1,
+          "does_not_reach": 0.29
+        },
+        "confidence": 0.4
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 3,
+      "arm": 0,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.85,
+        "probabilities": {
+          "cannot_determine": 0.09,
+          "does_not_reach": 0.06,
+          "reaches_it": 0.85
+        },
+        "confidence": 0.77
+      }
+    },
+    {
+      "id": "kontor-385 prod_reactor_missing_tx_invalidation · wait_for_batch(1, Duration::from_secs(60))",
+      "run": 3,
+      "arm": 1,
+      "packet": "48c89c80e78863eddf590414011beb115ba8b9a04bbc50eaf29d49b2a6f7dc2f",
+      "sent": [],
+      "answer": {
+        "choice": "reaches_it",
+        "probability": 0.61,
+        "probabilities": {
+          "does_not_reach": 0.3,
+          "reaches_it": 0.61,
+          "cannot_determine": 0.09
+        },
+        "confidence": 0.4
+      }
+    }
+  ]
+}

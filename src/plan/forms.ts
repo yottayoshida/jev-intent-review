@@ -21,6 +21,7 @@ import { redact } from "../evidence/redact.ts";
 import type { Questions } from "../judgments/provider.ts";
 import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
+import { checksBefore, occurrences, wrapperOf } from "./decisive.ts";
 import { BAR, conditionFor, questionsFor } from "./local-check.ts";
 import { MAPPING_PROPERTY, mappingQuestionFor, type MappingAnswer, whyListed } from "./mapping.ts";
 import type { Askability } from "./select.ts";
@@ -47,6 +48,25 @@ export interface AskContext {
   readHere: (callee: string) => Promise<FunctionCandidate | null>;
 }
 
+/** What a form is given to name the code that decides a reading (ADR 0019). */
+export interface DecisiveContext {
+  requirement: Requirement;
+  fn: FunctionCandidate;
+  call: CallCandidate;
+  /** The function's body as the packet carries it. */
+  body: string;
+  /** Every call the listing has in the function, the target among them. */
+  calls: readonly CallCandidate[];
+  /** Whether the repository defines a function of this name outside the tests. */
+  defined: (name: string) => Promise<boolean>;
+}
+
+/**
+ * The code a reading turns on: not asked about, and why; or the names of the functions whose bodies
+ * are sent with the packet — none when the body sent is all the reading needs.
+ */
+export type Decisive = { hold: string } | { send: readonly string[] };
+
 export interface Form {
   name: RequirementForm;
   /** What the mapping asks the requirement to require of the call, as a stable name for the record. */
@@ -58,6 +78,8 @@ export interface Form {
    */
   says: string;
   askable(context: AskContext): Promise<Askability>;
+  /** The code the reading turns on, from the body's text (ADR 0019). Decided after the budget. */
+  decisive(context: DecisiveContext): Promise<Decisive>;
   /** Always keyed `requirement_governs`, with the options `applies`, `does_not_apply`, `unknown`. */
   mappingQuestion(fn: FunctionCandidate, call: CallCandidate): Questions;
   /** The key of the observation answer the rule reads. The request may carry other, diagnostic ones. */
@@ -86,11 +108,26 @@ export interface Form {
 /** The call as the questions name it: redacted, and with no backtick left to close a code span. */
 const named = (call: CallCandidate) => redact(call.expression).text.replace(/`/g, "");
 
+/**
+ * Why a call is held when the rules cannot tell it from another in the body they read (ADR 0019): the
+ * code it turns on cannot be named, so it is not asked about. `locateCall` has already found it once
+ * in the packet's body; this is the net for a reading of the text that makes two of it.
+ */
+const UNTOLD = (call: CallCandidate) => `\`${named(call)}\` could not be told apart from another call of the same text in the body, so the code its reading turns on could not be named`;
+
 const failurePropagation: Form = {
   name: "failure_propagation",
   property: MAPPING_PROPERTY,
   says: "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
   askable: ({ fn, call, resultOf }) => resultOf(fn, call),
+  // The failure decides the reading. Passed to this repository's own code before it is returned, what
+  // the function returns is that code's to say, and its body is not sent: the call is not asked about.
+  decisive: async ({ body, call, defined }) => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
+    const wrapper = wrapperOf(body, call);
+    if (wrapper === null || !(await defined(wrapper))) return { send: [] };
+    return { hold: `its failure is passed to \`${wrapper}\` before it is returned, and \`${wrapper}\` is this repository's own function, whose body is not sent: what the function returns is \`${wrapper}\`'s to say` };
+  },
   mappingQuestion: (fn, call) => mappingQuestionFor(fn, call, named(call)),
   observationKey: "on_error_result",
   observationQuestions: (fn, call) => questionsFor(conditionFor(fn, call)),
@@ -146,6 +183,16 @@ const checkBeforeAction: Form = {
     const names = [...calleeNameTerms(call)].some((c) => [...wanted].some((w) => termsMeet(c, w)));
     return { ok: true, names };
   },
+  // The check decides the reading: a call above the target, in a condition, whose own name meets the
+  // requirement. Its body goes with the packet. A function the change touched is not left out, as
+  // `readHere` leaves out a target's: a helper the pull request added is where a check that does
+  // nothing is likeliest to be.
+  decisive: async ({ requirement, body, call, calls }) => {
+    if (occurrences(body, call) !== 1) return { hold: UNTOLD(call) };
+    const wanted = requirementTerms(requirement);
+    const meets = (c: CallCandidate) => [...calleeNameTerms(c)].some((t) => [...wanted].some((w) => termsMeet(t, w)));
+    return { send: checksBefore(body, call, calls, meets) };
+  },
   mappingQuestion: (fn, call) => ({
     requirement_governs: {
       type: "choice",
@@ -159,13 +206,17 @@ const checkBeforeAction: Form = {
   }),
   observationKey: "in_forbidden_case",
   // The case is the requirement's: the packet carries its text, and the question points at it rather
-  // than restating it. Nothing here writes what the check is — that would be this tool guessing.
+  // than restating it. Nothing here writes what the check is — that would be this tool guessing, and
+  // the question does not say "the check does not pass" either (ADR 0020): told that, Jev took a
+  // helper whose body was sent for the check and its name for its body. The bodies of the checks the
+  // form named are under `evidence.related` (ADR 0019), and the case is all that is assumed. Measured
+  // wording (`bench/decisive/words-probe.json`, arm 1): a word changed here is a changed measurement.
   observationQuestions: (fn, call) => ({
     in_forbidden_case: {
       type: "choice",
       instructions:
-        `\`code\` is the body of \`${fn.name}\`. The entries under \`evidence.related\` are other code it may call, given so that what those calls do can be worked out; they are not what this question is about. ` +
-        `Assume exactly this and nothing else: \`${fn.name}\` is called in a case where \`requirement.text\` says the call \`${named(call)}\` must not be made, because the check it asks for does not pass. ` +
+        `\`code\` is the body of \`${fn.name}\`. The entries under \`evidence.related\` are the bodies of functions \`${fn.name}\` calls, given so that what those calls do can be read. ` +
+        `Assume exactly this and nothing else: \`${fn.name}\` is called in the case \`requirement.text\` describes, the one in which it says the call \`${named(call)}\` must not be made; every other operation the function reaches succeeds, unless the case itself decides it otherwise. ` +
         `Under that condition: does \`${fn.name}\` go on to make the call \`${named(call)}\`?`,
       criteria: REACH_CRITERIA,
     },
@@ -173,18 +224,18 @@ const checkBeforeAction: Form = {
   violates: ["reaches_it"],
   keeps: ["does_not_reach"],
   words: {
-    intro: `Two questions are put to Jev about each call, separately: whether the requirement requires that a check pass before the call is made, and whether the function still makes the call in a case the requirement forbids it. The bar for each is ${BAR}.`,
+    intro: `Two questions are put to Jev about each call, separately: whether the requirement requires that a check pass before the call is made, and whether the function still makes the call in the case the requirement forbids it, with the bodies of the checks named above the call sent along. The bar for each is ${BAR}.`,
     asks: "Jev, on whether the function still makes the call",
-    observed: "in a case the requirement forbids it",
-    assumed: (fn, call) => `\`${fn.name}\` is called in a case where the requirement says \`${named(call)}\` must not be made, because the check it asks for does not pass.`,
+    observed: "in the case the requirement forbids it",
+    assumed: (fn, call) => `\`${fn.name}\` is called in the case the requirement describes, in which it says \`${named(call)}\` must not be made; every other operation it reaches succeeds, unless the case itself decides it otherwise.`,
     reading: {
-      reaches_it: "the call is made in a case the requirement forbids it",
-      does_not_reach: "the call is not made in a case the requirement forbids it",
+      reaches_it: "the call is made in the case the requirement forbids it",
+      does_not_reach: "the call is not made in the case the requirement forbids it",
       cannot_determine: "the code shown does not settle whether the call is made in that case",
     },
     whyListed: (target, mapping, observation, probability) =>
       `Jev answered \`${mapping.verdict}\` (${mapping.probability.toFixed(2)}) when asked whether the requirement requires a check to pass before this call, ` +
-      `and \`${observation}\` (${probability.toFixed(2)}) when asked whether \`${target}\` still makes the call in a case the requirement forbids it. ` +
+      `and \`${observation}\` (${probability.toFixed(2)}) when asked whether \`${target}\` still makes the call in the case the requirement forbids it. ` +
       `Both are Jev's readings and neither checks the other.`,
   },
 };

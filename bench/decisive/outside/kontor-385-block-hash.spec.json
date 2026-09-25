@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "kontorprotocol/kontor#385 — a check-before-action requirement written for the outside line of #82's probe of the words (version 4)",
+  "summary": "Written on 2026-09-25 after reading validate_and_accept_proposal in core/indexer/src/reactor/batches.rs at the pull request's head, before any request of version 4: a block value is built only when the proposed hash matches the pending block (if block.hash != *hash returns Ok(None) first).",
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "A block value must not be built for a block proposal whose hash does not match the pending block.",
+      "kind": "behavior",
+      "priority": "required",
+      "sourceRefs": [],
+      "searchHints": ["new_block"],
+      "form": "check_before_action"
+    }
+  ],
+  "nonGoals": [],
+  "ambiguities": []
+}
