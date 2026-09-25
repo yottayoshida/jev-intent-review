@@ -78,6 +78,11 @@ module lives (`testOnlyFiles` in `bench/call-oracle/classify.ts`): a crate root,
 file loaded through `#[path]` keeps its children beside it, `a.rs` keeps them under `a/`, and
 `#[path]` names the file relative to the declaring file's directory.
 
+Since #83 the listing is taken the way the product takes it — through the `Discoverer`, a file a parent
+declares test-only listing nothing — so a file the product does not read at all (larger than it reads,
+or binary: `Git.readText`) is taken out on both sides and reported, with its lines and the oracle's
+calls in it (`notReadByTheProduct`). The scope stays the oracle's own.
+
 A file the oracle cannot parse is taken out on both sides and reported: files, lines, and the
 listing's candidates in them.
 
@@ -153,7 +158,69 @@ node bench/call-oracle.ts measure bench/call-oracle/material.dev.json --broken
 node bench/call-oracle.ts fixtures      # rewrites test/fixtures/call-oracle/oracle.json and baseline.json
 ```
 
-## The record (dev)
+## The record after #83: the parser (dev)
+
+`bench/logs/call-oracle-dev.json`, made with the listing that reads a Rust file with tree-sitter
+(ADR 0022). One file the product does not read — whatsapp-rust's generated `waproto/src/whatsapp.rs`,
+20,009 lines, 1,410 calls, all `Ok` / `Err` / `Some` — is out on both sides; the record before, with
+that file taken out the same way, had the same 158,708 calls in scope.
+
+| | Before (the line reader, `da285e3`) | After (the parser) |
+|---|---:|---:|
+| in-scope calls listed under the right function | 136,914 | **139,021** |
+| listed under another function | 0 | 0 |
+| left out and said so (the cap of 60 functions) | 4,921 + 36 | 4,921 |
+| left out as unreadable, and said so | — | 0 |
+| `Ok` / `Err` / `Some`, refused by design | 16,176 − 1,410 | 14,766 |
+| **dropped with nothing said** | **2,071** | **0** |
+| **candidates outside a macro that are not in-scope calls** | **26,876** | **0** |
+| candidates inside a macro | 11,317 | 5,568 |
+
+Every silent miss and every false positive of the record before is gone: the turbofish, the names
+refused as a macro's, the strings continuing at column 0, the comments, strings, patterns, keywords,
+definition lines, nested functions' second listings and test code. The parser could not read 5 of the
+1,815 files in places; none of those places held an in-scope call (`omitted_unread` 0, bar 0.5%).
+
+As estimates (`bench/eval/PROTOCOL.md`: the mean over repositories, Clopper–Pearson at 95 %, 8
+repositories): calls dropped silently 0.0% (0.0% – 36.9%), candidates that are not calls 0.0% (0.0% –
+36.9%), calls detected 85.2% (44.9% – 99.4%). Eight repositories give intervals this wide whatever the
+counts.
+
+Inside macros, which the oracle does not grade (*What counts as a call*): the calls a question could
+be put to — the callee settles to one definition returning a `Result` — are 538, where the line reader
+listed 667. Most of the difference was the line reader's own misreading (a format string's `keys (`,
+`matches!`'s patterns, `quote!`'s tokens); what the parser does not read is the macros whose arguments
+do not read as expressions (`tokio::select!`, `json!`, `tracing`'s `%x` and `?x`), counted in the run's
+notes. A seeded sample of the macro calls listed, 30 from each reader and mixed
+(`bench/logs/call-oracle-macro-labels-dev.json`), was shown to three annotators without the side: none
+of the parser's 30 is not a call; 4 of the line reader's 30 are (a string, a pattern, two `quote!`), so
+the annotators told them apart. The pairing was broken on purpose again: taking the method calls out
+moves exactly the 100,748 detected method calls, and no other form
+(`bench/logs/call-oracle-dev-broken.json`).
+
+The places a question reaches were compared too, with no request sent
+(`bench/budget-by-origin.ts`, `bench/logs/budget-by-origin-v3.json`): on the 20 runs of the acceptance
+cases and omamori `#468`'s branches, every known target that was inside the budget before is inside
+it after — moltis-1064's B moves from 20th to 22nd of 30, the rest keep their place. moltis-1064's
+changed functions have two more calls a question can be put to (18 → 20), so its callers, whose budget
+is 10 and what the changed functions leave (ADR 0015), are asked 10 where they were asked 12.
+
+| Case | Files | Calls in scope | detected | omitted_cap | declared_exclusion | silent_miss | Candidates | in_macro | false_positive |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| grovedb-500 | 264 | 16,939 | 14,704 | 260 | 1,975 | 0 | 16,444 | 1,740 | 0 |
+| grovedb-501 | 1 (+263 already measured) | 243 | 220 | 0 | 23 | 0 | 220 | 0 | 0 |
+| instruckt-tauri-9 | 12 | 306 | 273 | 0 | 33 | 0 | 301 | 28 | 0 |
+| kontor-385 | 128 | 9,224 | 7,976 | 256 | 992 | 0 | 8,203 | 227 | 0 |
+| moltis-1064 | 962 | 84,292 | 76,809 | 367 | 7,116 | 0 | 78,714 | 1,905 | 0 |
+| omamori-468 | 44 | 5,161 | 4,561 | 0 | 600 | 0 | 4,885 | 324 | 0 |
+| pybun-428 | 61 | 9,815 | 8,848 | 125 | 842 | 0 | 9,300 | 452 | 0 |
+| quebec-136 | 53 | 9,479 | 6,283 | 2,510 | 686 | 0 | 6,617 | 334 | 0 |
+| whatsapp-rust-759 | 290 | 23,249 | 19,347 | 1,403 | 2,499 | 0 | 19,905 | 558 | 0 |
+
+## The record before #83: the line reader (dev)
+
+What follows was measured with the line reader, before #83 replaced it. It is kept as it was
+committed; its log is `bench/logs/call-oracle-dev.json` at `da285e3`.
 
 `bench/logs/call-oracle-dev.json`: 1,816 files, 827,921 lines, every file parsed. It holds
 the sha256 of the listing's code it was made with (`src/plan/candidates.ts`, `src/change/blocks.ts`)

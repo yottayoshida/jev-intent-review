@@ -39,17 +39,6 @@
      "name": "f",
      "line": 2
     },
-    "line": 3,
-    "column": 15,
-    "callee": "old_call",
-    "class": "false_positive",
-    "reason": "comment"
-   },
-   {
-    "fn": {
-     "name": "f",
-     "line": 2
-    },
     "line": 4,
     "column": 4,
     "callee": "real",
@@ -60,32 +49,10 @@
      "name": "f",
      "line": 2
     },
-    "line": 5,
-    "column": 13,
-    "callee": "not_a_call",
-    "class": "false_positive",
-    "reason": "string"
-   },
-   {
-    "fn": {
-     "name": "f",
-     "line": 2
-    },
     "line": 7,
     "column": 4,
     "callee": "other",
     "class": "matched"
-   },
-   {
-    "fn": {
-     "name": "f",
-     "line": 2
-    },
-    "line": 7,
-    "column": 17,
-    "callee": "trailing_note",
-    "class": "false_positive",
-    "reason": "comment"
    }
   ],
   "columnDisagreements": 0
@@ -160,17 +127,6 @@
      "name": "f",
      "line": 3
     },
-    "line": 5,
-    "column": 11,
-    "callee": "E::A",
-    "class": "false_positive",
-    "reason": "pattern"
-   },
-   {
-    "fn": {
-     "name": "f",
-     "line": 3
-    },
     "line": 6,
     "column": 16,
     "callee": "zero",
@@ -230,8 +186,7 @@
     "line": 4,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss",
-    "macroNameCollision": true
+    "class": "detected"
    },
    {
     "callee": "format",
@@ -246,8 +201,7 @@
     "line": 5,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss",
-    "macroNameCollision": true
+    "class": "detected"
    },
    {
     "callee": "to_string",
@@ -262,10 +216,20 @@
     "line": 9,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    }
   ],
   "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 4,
+    "column": 8,
+    "callee": "write",
+    "class": "matched"
+   },
    {
     "fn": {
      "name": "f",
@@ -281,10 +245,30 @@
      "name": "f",
      "line": 3
     },
+    "line": 5,
+    "column": 12,
+    "callee": "format",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
     "line": 7,
     "column": 17,
     "callee": "compute",
     "class": "in_macro"
+   },
+   {
+    "fn": {
+     "name": "format",
+     "line": 9
+    },
+    "line": 9,
+    "column": 31,
+    "callee": "to_string",
+    "class": "matched"
    }
   ],
   "columnDisagreements": 0
@@ -305,7 +289,7 @@
     "line": 3,
     "multiline": true,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "build",
@@ -369,6 +353,16 @@
    }
   ],
   "candidates": [
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
+    "line": 3,
+    "column": 12,
+    "callee": "compute",
+    "class": "matched"
+   },
    {
     "fn": {
      "name": "f",
@@ -467,28 +461,6 @@
      "name": "outer",
      "line": 2
     },
-    "line": 3,
-    "column": 7,
-    "callee": "inner",
-    "class": "false_positive",
-    "reason": "definition"
-   },
-   {
-    "fn": {
-     "name": "outer",
-     "line": 2
-    },
-    "line": 4,
-    "column": 8,
-    "callee": "deep",
-    "class": "false_positive",
-    "reason": "duplicate"
-   },
-   {
-    "fn": {
-     "name": "outer",
-     "line": 2
-    },
     "line": 6,
     "column": 4,
     "callee": "inner",
@@ -533,7 +505,7 @@
     "line": 2,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "bar",
@@ -548,10 +520,31 @@
     "line": 3,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    }
   ],
-  "candidates": [],
+  "candidates": [
+   {
+    "fn": {
+     "name": "a",
+     "line": 2
+    },
+    "line": 2,
+    "column": 9,
+    "callee": "foo",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "b",
+     "line": 3
+    },
+    "line": 3,
+    "column": 15,
+    "callee": "bar",
+    "class": "matched"
+   }
+  ],
   "columnDisagreements": 0
  },
  {
@@ -570,7 +563,7 @@
     "line": 5,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "",
@@ -585,7 +578,7 @@
     "line": 5,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "make",
@@ -610,8 +603,28 @@
      "line": 4
     },
     "line": 5,
+    "column": 16,
+    "callee": "",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "go",
+     "line": 4
+    },
+    "line": 5,
     "column": 22,
     "callee": "make",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "go",
+     "line": 4
+    },
+    "line": 5,
+    "column": 28,
+    "callee": "",
     "class": "matched"
    }
   ],
@@ -648,7 +661,7 @@
     "line": 5,
     "multiline": false,
     "turbofish": "none",
-    "class": "silent_miss"
+    "class": "detected"
    }
   ],
   "candidates": [
@@ -660,6 +673,16 @@
     "line": 4,
     "column": 14,
     "callee": "type",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 3
+    },
+    "line": 5,
+    "column": 8,
+    "callee": "match",
     "class": "matched"
    }
   ],
@@ -694,17 +717,6 @@
     "column": 4,
     "callee": "work",
     "class": "matched"
-   },
-   {
-    "fn": {
-     "name": "top_level_test",
-     "line": 12
-    },
-    "line": 13,
-    "column": 4,
-    "callee": "check",
-    "class": "false_positive",
-    "reason": "test_only"
    }
   ],
   "columnDisagreements": 0
@@ -783,7 +795,7 @@
     "line": 3,
     "multiline": false,
     "turbofish": "last",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "Vec::new",
@@ -813,7 +825,7 @@
     "line": 5,
     "multiline": false,
     "turbofish": "last",
-    "class": "silent_miss"
+    "class": "detected"
    },
    {
     "callee": "it",
@@ -852,9 +864,19 @@
      "name": "f",
      "line": 2
     },
+    "line": 3,
+    "column": 12,
+    "callee": "foo",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
     "line": 4,
-    "column": 23,
-    "callee": "new",
+    "column": 17,
+    "callee": "Vec::new",
     "class": "matched"
    },
    {
@@ -872,13 +894,23 @@
      "name": "f",
      "line": 2
     },
+    "line": 5,
+    "column": 26,
+    "callee": "collect",
+    "class": "matched"
+   },
+   {
+    "fn": {
+     "name": "f",
+     "line": 2
+    },
     "line": 6,
     "column": 4,
     "callee": "bar",
     "class": "matched"
    }
   ],
-  "columnDisagreements": 0
+  "columnDisagreements": 1
  },
  {
   "path": "types.rs",
@@ -900,17 +932,6 @@
    }
   ],
   "candidates": [
-   {
-    "fn": {
-     "name": "run",
-     "line": 2
-    },
-    "line": 3,
-    "column": 16,
-    "callee": "Fn",
-    "class": "false_positive",
-    "reason": "type"
-   },
    {
     "fn": {
      "name": "run",

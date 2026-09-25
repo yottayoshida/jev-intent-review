@@ -129,7 +129,7 @@ function append<T>(target: T[], items: readonly T[]): void {
  */
 export function regionsOf(file: FileChange, path: string, lines: string[]): ChangedRegion[] {
   const code = isCode(path);
-  const index = code ? new BlockIndex(lines) : null;
+  const index = code ? new BlockIndex(lines, { path }) : null;
   const touched = new Map<string, { region: ChangedRegion; lines: Set<number> }>();
   const regionFor = (block: Block, line: number): ChangedRegion => {
     const key = `${block.startLine}-${block.endLine}`;

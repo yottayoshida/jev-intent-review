@@ -5,6 +5,11 @@
 // a wrong or oversized region; oversized regions fall back to a fixed window around the line.
 // Language-aware extraction (tree-sitter) is spec Phase 4.
 
+import { cfgPredicate, testOnlyCfg } from "../syntax/cfg.ts";
+import { parseRust, type ParsedRust } from "../syntax/rust.ts";
+
+export { testOnlyCfg };
+
 export interface Block {
   startLine: number; // 1-based, inclusive
   endLine: number;
@@ -64,79 +69,6 @@ const CONTINUATION = /^\s*([)\]]|\{\s*$|>.*\{\s*$|->.*\{\s*$|where\b.*\{\s*$)/;
 const PASSED_ON_THE_WAY_UP = /^\s*([)\]>]|->|where\b(?!\s*[(=])|\{\s*$)/;
 
 const NOT_NAMES = new Set(["if", "for", "while", "switch", "catch", "return", "function", "new", "await", "async", "else", "do", "with", "yield"]);
-
-/** Pieces of a `cfg` predicate, split on the commas that are not inside nested parentheses. */
-function splitPredicate(text: string): string[] {
-  const parts: string[] = [];
-  let depth = 0;
-  let quote = false;
-  let start = 0;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i] as string;
-    if (quote) {
-      if (ch === "\\") i += 1;
-      else if (ch === '"') quote = false;
-      continue;
-    }
-    if (ch === '"') quote = true;
-    else if (ch === "(") depth += 1;
-    else if (ch === ")") depth -= 1;
-    else if (ch === "," && depth === 0) {
-      parts.push(text.slice(start, i));
-      start = i + 1;
-    }
-  }
-  parts.push(text.slice(start));
-  return parts.map((p) => p.trim()).filter((p) => p.length > 0);
-}
-
-/**
- * Whether a `cfg` predicate can hold **only** when the tests are being compiled.
- *
- * `all(test, unix)` can, because every part has to hold. `any(test, feature = "production")`
- * cannot: with that feature on, the code is in an ordinary build. Excluding it would delete real
- * code from the candidates and from the definitions names resolve against, and say nothing.
- *
- * Anything this does not recognise — a `not`, an unknown form — is **not** test-only. Being unsure
- * leaves the code in, where it is visible, rather than dropping it where nothing reports it.
- */
-export function testOnlyCfg(predicate: string): boolean {
-  const text = predicate.trim();
-  if (text === "test") return true;
-  const call = /^(all|any|not)\s*\(([\s\S]*)\)$/.exec(text);
-  if (!call) return false;
-  const parts = splitPredicate(call[2] as string);
-  if (parts.length === 0) return false;
-  if (call[1] === "all") return parts.some(testOnlyCfg);
-  if (call[1] === "any") return parts.every(testOnlyCfg);
-  return false;
-}
-
-/**
- * What is inside `#[cfg(…)]` on this line, by matching the parenthesis rather than the last `)]`
- * on the line — `#[cfg(test)] // uses &[(u8)]` ends its attribute long before the line does.
- */
-function cfgPredicate(line: string): string | null {
-  const open = /^\s*#\[cfg\(/.exec(line);
-  if (!open) return null;
-  let depth = 1;
-  let quote = false;
-  for (let i = open[0].length; i < line.length; i++) {
-    const ch = line[i] as string;
-    if (quote) {
-      if (ch === "\\") i += 1;
-      else if (ch === '"') quote = false;
-      continue;
-    }
-    if (ch === '"') quote = true;
-    else if (ch === "(") depth += 1;
-    else if (ch === ")") {
-      depth -= 1;
-      if (depth === 0) return line.slice(open[0].length, i);
-    }
-  }
-  return null;
-}
 
 /**
  * Lines inside a test region of a source file: Rust's `#[cfg(test)] mod tests`, Zig's
@@ -326,8 +258,20 @@ export class BlockIndex {
   /** Lines inside a test region of this file, so a definition in one can be told apart. */
   readonly testRegions: readonly { start: number; end: number }[];
 
-  constructor(lines: readonly string[]) {
+  /**
+   * A Rust file's reading by the parser (#83, ADR 0022), when `path` names one: its functions and
+   * items answer `enclosing`, and the listing is built from the same reading, so the two cannot
+   * disagree on where a function ends (#74). `testRegions` stays the indentation reader's (see the
+   * constructor). Other files are read by indentation as before.
+   */
+  readonly rust: ParsedRust | undefined;
+
+  constructor(lines: readonly string[], options: { path?: string } = {}) {
     this.lines = lines;
+    this.rust = options.path?.endsWith(".rs") ? parseRust(lines.join("\n")) : undefined;
+    // Read by indentation still, for every file: the definitions a name resolves to read these
+    // regions, and which definition a call reaches is #83's second part, not this one (ADR 0022).
+    // The listing takes its test code from the parse (each function's `testOnly`, `#[test]` functions too).
     this.testRegions = testRegions(lines);
     const n = lines.length;
     this.#indent = lines.map(indentOf);
@@ -430,6 +374,7 @@ export class BlockIndex {
     // Only blank lines and comments on that side (a comment added after the last function): the
     // line is a region of its own, not a window borrowed from the code on the other side.
     if (found < 0) return { startLine: idx + 1, endLine: idx + 1, windowed: false };
+    if (this.rust) return this.#rustEnclosing(this.rust, idx, found, maxLines, window);
     let anchor = found;
     // A line that only closes brackets (`}`, `});`) belongs to the block it closes, which the line
     // above it is inside of.
@@ -458,8 +403,34 @@ export class BlockIndex {
     const name = definedName(this.lines[start] as string);
     return { startLine: start + 1, endLine: this.#end(start) + 1, ...(name ? { name } : {}), windowed: false };
   }
+
+  /**
+   * The same rule on a Rust file's parse: the innermost function containing the line that fits
+   * `maxLines`; without one, the outermost construct containing it if that fits, else the innermost
+   * that fits, else the window. Chosen by the ranges containing the line, not by indentation, so a
+   * string continuing at column 0 does not end a function (#81). A line inside what the parser could
+   * not read is outside every function. A line in no construct is a region of its own.
+   */
+  #rustEnclosing(rust: ParsedRust, idx: number, found: number, maxLines: number, window: number): Block {
+    const n = this.lines.length;
+    const line = found + 1;
+    const contains = (s: { startLine: number; endLine: number }) => line >= s.startLine && line <= s.endLine;
+    const size = (s: { startLine: number; endLine: number }) => s.endLine - s.startLine + 1;
+    const fits = (s: { startLine: number; endLine: number }) => size(s) <= maxLines;
+    const unread = rust.unread.some(contains);
+    const fns = unread ? [] : rust.functions.filter(contains).sort((a, b) => size(a) - size(b));
+    const block = (s: { startLine: number; endLine: number; name?: string }): Block => ({ startLine: s.startLine, endLine: s.endLine, ...(s.name ? { name: s.name } : {}), windowed: false });
+    const fn = fns.find(fits);
+    if (fn) return block(fn);
+    const containers = [...fns, ...rust.items.filter(contains)].sort((a, b) => size(a) - size(b));
+    if (containers.length === 0) return { startLine: line, endLine: line, windowed: false };
+    const outer = containers[containers.length - 1]!;
+    const start = fits(outer) ? outer : containers.find(fits);
+    if (start) return block(start);
+    return { startLine: Math.max(1, idx + 1 - window), endLine: Math.min(n, idx + 1 + window), windowed: true };
+  }
 }
 
-export function enclosingBlock(lines: readonly string[], lineNo: number, maxLines = 300, window = 40): Block {
-  return new BlockIndex(lines).enclosing(lineNo, { maxLines, window });
+export function enclosingBlock(lines: readonly string[], lineNo: number, maxLines = 300, window = 40, path?: string): Block {
+  return new BlockIndex(lines, path === undefined ? {} : { path }).enclosing(lineNo, { maxLines, window });
 }

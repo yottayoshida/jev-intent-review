@@ -76,6 +76,15 @@ touched, and 10 and what those left in their callers — gets two questions to J
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
 
+**A Rust file is read by a parser (tree-sitter-rust, ADR 0022): every call outside a macro is listed
+under the function it is written in, and nothing that is not a call is listed; what the parser cannot
+read is left out and said so.** Inside a macro, the calls are listed when the macro's arguments read as
+expressions with no error anywhere; a macro whose arguments do not, or whose arguments are a pattern
+or code handled as text (`matches!`, `assert_matches!`, `stringify!`, `quote!`), is counted in the notes
+and not read. Test code lists nothing: a `#[cfg(test)]` item, a `#[test]` function, and a file a parent
+declares `#[cfg(test)] mod …;`. Measured against #81's oracle on #80's dev material in
+`docs/call-oracle.md`, *The record after #83: the parser (dev)*.
+
 A requirement that names no form — one read from text — is first asked which form its sentence
 says: one request carrying `{ requirement: { id, text } }` and nothing else (the measurement sent
 every sentence as `R1`; the run sends the requirement's own id), and its calls are then read under
