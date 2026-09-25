@@ -22,6 +22,7 @@ import type { Questions } from "../judgments/provider.ts";
 import { REQUIREMENT_FORMS, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
 import type { CallCandidate, FunctionCandidate } from "./candidates.ts";
 import { checksBefore, occurrences, wrapperOf } from "./decisive.ts";
+import { HANDLING_KEY, HANDLING_PROPERTY, handlingMappingFor, handlingQuestionsFor, handlingWhyListed } from "./handling.ts";
 import { BAR, conditionFor, questionsFor } from "./local-check.ts";
 import { MAPPING_PROPERTY, mappingQuestionFor, type MappingAnswer, whyListed } from "./mapping.ts";
 import type { Askability } from "./select.ts";
@@ -46,6 +47,11 @@ export interface AskContext {
    * one was held for a reason that was not true of it.
    */
   readHere: (callee: string) => Promise<FunctionCandidate | null>;
+  /**
+   * Whether the callee returns a `Result`, read whatever the calling function returns (`calleeOf`):
+   * for a form that asks what a function does with a failure, not what it returns.
+   */
+  calleeResultOf: (fn: FunctionCandidate, call: CallCandidate) => Promise<Askability>;
 }
 
 /** What a form is given to name the code that decides a reading (ADR 0019). */
@@ -77,6 +83,11 @@ export interface Form {
    * here is a changed measurement, and `test/forms.test.ts` holds the question to the measured hash.
    */
   says: string;
+  /**
+   * Whether the question that asks Jev which form a sentence has offers this form (ADR 0008). A form
+   * that is not offered is used only when a spec names it, and the measured question stays as it was.
+   */
+  chosenBySentence: boolean;
   askable(context: AskContext): Promise<Askability>;
   /** The code the reading turns on, from the body's text (ADR 0019). Decided after the budget. */
   decisive(context: DecisiveContext): Promise<Decisive>;
@@ -119,6 +130,7 @@ const failurePropagation: Form = {
   name: "failure_propagation",
   property: MAPPING_PROPERTY,
   says: "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
+  chosenBySentence: true,
   askable: ({ fn, call, resultOf }) => resultOf(fn, call),
   // The failure decides the reading. Passed to this repository's own code before it is returned, what
   // the function returns is that code's to say, and its body is not sent: the call is not asked about.
@@ -166,6 +178,7 @@ const checkBeforeAction: Form = {
   name: "check_before_action",
   property: "check_passes_before_call",
   says: "The sentence says that an operation must not be performed unless a check passes, or must never be performed in some case, and it names the operation.",
+  chosenBySentence: true,
   askable: async ({ requirement, call, readHere }) => {
     // The words first: they cost nothing, and only a call they let through needs its callee's
     // definitions looked up.
@@ -240,10 +253,51 @@ const checkBeforeAction: Form = {
   },
 };
 
+/**
+ * `failure_handling` (#85): a failure may be returned, logged or recorded, and must not be turned
+ * silently into a success. Its observation question was measured before it was wired
+ * (`bench/handling/`, `bench/logs/handling-probe-v1.json`); it is offered to no sentence, and is
+ * used only when a spec names it.
+ */
+const failureHandling: Form = {
+  name: "failure_handling",
+  property: HANDLING_PROPERTY,
+  says: "The sentence says what must happen when an operation fails: the failure may be returned, logged or recorded, and must not be turned silently into a success.",
+  chosenBySentence: false,
+  // What a function does with a failure is asked of any function: one that returns nothing can still
+  // go on as if nothing had failed. Only the callee has to be able to fail.
+  askable: ({ fn, call, calleeResultOf }) => calleeResultOf(fn, call),
+  // The same as `failure_propagation`: passed to this repository's own code, what happens to the
+  // failure is that code's to say, and its body is not sent.
+  decisive: (context) => failurePropagation.decisive(context),
+  mappingQuestion: (fn, call) => handlingMappingFor(fn, call, named(call)),
+  observationKey: HANDLING_KEY,
+  observationQuestions: (fn, call) => handlingQuestionsFor(conditionFor(fn, call)),
+  violates: ["continues_silently"],
+  keeps: ["propagates", "reports_locally"],
+  words: {
+    intro: `Two questions are put to Jev about each call, separately: whether the requirement requires that a failure of it not be turned silently into a success, and what the function does with that failure. The bar for each is ${BAR}.`,
+    asks: "Jev, on what the function does with the failure",
+    observed: "when that call fails",
+    assumed: (fn, call) => failurePropagation.words.assumed(fn, call),
+    reading: {
+      continues_silently: "the failure is left without a trace, as if the call had succeeded",
+      propagates: "the failure is returned to the caller",
+      reports_locally: "the failure is not returned but leaves a trace: a log, a record, or a value the caller can tell from a success",
+      cannot_determine: "the code shown does not settle what is done with the failure",
+    },
+    whyListed: handlingWhyListed,
+  },
+};
+
 export const FORMS: Readonly<Record<RequirementForm, Form>> = {
   failure_propagation: failurePropagation,
   check_before_action: checkBeforeAction,
+  failure_handling: failureHandling,
 };
+
+/** The forms the question of ADR 0008 offers, in the order they are declared. */
+export const CHOSEN_FORMS: readonly RequirementForm[] = REQUIREMENT_FORMS.filter((name) => FORMS[name].chosenBySentence);
 
 export const formOf = (requirement: Requirement): Form => FORMS[requirement.form ?? DEFAULT_FORM];
 
@@ -267,7 +321,7 @@ export const FORM_QUESTION: Questions = {
   requirement_form: {
     type: "choice",
     instructions: "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
-    criteria: { ...Object.fromEntries(Object.entries(FORMS).map(([name, form]) => [name, form.says])), neither: NEITHER_SAYS },
+    criteria: { ...Object.fromEntries(CHOSEN_FORMS.map((name) => [name, FORMS[name].says])), neither: NEITHER_SAYS },
   },
 };
 
@@ -298,7 +352,7 @@ export interface FormChoice {
  */
 export function chooseForm(answer: ChoiceAnswer | undefined): FormChoice {
   if (!answer) return { form: DEFAULT_FORM, by: "default", verdict: "no_answer", probability: 0 };
-  const read = readOption(answer, REQUIREMENT_FORMS, BAR);
+  const read = readOption(answer, CHOSEN_FORMS, BAR);
   return { form: read.kind === "option" ? (read.option as RequirementForm) : DEFAULT_FORM, by: read.kind === "option" ? "jev" : "default", verdict: answer.choice, probability: answer.probability };
 }
 

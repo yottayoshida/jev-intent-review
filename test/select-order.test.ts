@@ -226,7 +226,7 @@ test("a real callee resolution points at the changed function's own first line",
 test("through the failure form the CLI uses, the order still moves the call", async () => {
   const requirement: Requirement = { id: "R1", text: "A failure must reach the caller.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [] };
   const form = FORMS.failure_propagation;
-  const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf: (f, c) => applicabilityOf(discoverer, f, c), readHere: async () => null });
+  const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf: (f, c) => applicabilityOf(discoverer, f, c), readHere: async () => null, calleeResultOf: async () => ({ ok: true }) });
   const sel = await selectSites([source(["changed_one", "changed_two"], [])], decide, 2, 1);
   assert.equal(firstIn(sel.budgeted, "changed_one"), "changed_two()");
 });

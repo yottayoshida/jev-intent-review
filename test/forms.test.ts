@@ -11,7 +11,7 @@ import { test } from "node:test";
 import { parseIntentSpec } from "../src/intent/schema.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { CallCandidate } from "../src/plan/candidates.ts";
-import { callTerms, chooseForm, FORM_QUESTION, formOf, FORMS, identifierWords, NEITHER_SAYS, readOption, requirementTerms, termsMeet } from "../src/plan/forms.ts";
+import { callTerms, CHOSEN_FORMS, chooseForm, FORM_QUESTION, formOf, FORMS, identifierWords, NEITHER_SAYS, readOption, requirementTerms, termsMeet } from "../src/plan/forms.ts";
 import { BAR as OBSERVATION_BAR, describe } from "../src/plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR } from "../src/plan/mapping.ts";
 import { LOCAL_CHECK_INTRO, requirementSection } from "../src/report/markdown.ts";
@@ -424,8 +424,13 @@ test("the form question is the measured one: its serialisation hashes to what th
 test("the form question is assembled from the forms' own criteria, in their order, then neither", () => {
   const q = FORM_QUESTION.requirement_form!;
   assert.deepEqual(Object.keys(q), ["type", "instructions", "criteria"]);
-  assert.deepEqual(Object.keys(q.criteria), [...FORM_NAMES, "neither"]);
-  for (const name of FORM_NAMES) assert.equal(q.criteria[name], FORMS[name].says);
+  assert.deepEqual(Object.keys(q.criteria), [...CHOSEN_FORMS, "neither"]);
+  for (const name of CHOSEN_FORMS) assert.equal(q.criteria[name], FORMS[name].says);
+  // A form offered to no sentence (#85) is not in the question, and an answer naming it is the default.
+  assert.deepEqual(CHOSEN_FORMS, ["failure_propagation", "check_before_action"]);
+  assert.ok(!("failure_handling" in q.criteria));
+  const a = (choice: string, p: number): ChoiceAnswer => ({ choice, probability: p, confidence: p, probabilities: { [choice]: p } });
+  assert.deepEqual(chooseForm(a("failure_handling", 0.99)), { form: "failure_propagation", by: "default", verdict: "failure_handling", probability: 0.99 });
   assert.equal(q.criteria.neither, NEITHER_SAYS);
   assert.ok(!(REQUIREMENT_FORMS as readonly string[]).includes("neither"), "neither is an option, not a form");
 });
