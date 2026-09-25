@@ -1,0 +1,563 @@
+{
+  "baselineVersion": 1,
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "budgetFrom": "bench/logs/acceptance-v4.json",
+  "cases": {
+    "grovedb-500": {
+      "shipped": {
+        "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "head": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+        "requirementId": "R1",
+        "budget": 188044,
+        "material": {
+          "bytes": 122583,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 219
+            },
+            {
+              "step": 2,
+              "bytes": 1840
+            },
+            {
+              "step": 3,
+              "path": "merk/src/merk/restore.rs",
+              "bytes": 57643
+            },
+            {
+              "step": 4,
+              "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+              "bytes": 720
+            },
+            {
+              "step": 4,
+              "path": "grovedb-commitment-tree/src/lib.rs",
+              "bytes": 6670
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+              "bytes": 1535
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+              "bytes": 37229
+            },
+            {
+              "step": 4,
+              "path": "grovedb-merkle-mountain-range/src/node.rs",
+              "bytes": 16727
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "grovedb/src/batch/mod.rs",
+            "bytes": 198718
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [],
+            "listed": 0,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.418624,
+            "inputTokens": 2,
+            "outputTokens": 924,
+            "durationMs": 10631
+          }
+        ]
+      },
+      "defect-A": {
+        "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "head": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+        "requirementId": "R1",
+        "budget": 188100,
+        "material": {
+          "bytes": 122539,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 219
+            },
+            {
+              "step": 2,
+              "bytes": 1789
+            },
+            {
+              "step": 3,
+              "path": "merk/src/merk/restore.rs",
+              "bytes": 57650
+            },
+            {
+              "step": 4,
+              "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+              "bytes": 720
+            },
+            {
+              "step": 4,
+              "path": "grovedb-commitment-tree/src/lib.rs",
+              "bytes": 6670
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+              "bytes": 1535
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+              "bytes": 37229
+            },
+            {
+              "step": 4,
+              "path": "grovedb-merkle-mountain-range/src/node.rs",
+              "bytes": 16727
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "grovedb/src/batch/mod.rs",
+            "bytes": 198718
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "finalize",
+                "call": "self.rewrite_heights(grove_version)",
+                "claim": "The result is assigned to `let _`, so a failed height rewrite is thrown away and finalize continues toward returning Ok(self.merk)."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_heights",
+                "call": "self.merk.tree.take().unwrap()",
+                "claim": "If no root tree is loaded, this panics instead of returning an error to the caller."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_child_heights",
+                "call": "TreeNode::decode(\n                walker.tree().key().to_vec(),\n                walker.tree().encode().as_slice(),\n                None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>,\n                grove_version,\n            )\n            .unwrap()",
+                "claim": "A decode failure while rewriting heights panics instead of propagating as an Error."
+              }
+            ],
+            "listed": 3,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.41331599999999996,
+            "inputTokens": 2,
+            "outputTokens": 665,
+            "durationMs": 6824
+          }
+        ]
+      },
+      "rewrite-A": {
+        "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "head": "87e06509bc8da68b9c815ad5799f507d81183c69",
+        "requirementId": "R1",
+        "budget": 188548,
+        "material": {
+          "bytes": 122707,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 219
+            },
+            {
+              "step": 2,
+              "bytes": 1903
+            },
+            {
+              "step": 3,
+              "path": "merk/src/merk/restore.rs",
+              "bytes": 57704
+            },
+            {
+              "step": 4,
+              "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+              "bytes": 720
+            },
+            {
+              "step": 4,
+              "path": "grovedb-commitment-tree/src/lib.rs",
+              "bytes": 6670
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+              "bytes": 1535
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+              "bytes": 37229
+            },
+            {
+              "step": 4,
+              "path": "grovedb-merkle-mountain-range/src/node.rs",
+              "bytes": 16727
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "grovedb/src/batch/mod.rs",
+            "bytes": 198718
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [],
+            "listed": 0,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.4133,
+            "inputTokens": 2,
+            "outputTokens": 643,
+            "durationMs": 7406
+          }
+        ]
+      }
+    },
+    "moltis-1064": {
+      "shipped": {
+        "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "head": "4106d46dad04481a932597141739e42a5452cc86",
+        "requirementId": "R1",
+        "budget": 135988,
+        "material": {
+          "bytes": 126575,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 166
+            },
+            {
+              "step": 2,
+              "bytes": 17986
+            },
+            {
+              "step": 3,
+              "path": "crates/chat/src/service/chat_impl/send.rs",
+              "bytes": 64046
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+              "bytes": 14785
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/methods/services/sessions.rs",
+              "bytes": 12520
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/session/title.rs",
+              "bytes": 10611
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/json_repair.rs",
+              "bytes": 6461
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "crates/agents/src/lazy_tools.rs",
+            "bytes": 18670
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "from_auxiliary.or(from_session).or_else(|| reg.first())",
+                "claim": "When no provider can be resolved for title generation, the function logs at debug level and returns Ok(None), so the caller gets a successful result with no label instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/methods/services/sessions.rs",
+                "function": "register",
+                "call": "crate::session::title::generate_title_for_session(&ctx.state, &key)",
+                "claim": "When generation cannot produce a title and returns Ok(None) (no provider, no registry, or missing stores), the `sessions.generate_title` RPC falls back to the existing label and can respond `{ \"ok\": true, \"label\": null }`, which is a successful result with no label."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "state.services.session_store.as_ref()",
+                "claim": "If the session store (or session metadata) service is missing, title generation cannot happen, yet the function returns Ok(None) instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_if_needed",
+                "call": "try_generate_title_if_needed(state, session_key)",
+                "claim": "Any error from automatic title generation is only logged with `warn!` and swallowed, because the function returns `()`, so the failure never reaches its caller."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "inner.llm_providers",
+                "claim": "If no provider registry is available, the function returns Ok(None) instead of an error, so callers see success without a generated label."
+              }
+            ],
+            "listed": 5,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.363972,
+            "inputTokens": 2,
+            "outputTokens": 1421,
+            "durationMs": 13577
+          }
+        ]
+      },
+      "defect-A": {
+        "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "head": "fa45a528825734c277a84107af93b4ea9ff105d0",
+        "requirementId": "R1",
+        "budget": 136160,
+        "material": {
+          "bytes": 126659,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 166
+            },
+            {
+              "step": 2,
+              "bytes": 18029
+            },
+            {
+              "step": 3,
+              "path": "crates/chat/src/service/chat_impl/send.rs",
+              "bytes": 64046
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+              "bytes": 14785
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/methods/services/sessions.rs",
+              "bytes": 12520
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/session/title.rs",
+              "bytes": 10652
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/json_repair.rs",
+              "bytes": 6461
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "crates/agents/src/lazy_tools.rs",
+            "bytes": 18670
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "moltis_agents::title::generate_title(provider, &chat_msgs).await",
+                "claim": "When the LLM title call fails, the `let Ok(title) = ... else { return Ok(None); }` pattern discards the error and returns Ok(None), so the sessions.generate_title RPC replies ok:true with a null label and the /title command replies with the old label or \"untitled\" instead of an error."
+              }
+            ],
+            "listed": 1,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.34911200000000003,
+            "inputTokens": 2,
+            "outputTokens": 664,
+            "durationMs": 8253
+          }
+        ]
+      },
+      "rewrite-A": {
+        "base": "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4",
+        "head": "e14b5b7d1268fc583d428735086583335943e684",
+        "requirementId": "R1",
+        "budget": 136296,
+        "material": {
+          "bytes": 126726,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 166
+            },
+            {
+              "step": 2,
+              "bytes": 18063
+            },
+            {
+              "step": 3,
+              "path": "crates/chat/src/service/chat_impl/send.rs",
+              "bytes": 64046
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+              "bytes": 14785
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/methods/services/sessions.rs",
+              "bytes": 12520
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/session/title.rs",
+              "bytes": 10685
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/json_repair.rs",
+              "bytes": 6461
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "crates/agents/src/lazy_tools.rs",
+            "bytes": 18670
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "from_auxiliary.or(from_session).or_else(|| reg.first())",
+                "claim": "When no provider can be resolved for title generation, the function only logs at debug level and returns `Ok(None)`, so `sessions.generate_title` replies `{ok: true, label: null}` and `/title` replies \"Title: untitled\" instead of reporting an error."
+              }
+            ],
+            "listed": 1,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.356524,
+            "inputTokens": 2,
+            "outputTokens": 1025,
+            "durationMs": 10976
+          }
+        ]
+      },
+      "defect-B": {
+        "base": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+        "head": "4697c3977399b015efd2ac38fd9aec6797783117",
+        "requirementId": "R1",
+        "budget": 136932,
+        "material": {
+          "bytes": 126575,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 166
+            },
+            {
+              "step": 2,
+              "bytes": 17986
+            },
+            {
+              "step": 3,
+              "path": "crates/chat/src/service/chat_impl/send.rs",
+              "bytes": 64046
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+              "bytes": 14785
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/methods/services/sessions.rs",
+              "bytes": 12520
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/session/title.rs",
+              "bytes": 10611
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/json_repair.rs",
+              "bytes": 6461
+            }
+          ],
+          "stoppedAt": {
+            "step": 4,
+            "path": "crates/agents/src/lazy_tools.rs",
+            "bytes": 18670
+          }
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "from_auxiliary.or(from_session).or_else(|| reg.first())",
+                "claim": "When no provider can be resolved, the function returns Ok(None) instead of an error, so the title-generation failure looks like a successful result with no label."
+              },
+              {
+                "file": "crates/gateway/src/methods/services/sessions.rs",
+                "function": "register",
+                "call": "crate::session::title::generate_title_for_session(&ctx.state, &key)",
+                "claim": "When generation is skipped because there is no store, metadata, registry, provider or enough messages, Ok(None) comes back and the RPC replies {\"ok\": true, \"label\": null} instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+                "function": "handle_title",
+                "call": "crate::session::title::generate_title_for_session(state, session_key)",
+                "claim": "When generation yields Ok(None) because a provider, store or metadata is missing, the /title command replies successfully with \"Title: untitled\" instead of returning an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_if_needed",
+                "call": "try_generate_title_if_needed(state, session_key)",
+                "claim": "When automatic title generation fails, the error is only logged with warn! and swallowed, so the caller (trigger_auto_title) never receives an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "state.services.session_store.as_ref()",
+                "claim": "When the session store is unavailable, the function returns Ok(None) instead of an error, so the caller gets a successful result with no label."
+              }
+            ],
+            "listed": 5,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.369,
+            "inputTokens": 2,
+            "outputTokens": 1672,
+            "durationMs": 14841
+          }
+        ]
+      }
+    }
+  }
+}

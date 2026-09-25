@@ -1,0 +1,249 @@
+{
+  "baselineVersion": 1,
+  "model": "claude-opus-5-5",
+  "effort": "high",
+  "budgetFrom": "bench/logs/acceptance-v4.json",
+  "cases": {
+    "grovedb-500": {
+      "defect-A": {
+        "base": "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5",
+        "head": "26efc3e5a004ad96250d823e95e7ca893e13d62f",
+        "requirementId": "R1",
+        "budget": 188100,
+        "material": {
+          "bytes": 187788,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 219
+            },
+            {
+              "step": 2,
+              "bytes": 1789
+            },
+            {
+              "step": 3,
+              "path": "merk/src/merk/restore.rs",
+              "bytes": 57650
+            },
+            {
+              "step": 4,
+              "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+              "bytes": 720
+            },
+            {
+              "step": 4,
+              "path": "grovedb-commitment-tree/src/lib.rs",
+              "bytes": 6670
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+              "bytes": 1535
+            },
+            {
+              "step": 4,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/tests.rs",
+              "bytes": 37229
+            },
+            {
+              "step": 4,
+              "path": "grovedb-merkle-mountain-range/src/node.rs",
+              "bytes": 16727
+            },
+            {
+              "step": 4,
+              "path": "grovedb/src/replication/state_sync_session.rs",
+              "bytes": 30611
+            },
+            {
+              "step": 4,
+              "path": "grovedb/src/tests/chunk_branch_proof_tests.rs",
+              "bytes": 12051
+            },
+            {
+              "step": 4,
+              "path": "grovedb/src/tests/trunk_proof_tests.rs",
+              "bytes": 15324
+            },
+            {
+              "step": 4,
+              "path": "merk/src/proofs/chunk/error.rs",
+              "bytes": 4567
+            },
+            {
+              "step": 5,
+              "path": "grovedb-dense-fixed-sized-merkle-tree/src/lib.rs",
+              "bytes": 858
+            },
+            {
+              "step": 5,
+              "path": "merk/src/tree/commit.rs",
+              "bytes": 1500
+            },
+            {
+              "step": 5,
+              "path": "merk/src/proofs/chunk.rs",
+              "bytes": 338
+            }
+          ],
+          "skipped": 224,
+          "stoppedAt": null
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "finalize",
+                "call": "self.rewrite_heights(grove_version)",
+                "claim": "The result is assigned to `let _`, so a failed height rewrite is discarded and finalize goes on to reload the root and can return Ok(self.merk) as if the restore had finished."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_heights",
+                "call": "self.merk.tree.take().unwrap()",
+                "claim": "If the root node was not loaded, this unwrap panics instead of returning an Err to the caller of finalize."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_child_heights",
+                "call": "TreeNode::decode(\n                walker.tree().key().to_vec(),\n                walker.tree().encode().as_slice(),\n                None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>,\n                grove_version,\n            )\n            .unwrap()",
+                "claim": "If decoding a node fails during the height rewrite, the unwrap panics instead of passing the error back through rewrite_heights to the finalize caller."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_child_heights",
+                "call": "cloned_node.link_mut(LEFT).unwrap()",
+                "claim": "If the cloned node has no left link, this unwrap panics during the height rewrite instead of returning an error to the caller."
+              },
+              {
+                "file": "merk/src/merk/restore.rs",
+                "function": "rewrite_child_heights",
+                "call": "cloned_node.link_mut(RIGHT).unwrap()",
+                "claim": "If the cloned node has no right link, this unwrap panics during the height rewrite instead of returning an error to the caller."
+              }
+            ],
+            "listed": 5,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.616748,
+            "inputTokens": 74617,
+            "outputTokens": 991,
+            "durationMs": 9218
+          }
+        ]
+      }
+    },
+    "moltis-1064": {
+      "defect-B": {
+        "base": "3eae0c6bcbcafe16167085ca8f4381cbff0051d4",
+        "head": "4697c3977399b015efd2ac38fd9aec6797783117",
+        "requirementId": "R1",
+        "budget": 136932,
+        "material": {
+          "bytes": 136902,
+          "parts": [
+            {
+              "step": 1,
+              "bytes": 166
+            },
+            {
+              "step": 2,
+              "bytes": 17986
+            },
+            {
+              "step": 3,
+              "path": "crates/chat/src/service/chat_impl/send.rs",
+              "bytes": 64046
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+              "bytes": 14785
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/methods/services/sessions.rs",
+              "bytes": 12520
+            },
+            {
+              "step": 3,
+              "path": "crates/gateway/src/session/title.rs",
+              "bytes": 10611
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/json_repair.rs",
+              "bytes": 6461
+            },
+            {
+              "step": 4,
+              "path": "crates/agents/src/model/chat.rs",
+              "bytes": 8349
+            },
+            {
+              "step": 4,
+              "path": "crates/channels/src/message_log.rs",
+              "bytes": 1250
+            },
+            {
+              "step": 4,
+              "path": "crates/config/src/schema/hooks.rs",
+              "bytes": 728
+            }
+          ],
+          "skipped": 707,
+          "stoppedAt": null
+        },
+        "runs": [
+          {
+            "counted": true,
+            "findings": [
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "from_auxiliary.or(from_session).or_else(|| reg.first())",
+                "claim": "When no LLM provider can be resolved, the function only logs at debug level and returns Ok(None), so `sessions.generate_title` answers `{\"ok\": true, \"label\": null}` instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "state.inner.read().await",
+                "claim": "When `inner.llm_providers` is None (no provider registry), title generation is abandoned with Ok(None), so the RPC and `/title` callers get a success with no generated label instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "state.services.session_store.as_ref()",
+                "claim": "When the session store service is unavailable, the function returns Ok(None), so the caller reports success with a null or \"untitled\" label instead of an error."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_for_session",
+                "call": "state.services.session_metadata.as_ref()",
+                "claim": "When the session metadata service is unavailable, the title cannot be generated or persisted, yet the function returns Ok(None), which callers turn into a successful response with no label."
+              },
+              {
+                "file": "crates/gateway/src/session/title.rs",
+                "function": "generate_title_if_needed",
+                "call": "try_generate_title_if_needed(state, session_key)",
+                "claim": "Any error from automatic title generation, including provider and persistence failures, is only logged with `warn!`, and the function returns `()`, so the error never reaches its caller."
+              }
+            ],
+            "listed": 5,
+            "model": [
+              "claude-opus-5-5"
+            ],
+            "costUsd": 0.39658400000000005,
+            "inputTokens": 45464,
+            "outputTokens": 1644,
+            "durationMs": 15707
+          }
+        ]
+      }
+    }
+  }
+}
