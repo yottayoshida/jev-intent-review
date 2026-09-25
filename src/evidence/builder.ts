@@ -234,7 +234,7 @@ export interface SentBody {
 
 export type DecisiveBodies =
   | { hold: string }
-  | { related: Related[]; sent: SentBody[]; locations: Location[]; redactions: number; notSent: string[] };
+  | { related: Related[]; sent: SentBody[]; notSent: string[] };
 
 /**
  * The bodies of the checks a form named, and of the functions they call, one level down.
@@ -248,10 +248,8 @@ export type DecisiveBodies =
 export async function decisiveBodies(discoverer: Discoverer, names: readonly string[], asked: { path: string; startLine: number; endLine: number }, limits: { each: number; total: number } = DECISIVE_LIMITS): Promise<DecisiveBodies> {
   const related: Related[] = [];
   const sent: SentBody[] = [];
-  const locations: Location[] = [];
   const notSent: string[] = [];
   let used = 0;
-  let redactions = 0;
   const taken = new Set<string>();
 
   /** One definition's body, or why it cannot be sent. `null`: the repository does not define it. */
@@ -268,14 +266,12 @@ export async function decisiveBodies(discoverer: Discoverer, names: readonly str
     // nothing more to send.
     if (def.path === asked.path && block.startLine >= asked.startLine && block.endLine <= asked.endLine) return null;
     const r = redact(slice(index.lines, block.startLine, block.endLine));
-    redactions += r.count;
     return { code: r.text, path: def.path, start: block.startLine, end: block.endLine };
   };
   const take = (name: string, b: { code: string; path: string; start: number; end: number }, depth: 1 | 2) => {
     used += b.code.length;
     taken.add(name);
     related.push({ path: b.path, lines: span(b.start, b.end), code: b.code });
-    locations.push({ path: b.path, startLine: b.start, endLine: b.end });
     sent.push({ name, path: b.path, lines: span(b.start, b.end), depth });
   };
 
@@ -303,5 +299,5 @@ export async function decisiveBodies(discoverer: Discoverer, names: readonly str
       take(name, b, 2);
     }
   }
-  return { related, sent, locations, redactions, notSent: [...new Set(notSent)] };
+  return { related, sent, notSent: [...new Set(notSent)] };
 }

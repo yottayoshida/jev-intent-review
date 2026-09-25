@@ -398,16 +398,20 @@ export async function runLocalCheck(
   };
 
   // What a form is given to name the code a reading turns on (ADR 0019): the function's calls, from
-  // the same listing the run reads, and whether the repository defines a name. Both depend on the
+  // the listing the run already has for its file — a sibling's file is listed here once, since it is
+  // not among the change's sources — and whether the repository defines a name. Both depend on the
   // commit alone, so each is looked up once.
   const listings = new Map<string, Promise<ReturnType<typeof enumerate> | null>>();
   const callsOf = async (fn: FunctionCandidate): Promise<CallCandidate[]> => {
+    const own = fromChange.sources.get(fn.path)?.candidates;
+    if (own) return own.calls.filter((c) => c.functionId === fn.id);
     let listing = listings.get(fn.path);
     if (!listing) {
       listing = discoverer.index(fn.path).then((index) => (index ? enumerate(fn.path, index.lines.join("\n")) : null));
       listings.set(fn.path, listing);
     }
     const l = await listing;
+    // Ids are positional within a listing, so a function of another listing is matched by place.
     const same = l?.functions.find((f) => f.name === fn.name && f.startLine === fn.startLine);
     return same ? l!.calls.filter((c) => c.functionId === same.id) : [];
   };
@@ -462,8 +466,6 @@ export async function runLocalCheck(
         return tally;
       }
       evidence.packet.evidence.related.push(...bodies.related);
-      evidence.sent.push(...bodies.locations);
-      evidence.redactions += bodies.redactions;
       sent = bodies.sent;
       notSent = bodies.notSent;
     }
