@@ -1,0 +1,1062 @@
+{
+ "note": "Seed 81 sample of bench/logs/call-oracle-provisional.json (node bench/call-oracle.ts sample). Three fresh subagent annotators, each shown the position, the function and the source context but not the class, answered whether the name is the callee of an in-scope call in that function (docs/call-oracle.md, *Checking the oracle*). wrong_function had no rows to draw. Drawn from the first run; the record was measured again after files a parent declares test-only were taken out of scope, and none of the 70 changed class.",
+ "threshold": "majority agrees with the oracle on more than 95% of items",
+ "result": {
+  "items": 70,
+  "majorityAgrees": 70,
+  "unanimous": 70,
+  "allYesAnnotatorWouldAgree": 50
+ },
+ "items": [
+  {
+   "item": 1,
+   "path": "crates/gateway/src/local_llm_setup/service.rs",
+   "function": "configure_custom@519",
+   "line": 695,
+   "column": 43,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 2,
+   "path": "crates/tailscale/src/manager.rs",
+   "function": "status@521",
+   "line": 529,
+   "column": 20,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 3,
+   "path": "merk/src/proofs/query/merk_integration_tests.rs",
+   "function": "range_to_proof@1376",
+   "line": 1505,
+   "column": 19,
+   "name": "make_6_node_tree",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 4,
+   "path": "core/indexer/src/reg_tester.rs",
+   "function": "wit@566",
+   "line": 568,
+   "column": 8,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 5,
+   "path": "core/indexer/src/runtime/storage.rs",
+   "function": "contract_id@100",
+   "line": 101,
+   "column": 8,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 6,
+   "path": "crates/providers/src/local_llm/models.rs",
+   "function": "ensure_mlx_repo_with_progress@635",
+   "line": 644,
+   "column": 30,
+   "name": "join",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 7,
+   "path": "crates/media/src/image_ops.rs",
+   "function": "needs_optimization@68",
+   "line": 71,
+   "column": 15,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 8,
+   "path": "src/control_plane/utils.rs",
+   "function": "render_template@413",
+   "line": 493,
+   "column": 50,
+   "name": "collect",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 9,
+   "path": "src/client/tests.rs",
+   "function": "test_ack_behavior_for_incoming_stanzas@10",
+   "line": 62,
+   "column": 13,
+   "name": "insert",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 10,
+   "path": "crates/skills/src/usage.rs",
+   "function": "record_write@148",
+   "line": 151,
+   "column": 39,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 11,
+   "path": "core/indexer/src/consensus/proposal_part.rs",
+   "function": "from_proto@145",
+   "line": 157,
+   "column": 47,
+   "name": "ProtoError::missing_field",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 12,
+   "path": "crates/graphql/src/queries/resolvers.rs",
+   "function": "health@33",
+   "line": 35,
+   "column": 8,
+   "name": "from_service",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 13,
+   "path": "src/client/tests.rs",
+   "function": "test_build_ack_node_for_message_without_recipient_omits_recipient@2008",
+   "line": 2013,
+   "column": 9,
+   "name": "attr",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 14,
+   "path": "grovedb/src/operations/proof/verify.rs",
+   "function": "verify_layer_proof_v1@390",
+   "line": 470,
+   "column": 39,
+   "name": "Element::CountTree",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 15,
+   "path": "src/traceback.rs",
+   "function": "make_relative@142",
+   "line": 156,
+   "column": 49,
+   "name": "strip_prefix",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 16,
+   "path": "wacore/src/store/traits.rs",
+   "function": "put_identities_batch@115",
+   "line": 122,
+   "column": 8,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 17,
+   "path": "crates/code-index/src/store_sqlite.rs",
+   "function": "chunk_count@325",
+   "line": 333,
+   "column": 36,
+   "name": "Error::IndexStore",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 18,
+   "path": "crates/sessions/src/metadata/tests.rs",
+   "function": "test_mcp_disabled@606",
+   "line": 607,
+   "column": 24,
+   "name": "tempfile::tempdir",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 19,
+   "path": "grovedb-query/src/query_item/mod.rs",
+   "function": "serialize@82",
+   "line": 103,
+   "column": 23,
+   "name": "QueryItem::RangeToInclusive",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 20,
+   "path": "src/types.rs",
+   "function": "extract_kwarg_or_env@21",
+   "line": 32,
+   "column": 21,
+   "name": "extract",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 21,
+   "path": "crates/matrix/src/plugin.rs",
+   "function": "start_account@284",
+   "line": 323,
+   "column": 45,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 22,
+   "path": "crates/providers/src/local_llm/backend.rs",
+   "function": "stream_generate_python@1073",
+   "line": 1142,
+   "column": 28,
+   "name": "is_empty",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 23,
+   "path": "crates/cron/src/service/tests.rs",
+   "function": "test_wake_allowed_after_cooldown_expires@888",
+   "line": 901,
+   "column": 19,
+   "name": "get_hb_next_run",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 24,
+   "path": "crates/tools/src/fs/shared.rs",
+   "function": "consecutive_reads@606",
+   "line": 608,
+   "column": 13,
+   "name": "get",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 25,
+   "path": "crates/gateway/src/session.rs",
+   "function": "message_text@157",
+   "line": 172,
+   "column": 13,
+   "name": "collect",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 26,
+   "path": "src/client/tests.rs",
+   "function": "test_message_ack_source_node_status_addressing@2169",
+   "line": 2179,
+   "column": 19,
+   "name": "Default::default",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 27,
+   "path": "crates/httpd/src/ssh_routes.rs",
+   "function": "configure_ssh_askpass@883",
+   "line": 890,
+   "column": 13,
+   "name": "std::fs::write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 28,
+   "path": "crates/gateway/src/server/startup.rs",
+   "function": "sync_runtime_webauthn_host_and_notice@185",
+   "line": 240,
+   "column": 31,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 29,
+   "path": "crates/chat/src/chat_error.rs",
+   "function": "parse_retry_delay_ms_from_fragment@317",
+   "line": 328,
+   "column": 36,
+   "name": "parse",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 30,
+   "path": "grovedb/src/replication/state_sync_session.rs",
+   "function": "apply_chunk@382",
+   "line": 444,
+   "column": 63,
+   "name": "len",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 31,
+   "path": "src/continuation.rs",
+   "function": "pyobject_to_json@805",
+   "line": 816,
+   "column": 15,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 32,
+   "path": "crates/gateway/src/onboarding.rs",
+   "function": "identity_update@215",
+   "line": 224,
+   "column": 40,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 33,
+   "path": "crates/sessions/src/metadata.rs",
+   "function": "compare_sidebar_order@124",
+   "line": 130,
+   "column": 37,
+   "name": "cmp",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 34,
+   "path": "crates/tools/src/task_list.rs",
+   "function": "persist@132",
+   "line": 133,
+   "column": 31,
+   "name": "read",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 35,
+   "path": "crates/code-index/src/backend_qmd.rs",
+   "function": "qmd_config_for_project@48",
+   "line": 63,
+   "column": 20,
+   "name": "insert",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 36,
+   "path": "grovedb/src/operations/commitment_tree.rs",
+   "function": "commitment_tree_get_value@271",
+   "line": 295,
+   "column": 23,
+   "name": "Err",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 37,
+   "path": "crates/tools/src/web_fetch.rs",
+   "function": "fetch_url@147",
+   "line": 221,
+   "column": 23,
+   "name": "is_success",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 38,
+   "path": "crates/auth/src/credential_store/tests.rs",
+   "function": "test_credential_store_env_vars@259",
+   "line": 277,
+   "column": 10,
+   "name": "set_env_var",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 39,
+   "path": "core/indexer/src/database/types.rs",
+   "function": "from_str@291",
+   "line": 309,
+   "column": 13,
+   "name": "parse",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 40,
+   "path": "merk/src/proofs/query/merk_integration_tests.rs",
+   "function": "test_kvvaluehash_still_used_for_tree_discriminants@4125",
+   "line": 4212,
+   "column": 15,
+   "name": "insert_key",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 41,
+   "path": "crates/external-agents/src/registry.rs",
+   "function": "send_prompt@202",
+   "line": 220,
+   "column": 10,
+   "name": "cfg",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 42,
+   "path": "src/control_plane/utils.rs",
+   "function": "parse_error_fields@358",
+   "line": 386,
+   "column": 32,
+   "name": "Some",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 43,
+   "path": "crates/voice/src/stt/voxtral_local.rs",
+   "function": "is_configured@77",
+   "line": 81,
+   "column": 19,
+   "name": "is_some",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 44,
+   "path": "core/indexer/src/consensus/codec.rs",
+   "function": "decode_polka_certificate@501",
+   "line": 527,
+   "column": 13,
+   "name": "collect",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 45,
+   "path": "src/continuation.rs",
+   "function": "json_to_pyobject@773",
+   "line": 783,
+   "column": 22,
+   "name": "None",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 46,
+   "path": "merk/src/proofs/query/merk_integration_tests.rs",
+   "function": "test_kvvaluehash_still_used_for_tree_discriminants@4125",
+   "line": 4140,
+   "column": 17,
+   "name": "clone",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 47,
+   "path": "src/client/tests.rs",
+   "function": "test_encrypt_identity_notification_omits_type@1765",
+   "line": 1769,
+   "column": 9,
+   "name": "attr",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 48,
+   "path": "merk/src/proofs/query/merk_integration_tests.rs",
+   "function": "doc_proof@697",
+   "line": 825,
+   "column": 20,
+   "name": "next",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 49,
+   "path": "crates/config/src/loader/config_io.rs",
+   "function": "save_user_config_to_path@411",
+   "line": 412,
+   "column": 31,
+   "name": "parent",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 50,
+   "path": "crates/matrix/src/outbound.rs",
+   "function": "poll_relation_from_value@886",
+   "line": 894,
+   "column": 17,
+   "name": "then",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 51,
+   "path": "merk/src/element/reconstruct.rs",
+   "function": "reconstruct_with_root_key@22",
+   "line": 28,
+   "column": 21,
+   "name": "Element::Tree",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 52,
+   "path": "crates/auth/src/credential_store/sessions.rs",
+   "function": "with_config@88",
+   "line": 105,
+   "column": 35,
+   "name": "auth_state",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 53,
+   "path": "crates/config/src/schema/agents.rs",
+   "function": "builtin_agent_preset@175",
+   "line": 186,
+   "column": 19,
+   "name": "Some",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 54,
+   "path": "crates/openclaw-import/src/identity.rs",
+   "function": "candidate_workspace_dirs@363",
+   "line": 415,
+   "column": 9,
+   "name": "iter",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 55,
+   "path": "path/src/subtree_path_builder.rs",
+   "function": "len@120",
+   "line": 124,
+   "column": 33,
+   "name": "SubtreePathRelative::Multi",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 56,
+   "path": "crates/tools/src/checkpoints.rs",
+   "function": "classify_source_kind@446",
+   "line": 451,
+   "column": 15,
+   "name": "Ok",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 57,
+   "path": "crates/tools/src/fs/contract_tests.rs",
+   "function": "read_write_edit_multi_edit_via_registry@188",
+   "line": 244,
+   "column": 13,
+   "name": "as_str",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 58,
+   "path": "core/indexer/src/consensus/codec.rs",
+   "function": "decode@285",
+   "line": 290,
+   "column": 39,
+   "name": "ProtoError::missing_field",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 59,
+   "path": "crates/gateway/src/channel_events/commands/quick_actions.rs",
+   "function": "handle_insights@325",
+   "line": 480,
+   "column": 54,
+   "name": "filter",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 60,
+   "path": "crates/swift-bridge/src/ffi_config.rs",
+   "function": "moltis_memory_config_get@203",
+   "line": 205,
+   "column": 4,
+   "name": "trace_call",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 61,
+   "path": "crates/gateway/src/methods/services/voicecall.rs",
+   "function": "register@6",
+   "line": 208,
+   "column": 58,
+   "name": "as_str",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 62,
+   "path": "grovedb/src/operations/proof/generate.rs",
+   "function": "query_items_to_leaf_indices@1644",
+   "line": 1707,
+   "column": 39,
+   "name": "min",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 63,
+   "path": "wacore/src/send/tests.rs",
+   "function": "test_cloud_api_device_without_prekey@590",
+   "line": 614,
+   "column": 49,
+   "name": "is_some",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "item": 64,
+   "path": "crates/gateway/src/methods/voice.rs",
+   "function": "apply_voice_provider_settings@1046",
+   "line": 1118,
+   "column": 44,
+   "name": "Some",
+   "class": "declared_exclusion",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 65,
+   "path": "crates/providers/src/local_gguf/tool_grammar.rs",
+   "function": "build_tool_call_grammar@17",
+   "line": 22,
+   "column": 30,
+   "name": "String::with_capacity",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 66,
+   "path": "src/commands/test.rs",
+   "function": "run_tests@295",
+   "line": 508,
+   "column": 39,
+   "name": "to_string",
+   "class": "detected",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 67,
+   "path": "src/types.rs",
+   "function": "drain_batch@976",
+   "line": 1025,
+   "column": 46,
+   "name": "PyErr::new",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 68,
+   "path": "crates/tools/src/sandbox/router.rs",
+   "function": "switch_to_fallback@68",
+   "line": 69,
+   "column": 49,
+   "name": "write",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 69,
+   "path": "crates/providers/src/local_llm/backend.rs",
+   "function": "generate_with_python@860",
+   "line": 907,
+   "column": 19,
+   "name": "strip_chat_template_tokens",
+   "class": "silent_miss",
+   "oracleSays": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "item": 70,
+   "path": "crates/cron/src/service/tests.rs",
+   "function": "test_deliver_empty_string_channel_fails@832",
+   "line": 834,
+   "column": 30,
+   "name": "noop_system_event",
+   "class": "false_positive",
+   "oracleSays": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  }
+ ]
+}

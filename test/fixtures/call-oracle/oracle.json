@@ -1,0 +1,1775 @@
+{
+ "note": "Written by `node bench/call-oracle.ts fixtures`. test/call-oracle.test.ts checks the shas.",
+ "sources": {
+  "src/main.rs": "a15dec5b7dd62807541388d9a3d647f137be145d6b9582033f1c5bab1213d4be",
+  "Cargo.toml": "f12d2bbdae786011e40dd85157ca57bb8a71f545b9847b7b16695f75a03484a1",
+  "Cargo.lock": "cc7e1f376173511677a6591ff86e00ca58a96f472052690fbfad94d380a601a9"
+ },
+ "files": [
+  {
+   "sha256": "0ada2a09303efea5caf35b1a38c0f5b4bde0240539a6535c60bcfd7b457de0c8",
+   "calls": [
+    {
+     "callee": "real",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "real",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "other",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "other",
+     "line": 7,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      7,
+      8,
+      1
+     ],
+     "line": 2,
+     "name": "f"
+    }
+   ],
+   "lines": 9,
+   "mods": [],
+   "parsed": true,
+   "path": "comments.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      7,
+      8,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ],
+     [
+      3,
+      4,
+      3,
+      29
+     ],
+     [
+      6,
+      4,
+      6,
+      22
+     ],
+     [
+      7,
+      14,
+      7,
+      33
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      5,
+      8,
+      5,
+      9
+     ]
+    ],
+    "string": [
+     [
+      5,
+      12,
+      5,
+      27
+     ]
+    ],
+    "test_only": [],
+    "type": []
+   }
+  },
+  {
+   "sha256": "6a954731617064bd3f61cf46d8195eac30e6727643fcb81c4de0e0a36bc47d14",
+   "calls": [
+    {
+     "callee": "zero",
+     "capitalized": false,
+     "column": 16,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "zero",
+     "line": 6,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "E::A",
+     "capitalized": true,
+     "column": 15,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "A",
+     "line": 8,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "drop",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "drop",
+     "line": 9,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "Ok",
+     "capitalized": true,
+     "column": 4,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "Ok",
+     "line": 10,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      3,
+      29,
+      11,
+      1
+     ],
+     "line": 3,
+     "name": "f"
+    },
+    {
+     "body": [
+      12,
+      16,
+      12,
+      21
+     ],
+     "line": 12,
+     "name": "zero"
+    }
+   ],
+   "lines": 13,
+   "mods": [],
+   "parsed": true,
+   "path": "constructors.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      3,
+      29,
+      11,
+      1
+     ],
+     [
+      12,
+      16,
+      12,
+      21
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      3,
+      5,
+      3,
+      6
+     ],
+     [
+      4,
+      8,
+      4,
+      9
+     ],
+     [
+      5,
+      8,
+      5,
+      15
+     ],
+     [
+      5,
+      13,
+      5,
+      14
+     ],
+     [
+      6,
+      8,
+      6,
+      12
+     ],
+     [
+      8,
+      8,
+      8,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      2,
+      11,
+      2,
+      13
+     ],
+     [
+      3,
+      8,
+      3,
+      9
+     ],
+     [
+      3,
+      14,
+      3,
+      28
+     ],
+     [
+      3,
+      21,
+      3,
+      23
+     ],
+     [
+      3,
+      25,
+      3,
+      27
+     ],
+     [
+      12,
+      13,
+      12,
+      15
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "59b42f8d4d999715c8c9115a007062f3256593dcda2b3a8e7df130e612d8c458",
+   "calls": [
+    {
+     "callee": "unwrap",
+     "capitalized": false,
+     "column": 20,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "unwrap",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "write",
+     "capitalized": false,
+     "column": 8,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "write",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "format",
+     "capitalized": false,
+     "column": 12,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "format",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "to_string",
+     "capitalized": false,
+     "column": 31,
+     "fn": {
+      "line": 9,
+      "name": "format"
+     },
+     "kind": "method",
+     "last": "to_string",
+     "line": 9,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      3,
+      24,
+      8,
+      1
+     ],
+     "line": 3,
+     "name": "f"
+    },
+    {
+     "body": [
+      9,
+      27,
+      9,
+      44
+     ],
+     "line": 9,
+     "name": "format"
+    }
+   ],
+   "lines": 10,
+   "mods": [],
+   "parsed": true,
+   "path": "macro_names.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      3,
+      24,
+      8,
+      1
+     ],
+     [
+      9,
+      27,
+      9,
+      44
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [
+     [
+      6,
+      4,
+      6,
+      21
+     ],
+     [
+      7,
+      12,
+      7,
+      28
+     ]
+    ],
+    "pattern": [
+     [
+      3,
+      5,
+      3,
+      8
+     ],
+     [
+      5,
+      8,
+      5,
+      9
+     ],
+     [
+      7,
+      8,
+      7,
+      9
+     ],
+     [
+      9,
+      10,
+      9,
+      11
+     ]
+    ],
+    "string": [
+     [
+      4,
+      14,
+      4,
+      18
+     ]
+    ],
+    "test_only": [],
+    "type": [
+     [
+      3,
+      10,
+      3,
+      22
+     ],
+     [
+      3,
+      15,
+      3,
+      22
+     ],
+     [
+      3,
+      19,
+      3,
+      21
+     ],
+     [
+      9,
+      13,
+      9,
+      15
+     ],
+     [
+      9,
+      20,
+      9,
+      26
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "35f9f3d19f0aff892315ca43e3c2f430f20b5e034e1c22e813bc7ca2a7cfbbfa",
+   "calls": [
+    {
+     "callee": "compute",
+     "capitalized": false,
+     "column": 12,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "compute",
+     "line": 3,
+     "multiline": true,
+     "turbofish": "none"
+    },
+    {
+     "callee": "build",
+     "capitalized": false,
+     "column": 9,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "build",
+     "line": 7,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "with",
+     "capitalized": false,
+     "column": 9,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "with",
+     "line": 6,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "builder",
+     "capitalized": false,
+     "column": 12,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "builder",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "g",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "g",
+     "line": 8,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      7,
+      9,
+      1
+     ],
+     "line": 2,
+     "name": "f"
+    }
+   ],
+   "lines": 10,
+   "mods": [],
+   "parsed": true,
+   "path": "multiline.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      7,
+      9,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      3,
+      8,
+      3,
+      9
+     ],
+     [
+      5,
+      8,
+      5,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": []
+   }
+  },
+  {
+   "sha256": "630b7bde9bd422ddec30868032e08a9767df015158758fc8339e35055fe88129",
+   "calls": [
+    {
+     "callee": "deep",
+     "capitalized": false,
+     "column": 8,
+     "fn": {
+      "line": 3,
+      "name": "inner"
+     },
+     "kind": "path",
+     "last": "deep",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "inner",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "outer"
+     },
+     "kind": "path",
+     "last": "inner",
+     "line": 6,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "helper",
+     "capitalized": false,
+     "column": 20,
+     "fn": {
+      "line": 2,
+      "name": "outer"
+     },
+     "kind": "path",
+     "last": "helper",
+     "line": 7,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      11,
+      8,
+      1
+     ],
+     "line": 2,
+     "name": "outer"
+    },
+    {
+     "body": [
+      3,
+      15,
+      5,
+      5
+     ],
+     "line": 3,
+     "name": "inner"
+    }
+   ],
+   "lines": 9,
+   "mods": [],
+   "parsed": true,
+   "path": "nested.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      11,
+      8,
+      1
+     ],
+     [
+      3,
+      15,
+      5,
+      5
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      7,
+      8,
+      7,
+      9
+     ],
+     [
+      7,
+      13,
+      7,
+      18
+     ],
+     [
+      7,
+      13,
+      7,
+      14
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      7,
+      16,
+      7,
+      18
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "e2f35927e8b41527e208cfd530ebba082336383efd98fcf7b7d8341f82c88a7f",
+   "calls": [
+    {
+     "callee": "foo",
+     "capitalized": false,
+     "column": 9,
+     "fn": {
+      "line": 2,
+      "name": "a"
+     },
+     "kind": "path",
+     "last": "foo",
+     "line": 2,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "bar",
+     "capitalized": false,
+     "column": 15,
+     "fn": {
+      "line": 3,
+      "name": "b"
+     },
+     "kind": "path",
+     "last": "bar",
+     "line": 3,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      7,
+      2,
+      16
+     ],
+     "line": 2,
+     "name": "a"
+    },
+    {
+     "body": [
+      3,
+      13,
+      3,
+      23
+     ],
+     "line": 3,
+     "name": "b"
+    }
+   ],
+   "lines": 4,
+   "mods": [],
+   "parsed": true,
+   "path": "one_line.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      7,
+      2,
+      16
+     ],
+     [
+      3,
+      13,
+      3,
+      23
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      3,
+      10,
+      3,
+      12
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "06eedafde5df954ab67f70e07f550bfc9f035d3edfa1e887c739bd61a6ca3fe3",
+   "calls": [
+    {
+     "callee": "",
+     "capitalized": false,
+     "column": 16,
+     "fn": {
+      "line": 4,
+      "name": "go"
+     },
+     "kind": "other",
+     "last": "",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "",
+     "capitalized": false,
+     "column": 28,
+     "fn": {
+      "line": 4,
+      "name": "go"
+     },
+     "kind": "other",
+     "last": "",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "make",
+     "capitalized": false,
+     "column": 22,
+     "fn": {
+      "line": 4,
+      "name": "go"
+     },
+     "kind": "path",
+     "last": "make",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      4,
+      23,
+      6,
+      5
+     ],
+     "line": 4,
+     "name": "go"
+    },
+    {
+     "body": [
+      8,
+      26,
+      8,
+      32
+     ],
+     "line": 8,
+     "name": "make"
+    },
+    {
+     "body": [
+      9,
+      19,
+      9,
+      24
+     ],
+     "line": 9,
+     "name": "id"
+    }
+   ],
+   "lines": 10,
+   "mods": [],
+   "parsed": true,
+   "path": "other_callee.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      4,
+      23,
+      6,
+      5
+     ],
+     [
+      8,
+      26,
+      8,
+      32
+     ],
+     [
+      9,
+      19,
+      9,
+      24
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      9,
+      6,
+      9,
+      7
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      2,
+      14,
+      2,
+      26
+     ],
+     [
+      2,
+      17,
+      2,
+      19
+     ],
+     [
+      2,
+      24,
+      2,
+      26
+     ],
+     [
+      3,
+      5,
+      3,
+      6
+     ],
+     [
+      4,
+      10,
+      4,
+      15
+     ],
+     [
+      4,
+      11,
+      4,
+      15
+     ],
+     [
+      4,
+      20,
+      4,
+      22
+     ],
+     [
+      8,
+      13,
+      8,
+      25
+     ],
+     [
+      8,
+      16,
+      8,
+      18
+     ],
+     [
+      8,
+      23,
+      8,
+      25
+     ],
+     [
+      9,
+      9,
+      9,
+      11
+     ],
+     [
+      9,
+      16,
+      9,
+      18
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "7850b5efee3fbadb852c06eb444b1f7e218eb1b0ef2a2e32a1a0b9f8adbb0ecc",
+   "calls": [
+    {
+     "callee": "type",
+     "capitalized": false,
+     "column": 14,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "type",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "match",
+     "capitalized": false,
+     "column": 8,
+     "fn": {
+      "line": 3,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "match",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      18,
+      2,
+      23
+     ],
+     "line": 2,
+     "name": "type"
+    },
+    {
+     "body": [
+      3,
+      13,
+      6,
+      1
+     ],
+     "line": 3,
+     "name": "f"
+    }
+   ],
+   "lines": 7,
+   "mods": [],
+   "parsed": true,
+   "path": "raw.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      18,
+      2,
+      23
+     ],
+     [
+      3,
+      13,
+      6,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      4,
+      8,
+      4,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      2,
+      15,
+      2,
+      17
+     ],
+     [
+      3,
+      10,
+      3,
+      12
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "9bb56a0471b020b3c70508ae8655c5b27019e4b007fe8cce87e00e9d837ef1f8",
+   "calls": [
+    {
+     "callee": "work",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "live"
+     },
+     "kind": "path",
+     "last": "work",
+     "line": 3,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      10,
+      4,
+      1
+     ],
+     "line": 2,
+     "name": "live"
+    }
+   ],
+   "lines": 17,
+   "mods": [
+    {
+     "name": "tests",
+     "path": null,
+     "test": true
+    }
+   ],
+   "parsed": true,
+   "path": "tests_and_cfg.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      10,
+      4,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [],
+    "string": [],
+    "test_only": [
+     [
+      5,
+      0,
+      10,
+      1
+     ],
+     [
+      11,
+      0,
+      14,
+      1
+     ],
+     [
+      15,
+      0,
+      16,
+      10
+     ]
+    ],
+    "type": []
+   }
+  },
+  {
+   "sha256": "b0a30cd65b405fad498e89d8a9369e0a69961c8b1a388832986d1b4757312030",
+   "calls": [
+    {
+     "callee": "pow",
+     "capitalized": false,
+     "column": 19,
+     "fn": {
+      "line": 4,
+      "name": "def"
+     },
+     "kind": "method",
+     "last": "pow",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "req",
+     "capitalized": false,
+     "column": 13,
+     "fn": {
+      "line": 4,
+      "name": "def"
+     },
+     "kind": "method",
+     "last": "req",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      4,
+      24,
+      6,
+      5
+     ],
+     "line": 4,
+     "name": "def"
+    }
+   ],
+   "lines": 8,
+   "mods": [],
+   "parsed": true,
+   "path": "traits.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      4,
+      24,
+      6,
+      5
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      3,
+      11,
+      3,
+      16
+     ],
+     [
+      3,
+      12,
+      3,
+      16
+     ],
+     [
+      3,
+      21,
+      3,
+      23
+     ],
+     [
+      4,
+      11,
+      4,
+      16
+     ],
+     [
+      4,
+      12,
+      4,
+      16
+     ],
+     [
+      4,
+      21,
+      4,
+      23
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "2c47b1cce3be14742b42a29309efdc30937d7456d98e2448774a2e55fd4fd30c",
+   "calls": [
+    {
+     "callee": "foo",
+     "capitalized": false,
+     "column": 12,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "foo",
+     "line": 3,
+     "multiline": false,
+     "turbofish": "last"
+    },
+    {
+     "callee": "Vec::new",
+     "capitalized": false,
+     "column": 23,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "new",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "inner"
+    },
+    {
+     "callee": "collect",
+     "capitalized": false,
+     "column": 26,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "method",
+     "last": "collect",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "last"
+    },
+    {
+     "callee": "it",
+     "capitalized": false,
+     "column": 21,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "it",
+     "line": 5,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "bar",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "f"
+     },
+     "kind": "path",
+     "last": "bar",
+     "line": 6,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      7,
+      7,
+      1
+     ],
+     "line": 2,
+     "name": "f"
+    }
+   ],
+   "lines": 8,
+   "mods": [],
+   "parsed": true,
+   "path": "turbofish.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      7,
+      7,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      3,
+      8,
+      3,
+      9
+     ],
+     [
+      4,
+      8,
+      4,
+      9
+     ],
+     [
+      5,
+      8,
+      5,
+      18
+     ],
+     [
+      5,
+      8,
+      5,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      3,
+      18,
+      3,
+      20
+     ],
+     [
+      4,
+      18,
+      4,
+      20
+     ],
+     [
+      5,
+      11,
+      5,
+      18
+     ],
+     [
+      5,
+      15,
+      5,
+      17
+     ],
+     [
+      5,
+      36,
+      5,
+      42
+     ],
+     [
+      5,
+      40,
+      5,
+      41
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "4849d597d3b34f8924a80c915cc41353ff63357a00aec768b71807f33d297d1a",
+   "calls": [
+    {
+     "callee": "g",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "run"
+     },
+     "kind": "path",
+     "last": "g",
+     "line": 4,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      2,
+      39,
+      5,
+      1
+     ],
+     "line": 2,
+     "name": "run"
+    }
+   ],
+   "lines": 6,
+   "mods": [],
+   "parsed": true,
+   "path": "types.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      2,
+      39,
+      5,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      2,
+      7,
+      2,
+      8
+     ],
+     [
+      3,
+      8,
+      3,
+      28
+     ],
+     [
+      3,
+      8,
+      3,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      2,
+      10,
+      2,
+      31
+     ],
+     [
+      2,
+      14,
+      2,
+      30
+     ],
+     [
+      2,
+      21,
+      2,
+      23
+     ],
+     [
+      2,
+      28,
+      2,
+      30
+     ],
+     [
+      2,
+      36,
+      2,
+      38
+     ],
+     [
+      3,
+      11,
+      3,
+      28
+     ],
+     [
+      3,
+      12,
+      3,
+      28
+     ],
+     [
+      3,
+      19,
+      3,
+      21
+     ],
+     [
+      3,
+      26,
+      3,
+      28
+     ]
+    ]
+   }
+  },
+  {
+   "sha256": "38fc58898ff67fd1736381859dc3467bd1e00b8dd857e51821e6f64905c0f319",
+   "calls": [
+    {
+     "callee": "into",
+     "capitalized": false,
+     "column": 14,
+     "fn": {
+      "line": 2,
+      "name": "generic"
+     },
+     "kind": "method",
+     "last": "into",
+     "line": 6,
+     "multiline": false,
+     "turbofish": "none"
+    },
+    {
+     "callee": "add",
+     "capitalized": false,
+     "column": 4,
+     "fn": {
+      "line": 2,
+      "name": "generic"
+     },
+     "kind": "path",
+     "last": "add",
+     "line": 7,
+     "multiline": false,
+     "turbofish": "none"
+    }
+   ],
+   "fns": [
+    {
+     "body": [
+      5,
+      0,
+      8,
+      1
+     ],
+     "line": 2,
+     "name": "generic"
+    }
+   ],
+   "lines": 9,
+   "mods": [],
+   "parsed": true,
+   "path": "where_clause.rs",
+   "ranges": {
+    "attribute": [],
+    "body": [
+     [
+      5,
+      0,
+      8,
+      1
+     ]
+    ],
+    "comment": [
+     [
+      1,
+      0,
+      1,
+      27
+     ]
+    ],
+    "macro": [],
+    "pattern": [
+     [
+      2,
+      14,
+      2,
+      15
+     ],
+     [
+      6,
+      8,
+      6,
+      9
+     ]
+    ],
+    "string": [],
+    "test_only": [],
+    "type": [
+     [
+      4,
+      4,
+      4,
+      5
+     ],
+     [
+      4,
+      12,
+      4,
+      14
+     ],
+     [
+      2,
+      17,
+      2,
+      18
+     ],
+     [
+      2,
+      23,
+      2,
+      25
+     ]
+    ]
+   }
+  }
+ ]
+}
