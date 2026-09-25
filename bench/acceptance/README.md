@@ -1,5 +1,8 @@
 # The acceptance set (issue #36)
 
+Which side of the evaluation protocol each of these cases is on — every one is dev — is decided by
+`bench/eval/split.json`, not by a case's `role` (`bench/eval/PROTOCOL.md`).
+
 Everything v0.1 claimed before this set rested on one measurement: omamori `#468`, two
 requirements, five branches, one run each — and the wording of the questions was worked out on
 those same functions. This directory holds cases that were **not** used to tune anything, and the

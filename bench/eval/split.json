@@ -1,0 +1,601 @@
+{
+  "protocolVersion": 1,
+  "what": "Which side each repository is on. A repository is on one side only. Built by build-pool.ts from pool.json; sealed entries are added only by the rule of PROTOCOL.md.",
+  "repos": [
+    {
+      "repo": "0xckruger/arbiter_v2",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "agentworkforce/burn",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "alacritty/alacritty",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "anchapin/fluxion",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "andreabozzo/dataprof",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)"
+      ]
+    },
+    {
+      "repo": "andrewdavidmackenzie/flow",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "aptos-labs/aptos-core",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "armaxri/termihub",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "beagleboard/bb-imager-rs",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "beboite/boite-legacy",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "ben1009/mini-lsm",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "bindreams/skuld",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "boundaryml/baml",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "burntsushi/ripgrep",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "cavi-ai/bobby-browser",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "chainsafe/forest",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "clap-rs/clap",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "dashpay/grovedb",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/grovedb-500: built or pre-checked",
+        "bench/acceptance/cases/grovedb-501: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "davidslv/cce-rust",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)"
+      ]
+    },
+    {
+      "repo": "dawnlandteam/dawnland-launcher",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "diogo-esteves/polyvocal",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "dobesv/harnx",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "dolang-org/dolang",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "dsx-ai-factory/infra-controller",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "edge-toolkit/core",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "extra-chill/homeboy",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "getappz/agentflare",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)"
+      ]
+    },
+    {
+      "repo": "git-ai-project/git-ai",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "goldsky-io/streamling",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "guacsec/trustify",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "iii-hq/workers",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "infraweave-io/infraweave",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "insight-platform/savant-rs",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "iotaledger/iota",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)"
+      ]
+    },
+    {
+      "repo": "jonathangadeaharder/pytest-linter",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "jrollin/cartog",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "kennguy3n/knowledge",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "kontorprotocol/kontor",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/kontor-385: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "leynos/netsuke",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "limn-works/scp",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "liveask/liveask",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "mandubian/autonoetic",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "marshalx/python-libipld",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "moltis-org/moltis",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/moltis-1064: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "naoray/instruckt-tauri",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/instruckt-tauri-9: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "navicore/anz",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "ng/yggdrasil",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "nilesh32236/vector-mcp-rust",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "oneiron-dev/oneiron",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "openfootmanager/openfootmanager",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "oven-sh/bun",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "oxicrab/oxicrab",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "oxidezap/whatsapp-rust",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/whatsapp-rust-759: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "pnpm/pnpm",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "qdrant/qdrant",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "ratazzi/quebec",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/quebec-136: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "risingwavelabs/risingwave",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "rust-lang/cargo",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "sg-devel/tailtriage",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "sharkdp/bat",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "shubhattin/lipilekhika",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "smicry/rosregview",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "snowflakedb/drivers",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "thedoublejay/gather-step",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "tokio-rs/tokio",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "sentence-choice: used to build or tune"
+      ]
+    },
+    {
+      "repo": "tumbleowlee/ferrowl",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "tyroxx/nonlocalityos",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "void-technology-inc/pybun",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: the tool was run on it for (b)",
+        "bench/acceptance/cases/pybun-428: built or pre-checked"
+      ]
+    },
+    {
+      "repo": "vox-foundation/vox",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: read for (s)/(d), the wall of #37"
+      ]
+    },
+    {
+      "repo": "vybestack/llxprt-jefe",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    },
+    {
+      "repo": "yottayoshida/omamori",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v1: in the pool before protocol v1",
+        "bench/acceptance/cases/omamori-468: built or pre-checked",
+        "corpus: used to build or tune",
+        "fixture: used to build or tune"
+      ]
+    },
+    {
+      "repo": "yottayoshida/sideeye",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "corpus: used to build or tune"
+      ]
+    },
+    {
+      "repo": "zeroclaw-labs/zeroclaw",
+      "side": "dev",
+      "fixed": true,
+      "why": [
+        "acceptance-v2: in the pool before protocol v1"
+      ]
+    }
+  ]
+}
