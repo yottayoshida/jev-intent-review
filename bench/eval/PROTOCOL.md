@@ -1,4 +1,4 @@
-# The evaluation protocol, version 3 (issues #80, #88, #89)
+# The evaluation protocol, version 4 (issues #80, #88, #89)
 
 **Through `bench/eval/run.ts`, a sealed evaluation sends no request until the line that opens it has
 been committed to main. The sealed set has no case yet, and the rule by which the second batch chooses
@@ -9,7 +9,7 @@ Everything below was committed before any sealed result exists. Changing a metri
 interval, the split or the rules makes a new version; a sealed result is compared only with results of
 its own version, and the count of openings (below) runs across versions.
 
-**Version 2** (#88, before any sealed case was built or opened) changed rule 5 below: a sealed
+**Version 2** (#88, before any sealed case was built or opened) changed what is now rule 6 below: a sealed
 repository gets a defect in a changed function (A) and, where one exists, in an unchanged caller of one (B),
 and the gates count both. Version 1 had one defect of any place. Nothing was measured under version 1.
 
@@ -22,6 +22,12 @@ they are placed by the same `sideOf` with its own salt, and a sealed retrospecti
 measurement's repositories alone (`RETRO.md`, "Where records live"). Nothing here changed for this
 set's cases. No sealed case was built or opened under version 2.
 
+**Version 4** (#80, before any sealed case was built or opened) set how the sealed set is chosen in
+batches: the second search (`search-v2.json`, taken before this version's first row is read), screening
+by licence, fork and one case per repository, dependencies fetched to build but not to observe, an hour
+a candidate, batches recorded as counts and sha256 in `sealed-batches.json` with the salt found by that
+hash, and a cap of 800 rows where version 3 had 400. No sealed case was built or opened under version 3.
+
 ## Files
 
 | file | what it is |
@@ -30,6 +36,8 @@ set's cases. No sealed case was built or opened under version 2.
 | `split.json` | the side of each repository. One entry per repository; **this file, not a case's `role`, is the source of which side a case is on** |
 | `labels.json` | how the code before each fix handled its failure (*Labels*), merged into `pool.json` |
 | `search-v1.json` | the raw results of the second batch's searches: reference, title, merge time. No body read |
+| `search-v2.json`, `search-v2.ts` | the same four phrases over 2026-01-01 to 2026-06-30, ranges split until none stops at 100; taken before any row is read |
+| `sealed-batches.json` | each batch of sealed candidates, #80's and #89's: the range of rows read, rows kept, and the sha256 of its verdicts in the sandbox. Lines are only ever added |
 | `sealed-access.jsonl` | every opening of the sealed set and every result. Lines are only ever added |
 | `metrics.ts` | the metrics, the interval, the gates |
 | `run.ts` | the one entry: `--set dev` and `--set sealed` |
@@ -45,44 +53,77 @@ protocol existed — the tool was run on it for condition (b), a case was built 
 `bench/corpus/`, `bench/fixtures/` or `bench/sentence-choice/`, or it was examined for `#36`. The
 dev set may be run and read as often as work needs.
 
-**The sealed set is new repositories only.** It is chosen by the second batch, by this rule:
+**The sealed set is new repositories only.** It is chosen in batches, by this rule (version 4):
 
-1. The candidates are `search-v1.json`'s rows, in its order, skipping a repository already in
-   `pool.json` or in the retrospective's search (`retro/search-v1.json`, version 3). If they run out
-   before the stop below, one query is added and recorded in a new `search-v2.json` before any of its
-   results is read.
-2. A candidate is examined once its pull request or issue text is read. It is kept when (a) its
+1. The candidates are `search-v1.json`'s rows, in its order, then `search-v2.json`'s — the same four
+   phrases over 2026-01-01 to 2026-06-30, every range split until no phrase reaches `gh search`'s silent
+   limit of 100 (`search-v2.ts`), taken and committed before any row of either is read. `search-v1.json`
+   is a best-match sample: three of its four phrases stopped at 100, and which 100 is not reproducible;
+   the committed file, not the command, is the list. Skipped: a repository already in `pool.json`, on the
+   split, or in the retrospective's search (`retro/search-v1.json`, version 3), which already takes these
+   phrases from 2026-07-01 on.
+2. Before any text is read, a candidate is screened out, and recorded so, when its repository **has no
+   licence** (any licence will do, GPL and MPL included: the cases are kept private and never distributed;
+   owner, 2026-09-25); when it is a **fork or a copy of a repository already met** — GitHub's `parent` or
+   `source` is in the pool, the split, an earlier batch or an earlier row — which counts as the same
+   repository; or when an **earlier row of the same repository was kept** (one case per repository).
+3. A candidate is examined once its pull request or issue text is read. It is kept when (a) its
    requirement can be written as "a failure must reach the caller as an error, not as a success, an
    empty value or an absence", and (c) the behaviour difference of a defect can be observed in a
-   throwaway clone, with no network and no credentials. **Condition (b) of `bench/acceptance/README.md`
-   — the tool puts the fixed call where a question can be put — is not a condition here**: choosing by
-   what the tool reaches would raise the reach rate it is meant to measure. It is a stage that is
-   measured (*Scoring*, 1–3, of that README).
-3. The requirement is written from the text before the fix's diff is opened, and committed.
-4. A kept candidate's repository is placed by
-   `sha256("<salt>:<owner/repo>")`'s first byte: below 192, sealed; otherwise dev (`split.ts`,
-   `sideOf`). The salt is **the main merge commit that first contains the batch's verdicts** — a value
-   that exists only once the verdicts are merged, so whoever wrote them could not know the side first.
-   A test checks that every salt is a merge commit on main's first-parent line (`saltProblems`); it does
-   not stop a merge commit made by hand and pushed straight to main, which main's missing protection
-   allows, nor that the salt is the *first* merge commit with the verdicts rather than a later one —
-   the rule rests on merging through pull requests and on the batch's own record of its commit. Three in four go to sealed because dev
-   already has more than ten repositories. `build-pool.ts` keeps these entries when it rebuilds the split.
-5. Every sealed repository gets a `defect-A` — the defect in a function the pull request changed — and,
+   throwaway clone: dependencies may be fetched to build, and the test or example that shows it runs
+   with no network and no credentials. **One hour a candidate**: a candidate not settled by then fails
+   (c), recorded as timed out — it falls before the side is known, so on both sides alike. A candidate
+   that fails because `changed-functions.ts` or `occurrences` misread its syntax is counted apart.
+   **Condition (b) of `bench/acceptance/README.md` — the tool puts the fixed call where a question can be
+   put — is not a condition here**: choosing by what the tool reaches would raise the reach rate it is
+   meant to measure. It is a stage that is measured (*Scoring*, 1–3, of that README). The tool is never
+   run on a candidate, `--candidates-only` included.
+4. The requirement is written from the text before the fix's diff is opened, and pushed to the sandbox
+   first; the push event's id and time are recorded (a commit's date can be set by hand; the push's
+   cannot).
+5. **A batch's verdicts are one file in the sandbox, and its sha256 is added to `sealed-batches.json`**
+   (with the range of rows read — a measurement's batches run on from row 1, so no row is judged twice
+   to draw a side again — and the rows kept; lines are only ever added, #80's and #89's alike, checked
+   against origin/main, which a push straight to main would get round). A kept
+   candidate's repository is placed by `sha256("<salt>:<owner/repo>")`'s first byte: below 192, sealed;
+   otherwise dev (`split.ts`, `sideOf`). **The salt is the first main merge commit holding the batch's
+   sha256** — found by the hash, not by the batch's name, so verdicts swapped and rehashed afterwards do
+   not pass; a test asks git for that commit and compares it with every salt of the split
+   (`batchSaltProblems`), and that each repository names the first batch that read one of its rows. Pull requests that add a batch are merged with a merge commit (`gh pr merge
+   --merge`): a squash or a rebase leaves no merge commit to be the salt. A merge commit pushed to main
+   by hand would still pass — main has no working protection — so the rule rests on merging through pull
+   requests. Three in four go to sealed because dev already has more than ten repositories. A repository
+   another measurement placed first keeps that side. `build-pool.ts` keeps these entries.
+6. Every sealed repository gets a `defect-A` — the defect in a function the pull request changed — and,
    where a function the pull request did not change calls one it did, a `defect-B` in that caller; one
    `shipped`, and a `rewrite` for each defect's target (`rewrite-A`, `rewrite-B`): at most five versions.
-   Places A and B are those of `bench/acceptance/README.md`. **The gates below count every version of
-   both places** (owner, 2026-09-25): the tool says it looks beyond the diff, and B is where that is
-   tested — which makes the gates stricter than version 1's, since B is where the tool has been weakest
-   (#36). The frontier-model comparison (`BASELINE.md`) reads the two places apart as well as together.
-6. Stop when sealed holds 17 repositories and 17 requirements, or when 400 candidates have been
-   examined; at 400, stop and say how far it got. From the pass rates so far — (a) about 27 %, (c) two
-   of four — 17 sealed repositories need about 200 to 300 candidates, and `search-v1.json` has 238.
+   A defect version must give a different result from `shipped` in the recorded observation, and a
+   rewrite the same. Places A and B are those of `bench/acceptance/README.md`. **The gates below count
+   every version of both places** (owner, 2026-09-25): the tool says it looks beyond the diff, and B is
+   where that is tested — which makes the gates stricter than version 1's, since B is where the tool has
+   been weakest (#36). The frontier-model comparison (`BASELINE.md`) reads the two places apart as well
+   as together.
+7. **Yield and cap**: once the first 100 rows are screened, the yield is measured and multiplied by every
+   row of `search-v1.json` and `search-v2.json` — all recorded before the yield is read. If that could not
+   reach 17 sealed repositories, stop and say so ("no evaluation verdict"). Otherwise stop when sealed
+   holds 17 repositories and 17 requirements, or when 800 rows have been examined.
 
-**Sealed cases do not live in this repository**: every session working on the tool can read it. They
-live on the branch `sealed` of the private `yottayoshida/jev-review-sandbox`, pushed without a pull
-request (that repository's workflow runs the Action on pull requests, which would be an evaluation the
-access log never saw) and never on its `main`.
+**Nothing of a candidate lives in this repository — verdicts, requirements, patches, observations —
+only each batch's counts and sha256.** They live in the private `yottayoshida/jev-review-sandbox`,
+pushed without a pull request (its workflow runs the Action on pull requests, which would be an
+evaluation the access log never saw) and never on its `main`: each candidate on a branch of its own
+(`cand/<row>`), each batch's verdicts on `batches`, and once the side is known the sealed cases on
+`sealed` and the dev cases on `dev`. The verdicts file holds the sha256 of every file of every case, so a
+case changed after the batch is found. The sandbox is private and this repository's CI cannot read it:
+**`run.ts` checks every sealed case against its batch's hashes before it opens the sealed set** (wired
+with the opening itself); until then the check is done by hand and its result written in the pull
+request that places a batch.
+
+**A candidate is examined and its case built by a session that keeps nothing of it**: a fresh subagent per
+candidate, and one more that gathers a batch's verdicts, return the orchestrator only a row's reference,
+whether it was kept, the conditions it failed, and a batch's counts and sha256. Neither writes memory,
+and no plan, memory or note of the orchestrator holds a requirement, a function name or a patch of a
+candidate. Clones are thrown away at the end of the batch.
 
 ### Contamination
 

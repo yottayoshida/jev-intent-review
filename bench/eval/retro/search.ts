@@ -64,17 +64,18 @@ const day = (d: string, plus: number) => new Date(Date.parse(`${d}T00:00:00Z`) +
 const days = (from: string, to: string) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) + 1;
 
 /**
- * Every result of the four phrases in `from..to`, splitting any range where a phrase reaches `LIMIT`.
- * `run` is the search itself, put in so a test can give a fake.
+ * Every result of the phrases in `from..to`, splitting any range where a phrase reaches `LIMIT`.
+ * `run` is the search itself, put in so a test can give a fake. `phrases` defaults to this search's
+ * four; #80's `search-v2.ts` passes the same four for its own range.
  */
-export function searchRange(from: string, to: string, run: (phrase: string, from: string, to: string) => Hit[]): { windows: Window[]; hits: Map<string, Hit[]> } {
-  const found = new Map(PHRASES.map((p) => [p, run(p, from, to)] as const));
+export function searchRange(from: string, to: string, run: (phrase: string, from: string, to: string) => Hit[], phrases: readonly string[] = PHRASES): { windows: Window[]; hits: Map<string, Hit[]> } {
+  const found = new Map(phrases.map((p) => [p, run(p, from, to)] as const));
   const full = [...found].filter(([, h]) => h.length >= LIMIT).map(([p]) => p);
   if (full.length > 0 && from < to) {
     const mid = day(from, Math.floor(days(from, to) / 2) - 1);
-    const a = searchRange(from, mid, run);
-    const b = searchRange(day(mid, 1), to, run);
-    return { windows: [...a.windows, ...b.windows], hits: new Map(PHRASES.map((p) => [p, [...a.hits.get(p)!, ...b.hits.get(p)!]])) };
+    const a = searchRange(from, mid, run, phrases);
+    const b = searchRange(day(mid, 1), to, run, phrases);
+    return { windows: [...a.windows, ...b.windows], hits: new Map(phrases.map((p) => [p, [...a.hits.get(p)!, ...b.hits.get(p)!]])) };
   }
   return { windows: [{ from, to, found: Object.fromEntries([...found].map(([p, h]) => [p, h.length])), cut: full }], hits: found as Map<string, Hit[]> };
 }
@@ -109,6 +110,20 @@ export function rowsOf(hits: ReadonlyMap<string, Hit[]>, split: ReadonlySet<stri
   return { rows, left };
 }
 
+/**
+ * The repositories of #80's searches — `search-v1.json`, and `search-v2.json` since #80's protocol
+ * version 4 — which this search leaves out, so the two measurements never share a repository.
+ */
+export function searchOf80(evalDir: string): Set<string> {
+  const out = new Set<string>();
+  for (const f of ["search-v1.json", "search-v2.json"]) {
+    const p = join(evalDir, f);
+    if (!existsSync(p)) continue;
+    for (const r of (JSON.parse(readFileSync(p, "utf8")) as { rows: { repo: string }[] }).rows) out.add(r.repo.toLowerCase());
+  }
+  return out;
+}
+
 /** Days a range's last day must be behind today (UTC): GitHub's search index takes a while to fill in. */
 export const SETTLE_DAYS = 2;
 
@@ -128,7 +143,7 @@ export function rangeProblem(from: string, to: string, today: string, searched: 
 function main(from: string, to: string) {
   const today = new Date().toISOString().slice(0, 10);
   const split = new Set((JSON.parse(readFileSync(join(HERE, "..", "split.json"), "utf8")) as Split).repos.map((r) => r.repo.toLowerCase()));
-  const of80 = new Set((JSON.parse(readFileSync(join(HERE, "..", "search-v1.json"), "utf8")) as { rows: { repo: string }[] }).rows.map((r) => r.repo.toLowerCase()));
+  const of80 = searchOf80(join(HERE, ".."));
   const book: Search = existsSync(SEARCH) ? JSON.parse(readFileSync(SEARCH, "utf8")) : { what: "The raw results of the retrospective's searches (RETRO.md, \"Candidates\"): reference, title and merge time only. No body was read. Ranges are added newest first, each recorded before any of its rows is read.", earliestFix: EARLIEST_FIX, ranges: [], rows: [] };
   const problem = rangeProblem(from, to, today, book.ranges);
   if (problem !== null) throw new Error(problem);
