@@ -51,7 +51,7 @@ export interface SourceRef {
  * Experimental. A spec names it; a requirement read from an issue, a pull request or the command
  * line is asked of Jev, which form its sentence says, before its calls (docs/adr/0008).
  */
-export const REQUIREMENT_FORMS = ["failure_propagation", "check_before_action"] as const;
+export const REQUIREMENT_FORMS = ["failure_propagation", "check_before_action", "failure_handling"] as const;
 export type RequirementForm = (typeof REQUIREMENT_FORMS)[number];
 
 export interface Requirement {

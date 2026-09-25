@@ -11,7 +11,7 @@ import { test } from "node:test";
 import { parseIntentSpec } from "../src/intent/schema.ts";
 import type { JudgmentProvider, Questions } from "../src/judgments/provider.ts";
 import type { CallCandidate } from "../src/plan/candidates.ts";
-import { callTerms, chooseForm, FORM_QUESTION, formOf, FORMS, identifierWords, NEITHER_SAYS, readOption, requirementTerms, termsMeet } from "../src/plan/forms.ts";
+import { callTerms, CHOSEN_FORMS, chooseForm, FORM_QUESTION, formOf, FORMS, identifierWords, NEITHER_SAYS, readOption, requirementTerms, termsMeet } from "../src/plan/forms.ts";
 import { BAR as OBSERVATION_BAR, describe } from "../src/plan/local-check.ts";
 import { acceptMapping, MAPPING_BAR } from "../src/plan/mapping.ts";
 import { LOCAL_CHECK_INTRO, requirementSection } from "../src/report/markdown.ts";
@@ -424,8 +424,13 @@ test("the form question is the measured one: its serialisation hashes to what th
 test("the form question is assembled from the forms' own criteria, in their order, then neither", () => {
   const q = FORM_QUESTION.requirement_form!;
   assert.deepEqual(Object.keys(q), ["type", "instructions", "criteria"]);
-  assert.deepEqual(Object.keys(q.criteria), [...FORM_NAMES, "neither"]);
-  for (const name of FORM_NAMES) assert.equal(q.criteria[name], FORMS[name].says);
+  assert.deepEqual(Object.keys(q.criteria), [...CHOSEN_FORMS, "neither"]);
+  for (const name of CHOSEN_FORMS) assert.equal(q.criteria[name], FORMS[name].says);
+  // A form offered to no sentence (#85) is not in the question, and an answer naming it is the default.
+  assert.deepEqual(CHOSEN_FORMS, ["failure_propagation", "check_before_action"]);
+  assert.ok(!("failure_handling" in q.criteria));
+  const a = (choice: string, p: number): ChoiceAnswer => ({ choice, probability: p, confidence: p, probabilities: { [choice]: p } });
+  assert.deepEqual(chooseForm(a("failure_handling", 0.99)), { form: "failure_propagation", by: "default", verdict: "failure_handling", probability: 0.99 });
   assert.equal(q.criteria.neither, NEITHER_SAYS);
   assert.ok(!(REQUIREMENT_FORMS as readonly string[]).includes("neither"), "neither is an option, not a form");
 });
@@ -553,4 +558,24 @@ test("a call the rules cannot tell from another of the same text is held, not as
     const once = await form.decisive({ requirement: GUARD, fn, call: target, body: "settle(load(x))?;", calls: [target], defined: async () => false });
     assert.ok(!("hold" in once), `${form.name}: once, and nothing the repository defines around it, is not held`);
   }
+});
+
+test("failure_handling end to end: a function that returns () is asked about its callee's failure, where failure_propagation holds it (#85)", async () => {
+  const LOG = "pub fn record(store: &Store) {\n    write_entry(store);\n    touch(store);\n}\n\npub fn write_entry(store: &Store) -> Result<(), Error> {\n    store.put()\n}\n\npub fn touch(store: &Store) {\n    store.mark();\n}\n";
+  const git = fakeRepo({ "src/log.rs": LOG }, { "src/log.rs": LOG.replace("    touch(store);\n", "") }, hunk("src/log.rs", LOG, "touch(store);", "store.mark();"));
+  const requirement = (form: RequirementForm): Requirement => ({ id: "R1", text: "A failure to write an entry is returned, logged or recorded, not dropped.", kind: "behavior", priority: "required", sourceRefs: [], searchHints: [], form });
+  const [handling] = await complete(runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [requirement("failure_handling")], jev(), () => true, DEFAULT_LOCAL_CHECK)).then((x) => x.requirements);
+  const [propagation] = await complete(runLocalCheck(git, { before: "BEFORE", after: "AFTER" }, [requirement("failure_propagation")], jev(), () => true, DEFAULT_LOCAL_CHECK)).then((x) => x.requirements);
+  assert.deepEqual(asked(handling!), ["write_entry"], "the callee that can fail is asked about; touch cannot fail");
+  assert.deepEqual(asked(propagation!), [], "the failure form holds it: record returns ()");
+  assert.ok(propagation!.unchecked.some((u) => u.call.startsWith("write_entry") && /does not return a Result/.test(u.why)));
+});
+
+test("failure_handling holds a call whose failure goes to this repository's own function, in its own words", async () => {
+  const body = "log_err(write_entry(store));";
+  const call = { id: "c", functionId: "f", line: 1, column: 1, text: body, callee: "write_entry", expression: "write_entry(store)", expressionComplete: true } as CallCandidate;
+  const decided = await FORMS.failure_handling.decisive({ requirement: {} as Requirement, fn: {} as never, call, body, calls: [call], defined: async () => true });
+  assert.ok("hold" in decided && /whether the failure is returned, leaves a trace or is dropped is `log_err`'s to say/.test(decided.hold), JSON.stringify(decided));
+  // The control: not defined here, so nothing decides it elsewhere and the call is asked.
+  assert.deepEqual(await FORMS.failure_handling.decisive({ requirement: {} as Requirement, fn: {} as never, call, body, calls: [call], defined: async () => false }), { send: [] });
 });

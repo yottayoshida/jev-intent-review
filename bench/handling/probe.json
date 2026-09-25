@@ -1,0 +1,174 @@
+{
+  "about": "#85: the probe of failure_handling observation question (src/plan/handling.ts, as sent), fixed before any request. Each target is a version of an acceptance case, or a defect version with one patch here on top. Version 1.",
+  "question": "src/plan/handling.ts handlingQuestionsFor(conditionFor(fn, call)) as committed with this file",
+  "bar": 0.6,
+  "runs": 3,
+  "order": "every run sends each target once, in an order shuffled by the run number (seeded), one request at a time",
+  "lines": {
+    "pairs": "for each place (grovedb-A, moltis-A, moltis-B, moltis-C), every version that is not shipped or rewrite gets its expected answer at the bar or above in 3 runs of 3",
+    "noFalseListing": "no shipped or rewrite version is answered continues_silently in any run (at any probability)",
+    "wiring": "the form is wired only if both lines hold; otherwise the log and this file are kept and the ADR says the question did not tell the versions apart"
+  },
+  "targets": [
+    {
+      "id": "grovedb-A-shipped",
+      "repo": "grovedb-500",
+      "ref": "refs/bench/check-before-action/grovedb-500/shipped/head",
+      "file": "merk/src/merk/restore.rs",
+      "function": "finalize",
+      "call": "rewrite_heights(grove_version)",
+      "expected": "propagates"
+    },
+    {
+      "id": "grovedb-A-rewrite",
+      "repo": "grovedb-500",
+      "ref": "refs/acceptance/grovedb-500-rewrite-A",
+      "file": "merk/src/merk/restore.rs",
+      "function": "finalize",
+      "call": "rewrite_heights(grove_version)",
+      "expected": "propagates"
+    },
+    {
+      "id": "grovedb-A-defect",
+      "repo": "grovedb-500",
+      "ref": "refs/acceptance/grovedb-500-defect-A",
+      "file": "merk/src/merk/restore.rs",
+      "function": "finalize",
+      "call": "rewrite_heights(grove_version)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "grovedb-A-reported",
+      "repo": "grovedb-500",
+      "ref": "refs/acceptance/grovedb-500-defect-A",
+      "patch": "patches/grovedb-500-reported-A.patch",
+      "file": "merk/src/merk/restore.rs",
+      "function": "finalize",
+      "call": "rewrite_heights(grove_version)",
+      "expected": "reports_locally"
+    },
+    {
+      "id": "grovedb-A-decoy",
+      "repo": "grovedb-500",
+      "ref": "refs/acceptance/grovedb-500-defect-A",
+      "patch": "patches/grovedb-500-decoy-A.patch",
+      "file": "merk/src/merk/restore.rs",
+      "function": "finalize",
+      "call": "rewrite_heights(grove_version)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "moltis-A-shipped",
+      "repo": "moltis-1064",
+      "ref": "refs/bench/check-before-action/moltis-1064/shipped/head",
+      "file": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_for_session",
+      "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+      "expected": "propagates"
+    },
+    {
+      "id": "moltis-A-rewrite",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-rewrite-A",
+      "file": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_for_session",
+      "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+      "expected": "propagates"
+    },
+    {
+      "id": "moltis-A-defect",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-A",
+      "file": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_for_session",
+      "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "moltis-A-reported",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-A",
+      "patch": "patches/moltis-1064-reported-A.patch",
+      "file": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_for_session",
+      "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+      "expected": "reports_locally"
+    },
+    {
+      "id": "moltis-A-decoy",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-A",
+      "patch": "patches/moltis-1064-decoy-A.patch",
+      "file": "crates/gateway/src/session/title.rs",
+      "function": "generate_title_for_session",
+      "call": "moltis_agents::title::generate_title(provider, &chat_msgs)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "moltis-B-shipped",
+      "repo": "moltis-1064",
+      "ref": "refs/bench/check-before-action/moltis-1064/shipped/head",
+      "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+      "function": "dispatch_command",
+      "call": "session_handlers::handle_title(state, &session_key)",
+      "expected": "propagates"
+    },
+    {
+      "id": "moltis-B-defect",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-B",
+      "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+      "function": "dispatch_command",
+      "call": "session_handlers::handle_title(state, &session_key)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "moltis-B-reported",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-B",
+      "patch": "patches/moltis-1064-reported-B.patch",
+      "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+      "function": "dispatch_command",
+      "call": "session_handlers::handle_title(state, &session_key)",
+      "expected": "reports_locally"
+    },
+    {
+      "id": "moltis-B-decoy",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-B",
+      "patch": "patches/moltis-1064-decoy-B.patch",
+      "file": "crates/gateway/src/channel_events/commands/dispatch.rs",
+      "function": "dispatch_command",
+      "call": "session_handlers::handle_title(state, &session_key)",
+      "expected": "continues_silently"
+    },
+    {
+      "id": "moltis-C-shipped",
+      "repo": "moltis-1064",
+      "ref": "refs/bench/check-before-action/moltis-1064/shipped/head",
+      "file": "crates/agents/src/title.rs",
+      "function": "generate_title",
+      "call": "complete(&messages, &[])",
+      "expected": "propagates"
+    },
+    {
+      "id": "moltis-C-logged",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-C",
+      "file": "crates/agents/src/title.rs",
+      "function": "generate_title",
+      "call": "complete(&messages, &[])",
+      "expected": "reports_locally"
+    },
+    {
+      "id": "moltis-C-silent",
+      "repo": "moltis-1064",
+      "ref": "refs/acceptance/moltis-1064-defect-C",
+      "patch": "patches/moltis-1064-silent-C.patch",
+      "file": "crates/agents/src/title.rs",
+      "function": "generate_title",
+      "call": "complete(&messages, &[])",
+      "expected": "continues_silently"
+    }
+  ]
+}

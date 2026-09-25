@@ -66,6 +66,10 @@ report says which form and who chose it. A sentence that names the operation it 
 disabled API key must never create a session." — reaches the calls that share a word with it; one
 that names none reaches no call, and the report says so for each call it held.
 
+A third form, `failure_handling` — a failure may be returned, logged or recorded, and must not be
+turned silently into a success — is never chosen this way: it is used only when a spec names it
+(`"form": "failure_handling"`, [docs/local-check-cli.md](local-check-cli.md), *Writing a requirement*).
+
 ## What is read, exactly
 
 - Left out, and only these: HTML comments, code blocks, link reference definitions

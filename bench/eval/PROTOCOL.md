@@ -170,6 +170,14 @@ Fleiss' κ 0.865. The disagreements sit mostly between `swallows_as_success` and
 `#85` evaluates on these labels and does not relabel. Whether they give `#85` enough handled-failure
 rows is not known yet; the second batch labels its candidates the same way.
 
+**Added 2026-09-25, owner ruling (#85).** Two more judgments per labelled row, in their own file and
+not in `label`: whether the row's requirement could be written in the form `failure_propagation` (a) or
+`failure_handling` (a′), each by three fresh annotators in separate sessions, reading the same text as
+the labels (`bench/eval/forms-85/`, fixed before any was made). `label` and `verdicts.a` are not changed.
+They record which requirements a form's sentence can write; they are no gate and change no metric,
+threshold, interval, split or rule of choosing cases, so the version stays 4 (as for the fork sentence
+of rule 2).
+
 ## Opening the sealed set
 
 ```sh

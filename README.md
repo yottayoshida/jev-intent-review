@@ -5,7 +5,7 @@
 `jev-intent-review` checks whether a pull request actually satisfies the intent behind it — including code the diff did not touch.
 It starts from the requirement, not from the changed lines: **the diff is a search hint, not the review boundary.**
 
-It reads **Rust** only, and requirements written in **two shapes** — a requirements section or a `Property:` paragraph — asking one of **two things** of each call: how a failure must reach the caller, or that a check passes before an action.
+It reads **Rust** only, and requirements written in **two shapes** — a requirements section or a `Property:` paragraph — asking one of **two things** of each call: how a failure must reach the caller, or that a check passes before an action — and, when a spec names it, a third: that a failure is returned, logged or recorded rather than silently dropped.
 
 ## Demo
 

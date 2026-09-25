@@ -14,7 +14,8 @@
 //   2. every call in every one of those functions is added — the diff says which body, and the
 //      defect is usually a different call in it
 //   3. the form says which calls are askable — for failures, a callee resolving here to something
-//      returning a `Result` — and the rest are held, with the reason, in the report
+//      returning a `Result`, in a function that returns one when the form asks what is returned —
+//      and the rest are held, with the reason, in the report
 //   4. two judgment budgets for the requirement (ADR 0015) — the functions the change touched, and
 //      their callers one hop out, asked when the command asks for them (`askCallers`), after the
 //      changes' questions — each spent round-robin over functions, so neither a busy body nor a
@@ -45,7 +46,7 @@ import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
-import { applicabilityOf, definitionsOfName, functionDefinitionsOf } from "../plan/applicability.ts";
+import { applicabilityOf, calleeOf, definitionsOfName, functionDefinitionsOf } from "../plan/applicability.ts";
 import { enumerate, type CallCandidate, type FunctionCandidate } from "../plan/candidates.ts";
 import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
 import { CandidateFiles, sitesFromChange } from "../plan/from-diff.ts";
@@ -347,6 +348,18 @@ export async function runLocalCheck(
     }
     return answer;
   };
+  // The callee alone, whatever the calling function returns: for a form that asks what a function
+  // does with a failure rather than what it returns (#85).
+  const calleeAnswers = new Map<string, Promise<Askability>>();
+  const calleeResultOf = (fn: FunctionCandidate, call: CallCandidate): Promise<Askability> => {
+    const key = `${fn.id}\u0000${call.id}`;
+    let answer = calleeAnswers.get(key);
+    if (!answer) {
+      answer = calleeOf(discoverer, fn, call).then((c) => c.result);
+      calleeAnswers.set(key, answer);
+    }
+    return answer;
+  };
 
   // A request that fails without ending the run leaves its call unanswered, and the run goes on. But
   // a host that answered nothing at all is not a run of "not settled": it is the host failing, as the
@@ -568,7 +581,7 @@ export async function runLocalCheck(
     }
     const into: Collected = { observed: [], unchecked: [], mappings: [], findings: [] };
 
-    const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere });
+    const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere, calleeResultOf });
     const selection = await selectSites([...fromChange.sources.values()], decide, options.budget, callerBudget);
     for (const h of selection.held) into.unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
     const spent = { changed: `the budget of ${options.budget} was already spent`, calls_changed: `the callers' budget of ${selection.byOrigin.calls_changed.budget} was already spent` } satisfies Record<FunctionOrigin, string>;
@@ -681,7 +694,7 @@ export async function runLocalCheck(
     const siblings = await siblingSetOf();
     const budget = options.siblingBudget ?? DEFAULT_LOCAL_CHECK.siblingBudget;
     for (const { requirement, form, quote, result } of passes) {
-      const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere });
+      const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere, calleeResultOf });
       const selection = await selectSiblings(siblings.siblings, decide, budget);
       for (const h of selection.held) result.unchecked.push({ ...placeOf(h), why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
       for (const o of selection.overBudget) result.unchecked.push({ ...placeOf(o), why: `the siblings' budget of ${budget} was already spent` });
