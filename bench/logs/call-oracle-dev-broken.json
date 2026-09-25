@@ -8,8 +8,8 @@
  },
  "listing": {
   "src/plan/candidates.ts": "5c139e2f1517796a9f8334c4dfcca2db230a54ecc6d100ff52076b1e89079557",
-  "src/change/blocks.ts": "2bfa9c1a8d6d7a166b1bcc2854ee3d0f49bd9b696cf83657b01183e8a13b8e87",
-  "src/syntax/rust.ts": "3296fdd521cb29508c88186a2a1d19f7eda17d0029ca2a854c79b826cd269fa0",
+  "src/change/blocks.ts": "fd6251ffcae883e58c26e59a04c2bd676be67204c9404000599cc56b7d42b429",
+  "src/syntax/rust.ts": "64085392ee11d7c697657aab7031437a80f0e6a77a05b6ea76df58aa7c8949a8",
   "src/syntax/cfg.ts": "31af340870c3a65f784d77904f081b74cf4fb3a1c4106d4ae9adc7abb8ad6dc2",
   "src/plan/from-diff.ts": "b4ecd8fe13fb2c3f89aab2f460ef4a64ab75f29c773d29addcd27858cdb8f239",
   "src/plan/applicability.ts": "bab52af2eb92d575d622adba26103c25d3e0c3ee2c0e23b9ce2131f1469d8d43",
