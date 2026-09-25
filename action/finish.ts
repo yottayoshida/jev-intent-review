@@ -287,8 +287,8 @@ const escapeData = (text: string) => text.replaceAll("%", "%25").replaceAll("\r"
 
 /** What became of the check run, said the same way in the job summary and in the log. */
 const CHECK_RUN_SAID: Record<CheckRunResult, string> = {
-  created: `The check run "${CHECK_NAME}" holds the same report.`,
-  partial: `The check run "${CHECK_NAME}" holds the same report; GitHub refused some of its marks on lines, which are in the report itself.`,
+  created: `The check run "${CHECK_NAME}" holds what decides; the artifact holds the whole report.`,
+  partial: `The check run "${CHECK_NAME}" holds what decides; the artifact holds the whole report. GitHub refused some of the check run's marks on lines, which are in the report itself.`,
   not_permitted: "No check run was created: the workflow does not grant `checks: write`, or this pull request's token cannot write checks (a fork, Dependabot).",
   not_sent: "No check run was asked for: the pull request's head commit could not be read from the event.",
   failed: "No check run was created: GitHub did not accept it.",
@@ -312,14 +312,19 @@ export async function finish(env: NodeJS.ProcessEnv, deps: Deps): Promise<void> 
     const stderr = existsSync(join(work, "stderr.txt")) ? readFileSync(join(work, "stderr.txt"), "utf8") : "";
     let report: ReviewReport | undefined;
     let markdown: string;
+    // What the check run and the job summary hold: what decides, with each requirement's audit
+    // counted instead of listed (ADR 0021). The artifact holds `markdown`, the whole report.
+    let decision: string;
     try {
       const parsed = JSON.parse(stdout) as ReviewReport;
       if (parsed?.version !== 2) throw new Error("not a version 2 report");
       markdown = renderMarkdown(parsed);
+      decision = renderMarkdown(parsed, { audit: false });
       report = parsed;
     } catch {
       report = undefined;
       markdown = stoppedReport(exitCode, stderr);
+      decision = markdown;
     }
 
     stage = "deciding the result";
@@ -351,8 +356,15 @@ export async function finish(env: NodeJS.ProcessEnv, deps: Deps): Promise<void> 
     const merge = report?.metadata.head ?? "";
     const { annotations, elsewhere } = report ? annotationsOf(report, (path) => headSha !== "" && merge !== "" && deps.sameAt(headSha, merge, path)) : { annotations: [], elsewhere: 0 };
     const moved = elsewhere > 0 ? `\n\n${plural(elsewhere, "call")} worth checking ${elsewhere === 1 ? "is" : "are"} in a file the merge commit changes from the pull request's head, so ${elsewhere === 1 ? "it is" : "they are"} listed above and not marked on a line.` : "";
-    const rest = `The rest of the report is in the artifact \`${artifact}\`.`;
-    const checkSummary = truncate(shown, CHECK_SUMMARY_LIMIT - Buffer.byteLength(moved), rest) + moved;
+    const rest = `The report is cut here; the whole of it is \`report.md\` in the artifact \`${artifact}\`.`;
+    // Said only where the audit was left out, and not again after a cut, which says it itself.
+    const whole = decision === markdown ? "" : `\n\nThe full report — every call read and every call not checked, each with its reason — is \`report.md\` in the artifact \`${artifact}\`.\n`;
+    const shownDecision = redact(decision, secrets);
+    const view = (limit: number) => {
+      const cut = truncate(shownDecision, limit - Buffer.byteLength(whole), rest);
+      return cut === shownDecision ? `${cut}${whole}` : cut;
+    };
+    const checkSummary = view(CHECK_SUMMARY_LIMIT - Buffer.byteLength(moved)) + moved;
     const safeAnnotations = annotations.map((a) => ({ ...a, message: redact(a.message, secrets), path: redact(a.path, secrets) }));
     stage = "creating the check run";
     let run: CheckRunResult;
@@ -372,7 +384,7 @@ export async function finish(env: NodeJS.ProcessEnv, deps: Deps): Promise<void> 
       `The Action's inputs for the names above: ${INPUT_NAMES}.`,
       "",
     ].join("\n");
-    if (env.GITHUB_STEP_SUMMARY) appendFileSync(env.GITHUB_STEP_SUMMARY, `${truncate(shown, SUMMARY_LIMIT - Buffer.byteLength(footer), rest)}${footer}`);
+    if (env.GITHUB_STEP_SUMMARY) appendFileSync(env.GITHUB_STEP_SUMMARY, `${view(SUMMARY_LIMIT - Buffer.byteLength(footer))}${footer}`);
 
     stage = "saying the result";
     say(`${outcome.title}.`);

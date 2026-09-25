@@ -97,3 +97,36 @@ export function report(overrides: Partial<ReviewReport> = {}): ReviewReport {
     ...overrides,
   };
 }
+
+/**
+ * A large run's report, in the proportions of a real one (grovedb#500 as shipped, against Jev, on
+ * 2026-09-25: of 15 calls read, 4 holding and 11 not required of; 273 not checked, whose lines were
+ * 87 % of an 82 KB report): 3 calls worth checking, 2 not settled, 4 holding, 11 not required of,
+ * 300 not checked with reasons as long as the real ones — and a second requirement that read no call,
+ * whose reasons are all it has to say (ADR 0021).
+ */
+export function largeRun(): ReviewReport {
+  const base = localCheckResult();
+  const finding = base.findings[0]!;
+  const mapping = base.mappings[0]!;
+  const read = (i: number, outcome: "violates" | "satisfies" | "unknown" | "aside") => {
+    const call = `step_${outcome}_${i}(grove_version)`;
+    const observation = { violates: "returns_success", satisfies: "returns_error", unknown: "cannot_determine", aside: "returns_error" }[outcome];
+    return {
+      observed: { ...base.observed[0]!, call, callId: call, outcome, result: { ...base.observed[0]!.result, observation, probability: 0.55, why: `read as \`${observation}\`` } },
+      mapping: { ...mapping, callId: call, call, verdict: outcome === "aside" ? ("does_not_apply" as const) : ("applies" as const), governs: outcome !== "aside" && outcome !== "unknown" },
+    };
+  };
+  const reads = [...[0, 1, 2].map((i) => read(i, "violates")), ...[0, 1].map((i) => read(i, "unknown")), ...[0, 1, 2, 3].map((i) => read(i, "satisfies")), ...Array.from({ length: 11 }, (_, i) => read(i, "aside"))];
+  const unchecked = (n: number, prefix: string) =>
+    Array.from({ length: n }, (_, i) => ({ file: "merk/src/merk/restore.rs", function: `restore_chunk_${i}`, call: `${prefix}_${i}(chunk, &mut self.tree)`, origin: "calls_changed" as const, why: `${prefix}_${i} is defined 14 times here, so which one this call reaches is not resolved, and nothing was asked` }));
+  const r1: LocalCheckResult = {
+    ...base,
+    observed: reads.map((x) => x.observed),
+    mappings: reads.map((x) => x.mapping),
+    findings: [0, 1, 2].map((i) => ({ ...finding, call: `step_violates_${i}(grove_version)`, sent: [{ name: `check_${i}`, path: "merk/src/merk/restore.rs", lines: "10-20", depth: 1 }] })),
+    unchecked: unchecked(300, "is_empty"),
+  };
+  const r2: LocalCheckResult = { ...base, requirementId: "R2", observed: [], mappings: [], findings: [], unchecked: unchecked(5, "held_in_r2"), notes: [] };
+  return report({ requirements: [r1, r2] });
+}

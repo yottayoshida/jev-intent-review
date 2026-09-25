@@ -1,7 +1,8 @@
 # GitHub Action
 
 On a pull request, the Action runs the command once and puts the report where the people looking at
-the pull request are: a check run, the job summary, and an artifact. Add the workflow and the keys,
+the pull request are: what decides in a check run and the job summary, and the whole report in an
+artifact. Add the workflow and the keys,
 and nothing else:
 
 ```yaml
@@ -52,11 +53,16 @@ so a pull request cannot loosen the rules it is checked under. A key set in the 
 never used: the step that runs the command takes every key name from these inputs.
 
 **What a run leaves.** A check run, "jev-intent-review result", with the report and — for each call
-worth checking whose file the merge commit does not change — a mark on its lines. The same report in
+worth checking whose file the merge commit does not change — a mark on its lines. The same view in
 the job summary. An artifact with `report.md`, the command's `stderr.txt`, `action.json` (which ref
-ran and a hash of its `src`), and `report.json` when the command printed one. The check run's copy
-is cut at about 64 KB and the summary's at about 1 MiB, each at a line, with a pointer to the
-artifact, which always holds the whole report. **Nothing the command prints goes
+ran and a hash of its `src`), and `report.json` when the command printed one. **The check run and
+the job summary put what decides first — each call worth checking, each call not settled, and what
+was not read — and count the calls read as holding, the calls not required of and the calls not
+checked instead of listing them; the list, each call with its reason, is the artifact's `report.md`** ([ADR
+0021](adr/0021-the-check-run-holds-what-decides.md)). A requirement that read no call keeps its
+calls not checked, with their reasons, in the check run too: for it they are all there is to read.
+The check run's copy is cut at about 64 KB and the summary's at about 1 MiB, each at a line, with a
+pointer to the artifact, which always holds the whole report. **Nothing the command prints goes
 to the job log**: requirements and code excerpts carry text that a log would read as a workflow
 command or as a compiler error, so what this Action adds to the log is a handful of fixed sentences.
 Around them the runner writes its own lines — the step headers and each step's `env:`, where a key
@@ -98,8 +104,8 @@ Its title says which. A neutral check run does not block a required check, and t
 green, so a run that checked nothing is told apart by the check run, not by the job's own mark.
 Without `checks: write` — a workflow that does not grant it, Dependabot, or a fork's run if you drop
 the condition above and have not turned on *Send write tokens to workflows from pull requests* — no
-check run is created: the report is in the job summary, and a run that read no call also writes one
-warning.
+check run is created: what decides is in the job summary, the whole report in the artifact, and a
+run that read no call also writes one warning.
 
 **Which pull requests are reviewed.**
 
