@@ -9,7 +9,7 @@ const prep = (repos: string[], over: Partial<Prepared> = {}): Prepared => ({
   limit: 1000,
   baseline: { host: "claude-code", model: "claude-opus-5-5", effort: "high", version: 1 },
   files: { "bench/eval/compare.ts": "c" },
-  versions: { "cand-1": { shipped: { base: "b", head: "h" } } },
+  versions: { "cand-1": { shipped: { base: "b", head: "h", asCaseJson: true } } },
   ...over,
 });
 
@@ -106,7 +106,7 @@ test("run checks again at the opening's sandbox commits, and refuses if what it 
   for (const [changed, what] of [
     [prep(["x/one", "x/two"], { files: { "bench/eval/compare.ts": "changed after the opening" } }), /files/],
     [prep(["x/one", "x/two"], { limit: 999 }), /limit/],
-    [prep(["x/one", "x/two"], { versions: { "cand-1": { shipped: { base: "b", head: "another head" } } } }), /versions/],
+    [prep(["x/one", "x/two"], { versions: { "cand-1": { shipped: { base: "b", head: "another head", asCaseJson: true } } } }), /versions/],
     [prep(["x/one", "x/three"]), /repos/],
     [prep(["x/one", "x/two"], { baseline: { host: "claude-code", model: "claude-sonnet-5", effort: "high", version: 1 } }), /baseline/],
   ] as const) {

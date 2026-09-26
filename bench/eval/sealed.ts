@@ -221,20 +221,102 @@ export function materialize(view: SandboxView, commit: string, cases: readonly C
 }
 
 /**
- * Check 4: a full clone of the case's repository (every blob, so nothing is fetched once requests are
- * being sent), the pull request's head fetched, and every version rebuilt from its patches with
- * `build-branches.sh`. A case that records it was built so (case.json's `build` names the script) must
- * come out at case.json's base and head. A case built another way cannot: its commits carry another
- * author and date. Its version is then the rebuilt commits — the patches, whose sha256 check 2 held,
- * decide the content — and the case written for `measure` names them. Returns the clone and every
- * version's commits, which the opening line records and `run` must find again.
+ * Git with Git LFS turned off: a case's repository may track files with LFS, which this machine may not
+ * have, and whose objects the review never reads. Pointer files are checked out as they are.
  */
-export function prepareClone(c: CheckedCase, work: Work): { clone: string; versions: Record<string, { base: string; head: string }> } {
+const NO_LFS: NodeJS.ProcessEnv = { GIT_LFS_SKIP_SMUDGE: "1", GIT_CONFIG_COUNT: "3", GIT_CONFIG_KEY_0: "filter.lfs.smudge", GIT_CONFIG_VALUE_0: "", GIT_CONFIG_KEY_1: "filter.lfs.process", GIT_CONFIG_VALUE_1: "", GIT_CONFIG_KEY_2: "filter.lfs.required", GIT_CONFIG_VALUE_2: "false" };
+/** A fixed author, committer and date, so the same patches on the same commits give the same SHAs anywhere. */
+const FIXED: NodeJS.ProcessEnv = { GIT_AUTHOR_NAME: "sealed", GIT_AUTHOR_EMAIL: "sealed@invalid", GIT_AUTHOR_DATE: "2026-09-26T00:00:00Z", GIT_COMMITTER_NAME: "sealed", GIT_COMMITTER_EMAIL: "sealed@invalid", GIT_COMMITTER_DATE: "2026-09-26T00:00:00Z" };
+
+/**
+ * One version of a case, built from its patches on the merge base `mb` and the pull request's head
+ * `prhead` (ADR 0024, owner 2026-09-26):
+ *
+ * - a base patch is a defect outside the diff: base = `mb` with it; the pull request's diff is committed
+ *   on top (`before`), so the defect never enters the diff;
+ * - a head patch goes on the pull request's head (the sealed cases' B head patches were taken there, the
+ *   base-side defect already in them), or, if it does not apply there or the result lacks the base-side
+ *   defect, on `before` (as `build-branches.sh` builds); with a base patch, the head must hold that
+ *   defect — the base patch applies in reverse to it — or the version refuses. The head is committed as
+ *   a child of `before`, so the diff from base to head is the pull request's plus the head patch's;
+ * - no head patch: head is `before`.
+ *
+ * Every commit is made with `commit-tree` (no hook runs), a fixed author, committer and date, and no
+ * global or system git configuration, so the same patches give the same commits on any machine. The
+ * version's commits are these, whatever SHAs case.json names: most sealed cases were committed by hand,
+ * with an author and a date nothing recorded. The patches, whose sha256 check 2 held against main,
+ * decide the content.
+ */
+export function buildVersion(clone: string, mb: string, prhead: string, dir: string, basePatch: string | null, headPatch: string | null, label: string, work: Work, log: string): { base: string; head: string } {
+  // No global or system configuration, and no hook of the clone (a global template may have put some there).
+  const env = { ...process.env, ...NO_LFS, GIT_CONFIG_COUNT: "4", GIT_CONFIG_KEY_3: "core.hooksPath", GIT_CONFIG_VALUE_3: "/dev/null", ...FIXED, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1", TMPDIR: work.tmp };
+  const run = (cwd: string, args: string[], input?: string) => execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", env, input, maxBuffer: 512 * 1024 * 1024, stdio: ["pipe", "pipe", "pipe"] });
+  const g = (cwd: string, args: string[], input?: string, raw = false) => {
+    try {
+      const out = run(cwd, args, input);
+      // `raw` keeps the output as git wrote it: a diff trimmed of its last newline is a corrupt patch.
+      return raw ? out : out.trim();
+    } catch (error) {
+      const e = error as { stderr?: string; status?: number };
+      writeFileSync(log, `git ${args[0]} (${label})\nexit ${e.status}\n${e.stderr ?? ""}\n`, { flag: "a" });
+      throw new Refused(`${label}: git ${args[0]} failed; its output is in ${log}`);
+    }
+  };
+  const ok = (cwd: string, args: string[]) => {
+    try {
+      run(cwd, args);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const commit = (tree: string, parent: string, what: string) => g(clone, ["commit-tree", tree, "-p", parent, "-m", `sealed: ${label}, ${what}`]);
+  const wt = mkdtempSync(join(work.tmp, "build-"));
+  rmSync(wt, { recursive: true, force: true });
+  g(clone, ["worktree", "add", "--quiet", "--detach", wt, mb]);
+  try {
+    let base = mb;
+    let before = prhead;
+    if (basePatch !== null) {
+      g(wt, ["apply", "--index", join(dir, basePatch)]);
+      base = commit(g(wt, ["write-tree"]), mb, "base");
+      g(wt, ["apply", "--index"], g(clone, ["diff", "--binary", "--no-ext-diff", "--no-color", mb, prhead], undefined, true));
+      before = commit(g(wt, ["write-tree"]), base, "the pull request's diff");
+    }
+    let head = before;
+    if (headPatch !== null) {
+      const holdsDefect = () => basePatch === null || ok(wt, ["apply", "--cached", "--check", "--reverse", join(dir, basePatch)]);
+      const on = (start: string) => ok(wt, ["read-tree", "--reset", "-u", start]) && ok(wt, ["apply", "--index", join(dir, headPatch)]) && holdsDefect();
+      if (!on(prhead) && !(basePatch !== null && on(before))) {
+        throw new Refused(`${label}: its head patch applies neither to the pull request's head nor to the base with the diff${basePatch === null ? "" : " so that the base-side defect stays"}`);
+      }
+      head = commit(g(wt, ["write-tree"]), before, "head");
+    }
+    // Keep the commits reachable in the clone after the worktree goes.
+    g(clone, ["update-ref", `refs/sealed/${label}`, head]);
+    return { base, head };
+  } finally {
+    try {
+      execFileSync("git", ["-C", clone, "worktree", "remove", "--force", wt], { stdio: "ignore", env });
+    } catch {
+      // the next build's worktree has another name
+    }
+  }
+}
+
+/**
+ * Check 4: a full clone of the case's repository (every blob, so nothing is fetched once requests are
+ * being sent; Git LFS off), the pull request's head fetched, and every version built from its patches
+ * (`buildVersion`). A patch that does not apply refuses. Returns the clone and every version's commits,
+ * which the opening line records and `run` must find again; whether each is case.json's is recorded too.
+ */
+export function prepareClone(c: CheckedCase, work: Work): { clone: string; versions: Record<string, { base: string; head: string; asCaseJson: boolean }> } {
   const clone = join(work.clones, c.id);
   const log = join(work.logs, `clone-${c.id}.txt`);
   // A path is a local repository (the tests'); anything else is on GitHub.
   const url = c.caseFile.repo.startsWith("https://") || c.caseFile.repo.startsWith("/") ? c.caseFile.repo : `https://github.com/${c.caseFile.repo}`;
-  if (!existsSync(join(clone, ".git"))) quiet("git", ["clone", "--quiet", url, clone], log);
+  const env = { ...process.env, ...NO_LFS };
+  if (!existsSync(join(clone, ".git"))) quiet("git", ["clone", "--quiet", url, clone], log, env);
   const shipped = c.caseFile.versions.shipped;
   if (shipped === undefined) throw new Refused(`${c.id} has no shipped version`);
   const has = (sha: string) => {
@@ -247,34 +329,24 @@ export function prepareClone(c: CheckedCase, work: Work): { clone: string; versi
   };
   if (!has(shipped.head)) {
     try {
-      quiet("git", ["-C", clone, "fetch", "--quiet", "origin", shipped.head], log);
+      quiet("git", ["-C", clone, "fetch", "--quiet", "origin", shipped.head], log, env);
     } catch {
-      quiet("git", ["-C", clone, "fetch", "--quiet", "origin", `refs/pull/${c.caseFile.pr}/head`], log);
+      quiet("git", ["-C", clone, "fetch", "--quiet", "origin", `refs/pull/${c.caseFile.pr}/head`], log, env);
     }
   }
   if (!has(shipped.base) || !has(shipped.head)) throw new Refused(`${c.id}: the clone lacks the shipped base or head`);
   const dir = join(work.cases, c.id);
-  const env = { ...process.env, TMPDIR: work.tmp };
-  const build = (c.caseFile as { build?: unknown }).build;
-  const reproducible = typeof build === "string" && build.includes("build-branches.sh");
-  // The label is in each commit's message, so the SHAs come back only with the label the case was built
-  // with: case.json's `build` ends with its template (`cand53-<version>`).
-  const template = typeof build === "string" ? /(\S*<version>\S*)\s*$/.exec(build)?.[1] : undefined;
-  const labelOf = (versionId: string) => (template === undefined ? `${c.id}-${versionId}` : template.replace("<version>", versionId));
-  const versions: Record<string, { base: string; head: string }> = { shipped: { base: shipped.base, head: shipped.head } };
+  const versions: Record<string, { base: string; head: string; asCaseJson: boolean }> = { shipped: { base: shipped.base, head: shipped.head, asCaseJson: true } };
   for (const [versionId, v] of Object.entries(c.caseFile.versions)) {
     if (versionId === "shipped") continue;
-    const base = existsSync(join(dir, `${versionId}.base.patch`)) ? `${versionId}.base.patch` : "-";
-    const head = existsSync(join(dir, `${versionId}.head.patch`)) ? `${versionId}.head.patch` : "-";
-    if (base === "-" && head === "-") throw new Refused(`${c.id} ${versionId} has no patch to build it from`);
-    const got = quiet("bash", [join(ROOT, "bench", "acceptance", "build-branches.sh"), clone, shipped.base, shipped.head, dir, base, head, labelOf(versionId)], log, env).trim();
-    const [b, h] = got.split(" ");
-    if (!/^[0-9a-f]{40}$/.test(b ?? "") || !/^[0-9a-f]{40}$/.test(h ?? "")) throw new Refused(`${c.id} ${versionId}: build-branches.sh printed no base and head`);
-    if (reproducible && got !== `${v.base} ${v.head}`) throw new Refused(`${c.id} ${versionId}: rebuilt from its patches it is not case.json's base and head`);
-    versions[versionId] = { base: b!, head: h! };
+    const base = existsSync(join(dir, `${versionId}.base.patch`)) ? `${versionId}.base.patch` : null;
+    const head = existsSync(join(dir, `${versionId}.head.patch`)) ? `${versionId}.head.patch` : null;
+    if (base === null && head === null) throw new Refused(`${c.id} ${versionId} has no patch to build it from`);
+    const got = buildVersion(clone, shipped.base, shipped.head, dir, base, head, `${c.id}-${versionId}`, work, log);
+    versions[versionId] = { ...got, asCaseJson: got.base === v.base && got.head === v.head };
   }
   // The case `measure` and the scoring read names the commits that were built, which are the ones measured.
-  for (const [versionId, v] of Object.entries(versions)) Object.assign(c.caseFile.versions[versionId]!, v);
+  for (const [versionId, v] of Object.entries(versions)) Object.assign(c.caseFile.versions[versionId]!, { base: v.base, head: v.head });
   writeFileSync(join(dir, "case.json"), `${JSON.stringify(c.caseFile, null, 2)}\n`);
   return { clone, versions };
 }

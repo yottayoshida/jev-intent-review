@@ -194,10 +194,12 @@ node bench/eval/run.ts --set sealed run <run id>
 environment sends judgments nowhere. Then, sending nothing, it checks every case it will open
 (`sealed.ts`): each batch file's sha256 is main's line for it; the case's directory on the sandbox's
 `sealed` holds exactly the files its batch lists, each with its sha256; the repository, or the fork it was
-read on (`readAs`), is one of the 17; every version rebuilds from its patches with
-`bench/acceptance/build-branches.sh` in a full clone — at case.json's base and head when the case records
-it was built with that script, and otherwise as the commits the patches make, which are then the version
-measured and are recorded in the line; and the annotators read only their directory.
+read on (`readAs`), is one of the 17; every version builds from its patches in a full clone, Git LFS off
+(`buildVersion` of `sealed.ts`: a base patch on the merge base with the pull request's diff committed on
+top; a head patch on the pull request's head, committed as a child of the commit before) — the commits it
+makes are the version measured, and the line records them, since most cases were committed by hand with
+an author and a date nothing kept, so case.json's SHAs cannot be made again (owner, 2026-09-26; whether
+each is case.json's is recorded); and the annotators read only their directory.
 Any of these that fails refuses before the line exists, so it does not spend an opening. It appends the time, the commit, the protocol version, the hash
 of `split.json` and `pool.json`, the host and the Jev alias it will ask, the reason, the repositories,
 the sandbox commits it checked (the run measures those), the most requests jev may send, the baseline it

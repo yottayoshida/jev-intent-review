@@ -17,10 +17,13 @@ and said the check was done by hand until then.
   repository needs.
 - **Checked before the line is written**: `open` checks, sending nothing, that each batch file's sha256
   is main's, that each case's files are exactly the batch's `files_sha256`, that the repository (or the
-  fork it was read on, `readAs`) is one of the 17, that each version rebuilds from its patches — at
-  case.json's SHAs when the case records it was built with `build-branches.sh`; a case built another way
-  cannot reproduce its commits' author and date, so the rebuilt commits are its version and the line
-  records them (found on the rehearsal: dev row 143) — and — with two `claude -p` runs — that the annotators can read their directory and
+  fork it was read on, `readAs`) is one of the 17, that each version builds from its patches (`buildVersion`:
+  a base patch on the merge base, the pull request's diff on top, a head patch on the pull request's head
+  committed as a child of that; Git LFS off) — the commits it makes are the version, and the line records
+  them. Of the 17 cases, 14 were committed by hand with an author and a date nothing kept, so case.json's
+  SHAs cannot be made again whatever the rule; the patches, whose sha256 main holds, decide the content
+  (owner, 2026-09-26, after the first `open` refused 11 of 17 under `build-branches.sh`, whose order
+  applied a B head patch taken against the pull request's head twice) — and — with two `claude -p` runs — that the annotators can read their directory and
   nothing outside it. Any failure refuses before the line exists, so a failed check does not spend an
   opening. `run` checks again, at the commits the line recorded.
 - **Both systems and the adjudication under one opening**: jev, then the baseline on the same bytes (on a
