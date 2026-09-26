@@ -114,46 +114,45 @@ test("openSet: the first N by the number of each first kept row, compared as num
   refuses(() => openSet(b.split, files, "#80", "sealed", 17), /holds 3 repositories of #80; 17 are opened/);
 });
 
-test("check 4: a case built with build-branches.sh must rebuild at case.json's SHAs; one built otherwise is measured at the rebuilt commits", () => {
+test("check 4: each version is built from its patches, the same commits every time, and a patch that does not apply refuses", () => {
   const repo = mkdtempSync(join(tmpdir(), "jir-sealed-cand-"));
   git(repo, "init", "-q");
   writeFileSync(join(repo, "lib.rs"), "fn a() {}\n");
+  writeFileSync(join(repo, "io.rs"), "fn w() { x(); }\n");
   const mb = commitAll(repo, "base");
   writeFileSync(join(repo, "lib.rs"), "fn a() { b(); }\n");
   const head = commitAll(repo, "pr");
   const work = workOf(mkdtempSync(join(tmpdir(), "jir-sealed-work-")));
   const dir = join(work.cases, "cand-1");
   mkdirSync(dir, { recursive: true });
+  // defect-A: a head patch only. defect-B: a defect outside the diff (base patch on io.rs), and a head patch
+  // taken against the pull request's head that holds that defect already, as the sealed cases were built.
   writeFileSync(join(dir, "defect-A.head.patch"), "--- a/lib.rs\n+++ b/lib.rs\n@@ -1 +1 @@\n-fn a() { b(); }\n+fn a() { let _ = b(); }\n");
-  const build = (defectHead: string, recorded = true): CheckedCase => ({
-    repo: "x/one",
-    order: 1,
-    id: "cand-1",
-    caseFile: { id: "cand-1", repo, role: "unseen", ...(recorded ? { build: "bench/acceptance/build-branches.sh <clone> …" } : {}), versions: { shipped: { base: mb, head, targets: {}, expected: {} }, "defect-A": { base: mb, head: defectHead, targets: {}, expected: {} } } } as unknown as CaseFile,
-  });
-  // The SHA the script makes, then the same case with one character of it changed.
-  refuses(() => prepareClone(build("0".repeat(40)), work), /rebuilt from its patches it is not case.json's/);
-  const log = join(work.logs, "clone-cand-1.txt");
-  assert.ok(!existsSync(log) || readFileSync(log, "utf8") === "", "a mismatch is not a failed command");
-  const made = execFileSync("git", ["-C", join(work.clones, "cand-1"), "rev-parse", "refs/acceptance/cand-1-defect-A"], { encoding: "utf8" }).trim();
-  assert.equal(prepareClone(build(made), work).clone, join(work.clones, "cand-1"));
-  // Built another way (no `build` recorded): its own SHA cannot be made again, and the rebuilt commit is the version.
-  const other = build("1".repeat(40), false);
-  const r = prepareClone(other, work);
-  assert.deepEqual(r.versions["defect-A"], { base: mb, head: made });
-  assert.equal(other.caseFile.versions["defect-A"]!.head, made, "the case measured names the rebuilt commit");
-  assert.equal(JSON.parse(readFileSync(join(dir, "case.json"), "utf8")).versions["defect-A"].head, made);
-  // The label is in the commit message: a case built with `cand1-<version>` rebuilds only under that label.
-  const templated = build("2".repeat(40), false);
-  (templated.caseFile as { build?: string }).build = "bench/acceptance/build-branches.sh <clone> <merge-base> <pr-head> <this dir> <base-patch|-> <head-patch|-> cand1-<version>";
-  assert.throws(() => prepareClone(templated, work), /not case.json's base and head/);
-  const labelled = execFileSync("git", ["-C", join(work.clones, "cand-1"), "rev-parse", "refs/acceptance/cand1-defect-A"], { encoding: "utf8" }).trim();
-  assert.notEqual(labelled, made, "another label, another commit");
-  const again = build(labelled, false);
-  (again.caseFile as { build?: string }).build = (templated.caseFile as { build?: string }).build;
-  assert.equal(prepareClone(again, work).versions["defect-A"]!.head, labelled);
+  writeFileSync(join(dir, "defect-B.base.patch"), "--- a/io.rs\n+++ b/io.rs\n@@ -1 +1 @@\n-fn w() { x(); }\n+fn w() { let _ = x(); }\n");
+  writeFileSync(join(dir, "defect-B.head.patch"), "--- a/io.rs\n+++ b/io.rs\n@@ -1 +1 @@\n-fn w() { x(); }\n+fn w() { let _ = x(); }\n");
+  const versions = (a: string, b: string) => ({ shipped: { base: mb, head, targets: {}, expected: {} }, "defect-A": { base: mb, head: a, targets: {}, expected: {} }, "defect-B": { base: b, head: b, targets: {}, expected: {} } });
+  const kase = (a = "0".repeat(40), b = "0".repeat(40)): CheckedCase => ({ repo: "x/one", order: 1, id: "cand-1", caseFile: { id: "cand-1", repo, role: "unseen", versions: versions(a, b) } as unknown as CaseFile });
+  const first = prepareClone(kase(), work);
+  const clone = first.clone;
+  // The same patches give the same commits again: what `run` compares with the opening line.
+  assert.deepEqual(prepareClone(kase(), work).versions, first.versions);
+  const a = first.versions["defect-A"]!;
+  const b = first.versions["defect-B"]!;
+  assert.equal(a.base, mb);
+  assert.equal(git(clone, "show", `${a.head}:lib.rs`), "fn a() { let _ = b(); }");
+  // B: the base holds the defect, the head holds the pull request's change and the defect, and the
+  // defect is not in the diff between them.
+  assert.equal(git(clone, "show", `${b.base}:io.rs`), "fn w() { let _ = x(); }");
+  assert.equal(git(clone, "show", `${b.head}:lib.rs`), "fn a() { b(); }");
+  assert.equal(git(clone, "show", `${b.head}:io.rs`), "fn w() { let _ = x(); }");
+  assert.deepEqual(git(clone, "diff", "--name-only", b.base, b.head).split("\n"), ["lib.rs"]);
+  // Whether case.json named these commits is recorded, never required.
+  assert.equal(a.asCaseJson, false);
+  assert.equal(prepareClone(kase(a.head), work).versions["defect-A"]!.asCaseJson, true);
+  // A patch that does not apply refuses.
+  writeFileSync(join(dir, "defect-A.head.patch"), "--- a/lib.rs\n+++ b/lib.rs\n@@ -1 +1 @@\n-fn nothing() {}\n+fn a() {}\n");
+  refuses(() => prepareClone(kase(), work), /cand-1-defect-A: its head patch applies neither/);
 });
-
 test("the stop rule: the same version failing twice, or five failures in all, stops", () => {
   const a = stopRule();
   a.fail("v1")("x");
@@ -358,4 +357,33 @@ test("an answer's JSON is read with an explanation after it, and a step that nev
   const never = () => (asked++, { counted: false, why: "x", sent: { system: "", request: "", bytes: 0 }, model: [] });
   assert.throws(() => adjudicate(items, "R", "/nowhere", "h", "/empty", () => {}, { ask: never, sourceCopy: () => mkdtempSync(join(tmpdir(), "jir-src-")) }), (e: unknown) => e instanceof StopRun);
   assert.equal(asked, MAX_ATTEMPTS, "a fail that does not throw still stops at the cap");
+});
+
+test("check 4, a B head patch: taken on the pull request's head or on the base with the diff, the head holds the base-side defect or the version refuses", () => {
+  const repo = mkdtempSync(join(tmpdir(), "jir-sealed-b-"));
+  git(repo, "init", "-q");
+  writeFileSync(join(repo, "lib.rs"), "fn a() {}\n");
+  writeFileSync(join(repo, "io.rs"), "fn w() { x(); }\n");
+  const mb = commitAll(repo, "base");
+  writeFileSync(join(repo, "lib.rs"), "fn a() { b(); }\n");
+  const head = commitAll(repo, "pr");
+  const work = workOf(mkdtempSync(join(tmpdir(), "jir-sealed-bw-")));
+  const dir = join(work.cases, "cand-2");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "defect-B.base.patch"), "--- a/io.rs\n+++ b/io.rs\n@@ -1 +1 @@\n-fn w() { x(); }\n+fn w() { let _ = x(); }\n");
+  // Taken against the base with the diff (build-branches.sh's order): it touches only lib.rs, so it
+  // applies on the pull request's head too — where the head would lack the base-side defect.
+  writeFileSync(join(dir, "defect-B.head.patch"), "--- a/lib.rs\n+++ b/lib.rs\n@@ -1 +1 @@\n-fn a() { b(); }\n+fn a() { let _ = b(); }\n");
+  const kase = (): CheckedCase => ({ repo: "x/two", order: 2, id: "cand-2", caseFile: { id: "cand-2", repo, role: "unseen", versions: { shipped: { base: mb, head, targets: {}, expected: {} }, "defect-B": { base: mb, head, targets: {}, expected: {} } } } as unknown as CaseFile });
+  const r = prepareClone(kase(), work);
+  const b = r.versions["defect-B"]!;
+  assert.equal(git(r.clone, "show", `${b.head}:io.rs`), "fn w() { let _ = x(); }", "the head holds the base-side defect");
+  assert.equal(git(r.clone, "show", `${b.head}:lib.rs`), "fn a() { let _ = b(); }");
+  assert.deepEqual(git(r.clone, "diff", "--name-only", b.base, b.head).split("\n"), ["lib.rs"]);
+  // Every commit has the fixed author, committer and date, whatever the environment says.
+  assert.equal(git(r.clone, "log", "-1", "--format=%an %ae %at %cn %ce %ct", b.head), "sealed sealed@invalid 1790380800 sealed sealed@invalid 1790380800");
+  // A head patch that takes the base-side defect out again leaves no head that holds it: refused.
+  writeFileSync(join(dir, "defect-B.head.patch"), "--- a/io.rs\n+++ b/io.rs\n@@ -1 +1 @@\n-fn w() { let _ = x(); }\n+fn w() { x(); }\n");
+  refuses(() => prepareClone(kase(), work), /cand-2-defect-B: its head patch applies neither .* base-side defect stays/);
+  assert.doesNotMatch(git(r.clone, "worktree", "list"), /build-/, "no worktree is left after a refusal");
 });

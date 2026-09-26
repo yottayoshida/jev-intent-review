@@ -68,7 +68,7 @@ export interface OpenLine {
   /** sha256 of what decides the comparison and the check, so a change merged in between is refused. */
   files: Record<string, string>;
   /** Each case's versions as rebuilt from its patches (check 4): the commits measured. */
-  versions: Record<string, Record<string, { base: string; head: string }>>;
+  versions: Record<string, Record<string, { base: string; head: string; asCaseJson: boolean }>>;
 }
 
 /** What `prepare` found: the cases checked, and what the opening line records of them. */
@@ -271,7 +271,7 @@ export const realDeps: SealedDeps = {
 /** The run's own directory, outside the repository: the sandbox clone, the cases, the clones, the logs. */
 const sealedWork = (runId: string) => join(homedir(), ".cctmp", `sealed-${runId}`);
 /** What `prepare` built in this process, for `measure` to run on. */
-const prepared = new Map<string, { work: Work; cases: (CheckedCase & { clone: string; versions: Record<string, { base: string; head: string }> })[]; n1: Preflight }>();
+const prepared = new Map<string, { work: Work; cases: (CheckedCase & { clone: string; versions: Record<string, { base: string; head: string; asCaseJson: boolean }> })[]; n1: Preflight }>();
 
 /**
  * The files whose change between open and run is refused: what checks the cases, runs each system,
@@ -282,7 +282,7 @@ function decidingFiles(): Record<string, string> {
   const files = [
     "bench/eval/run.ts", "bench/eval/sealed.ts", "bench/eval/baseline.ts", "bench/eval/compare.ts", "bench/eval/adjudicate.ts", "bench/eval/metrics.ts", "bench/eval/split.ts",
     "bench/eval/retro/prompts.ts", "bench/eval/retro/calibrate.ts", "bench/eval/sealed-batches.json",
-    "bench/acceptance/run.ts", "bench/acceptance/score.ts", "bench/acceptance/replay.ts", "bench/acceptance/build-branches.sh",
+    "bench/acceptance/run.ts", "bench/acceptance/score.ts", "bench/acceptance/replay.ts",
   ];
   return Object.fromEntries(files.map((f) => [f, sha256(readFileSync(join(ROOT, f)))]));
 }
