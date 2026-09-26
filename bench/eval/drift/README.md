@@ -102,9 +102,15 @@ comparison.
 it came, the baseline is not retaken to make it go away, and the versions and the frozen set's count
 are the first things to look at.
 
+**Replays are run by hand, not on a schedule** (owner, 2026-09-26): before an evaluation that
+relies on Jev, and when the host names a version the baseline does not have. No Cloudflare key is
+kept in this repository's Actions.
+
+**A stable alias is not evidence of stable judgment.** The same alias, and even the same version named
+by the host, answered the same frozen pairs differently from run to run in the baseline itself; only a
+replay against the baseline says whether the answers moved further than that.
+
 ## Not here yet
 
 - Calibration: the pairs carry no label. `bench/eval/metrics.ts`'s `calibration` needs 100 labelled
   judgments and 17 repositories in a family; this is added once the labelled dev set reaches that.
-- A schedule: whether the replay runs on its own, and with what key, is not decided (`#87` stays open
-  on it).
