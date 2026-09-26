@@ -18,6 +18,7 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Label, Pool } from "../split.ts";
+import { ghApi, PIPED } from "./gh.ts";
 import { fetchBundle, type Bundle } from "./material.ts";
 import { DEV_SEARCH, type Search } from "./search.ts";
 import { namedOrigins, originOf, realDeps, type Origin } from "./origin.ts";
@@ -303,7 +304,7 @@ export function devCandidates(pool: Pick<Pool, "rows">): (Candidate & { label80:
 const EARLIEST_FIX = "2026-07-01";
 
 export function realCalDeps(clones: string, labels80: Map<string, Label>, empty: string): CalDeps {
-  const api = (path: string) => JSON.parse(execFileSync("gh", ["api", path], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }));
+  const api = ghApi;
   const defaults = new Map<string, string>();
   const cloneOf = (repo: string) => {
     const dir = join(clones, repo.replace("/", "__"));
@@ -327,7 +328,7 @@ export function realCalDeps(clones: string, labels80: Map<string, Label>, empty:
       if (p.merged_at < EARLIEST_FIX) return { skip: `merged before ${EARLIEST_FIX}` };
       // The API's raw diff, escape sequences allowed: `gh pr diff` and `gh api` both refuse a diff holding them
       // (beboite/boite-legacy#187 stopped the first attempt, 2026-09-25). It is only ever read as text.
-      const diff = execFileSync("gh", ["api", "--allow-escape-sequences", "-H", "Accept: application/vnd.github.v3.diff", `repos/${repo}/pulls/${number}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+      const diff = execFileSync("gh", ["api", "--allow-escape-sequences", "-H", "Accept: application/vnd.github.v3.diff", `repos/${repo}/pulls/${number}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: PIPED });
       return { repo, number, ref: `${repo}#${number}`, title: p.title, body: p.body ?? "", diff, mergedAt: p.merged_at, base: p.base.sha, bundle: fetchBundle(repo, number), label80: labels80.get(`${repo}#${number}`) ?? null };
     },
     origin(fix) {
@@ -378,13 +379,13 @@ export function n1Problem(arrived: readonly string[], appendedAudit: string, emp
 }
 
 /** Subjects of the commits on the workspace's `origin/main` after `from` and up to `to`. */
-function arrivedBetween(from: string, to: string): string[] {
+export function arrivedBetween(from: string, to: string): string[] {
   if (from === to) return [];
   const ws = join(homedir(), "claude_workspace");
   return execFileSync("git", ["-C", ws, "log", "--format=%s", `${from.split(" ")[0]}..${to.split(" ")[0]}`], { encoding: "utf8" }).split("\n").filter(Boolean);
 }
 
-function readAppended(from: number | null): string {
+export function readAppended(from: number | null): string {
   if (from === null || !existsSync(AUDIT)) return "";
   const size = statSync(AUDIT).size;
   // A log rotated during the run is shorter than before: read the new one from its start.
