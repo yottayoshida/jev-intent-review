@@ -270,8 +270,9 @@ export function budgetOf(runs: readonly { finished: boolean; bytes?: number }[])
   return b.length % 2 === 1 ? b[mid]! : Math.floor((b[mid - 1]! + b[mid]!) / 2);
 }
 
-const requirementOf = (c: CaseFile, targets: Record<string, Target>): { id: string; text: string } => {
-  const spec = JSON.parse(readFileSync(join(HERE, "..", "acceptance", "cases", c.id, "spec.json"), "utf8")) as { requirements: { id: string; text: string }[] };
+/** The one requirement a version's targets name, from its case's spec.json (under `cases`, the acceptance cases by default). */
+export const requirementOf = (c: CaseFile, targets: Record<string, Target>, cases = join(HERE, "..", "acceptance", "cases")): { id: string; text: string } => {
+  const spec = JSON.parse(readFileSync(join(cases, c.id, "spec.json"), "utf8")) as { requirements: { id: string; text: string }[] };
   const ids = new Set(Object.values(targets).map((t) => t.requirementId));
   if (ids.size !== 1) throw new Error(`${c.id}: a version's targets name ${ids.size} requirements; the baseline asks one at a time`);
   const r = spec.requirements.find((x) => x.id === [...ids][0])!;
