@@ -108,7 +108,10 @@ dev set may be run and read as often as work needs.
 7. **Yield and cap**: once the first 100 rows are screened, the yield is measured and multiplied by every
    row of `search-v1.json` and `search-v2.json` — all recorded before the yield is read. If that could not
    reach 17 sealed repositories, stop and say so ("no evaluation verdict"). Otherwise stop when sealed
-   holds 17 repositories and 17 requirements, or when 800 rows have been examined.
+   holds 17 repositories and 17 requirements, or when 800 rows have been examined. A batch is read
+   whole, so the last one can leave more than 17 on the sealed side: **the 17 opened are the first by
+   the number of each repository's first kept row**, compared as numbers (owner, 2026-09-26). The rest
+   stay sealed and unopened, the replacements a contaminated repository needs.
 
 **Nothing of a candidate lives in this repository — verdicts, requirements, patches, observations —
 only each batch's counts and sha256.** They live in the private `yottayoshida/jev-review-sandbox`,
@@ -117,8 +120,9 @@ evaluation the access log never saw) and never on its `main`: each candidate on 
 (`cand/<row>`), each batch's verdicts on `batches`, and once the side is known the sealed cases on
 `sealed` and the dev cases on `dev`. The verdicts file holds the sha256 of every file of every case, so a
 case changed after the batch is found. The sandbox is private and this repository's CI cannot read it:
-**`run.ts` checks every sealed case against its batch's hashes before it opens the sealed set** (wired
-with the opening itself); until then the check is done by hand and its result written in the pull
+**`run.ts` checks every sealed case against its batch's hashes before it opens the sealed set**:
+`open` makes the checks of "Opening the sealed set" before it writes its line, and `run` makes them again
+(ADR 0024). Batches placed before this was wired were checked by hand, with the result written in the pull
 request that places a batch.
 
 **A candidate is examined and its case built by a session that keeps nothing of it**: a fresh subagent per
@@ -187,18 +191,46 @@ node bench/eval/run.ts --set sealed run <run id>
 ```
 
 `open` refuses without a reason, without a sealed case, in a tree that is not clean, and where the
-environment sends judgments nowhere. It appends the time, the commit, the protocol version, the hash
+environment sends judgments nowhere. Then, sending nothing, it checks every case it will open
+(`sealed.ts`): each batch file's sha256 is main's line for it; the case's directory on the sandbox's
+`sealed` holds exactly the files its batch lists, each with its sha256; the repository, or the fork it was
+read on (`readAs`), is one of the 17; every version rebuilds from its patches with
+`bench/acceptance/build-branches.sh` in a full clone — at case.json's base and head when the case records
+it was built with that script, and otherwise as the commits the patches make, which are then the version
+measured and are recorded in the line; and the annotators read only their directory.
+Any of these that fails refuses before the line exists, so it does not spend an opening. It appends the time, the commit, the protocol version, the hash
 of `split.json` and `pool.json`, the host and the Jev alias it will ask, the reason, the repositories,
-and how many times each has been opened, this time included — counted over main's lines and the
+the sandbox commits it checked (the run measures those), the most requests jev may send, the baseline it
+will ask, the sha256 of the files that decide the check and the comparison, and how many times each has
+been opened, this time included — counted over main's lines and the
 tree's together, so a branch behind main does not count low. `run` refuses unless that line is on
 origin/main (a branch whose pull request is closed would take the record with it), no result line for
 it is on main or in the tree, the tree is clean, `split.json` and `pool.json` are what it was opened
 with, and the environment asks the same host and alias. It builds `dist/` from the tree, sends the
 requests, and appends a result line: the commit it ran, the manifest, the build's hash, each run's
 `modelIdentity` (`#84`: the versions the host named in its answers), and the result file's sha256. A
-run that stops half way has already left its opening on main; it has no result line, so `run` would
-accept the same opening again and send its requests a second time under one count. **After a run that
-stopped, open again** rather than rerun.
+run that stops half way has already left its opening on main; it has no result line. `run` refuses an
+opening already started in the run's directory on this machine, but a clone elsewhere would accept it and
+send its requests a second time under one count. **After a run that
+stopped, open again** rather than rerun. Of the openings of the same repositories, **only the last whose
+result line reached main is the result**; a stopped one counts as an opening and gives no number.
+
+`run` measures jev on every case, then the baseline of `BASELINE.md` on the same bytes, then its
+adjudication. It stops rather than leave a version short — a short version would bias the comparison:
+when jev does not finish three runs of a version in its own five attempts (`bench/acceptance/run.ts`), when
+a version's baseline or adjudication `claude -p` cannot be counted twice, or when five of those could not
+be counted in all (a run that cannot be counted is taken again until then). Before the line is written,
+two `claude -p` runs check that the annotators read only their directory (`BASELINE.md`, "Sealed").
+What holds a case's content — the three logs — is written in the run's own directory outside the
+repository — `run` prints where, and they are pushed by hand to the sandbox's `results` branch as
+`results/<run id>/`; this repository gets the
+result line, with their sha256, and `logs/sealed-<run id>-report.json`, which holds numbers only and is
+checked to hold no requirement, target function or target call of a case.
+
+`run.ts --set dev sandbox <row>…` runs the same path — the checks, the clone, jev, the baseline, the
+adjudication, the numbers — on dev cases of the sandbox's `dev` branch, with no opening. It is the
+rehearsal of a sealed run; the choice of the 17 and the check that a repository is on the sealed side are
+not on that path and rest on `test/eval-sealed-chain.test.ts`.
 
 **Commit and merge the result line too.** A result line that never reaches main is not seen by a later
 `run` from another clone, and the same opening could be run twice; the log would then undercount.
