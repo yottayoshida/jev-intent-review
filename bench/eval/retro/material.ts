@@ -7,6 +7,7 @@
 // and the case counts as one whose requirement could not be written.
 
 import { execFileSync } from "node:child_process";
+import { PIPED } from "./gh.ts";
 
 /** One version of a text, as GitHub's `userContentEdits` returns it: the whole text at `editedAt`. */
 export interface Edit {
@@ -158,7 +159,7 @@ type Graph = (query: string, vars: Record<string, string | number>) => any;
 const gh: Graph = (query, vars) => {
   const args = ["api", "graphql", "-f", `query=${query}`];
   for (const [k, v] of Object.entries(vars)) args.push(typeof v === "number" ? "-F" : "-f", `${k}=${v}`);
-  return JSON.parse(execFileSync("gh", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })).data;
+  return JSON.parse(execFileSync("gh", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: PIPED })).data;
 };
 
 /** A text, visible from `at`: the body's `createdAt`, a comment's `publishedAt`, a review's `submittedAt`. */

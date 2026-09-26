@@ -1,4 +1,4 @@
-# The retrospective measurement, version 2 (issue #89)
+# The retrospective measurement, version 3 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -23,6 +23,15 @@ says 15 were spent before it: the counting added the second record's total, whic
 first's. 10 were; `nextAttempt` now reads the latest record.) Before the third, the steps that run no
 annotator were run over the first 80 candidates alone, to find tool errors without spending a run.
 No sealed candidate has been examined.
+
+**Version 3** (before any sealed row was read) says what version 2 left open and moves where the
+sealed records live. A row is a case once O is found, F's own material is complete and the screen
+keeps F; the writer and the checker are not filters — a case whose requirement is not written or is
+left out is still a case, not detected, as *Scoring* counts it. A case caught before the merge is its
+repository's one case, placed like the others, and out of the primary denominator and the 17. The
+yield is counted in repositories, and the rows it is compared with stop at the cap of 800. The inputs
+of "Caught before the merge" are named, and the runs are allowed in whole rows. The sealed records
+move from the sandbox's `sealed` branch to its `batches` branch, as `PROTOCOL.md` rule 5 keeps #80's.
 
 ## The question
 
@@ -62,21 +71,34 @@ of the measurement and is reported with it.
   `split.json` or in #80's search is left out: this measurement's repositories are none of #80's, so
   their counts of openings never mix. Only reference, title and merge time are recorded, before any row
   is read. A further range is recorded before any of its rows is read.
-- The rows are examined in their recorded order. **One case per repository**: the first of a
-  repository's rows to pass every step below is its case; later rows of the same repository are not
-  examined.
+- The rows are examined in their recorded order, in batches (`retro/screen.ts`; the first, `b1`, is
+  rows 1 to 100). **One case per repository**: the first of a repository's rows that is a case is its
+  case — caught before the merge or not — and its later rows are skipped, recorded so and counted among
+  the rows read. A row that is not a case leaves its repository's next row to be examined.
+- **A case** is a row whose O is found (step 1), whose F's own material — F's bundle, built as O's is
+  (below, "What the writer sees") and cut at F's merge — is complete, and whose F the screen keeps
+  (step 3). What
+  follows cannot take a case away: a gap in O's bundle, a writer that writes nothing or breaks the
+  rules, and a requirement the checker leaves out each make a case "whose requirement could not be
+  written", not detected (*Scoring*). Step 5 is run on every case in the batch — except one whose
+  O's bundle has a gap, which has nothing complete to write from — and step 6 on every requirement
+  step 5 writes, so that a batch's verdicts are final when they are hashed. An O that GitHub no longer has is such a gap.
 - **The steps, in order** — those that run no annotator first:
   1. O is found (below, "The original pull request"); a row with none is left out.
   2. The bundle is built (below, "What the writer sees"); a gap makes the case one without a
      requirement.
-  3. **F is screened**: F's title, description and the issues it closed, cut at F's merge the way O's
-     bundle is, are read by three annotators with `LABEL_SYSTEM` (`retro/prompts.ts`), whose labels are
+  3. **F is screened**: F's bundle — its title, description, comments, reviews and the issues it
+     connected, cut at F's merge the way O's bundle is (a gap in it leaves the row out: it falls before
+     the side is known) — is read by three annotators with `LABEL_SYSTEM` (`retro/prompts.ts`), whose labels are
      `PROTOCOL.md`'s "Labels", word for word. Two of three decide; three different labels make
      `cannot_label`. F is kept when the label is `swallows_as_success`, `falls_back_or_degrades`,
      `logs_or_warns` or `records_or_handles_locally` — the code before F did not bring the failure to
      the caller — and left out, with the label, otherwise.
-  4. Caught before the merge (below).
-  5. The writer, then 6. the checker (below, "Writing and checking the requirement").
+  4. Caught before the merge (below). It does not leave the row out.
+  5. The writer, then 6. the checker (below, "Writing and checking the requirement"). Neither leaves
+     the row out.
+- A repository on `split.json` when the row is read — placed by another measurement — is left out,
+  recorded so.
 - An annotator's answer that cannot be counted — another model, not JSON, the run failing — is asked
   again up to three times; after that the run over the rows stops, and that row is decided neither way.
 - A passed candidate's repository is placed by `split.ts`'s `sideOf`, the salt being the first main
@@ -86,7 +108,13 @@ of the measurement and is reported with it.
   first 100 rows have been screened, the yield is measured, and compared with the rows there are**:
   every row of the date floor's ranges (2026-07-01 to the last day searched), searched and recorded
   before the yield is read. If those rows, at that yield, could not reach 17 sealed repositories, stop
-  before annotating at scale and report "no evaluation verdict". (Expected yield is about 1 %: the (a)
+  before annotating at scale and report "no evaluation verdict". In repositories, as the 17 are counted
+  (version 3): of the `r` repositories batch `b1` read, `c` had a case not caught before the merge;
+  `M` repositories are among the first 800 rows of the search in its recorded order, the cap. A
+  repository on `split.json` — another measurement's, a fork's `readAs` included — is in neither. Go on
+  when `c/r × M × 3/4` is at least 17 — read as `3·c·M ≥ 68·r` in integers — and stop otherwise. The
+  point estimate decides; the same projection at the Clopper–Pearson lower bound of `c/r` is reported
+  beside it. A batch that did not decide all its rows gives no verdict. (Expected yield is about 1 %: the (a)
   step's 27 % on #80, then O found, the checks, and three in four going to sealed; September 1 to 23
   alone has 451 rows.)
 - Every examined row is kept with F, O, how O was found, the verdicts below, and why it was kept or
@@ -118,11 +146,14 @@ reaches beyond the diff; the reach origin of a detection is reported, and read w
 ## Caught before the merge
 
 Three annotators (below) each read O's reviews, review comments, conversation comments and bot reviews
-from before the merge, and its check results at the merge, with a one-paragraph description of the
-defect, and answer whether any of them pointed at it: the failing call, or what happens when it fails,
+from before the merge — those of O's bundle — and its check results at the merge — the check runs and
+commit statuses of O's head that had finished when it merged (`retro/checks.ts`) — with the defect as
+F's own bundle describes it, F's title and description as they stood at F's merge, and answer whether any of them pointed at it: the failing call, or what happens when it fails,
 in the code the defect is in. Two of three decide. A case caught before the merge is taken out of the
 primary numerator and denominator and reported apart. A case whose checks cannot be read is kept, and
-counted apart as "checks unknown".
+counted apart as "checks unknown"; a pull request with no check at all is counted apart as "checks
+none" (one whose checks had not finished by the merge is read, with none of them). Every run of a check
+is read, not only the latest: a run again after the merge does not hide the one before it.
 
 ## What the writer sees
 
@@ -245,9 +276,15 @@ repositories, cases and runs behind every number.
 ## Where records live
 
 Dev records are in `bench/eval/retro/`. **Sealed records — F, O, the bundle, the requirement, every
-verdict — live on the `sealed` branch of `yottayoshida/jev-review-sandbox`**, as `PROTOCOL.md`'s sealed
-cases do. This repository holds only their count and the sha256 of each batch's verdicts; the salt that
-places a batch's repositories is the first main merge commit holding that hash.
+answer — live in the private `yottayoshida/jev-review-sandbox`, on its `batches` branch** (version 3;
+version 2 said `sealed`): each row's record in `batches/89-<batch>/<row>.json`, and the batch's
+verdicts in `batches/89-<batch>.json` — each row's outcome and the sha256 of each row's file — as
+`PROTOCOL.md` rule 5 keeps #80's. Once a case's side is known it goes to `sealed` or `dev`. This
+repository holds only the batch's line in `sealed-batches.json` — the rows read, `kept` (the
+repositories with a case, those caught before the merge included: every one of them is placed) and the
+sha256 of the verdicts file; the salt that places a batch's repositories is the first main merge commit
+holding that hash. `retro/screen.ts` prints only counts; an error names the row, the step and the
+error's kind, never the row's text.
 
 Opening sealed retrospective cases goes through `bench/eval/run.ts --set sealed open`, on a line of its
 own with `#89` in the reason, and is counted per repository with every other opening. **`run.ts` opens
@@ -269,4 +306,7 @@ status` and the size of omamori's audit log are recorded before and after it. Ot
 the same workspace, so a moved `origin/main` or a longer status is recorded, not taken for this run's;
 the calibration does not start when the run left a mark only it could — an auto-backup commit (the
 hook `claude -p` would fire if it loaded user settings), or the audit log naming the run's directory —
-or gave no answer to count. The runs for sealed rows are asked for, as a number, before they start.
+or gave no answer to count. The runs for sealed rows are asked for, as a number, before they start,
+and are spent in whole rows: a row is begun only when its worst case — eight answers, each asked up to
+four times, 32 runs — fits the runs left, so a batch stops between rows and a later run begins at the
+first row not decided. Decided rows are never asked again.

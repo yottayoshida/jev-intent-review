@@ -14,6 +14,7 @@
 // retrospective result can say nothing about reaching beyond the diff from those cases.
 
 import { execFileSync } from "node:child_process";
+import { ghApi, PIPED } from "./gh.ts";
 
 export type Origin = { number: number; by: "named" } | { number: number; by: "blame"; share: number } | { number: null; why: string };
 
@@ -150,8 +151,8 @@ const asPull = (p: ApiPull): Pull => ({ number: p.number, mergedAt: p.merged_at,
 
 /** The deps of `originOf` for a clone of `repo` (`owner/name`) whose `defaultRef` is its default branch now. */
 export function realDeps(clone: string, repo: string, defaultRef: string): OriginDeps {
-  const git = (...args: string[]) => execFileSync("git", ["-C", clone, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  const api = (path: string) => JSON.parse(execFileSync("gh", ["api", path], { encoding: "utf8" }));
+  const git = (...args: string[]) => execFileSync("git", ["-C", clone, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: PIPED });
+  const api = ghApi;
   return {
     onDefault(sha) {
       try {
