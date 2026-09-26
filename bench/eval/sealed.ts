@@ -346,11 +346,11 @@ export interface Preflight {
  * workspace's main. The audit log is recorded too, but with `Read,Grep,Glob` no Bash hook runs, so it
  * shows nothing of these runs either way; what the record can catch is the commit.
  */
-export function preflight(work: Work, run: typeof ask = ask): Preflight {
-  const before = workspaceState();
+export function preflight(work: Work, run: typeof ask = ask, state: typeof workspaceState = workspaceState, arrived: typeof arrivedBetween = arrivedBetween): Preflight {
+  const before = state();
   const confined = probeConfinement(work, run);
-  const after = workspaceState();
-  const problem = confined ?? n1Problem(arrivedBetween(before.originMain, after.originMain), readAppended(before.auditBytes), work.root, true);
+  const after = state();
+  const problem = confined ?? n1Problem(arrived(before.originMain, after.originMain), readAppended(before.auditBytes), work.root, true);
   return { before, after, problem };
 }
 

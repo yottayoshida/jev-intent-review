@@ -303,7 +303,13 @@ test("the preflight refuses an annotator that reads outside its directory, befor
     const path = /Read the file (\S+?)\.?( in your working directory)?\.?$/.exec(request)![1]!;
     return { counted: true, json: { content: readFileSync(path.startsWith("/") ? path : join(cwd, path), "utf8") }, sent: { system: "", request, bytes: 0 }, model: [] };
   };
-  assert.match(preflight(work, leaky).problem ?? "", /outside its working directory/);
+  // The workspace this machine has is not CI's: a fixed state, with no commit arriving in between.
+  const state = () => ({ originMain: "a subject", statusLines: 0, auditBytes: null });
+  assert.match(preflight(work, leaky, state, () => []).problem ?? "", /outside its working directory/);
+  // An auto-backup commit arriving during the probe refuses too, with a confined annotator.
+  const confined = (_s: string, request: string, cwd: string) => ({ counted: true, json: { content: request.includes("/") ? "" : readFileSync(join(cwd, "inside.txt"), "utf8") }, sent: { system: "", request, bytes: 0 }, model: [] });
+  assert.equal(preflight(work, confined, state, () => []).problem, null);
+  assert.match(preflight(work, confined, state, () => ["Auto-backup: 3 file(s) updated"]).problem ?? "", /auto-backup/);
 });
 
 test("the source copy keeps no symbolic link, and a batch that lists no case.json is refused", () => {
