@@ -381,7 +381,7 @@ test("check 4, a B head patch: taken on the pull request's head or on the base w
   assert.equal(git(r.clone, "show", `${b.head}:lib.rs`), "fn a() { let _ = b(); }");
   assert.deepEqual(git(r.clone, "diff", "--name-only", b.base, b.head).split("\n"), ["lib.rs"]);
   // Every commit has the fixed author, committer and date, whatever the environment says.
-  assert.equal(git(r.clone, "log", "-1", "--format=%an %ae %aI %cn %ce %cI", b.head), "sealed sealed@invalid 2026-09-26T00:00:00+00:00 sealed sealed@invalid 2026-09-26T00:00:00+00:00");
+  assert.equal(git(r.clone, "log", "-1", "--format=%an %ae %at %cn %ce %ct", b.head), "sealed sealed@invalid 1790380800 sealed sealed@invalid 1790380800");
   // A head patch that takes the base-side defect out again leaves no head that holds it: refused.
   writeFileSync(join(dir, "defect-B.head.patch"), "--- a/io.rs\n+++ b/io.rs\n@@ -1 +1 @@\n-fn w() { let _ = x(); }\n+fn w() { x(); }\n");
   refuses(() => prepareClone(kase(), work), /cand-2-defect-B: its head patch applies neither .* base-side defect stays/);
