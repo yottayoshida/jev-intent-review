@@ -1,0 +1,745 @@
+{
+  "toolCommit": "0dec8db6cf45399f132d116409e86efdbff6243b",
+  "packets": "a2db6d5f771ed4fdde0177049003a7a3d2a9bddd19f831f92e84b0c77d6301d8",
+  "run": {
+    "batch": "replay",
+    "at": "2026-09-26T01:39:53.730Z",
+    "order": [
+      "9b8c5378da56eeaf960601be538ca7a64a9f6543486ee2902817a0f6c81dfd16",
+      "5bbd7713c4c6feedd2e64e5f0753c0649bc684ce0986872f6bbd5f2336e71d37",
+      "a595966375ae93ba563db51a4d93df3ffdd676933f29d1f26238ecb45eeb29f9",
+      "e1efea81cef8324963ab30317cb81096e5f0698b6930938d2a6279eed13066b8",
+      "8602faa6b4fc17e3ce1077d28975282d495976623a88474b41db03401f087fa1",
+      "0e61f9715a09c1da609e651ac234668e019d125088f70eca7476f7c28f7b990f",
+      "8c0a89101b8bc805852528d1a4209ab074b1f8d6a451b58085478f94cb936df7",
+      "c4d166288a06ab485eb46e1be31bb3f8f3633dea1ce71fe1c24b9876d3681364",
+      "176304ef50765972cc990a9583575eafa7cea02aa5d2b2cb2b4ee654d5f4d1ec",
+      "b76b9f5dbaeb386ee350716e9ff329b24db15442f0a15ee58b437a172a426263",
+      "07ce99a4eb112ae2dd55e1f3788e0e27bdab7aa989595d717c99969ef14e3c67",
+      "7ea74331c52ae23346a3a0213b5b206fb1ec4640fd7ae9f4790a504d8a9d4b52",
+      "c60f3a2d9705820ab146cb6c893d904ac007ade8b48aca1953bf3436a7f0df50",
+      "b73d07f751a8768ae0a19610f45f3b2995cd80935fa2025392f760020b73030f",
+      "7486e4e02ba0ef23cbe4d77d5f924c012dc3a09bff6ca8e525c7cf16fb5a98c1",
+      "948659e357de6b1b3a5db8cfd40421a19a56d0a0c375486768921b2cbfcc04de",
+      "852f2394616852ef69cfd3480fedac71d0a8339181b90c81cd29faa5f98716be",
+      "899b7570280589c2206b9fbd26cb1af5cbf6f23042834553ff6bdfa492cdb9fc",
+      "fcc409e8b6381352d8039fbbbc89f8a5de718f9e56dc68f9f417e23bd949e81b",
+      "78f44c50c852f2145cf2d455a87321be2d976049094f84df101fa890f2bc1780",
+      "3107f3dd46364d6c025fba325abe133590d428565a997edbf6dec57ef21fbf08",
+      "4985db3c44992419a7a2813dc847a71bbd46327367397589fa464afcb0fd1eff",
+      "5cd0ca942315edf179b89447c1ed5eb2b88e91f1e310208ca2dc4cdb6a1c1801",
+      "b66c45e7f7400bf6a3a359c54d7f733ac3d99c934acae0d4d82b9c3aa9de6fb3",
+      "00cbf2a53dda11cad78ea28edbbae10dd897dc09407195a19519f7f724afe566",
+      "bef266c1b19fb2b0d1e744878858b6507ad1b2d9fed57045edfe3568a1eb0fa8",
+      "55b02ad8a80273bd585b13cbf56b3602f0677346d4b35ce601f1225b0c13f83a",
+      "d0661f7496e635ece8fc872efe634fe8e9106142c4287aa8e17ad9a037fa5a79",
+      "16a6120f7756a5b225f6f8d1ca38451cf328cb10e0557a3687ae2f825170049e",
+      "d8d5040d7df7c9f2304f67a0bd4e45e24f0437d1564dfc00921c3d5c7cdc0276",
+      "35725c579a0e2891baaa0bcffb403424ecd7db9665421cc44cfe3a985f616241",
+      "fbe58556409776d25a48f2759858ce61a328038684a4b5d0f7c4520adaedd7de",
+      "5d0f5328cc449998e667d301eea05fb5e971d420122ef5081e71e9d2c141f68b",
+      "4c4ad4bcb2918a6fd323a90a94b68edb88be3afbdf4acb615d6d06b21fd9f2bb",
+      "44a71202f362c085a8db1ad1b3d9a0252f30b84f70103c3c7c82e7177cb84c34",
+      "ee9817f85a5b0edef7f8ddada5c94265b19a08ad4315961d8a5d37c46f5e532a",
+      "f03cc7dc12f328e02b4be788a039e965c46da66918469ae8c072893f9a1bb69d",
+      "493f6364801c88c472cfae021e0e5344f0b3b4e17d93b78dc11d68a9d43f940e",
+      "c31e04f4af8c127745aa123a532ef78698b4aa55923a2a5522485fc9ae9c877d",
+      "aeb9fa11edce0b29a9545839d77690af92fef214781599c564c58b309b670b6c",
+      "ec352b55db1505fda5a28c36c9238c40472e81a1e6437ed20cb71a4322bf0bce",
+      "936b5a0b170ef9af9ee1f7c847998a3aaf0586c849c8560334c53d6485c4efe1",
+      "607d961f4db2476a08f5a52deaedc4800cd54244353ef0192d924b9303a6ffb9",
+      "fccd4d17f307deb358c690481617bc1d5a5fd05d9864e7661a9146800b2fc52b",
+      "026fcc0e6c5ccc081981f6f27ed807d924b376597418f987da282812423091b6",
+      "a571f106e8620ff6ba425cd0c0a72b56c3961bc8801dd7e38e65b32185ad522e",
+      "bf922f3a83d85ee0d286e7eac303c1cfd4eb642db90ed1e13b48d5a2d6108b5a",
+      "3188ada33136b9af069b996cb6d81c1b63cfc88bb29c2cdd826f2d66001df605",
+      "f8cde9e5b35373cb9b15817f30bc033872055415adc3f45aeae418bc89ffeaa5",
+      "73d03167177b13548ba0e9c651bfff56a457174a1f293bd6e962e2337a8c3d6e",
+      "777951c8dbd639c5bee4b03f4355db95a6703d53c471ccf104ce8b2c145af96b",
+      "634fbc6656f219cad4f3f5273ac702d6446d062ceb1c98492fb370679879a0ed",
+      "ae46b8feddff206ddfc1d84ac4e2e23d3dafcf57f6a6bad45e15c2eec75cd46c",
+      "f6b99dcfab5cac4eca4e6498898484306a5dccbd3d4ba79562b0c48279cf4b4b",
+      "8e24b2434f19c9d283ef466a6663a9277f14c96308b0d61e3195b8fadfe61a41",
+      "edddef732bf58c7292b1f2eb04544f15066905f7237c4931d62444d3f1df52b5",
+      "124ad8d951933cefc5e833e9a70e926244c18441467159deb8d030de56329f7b"
+    ],
+    "answers": {
+      "9b8c5378da56eeaf960601be538ca7a64a9f6543486ee2902817a0f6c81dfd16": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "5bbd7713c4c6feedd2e64e5f0753c0649bc684ce0986872f6bbd5f2336e71d37": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.97
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.97
+        },
+        "outcome": "satisfies"
+      },
+      "a595966375ae93ba563db51a4d93df3ffdd676933f29d1f26238ecb45eeb29f9": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.98
+        },
+        "outcome": "aside"
+      },
+      "e1efea81cef8324963ab30317cb81096e5f0698b6930938d2a6279eed13066b8": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "8602faa6b4fc17e3ce1077d28975282d495976623a88474b41db03401f087fa1": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.95
+        },
+        "outcome": "aside"
+      },
+      "0e61f9715a09c1da609e651ac234668e019d125088f70eca7476f7c28f7b990f": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "8c0a89101b8bc805852528d1a4209ab074b1f8d6a451b58085478f94cb936df7": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.98
+        },
+        "outcome": "aside"
+      },
+      "c4d166288a06ab485eb46e1be31bb3f8f3633dea1ce71fe1c24b9876d3681364": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "176304ef50765972cc990a9583575eafa7cea02aa5d2b2cb2b4ee654d5f4d1ec": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.7
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 0.53
+        },
+        "outcome": "aside"
+      },
+      "b76b9f5dbaeb386ee350716e9ff329b24db15442f0a15ee58b437a172a426263": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.79
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 0.53
+        },
+        "outcome": "aside"
+      },
+      "07ce99a4eb112ae2dd55e1f3788e0e27bdab7aa989595d717c99969ef14e3c67": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "7ea74331c52ae23346a3a0213b5b206fb1ec4640fd7ae9f4790a504d8a9d4b52": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.98
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.94
+        },
+        "outcome": "aside"
+      },
+      "c60f3a2d9705820ab146cb6c893d904ac007ade8b48aca1953bf3436a7f0df50": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.97
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "aside"
+      },
+      "b73d07f751a8768ae0a19610f45f3b2995cd80935fa2025392f760020b73030f": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "7486e4e02ba0ef23cbe4d77d5f924c012dc3a09bff6ca8e525c7cf16fb5a98c1": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "satisfies"
+      },
+      "948659e357de6b1b3a5db8cfd40421a19a56d0a0c375486768921b2cbfcc04de": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 0.89
+        },
+        "outcome": "violates"
+      },
+      "852f2394616852ef69cfd3480fedac71d0a8339181b90c81cd29faa5f98716be": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "899b7570280589c2206b9fbd26cb1af5cbf6f23042834553ff6bdfa492cdb9fc": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "satisfies"
+      },
+      "fcc409e8b6381352d8039fbbbc89f8a5de718f9e56dc68f9f417e23bd949e81b": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.93
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.88
+        },
+        "outcome": "aside"
+      },
+      "78f44c50c852f2145cf2d455a87321be2d976049094f84df101fa890f2bc1780": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 1
+        },
+        "outcome": "violates"
+      },
+      "3107f3dd46364d6c025fba325abe133590d428565a997edbf6dec57ef21fbf08": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.54
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "unknown"
+      },
+      "4985db3c44992419a7a2813dc847a71bbd46327367397589fa464afcb0fd1eff": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.97
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.93
+        },
+        "outcome": "aside"
+      },
+      "5cd0ca942315edf179b89447c1ed5eb2b88e91f1e310208ca2dc4cdb6a1c1801": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.96
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "aside"
+      },
+      "b66c45e7f7400bf6a3a359c54d7f733ac3d99c934acae0d4d82b9c3aa9de6fb3": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "00cbf2a53dda11cad78ea28edbbae10dd897dc09407195a19519f7f724afe566": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "bef266c1b19fb2b0d1e744878858b6507ad1b2d9fed57045edfe3568a1eb0fa8": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.58
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "unknown"
+      },
+      "55b02ad8a80273bd585b13cbf56b3602f0677346d4b35ce601f1225b0c13f83a": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.74
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.98
+        },
+        "outcome": "aside"
+      },
+      "d0661f7496e635ece8fc872efe634fe8e9106142c4287aa8e17ad9a037fa5a79": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.96
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "16a6120f7756a5b225f6f8d1ca38451cf328cb10e0557a3687ae2f825170049e": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.72
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.97
+        },
+        "outcome": "aside"
+      },
+      "d8d5040d7df7c9f2304f67a0bd4e45e24f0437d1564dfc00921c3d5c7cdc0276": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "satisfies"
+      },
+      "35725c579a0e2891baaa0bcffb403424ecd7db9665421cc44cfe3a985f616241": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.96
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.97
+        },
+        "outcome": "aside"
+      },
+      "fbe58556409776d25a48f2759858ce61a328038684a4b5d0f7c4520adaedd7de": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "5d0f5328cc449998e667d301eea05fb5e971d420122ef5081e71e9d2c141f68b": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.94
+        },
+        "outcome": "satisfies"
+      },
+      "4c4ad4bcb2918a6fd323a90a94b68edb88be3afbdf4acb615d6d06b21fd9f2bb": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.82
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.93
+        },
+        "outcome": "satisfies"
+      },
+      "44a71202f362c085a8db1ad1b3d9a0252f30b84f70103c3c7c82e7177cb84c34": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "ee9817f85a5b0edef7f8ddada5c94265b19a08ad4315961d8a5d37c46f5e532a": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "satisfies"
+      },
+      "f03cc7dc12f328e02b4be788a039e965c46da66918469ae8c072893f9a1bb69d": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.91
+        },
+        "outcome": "satisfies"
+      },
+      "493f6364801c88c472cfae021e0e5344f0b3b4e17d93b78dc11d68a9d43f940e": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "c31e04f4af8c127745aa123a532ef78698b4aa55923a2a5522485fc9ae9c877d": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "satisfies"
+      },
+      "aeb9fa11edce0b29a9545839d77690af92fef214781599c564c58b309b670b6c": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "aside"
+      },
+      "ec352b55db1505fda5a28c36c9238c40472e81a1e6437ed20cb71a4322bf0bce": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.68
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.98
+        },
+        "outcome": "aside"
+      },
+      "936b5a0b170ef9af9ee1f7c847998a3aaf0586c849c8560334c53d6485c4efe1": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.77
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.58
+        },
+        "outcome": "aside"
+      },
+      "607d961f4db2476a08f5a52deaedc4800cd54244353ef0192d924b9303a6ffb9": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.9400000000000001
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "aside"
+      },
+      "fccd4d17f307deb358c690481617bc1d5a5fd05d9864e7661a9146800b2fc52b": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.95
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.91
+        },
+        "outcome": "aside"
+      },
+      "026fcc0e6c5ccc081981f6f27ed807d924b376597418f987da282812423091b6": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.72
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "a571f106e8620ff6ba425cd0c0a72b56c3961bc8801dd7e38e65b32185ad522e": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.94
+        },
+        "outcome": "aside"
+      },
+      "bf922f3a83d85ee0d286e7eac303c1cfd4eb642db90ed1e13b48d5a2d6108b5a": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.9
+        },
+        "outcome": "aside"
+      },
+      "3188ada33136b9af069b996cb6d81c1b63cfc88bb29c2cdd826f2d66001df605": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.55
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "unknown"
+      },
+      "f8cde9e5b35373cb9b15817f30bc033872055415adc3f45aeae418bc89ffeaa5": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.88
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 0.97
+        },
+        "outcome": "aside"
+      },
+      "73d03167177b13548ba0e9c651bfff56a457174a1f293bd6e962e2337a8c3d6e": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.57
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "unknown"
+      },
+      "777951c8dbd639c5bee4b03f4355db95a6703d53c471ccf104ce8b2c145af96b": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.96
+        },
+        "outcome": "satisfies"
+      },
+      "634fbc6656f219cad4f3f5273ac702d6446d062ceb1c98492fb370679879a0ed": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.9
+        },
+        "outcome": "aside"
+      },
+      "ae46b8feddff206ddfc1d84ac4e2e23d3dafcf57f6a6bad45e15c2eec75cd46c": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 0.96
+        },
+        "observation": {
+          "choice": "returns_success",
+          "probability": 1
+        },
+        "outcome": "violates"
+      },
+      "f6b99dcfab5cac4eca4e6498898484306a5dccbd3d4ba79562b0c48279cf4b4b": {
+        "mapping": {
+          "choice": "applies",
+          "probability": 1
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 1
+        },
+        "outcome": "satisfies"
+      },
+      "8e24b2434f19c9d283ef466a6663a9277f14c96308b0d61e3195b8fadfe61a41": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.62
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.97
+        },
+        "outcome": "aside"
+      },
+      "edddef732bf58c7292b1f2eb04544f15066905f7237c4931d62444d3f1df52b5": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.99
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.94
+        },
+        "outcome": "aside"
+      },
+      "124ad8d951933cefc5e833e9a70e926244c18441467159deb8d030de56329f7b": {
+        "mapping": {
+          "choice": "does_not_apply",
+          "probability": 0.97
+        },
+        "observation": {
+          "choice": "returns_error",
+          "probability": 0.99
+        },
+        "outcome": "aside"
+      }
+    },
+    "modelIdentity": {
+      "host": "cloudflare",
+      "requested": "typesafe/jev",
+      "requestedIs": "floating",
+      "reusedFromEarlierRuns": 0,
+      "returned": [
+        {
+          "model": "jev-1.13.0",
+          "responses": 114
+        }
+      ],
+      "notReturned": 0,
+      "unreadable": 0,
+      "named": "all"
+    }
+  },
+  "comparison": {
+    "verdict": "no_drift",
+    "why": "the replay differs on 3.5% of the pairs, within the baseline's own variation (runs 5.3%, days 5.3%)",
+    "pairs": 57,
+    "repositories": [
+      "grovedb-500",
+      "moltis-1064"
+    ],
+    "replay": 0.03508771929824561,
+    "runToRun": 0.05263157894736842,
+    "dayToDay": 0.05263157894736842,
+    "moves": {
+      "mappingChoice": 1,
+      "observationChoice": 1,
+      "mappingSide": 2,
+      "observationSide": 2,
+      "meanProbabilityShift": 0.012280701754385961,
+      "errors": 0
+    },
+    "versions": {
+      "baseline": [
+        "jev-1.13.0"
+      ],
+      "replay": [
+        "jev-1.13.0"
+      ],
+      "changed": false
+    },
+    "frozenVsTool": {
+      "added": 0,
+      "removed": 0
+    },
+    "baselineVariation": "observed"
+  }
+}
