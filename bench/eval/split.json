@@ -65,6 +65,20 @@
       ]
     },
     {
+      "repo": "apache/datafusion",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      },
+      "readAs": "spiceai/datafusion"
+    },
+    {
       "repo": "aptos-labs/aptos-core",
       "side": "dev",
       "fixed": true,
@@ -79,6 +93,19 @@
       "why": [
         "acceptance-v1: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "aydiler/md-viewer",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "beagleboard/bb-imager-rs",
@@ -129,6 +156,19 @@
       ]
     },
     {
+      "repo": "caliban-ai/caliban",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "caniko/chaosbox",
       "side": "sealed",
       "fixed": false,
@@ -148,6 +188,19 @@
       "why": [
         "acceptance-v1: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "ceharris/emma65",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "chainsafe/forest",
@@ -245,6 +298,19 @@
       ]
     },
     {
+      "repo": "efagerho/blst-simple-rs",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "esoltys/luminous",
       "side": "sealed",
       "fixed": false,
@@ -279,12 +345,38 @@
       }
     },
     {
+      "repo": "fraidev/bitrev",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "getappz/agentflare",
       "side": "dev",
       "fixed": true,
       "why": [
         "acceptance-v1: the tool was run on it for (b)"
       ]
+    },
+    {
+      "repo": "ghostrider1092/coincync",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "git-ai-project/git-ai",
@@ -402,6 +494,19 @@
       ]
     },
     {
+      "repo": "kyomi-ai/kyomi",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "leynos/netsuke",
       "side": "dev",
       "fixed": true,
@@ -466,6 +571,19 @@
       "why": [
         "acceptance-v1: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "mastepanoski/ce-ai",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "mnzsss/ivar",
@@ -536,6 +654,32 @@
       ]
     },
     {
+      "repo": "nushell/nushell",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
+      "repo": "oferchen/rsync",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "oneiron-dev/oneiron",
       "side": "dev",
       "fixed": true,
@@ -575,6 +719,19 @@
         "acceptance-v1: the tool was run on it for (b)",
         "bench/acceptance/cases/whatsapp-rust-759: built or pre-checked"
       ]
+    },
+    {
+      "repo": "pack-it/packit",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "pnpm/pnpm",
@@ -629,6 +786,19 @@
       "why": [
         "sentence-choice: used to build or tune"
       ]
+    },
+    {
+      "repo": "rustfs/rustfs",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
     },
     {
       "repo": "ruvnet/ruvector",
@@ -697,6 +867,32 @@
       ]
     },
     {
+      "repo": "stacks-network/stacks-core",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
+      "repo": "takazudo/zudo-front-builder",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "thedoublejay/gather-step",
       "side": "dev",
       "fixed": true,
@@ -715,6 +911,19 @@
       "batch": {
         "measurement": "#80",
         "id": "b1"
+      }
+    },
+    {
+      "repo": "thejens/dbt-temporal",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#80 b2: a case was built (PROTOCOL.md rules 1-4); placed by the hash"
+      ],
+      "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
+      "batch": {
+        "measurement": "#80",
+        "id": "b2"
       }
     },
     {
