@@ -322,17 +322,24 @@ export const formOf = (requirement: Requirement): Form => FORMS[requirement.form
 export const NEITHER_SAYS = "The sentence says something else: what a feature does or shows, what an output contains, what stays the same, a limit on data or an interface, or a task to do.";
 
 /**
- * The question, assembled from the forms in the order they are declared and then `neither`. The
- * key order (`type`, `instructions`, `criteria`; the criteria in that order) is part of what the
- * measurement's hash covers, so it is fixed here on purpose.
+ * The question offering `names`, in the order given and then `neither`. The key order (`type`,
+ * `instructions`, `criteria`; the criteria in that order) is part of what a measurement's hash
+ * covers, so it is fixed here on purpose. The bench builds a question offering more forms than the
+ * run does with this same function (`bench/forms/choice/v3.ts`), so what it measures is what the
+ * run would send once those forms are `chosenBySentence`.
  */
-export const FORM_QUESTION: Questions = {
-  requirement_form: {
-    type: "choice",
-    instructions: "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
-    criteria: { ...Object.fromEntries(CHOSEN_FORMS.map((name) => [name, FORMS[name].says])), neither: NEITHER_SAYS },
-  },
-};
+export function buildFormQuestion(names: readonly RequirementForm[]): Questions {
+  return {
+    requirement_form: {
+      type: "choice",
+      instructions: "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
+      criteria: { ...Object.fromEntries(names.map((name) => [name, FORMS[name].says])), neither: NEITHER_SAYS },
+    },
+  };
+}
+
+/** The question the run sends: the forms with `chosenBySentence`, in the order they are declared. */
+export const FORM_QUESTION: Questions = buildFormQuestion(CHOSEN_FORMS);
 
 export type OptionReading = { kind: "option"; option: string; probability: number } | { kind: "under"; option: string; probability: number } | { kind: "none" };
 

@@ -1,0 +1,16 @@
+{"drafts": [
+{"ref": "AndreaBozzo/dataprof#370", "sentence": "When decoding a value fails on a decode path, the profiler must surface the error instead of silently turning it into missing data or a default value that it treats as a statistic."},
+{"ref": "Naoray/instruckt-tauri#9", "sentence": "When serializing the result of an MCP tool call fails, the server must return an error response to the client instead of empty content."},
+{"ref": "armaxri/termiHub#2732", "sentence": "When killing, cancelling or stopping a connection or session fails, the failure must be logged and shown to the user, and the still-live connection must stay listed instead of the action looking like it succeeded."},
+{"ref": "dashpay/grovedb#500", "sentence": "When loading the root node or rewriting tree heights fails during Restorer::finalize, the error must be reported to the caller instead of being silently discarded."},
+{"ref": "dsx-ai-factory/infra-controller#3469", "sentence": "When persisting a rack health report fails, the failure must be logged and counted instead of being silently discarded."},
+{"ref": "liveask/liveask#127", "sentence": "When a fetch fails, the error must be reported instead of being swallowed."},
+{"ref": "oxidezap/whatsapp-rust#759", "sentence": "When downloading an external snapshot or mutation blob during app state sync fails, the failure must propagate so that the collection version is not advanced past data the client failed to fetch."},
+{"ref": "yottayoshida/omamori#111", "sentence": "When hook-check receives malformed JSON or input missing the tool_name or command field, it must block the command with exit 2 instead of allowing it."},
+{"ref": "yottayoshida/omamori#323", "sentence": "When HOME is unset, the staging directory and break-glass state path must refuse to operate instead of falling back to the current working directory."},
+{"ref": "yottayoshida/omamori#465", "sentence": "When the audit log contains an entry declaring an unrecognized chain_version, append() must keep refusing to write even if non-JSON content padded after that entry pushes it out of the 64 KB tail window."},
+{"ref": "yottayoshida/omamori#482", "sentence": "When the key directory cannot be enumerated, audit key rotate must refuse to rotate before any filesystem side effect instead of completing and stamping an unresolved key_id."},
+{"ref": "yottayoshida/omamori#490", "sentence": "When verify fails to reset the high-water-mark, it must not report to the operator that the high-water-mark has been reset to the current chain end."},
+{"ref": "yottayoshida/omamori#554", "sentence": "When hook-check --json-error blocks a command, it must record the block in the audit chain exactly as in text mode while keeping stderr a single JSON object."},
+{"ref": "yottayoshida/omamori#60", "sentence": "When current_exe() fails during regenerate_hooks, the user must be warned that the cursor hooks snippet was not regenerated instead of it being silently skipped."}
+]}

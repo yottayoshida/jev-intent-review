@@ -1675,6 +1675,60 @@ sends is the one above, held to the log's hash by `test/forms.test.ts`, and `met
 covers it from that change on — the records above carry the hash of their day, and a spec run's
 hash moved with it though what it sends did not.
 
+#### With `failure_handling` offered (set 3, #85)
+
+`failure_handling` is not offered to sentences (ADR 0023): a requirement read from text that says a
+failure may be logged or recorded but not swallowed is checked under `failure_propagation`. Whether
+offering it would route such a requirement to it was measured first (ADR 0026). With
+`failure_handling` offered as a third form, the numbers below are recomputed by
+`node bench/forms/choice/run.ts score --set 3` from `bench/logs/form-choice-v3.json` — a log whose
+sentences, their labels and the question were committed before its first request — beside the
+current question measured the same day (`score --set 1c`, `bench/logs/form-choice-v1c.json`).
+
+The question is the run's, built by the same function with every form offered, in declared order.
+The sentences are the 79 above and 23 written from dev pull requests
+(`bench/forms/choice/written-85/`): for each, one reader wrote the requirement from the pull
+request's and its issues' text only, and three others read only its diff and said whether the fixed
+code returns the failure or handles it where it happens — the sentence's label. 306 requests, and
+237 for the same day's comparison, all to Cloudflare, all answered. The table keeps the rows the text
+reads; `score --set 3` prints every row by author, the lines, the main line by repository and every
+sentence's three readings.
+
+| label | who wrote it | sentences | read as its label in 3/3 | as check in any run | as failure_handling in any run | neither / under the bar in any run | keyword rule right |
+|---|---|---|---|---|---|---|---|
+| failure_propagation | all | 38 | 32/38 | 1/38 | 3/38 | 3/38 | 21/38 |
+| | written-85 (fix returns it) | 13 | 9/13 | 1/13 | 3/13 | 1/13 | 11/13 |
+| check_before_action | all | 11 | 10/11 | 10/11 | 0/11 | 1/11 | 8/11 |
+| failure_handling | written-85 (fix handles it) | 10 | 4/10 | 0/10 | 4/10 | 3/10 | 4/10 |
+| neither | all | 43 | 35/43 | 2/43 | 3/43 | 38/43 | 27/43 |
+
+Against ADR 0026's lines, written before the first request:
+
+- **Not met — the main line.** Of the 10 sentences whose pull request's fixed code handles the
+  failure locally (8 repositories), 4 were read as `failure_handling` in every run (bar 80%; Wilson
+  95% 0.17–0.69, taking rows as independent). Three of the six others say what the issue asked in
+  words of propagation — "surface the error", "must be propagated", "let the error reach the …
+  backoff loop" — and were read as `failure_propagation` at 0.67–0.92; the other three (a message
+  to a finished session, a staging directory's report, an audit record) are not sentences about a
+  failure's handling and were under the bar, 0.42–0.54. Either way they go to `failure_propagation`,
+  which is the complaint #85 opens with.
+- Met — the rest. Of the 21 failure sentences that say the failure goes back, none was read as check
+  or as `failure_handling` in any run. Check sentences: 10 of 11 in every run, as under the question
+  sent now the same day. Neither sentences read as check in any run: 2 of 43 (4 under the question
+  sent now, the same day); as `failure_handling`: 3 of 43 — "A failed OAuth token exchange is retried
+  once before the login fails." and sideeye #626's two sentences on what a failing run prints and keeps.
+- Recorded: of the 13 sentences whose fix returns the failure, three were read as `failure_handling`
+  in some run — two in every run, at 0.60–0.68 (one says the isolate setup "must warn", one that a
+  failed fetch "must be reported instead of being swallowed"), one in one run of three — and one,
+  omamori #557's "append() must chain onto the log's last chain entry …", as check in every run
+  (0.68–0.71). The same day's comparison does not include these 23 sentences, so whether offering
+  the form moved them is not measured.
+
+Offering the form would not, on these sentences, send most requirements whose fixed code handles a
+failure to it: what decides the route is whether the issue's own words say how the failure is to be
+handled, and more than half of these do not say it in the form's terms. `failure_handling` stays
+offered to no sentence; the ruling is in ADR 0026.
+
 ## Only Jev
 
 The transport refuses any model but Jev's name on the host it sends to — `typesafe/jev` on

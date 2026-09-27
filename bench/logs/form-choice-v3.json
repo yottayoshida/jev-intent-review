@@ -1,0 +1,4520 @@
+{
+  "conditions": {
+    "sentences": [
+      "d900614a533b8da2314184cc293845e974fbd23fe73ff3654795d5a5c93ab6ca",
+      "adca6c272b90b9211c37455e647bb265c5b22210bf94f6a5ed0a5971bfc1b55d",
+      "05435dbc2eb53d864bd01181f3fc49dfc893fdfdefdb0b621fc8b2dd561b90ec"
+    ],
+    "question": "6cdaa9ca049801aa9f3dc6ed2c17bad3d889e61d9204ff7af41064373581f382",
+    "bar": 0.6,
+    "runsPerSentence": 3,
+    "provider": "cloudflare"
+  },
+  "tool": {
+    "head": "8f327c3742bc28c6e3707ffb5b44c497da0d356a",
+    "note": "the labelled set and the question were committed before the first request; `conditions` holds their sha256"
+  },
+  "question": {
+    "requirement_form": {
+      "type": "choice",
+      "instructions": "`requirement.text` is one requirement written for a change to a program. Which of these does its sentence say? Read its words only; assume nothing about the program.",
+      "criteria": {
+        "failure_propagation": "The sentence says what must happen when an operation fails: the failure must reach the caller as an error, and must not be returned as a success, an empty value or an absence.",
+        "check_before_action": "The sentence says that an operation must not be performed unless a check passes, or must never be performed in some case, and it names the operation.",
+        "failure_handling": "The sentence says what must happen when an operation fails: the failure may be returned, logged or recorded, and must not be turned silently into a success.",
+        "neither": "The sentence says something else: what a feature does or shows, what an output contains, what stays the same, a limit on data or an interface, or a task to do."
+      }
+    }
+  },
+  "endpoint": "Cloudflare Workers AI (https://api.cloudflare.com)",
+  "runs": {
+    "acceptance-moltis-1064": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 362
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 225
+      }
+    ],
+    "acceptance-grovedb-500": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 268
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 271
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0.99,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 218
+      }
+    ],
+    "acceptance-grovedb-501": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 241
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 212
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 229
+      }
+    ],
+    "acceptance-instruckt-tauri-9": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 409
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 292
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 226
+      }
+    ],
+    "acceptance-kontor-385": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 245
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 234
+      }
+    ],
+    "acceptance-pybun-428": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 217
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 225
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 223
+      }
+    ],
+    "acceptance-quebec-136": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_handling": 0.03,
+            "failure_propagation": 0.95,
+            "check_before_action": 0.02,
+            "neither": 0
+          },
+          "confidence": 0.93
+        },
+        "ms": 232
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0.97,
+            "neither": 0,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.96
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.96,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.02,
+            "failure_propagation": 0.96,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.95
+        },
+        "ms": 223
+      }
+    ],
+    "acceptance-whatsapp-rust-759": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 210
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 219
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 228
+      }
+    ],
+    "candidate-iota-10136": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 211
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 291
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 252
+      }
+    ],
+    "candidate-agentflare-229": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 211
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 216
+      }
+    ],
+    "candidate-cce-rust-168": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.94,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.94,
+            "check_before_action": 0.05,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.92
+        },
+        "ms": 248
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.97,
+            "check_before_action": 0.03,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 200
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "check_before_action": 0.03,
+            "failure_propagation": 0.97,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 207
+      }
+    ],
+    "candidate-dataprof-370": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 241
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 224
+      }
+    ],
+    "stated-omamori-468-R1": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 213
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 223
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 292
+      }
+    ],
+    "stated-omamori-468-R2": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 232
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 335
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 213
+      }
+    ],
+    "fixture-integrity-rust-R1": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.37,
+          "probabilities": {
+            "neither": 0.36,
+            "failure_handling": 0.26,
+            "failure_propagation": 0.37,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.16
+        },
+        "ms": 265
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.4,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "neither": 0.38,
+            "failure_handling": 0.21,
+            "failure_propagation": 0.4
+          },
+          "confidence": 0.2
+        },
+        "ms": 340
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.4,
+          "probabilities": {
+            "neither": 0.4,
+            "failure_handling": 0.21,
+            "failure_propagation": 0.39,
+            "check_before_action": 0
+          },
+          "confidence": 0.2
+        },
+        "ms": 217
+      }
+    ],
+    "constructed-R1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 278
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 248
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 212
+      }
+    ],
+    "reach-grovedb-500": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0.99,
+            "failure_propagation": 0,
+            "neither": 0.01,
+            "failure_handling": 0
+          },
+          "confidence": 0.98
+        },
+        "ms": 235
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0.99,
+            "neither": 0.01,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.98
+        },
+        "ms": 239
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0.99,
+            "failure_handling": 0,
+            "neither": 0.01
+          },
+          "confidence": 0.98
+        },
+        "ms": 246
+      }
+    ],
+    "reach-moltis-1064": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 361
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 228
+      }
+    ],
+    "fixture-both-forms-R2": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 212
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 228
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 1,
+            "neither": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 282
+      }
+    ],
+    "fixture-missed-path-R1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0.98,
+            "neither": 0.02,
+            "failure_handling": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 203
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0.95,
+            "neither": 0.05
+          },
+          "confidence": 0.93
+        },
+        "ms": 234
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.96,
+          "probabilities": {
+            "check_before_action": 0.96,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.04
+          },
+          "confidence": 0.95
+        },
+        "ms": 268
+      }
+    ],
+    "fixture-scope-creep-R1": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.71,
+          "probabilities": {
+            "neither": 0.25,
+            "check_before_action": 0,
+            "failure_propagation": 0.04,
+            "failure_handling": 0.71
+          },
+          "confidence": 0.61
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.63,
+          "probabilities": {
+            "neither": 0.33,
+            "failure_handling": 0.63,
+            "failure_propagation": 0.04,
+            "check_before_action": 0
+          },
+          "confidence": 0.51
+        },
+        "ms": 232
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.67,
+          "probabilities": {
+            "failure_handling": 0.67,
+            "failure_propagation": 0.05,
+            "check_before_action": 0,
+            "neither": 0.28
+          },
+          "confidence": 0.56
+        },
+        "ms": 211
+      }
+    ],
+    "fixture-unknown-plugin-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 210
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 280
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 279
+      }
+    ],
+    "corpus-omamori-551-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "neither": 0.97,
+            "check_before_action": 0.01,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.97
+        },
+        "ms": 222
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "neither": 0.97,
+            "check_before_action": 0.01,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.97
+        },
+        "ms": 198
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "neither": 0.97,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.01,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.97
+        },
+        "ms": 204
+      }
+    ],
+    "corpus-omamori-553-R1": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.9,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.9,
+            "check_before_action": 0,
+            "failure_handling": 0.1
+          },
+          "confidence": 0.86
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.9,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.9,
+            "failure_handling": 0.1
+          },
+          "confidence": 0.87
+        },
+        "ms": 232
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.93,
+          "probabilities": {
+            "failure_propagation": 0.93,
+            "failure_handling": 0.07,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.9
+        },
+        "ms": 232
+      }
+    ],
+    "corpus-omamori-553-R2": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.74,
+          "probabilities": {
+            "failure_handling": 0.24,
+            "failure_propagation": 0.74,
+            "check_before_action": 0.01,
+            "neither": 0.01
+          },
+          "confidence": 0.66
+        },
+        "ms": 277
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.71,
+          "probabilities": {
+            "failure_propagation": 0.71,
+            "failure_handling": 0.27,
+            "neither": 0.01,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.62
+        },
+        "ms": 217
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.7,
+          "probabilities": {
+            "failure_propagation": 0.7,
+            "neither": 0.02,
+            "check_before_action": 0.01,
+            "failure_handling": 0.27
+          },
+          "confidence": 0.61
+        },
+        "ms": 430
+      }
+    ],
+    "corpus-omamori-554-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "neither": 0.99,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 239
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.01,
+            "neither": 0.99,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 248
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.01,
+            "check_before_action": 0,
+            "neither": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 239
+      }
+    ],
+    "corpus-omamori-554-R2": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.97,
+            "check_before_action": 0,
+            "failure_handling": 0.03
+          },
+          "confidence": 0.96
+        },
+        "ms": 205
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.02,
+            "check_before_action": 0,
+            "neither": 0.98
+          },
+          "confidence": 0.97
+        },
+        "ms": 205
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "failure_handling": 0.02,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 233
+      }
+    ],
+    "corpus-omamori-554-R3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0.99,
+            "check_before_action": 0,
+            "failure_handling": 0.01,
+            "failure_propagation": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 223
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0.99,
+            "failure_propagation": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 225
+      }
+    ],
+    "corpus-omamori-554-R4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.91,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.91,
+            "check_before_action": 0.01,
+            "failure_handling": 0.08
+          },
+          "confidence": 0.88
+        },
+        "ms": 307
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.91,
+          "probabilities": {
+            "failure_handling": 0.08,
+            "neither": 0.91,
+            "check_before_action": 0.01,
+            "failure_propagation": 0
+          },
+          "confidence": 0.88
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.86,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "failure_propagation": 0,
+            "failure_handling": 0.13,
+            "neither": 0.86
+          },
+          "confidence": 0.81
+        },
+        "ms": 220
+      }
+    ],
+    "corpus-omamori-554-R5": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.97
+        },
+        "ms": 242
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.98,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.97
+        },
+        "ms": 210
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "check_before_action": 0.02,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 211
+      }
+    ],
+    "corpus-omamori-554-R6": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.96,
+          "probabilities": {
+            "neither": 0.96,
+            "failure_propagation": 0,
+            "failure_handling": 0.04,
+            "check_before_action": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 450
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "failure_propagation": 0,
+            "neither": 0.98,
+            "check_before_action": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 240
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.96,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.04,
+            "neither": 0.96,
+            "check_before_action": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 208
+      }
+    ],
+    "corpus-omamori-554-R7": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.85,
+          "probabilities": {
+            "neither": 0.85,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.15
+          },
+          "confidence": 0.8
+        },
+        "ms": 213
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.89,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0.89,
+            "failure_handling": 0.11,
+            "failure_propagation": 0
+          },
+          "confidence": 0.86
+        },
+        "ms": 217
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.88,
+          "probabilities": {
+            "failure_handling": 0.12,
+            "neither": 0.88,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.84
+        },
+        "ms": 229
+      }
+    ],
+    "corpus-omamori-557-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 226
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0,
+            "neither": 0.98,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.98
+        },
+        "ms": 249
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0.99,
+            "check_before_action": 0.01,
+            "failure_propagation": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 274
+      }
+    ],
+    "corpus-omamori-557-R2": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 1,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 295
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 199
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "neither": 0.99,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 257
+      }
+    ],
+    "corpus-omamori-557-R3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.89,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "check_before_action": 0.06,
+            "failure_propagation": 0.03,
+            "neither": 0.89
+          },
+          "confidence": 0.85
+        },
+        "ms": 221
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.92,
+          "probabilities": {
+            "neither": 0.92,
+            "failure_handling": 0.02,
+            "failure_propagation": 0.03,
+            "check_before_action": 0.03
+          },
+          "confidence": 0.88
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.91,
+          "probabilities": {
+            "failure_propagation": 0.03,
+            "failure_handling": 0.02,
+            "neither": 0.91,
+            "check_before_action": 0.04
+          },
+          "confidence": 0.88
+        },
+        "ms": 216
+      }
+    ],
+    "corpus-omamori-557-R4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 1,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 223
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 240
+      }
+    ],
+    "corpus-omamori-558-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.53,
+          "probabilities": {
+            "neither": 0.53,
+            "failure_handling": 0.37,
+            "failure_propagation": 0.07,
+            "check_before_action": 0.03
+          },
+          "confidence": 0.37
+        },
+        "ms": 267
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.52,
+          "probabilities": {
+            "failure_handling": 0.37,
+            "neither": 0.52,
+            "check_before_action": 0.02,
+            "failure_propagation": 0.09
+          },
+          "confidence": 0.35
+        },
+        "ms": 238
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.55,
+          "probabilities": {
+            "neither": 0.55,
+            "check_before_action": 0.02,
+            "failure_propagation": 0.07,
+            "failure_handling": 0.36
+          },
+          "confidence": 0.41
+        },
+        "ms": 248
+      }
+    ],
+    "corpus-sideeye-594-R1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.92,
+          "probabilities": {
+            "neither": 0.06,
+            "failure_handling": 0.01,
+            "check_before_action": 0.92,
+            "failure_propagation": 0.01
+          },
+          "confidence": 0.89
+        },
+        "ms": 296
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.94,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "check_before_action": 0.94,
+            "neither": 0.04,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.92
+        },
+        "ms": 264
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.9,
+          "probabilities": {
+            "check_before_action": 0.9,
+            "failure_propagation": 0.01,
+            "neither": 0.08,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.87
+        },
+        "ms": 228
+      }
+    ],
+    "corpus-sideeye-594-R2": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.79,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "failure_propagation": 0.02,
+            "check_before_action": 0.79,
+            "neither": 0.17
+          },
+          "confidence": 0.72
+        },
+        "ms": 251
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.81,
+          "probabilities": {
+            "check_before_action": 0.81,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.02,
+            "neither": 0.16
+          },
+          "confidence": 0.74
+        },
+        "ms": 219
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.79,
+          "probabilities": {
+            "check_before_action": 0.79,
+            "neither": 0.17,
+            "failure_handling": 0.02,
+            "failure_propagation": 0.02
+          },
+          "confidence": 0.73
+        },
+        "ms": 203
+      }
+    ],
+    "corpus-sideeye-594-R3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "failure_propagation": 0,
+            "check_before_action": 0.02,
+            "failure_handling": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 244
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0.97,
+            "failure_propagation": 0,
+            "check_before_action": 0.03
+          },
+          "confidence": 0.96
+        },
+        "ms": 241
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 0.97,
+            "check_before_action": 0.03
+          },
+          "confidence": 0.96
+        },
+        "ms": 308
+      }
+    ],
+    "corpus-sideeye-594-R4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.95,
+            "check_before_action": 0.05
+          },
+          "confidence": 0.93
+        },
+        "ms": 215
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0.95,
+            "check_before_action": 0.05,
+            "failure_propagation": 0
+          },
+          "confidence": 0.93
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.94,
+          "probabilities": {
+            "neither": 0.94,
+            "check_before_action": 0.06,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.92
+        },
+        "ms": 247
+      }
+    ],
+    "corpus-sideeye-594-R5": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.93,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.93,
+            "check_before_action": 0.07,
+            "failure_handling": 0
+          },
+          "confidence": 0.91
+        },
+        "ms": 200
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.93,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.93,
+            "check_before_action": 0.07
+          },
+          "confidence": 0.91
+        },
+        "ms": 327
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "neither": 0.95,
+            "check_before_action": 0.05,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.94
+        },
+        "ms": 225
+      }
+    ],
+    "corpus-sideeye-602-R1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.98,
+          "probabilities": {
+            "check_before_action": 0.98,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 0.02
+          },
+          "confidence": 0.97
+        },
+        "ms": 246
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.02,
+            "check_before_action": 0.98
+          },
+          "confidence": 0.96
+        },
+        "ms": 236
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.02,
+            "check_before_action": 0.98
+          },
+          "confidence": 0.96
+        },
+        "ms": 240
+      }
+    ],
+    "corpus-sideeye-602-R2": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.58,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "failure_handling": 0.02,
+            "neither": 0.39,
+            "check_before_action": 0.58
+          },
+          "confidence": 0.43
+        },
+        "ms": 207
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.56,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "neither": 0.4,
+            "check_before_action": 0.56,
+            "failure_propagation": 0.01
+          },
+          "confidence": 0.42
+        },
+        "ms": 269
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.59,
+          "probabilities": {
+            "check_before_action": 0.59,
+            "failure_propagation": 0.01,
+            "failure_handling": 0.02,
+            "neither": 0.38
+          },
+          "confidence": 0.46
+        },
+        "ms": 242
+      }
+    ],
+    "corpus-sideeye-602-R3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.89,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0.11,
+            "neither": 0.89
+          },
+          "confidence": 0.86
+        },
+        "ms": 256
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.81,
+          "probabilities": {
+            "check_before_action": 0.19,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.81
+          },
+          "confidence": 0.74
+        },
+        "ms": 236
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.87,
+          "probabilities": {
+            "check_before_action": 0.13,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.87
+          },
+          "confidence": 0.82
+        },
+        "ms": 223
+      }
+    ],
+    "corpus-sideeye-602-R4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.98,
+            "check_before_action": 0.02,
+            "failure_handling": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "check_before_action": 0.03,
+            "failure_propagation": 0,
+            "neither": 0.97,
+            "failure_handling": 0
+          },
+          "confidence": 0.96
+        },
+        "ms": 222
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "check_before_action": 0.02,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.98
+          },
+          "confidence": 0.98
+        },
+        "ms": 191
+      }
+    ],
+    "corpus-sideeye-602-R5": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "failure_propagation": 0,
+            "check_before_action": 0.02,
+            "failure_handling": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 243
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0.98,
+            "failure_handling": 0,
+            "check_before_action": 0.02,
+            "failure_propagation": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 278
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "neither": 0.99,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 0.98
+        },
+        "ms": 207
+      }
+    ],
+    "corpus-sideeye-609-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.87,
+          "probabilities": {
+            "neither": 0.87,
+            "failure_handling": 0.06,
+            "check_before_action": 0.06,
+            "failure_propagation": 0.01
+          },
+          "confidence": 0.83
+        },
+        "ms": 256
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.87,
+          "probabilities": {
+            "check_before_action": 0.07,
+            "neither": 0.87,
+            "failure_handling": 0.05,
+            "failure_propagation": 0.01
+          },
+          "confidence": 0.83
+        },
+        "ms": 256
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.78,
+          "probabilities": {
+            "neither": 0.78,
+            "failure_propagation": 0.01,
+            "check_before_action": 0.11,
+            "failure_handling": 0.1
+          },
+          "confidence": 0.71
+        },
+        "ms": 237
+      }
+    ],
+    "corpus-sideeye-609-R2": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "neither": 0.95,
+            "check_before_action": 0.05,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 0.94
+        },
+        "ms": 216
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.94,
+          "probabilities": {
+            "check_before_action": 0.06,
+            "neither": 0.94,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.92
+        },
+        "ms": 220
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.96,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0.96,
+            "failure_propagation": 0,
+            "check_before_action": 0.04
+          },
+          "confidence": 0.95
+        },
+        "ms": 208
+      }
+    ],
+    "corpus-sideeye-609-R3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "neither": 0.95,
+            "failure_handling": 0.03,
+            "check_before_action": 0.02,
+            "failure_propagation": 0
+          },
+          "confidence": 0.94
+        },
+        "ms": 296
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.95,
+          "probabilities": {
+            "check_before_action": 0.02,
+            "neither": 0.95,
+            "failure_handling": 0.03,
+            "failure_propagation": 0
+          },
+          "confidence": 0.93
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.96,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.02,
+            "neither": 0.96,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.95
+        },
+        "ms": 272
+      }
+    ],
+    "corpus-sideeye-609-R4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.98,
+            "check_before_action": 0.02,
+            "failure_handling": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 268
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0.02,
+            "neither": 0.98
+          },
+          "confidence": 0.97
+        },
+        "ms": 340
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0.98,
+            "check_before_action": 0.02,
+            "failure_propagation": 0
+          },
+          "confidence": 0.98
+        },
+        "ms": 237
+      }
+    ],
+    "corpus-sideeye-609-R5": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 245
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 1,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 229
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 233
+      }
+    ],
+    "corpus-sideeye-626-R1": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.85,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.85,
+            "neither": 0.15
+          },
+          "confidence": 0.8
+        },
+        "ms": 266
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.86,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.86,
+            "neither": 0.14,
+            "check_before_action": 0
+          },
+          "confidence": 0.82
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.87,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.87,
+            "neither": 0.13,
+            "check_before_action": 0
+          },
+          "confidence": 0.82
+        },
+        "ms": 236
+      }
+    ],
+    "corpus-sideeye-627-R1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 437
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 236
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 270
+      }
+    ],
+    "golden-omamori-551-1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.88,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "failure_handling": 0.1,
+            "neither": 0.88,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.83
+        },
+        "ms": 239
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.88,
+          "probabilities": {
+            "check_before_action": 0.02,
+            "failure_propagation": 0.01,
+            "failure_handling": 0.09,
+            "neither": 0.88
+          },
+          "confidence": 0.84
+        },
+        "ms": 219
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.86,
+          "probabilities": {
+            "neither": 0.86,
+            "failure_propagation": 0.01,
+            "failure_handling": 0.11,
+            "check_before_action": 0.02
+          },
+          "confidence": 0.82
+        },
+        "ms": 211
+      }
+    ],
+    "golden-omamori-553-1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.4,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.33,
+            "failure_handling": 0.27,
+            "neither": 0.4
+          },
+          "confidence": 0.2
+        },
+        "ms": 222
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.39,
+          "probabilities": {
+            "neither": 0.39,
+            "failure_propagation": 0.35,
+            "check_before_action": 0,
+            "failure_handling": 0.26
+          },
+          "confidence": 0.18
+        },
+        "ms": 257
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.43,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0.43,
+            "failure_propagation": 0.34,
+            "failure_handling": 0.23
+          },
+          "confidence": 0.23
+        },
+        "ms": 282
+      }
+    ],
+    "golden-omamori-554-1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.85,
+          "probabilities": {
+            "neither": 0.85,
+            "check_before_action": 0.06,
+            "failure_propagation": 0.01,
+            "failure_handling": 0.08
+          },
+          "confidence": 0.8
+        },
+        "ms": 246
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.84,
+          "probabilities": {
+            "failure_handling": 0.09,
+            "neither": 0.84,
+            "failure_propagation": 0.01,
+            "check_before_action": 0.06
+          },
+          "confidence": 0.79
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.84,
+          "probabilities": {
+            "failure_handling": 0.07,
+            "neither": 0.84,
+            "failure_propagation": 0.01,
+            "check_before_action": 0.08
+          },
+          "confidence": 0.79
+        },
+        "ms": 231
+      }
+    ],
+    "golden-sideeye-602-1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.48,
+          "probabilities": {
+            "failure_propagation": 0.13,
+            "failure_handling": 0.04,
+            "neither": 0.35,
+            "check_before_action": 0.48
+          },
+          "confidence": 0.31
+        },
+        "ms": 240
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.55,
+          "probabilities": {
+            "failure_propagation": 0.11,
+            "failure_handling": 0.04,
+            "neither": 0.3,
+            "check_before_action": 0.55
+          },
+          "confidence": 0.39
+        },
+        "ms": 274
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.43,
+          "probabilities": {
+            "failure_handling": 0.05,
+            "neither": 0.41,
+            "failure_propagation": 0.11,
+            "check_before_action": 0.43
+          },
+          "confidence": 0.25
+        },
+        "ms": 212
+      }
+    ],
+    "golden-sideeye-609-1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.02,
+            "neither": 0.98,
+            "check_before_action": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 243
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 0.98
+          },
+          "confidence": 0.98
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.02,
+            "neither": 0.98
+          },
+          "confidence": 0.97
+        },
+        "ms": 216
+      }
+    ],
+    "golden-sideeye-626-1": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.71,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0.71,
+            "neither": 0.29,
+            "check_before_action": 0
+          },
+          "confidence": 0.61
+        },
+        "ms": 256
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.71,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0.29,
+            "failure_propagation": 0,
+            "failure_handling": 0.71
+          },
+          "confidence": 0.61
+        },
+        "ms": 251
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.8,
+          "probabilities": {
+            "neither": 0.2,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.8
+          },
+          "confidence": 0.73
+        },
+        "ms": 226
+      }
+    ],
+    "golden-sideeye-627-1": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 1,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 271
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 313
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 1,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 249
+      }
+    ],
+    "golden-sideeye-627-2": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 246
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 301
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 307
+      }
+    ],
+    "golden-sideeye-627-3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 0.97,
+            "failure_handling": 0,
+            "check_before_action": 0.03
+          },
+          "confidence": 0.96
+        },
+        "ms": 255
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 0.03,
+            "neither": 0.97,
+            "failure_handling": 0
+          },
+          "confidence": 0.96
+        },
+        "ms": 199
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.98,
+          "probabilities": {
+            "check_before_action": 0.02,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.98
+          },
+          "confidence": 0.97
+        },
+        "ms": 270
+      }
+    ],
+    "golden-sideeye-627-4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 226
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 220
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 315
+      }
+    ],
+    "golden-sideeye-627-5": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 1,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 211
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 225
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "neither": 1,
+            "check_before_action": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 209
+      }
+    ],
+    "issue-35-1": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "failure_propagation": 0,
+            "check_before_action": 1
+          },
+          "confidence": 0.99
+        },
+        "ms": 267
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0.01,
+            "check_before_action": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 261
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "check_before_action": 1,
+            "neither": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 227
+      }
+    ],
+    "issue-35-2": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.54,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "check_before_action": 0.46,
+            "neither": 0.54
+          },
+          "confidence": 0.39
+        },
+        "ms": 216
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.53,
+          "probabilities": {
+            "check_before_action": 0.47,
+            "neither": 0.53,
+            "failure_handling": 0,
+            "failure_propagation": 0
+          },
+          "confidence": 0.37
+        },
+        "ms": 324
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.58,
+          "probabilities": {
+            "neither": 0.58,
+            "check_before_action": 0.42,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.44
+        },
+        "ms": 224
+      }
+    ],
+    "issue-35-3": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 236
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "neither": 1,
+            "failure_propagation": 0,
+            "check_before_action": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 278
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 1
+          },
+          "confidence": 1
+        },
+        "ms": 223
+      }
+    ],
+    "issue-35-4": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 1,
+            "failure_propagation": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 219
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 217
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 1,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 253
+      }
+    ],
+    "written-omamori-391": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 244
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 1,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 255
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "check_before_action": 1,
+            "failure_propagation": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 221
+      }
+    ],
+    "written-omamori-75": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 1,
+            "failure_propagation": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 246
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 1,
+            "failure_propagation": 0
+          },
+          "confidence": 1
+        },
+        "ms": 218
+      }
+    ],
+    "written-omamori-182": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 1,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 206
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 1,
+            "failure_propagation": 0,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 221
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "failure_propagation": 0,
+            "neither": 0,
+            "check_before_action": 1
+          },
+          "confidence": 1
+        },
+        "ms": 233
+      }
+    ],
+    "candidates-v2-autonoetic-901": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 298
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 211
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 240
+      }
+    ],
+    "candidates-v2-git-ai-1717": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.93,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.93,
+            "failure_handling": 0.06,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.91
+        },
+        "ms": 276
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_propagation": 0.95,
+            "failure_handling": 0.04,
+            "neither": 0,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.94
+        },
+        "ms": 223
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.95,
+          "probabilities": {
+            "failure_propagation": 0.95,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.05
+          },
+          "confidence": 0.93
+        },
+        "ms": 217
+      }
+    ],
+    "candidates-v2-vox-346": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 228
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 207
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "neither": 0
+          },
+          "confidence": 1
+        },
+        "ms": 218
+      }
+    ],
+    "candidates-v2-lipilekhika-127": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 1,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 218
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 198
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 0,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 236
+      }
+    ],
+    "candidates-v2-oxicrab-155": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.98,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.02,
+            "failure_propagation": 0.98,
+            "check_before_action": 0
+          },
+          "confidence": 0.98
+        },
+        "ms": 250
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 282
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 217
+      }
+    ],
+    "candidates-v2-infraweave-307": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 231
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 217
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.01,
+            "check_before_action": 0,
+            "failure_propagation": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 194
+      }
+    ],
+    "candidates-v2-skuld-33": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0,
+            "failure_propagation": 1
+          },
+          "confidence": 1
+        },
+        "ms": 226
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "neither": 0,
+            "failure_handling": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 240
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 1,
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0
+          },
+          "confidence": 1
+        },
+        "ms": 208
+      }
+    ],
+    "w85-andreabozzo-dataprof-370": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.67,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.33,
+            "failure_propagation": 0.67
+          },
+          "confidence": 0.56
+        },
+        "ms": 402
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.75,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.25,
+            "failure_propagation": 0.75,
+            "check_before_action": 0
+          },
+          "confidence": 0.66
+        },
+        "ms": 207
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.72,
+          "probabilities": {
+            "failure_propagation": 0.72,
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.28
+          },
+          "confidence": 0.62
+        },
+        "ms": 218
+      }
+    ],
+    "w85-davidslv-cce-rust-168": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.62,
+          "probabilities": {
+            "check_before_action": 0.21,
+            "neither": 0,
+            "failure_handling": 0.62,
+            "failure_propagation": 0.17
+          },
+          "confidence": 0.49
+        },
+        "ms": 247
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.56,
+          "probabilities": {
+            "check_before_action": 0.26,
+            "failure_propagation": 0.18,
+            "failure_handling": 0.56,
+            "neither": 0
+          },
+          "confidence": 0.42
+        },
+        "ms": 218
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.53,
+          "probabilities": {
+            "failure_handling": 0.53,
+            "check_before_action": 0.25,
+            "failure_propagation": 0.22,
+            "neither": 0
+          },
+          "confidence": 0.36
+        },
+        "ms": 331
+      }
+    ],
+    "w85-kontorprotocol-kontor-385": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.97,
+            "failure_handling": 0.03,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.96,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.96,
+            "failure_handling": 0.04,
+            "check_before_action": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 287
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_handling": 0.03,
+            "failure_propagation": 0.97,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.96
+        },
+        "ms": 220
+      }
+    ],
+    "w85-naoray-instruckt-tauri-9": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.99
+          },
+          "confidence": 0.98
+        },
+        "ms": 323
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 269
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0.98,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.02
+          },
+          "confidence": 0.97
+        },
+        "ms": 306
+      }
+    ],
+    "w85-tumbleowlee-ferrowl-127": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_propagation": 0.02,
+            "check_before_action": 0,
+            "failure_handling": 0.98,
+            "neither": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 209
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.98,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 0.02,
+            "failure_handling": 0.98
+          },
+          "confidence": 0.97
+        },
+        "ms": 252
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_handling": 0.97,
+            "neither": 0,
+            "failure_propagation": 0.03,
+            "check_before_action": 0
+          },
+          "confidence": 0.96
+        },
+        "ms": 198
+      }
+    ],
+    "w85-void-technology-inc-pybun-428": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.83,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.17,
+            "failure_propagation": 0.83
+          },
+          "confidence": 0.77
+        },
+        "ms": 220
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.86,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.14,
+            "failure_propagation": 0.86
+          },
+          "confidence": 0.81
+        },
+        "ms": 234
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.85,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.85,
+            "neither": 0,
+            "failure_handling": 0.15
+          },
+          "confidence": 0.8
+        },
+        "ms": 200
+      }
+    ],
+    "w85-armaxri-termihub-2732": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.89,
+          "probabilities": {
+            "failure_propagation": 0.11,
+            "failure_handling": 0.89,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.85
+        },
+        "ms": 227
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.9,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.1,
+            "failure_handling": 0.9,
+            "check_before_action": 0
+          },
+          "confidence": 0.87
+        },
+        "ms": 208
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.89,
+          "probabilities": {
+            "failure_propagation": 0.11,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.89
+          },
+          "confidence": 0.85
+        },
+        "ms": 204
+      }
+    ],
+    "w85-armaxri-termihub-2751": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_handling": 1,
+            "failure_propagation": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 200
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "failure_handling": 0.99,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 244
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 1,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_handling": 1,
+            "failure_propagation": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 216
+      }
+    ],
+    "w85-bindreams-skuld-33": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.89,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.89,
+            "check_before_action": 0,
+            "failure_handling": 0.11
+          },
+          "confidence": 0.84
+        },
+        "ms": 242
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.88,
+          "probabilities": {
+            "failure_propagation": 0.88,
+            "failure_handling": 0.11,
+            "neither": 0.01,
+            "check_before_action": 0
+          },
+          "confidence": 0.84
+        },
+        "ms": 237
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.92,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.92,
+            "failure_handling": 0.08
+          },
+          "confidence": 0.88
+        },
+        "ms": 233
+      }
+    ],
+    "w85-dashpay-grovedb-500": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.97,
+            "failure_handling": 0.03,
+            "neither": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 1613
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.97,
+            "check_before_action": 0,
+            "failure_handling": 0.03
+          },
+          "confidence": 0.95
+        },
+        "ms": 244
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.97,
+            "failure_handling": 0.03,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.96
+        },
+        "ms": 257
+      }
+    ],
+    "w85-dashpay-grovedb-501": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.97,
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.03
+          },
+          "confidence": 0.95
+        },
+        "ms": 338
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "failure_propagation": 0.97,
+            "failure_handling": 0.03,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.95
+        },
+        "ms": 336
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.97,
+          "probabilities": {
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_propagation": 0.97,
+            "failure_handling": 0.03
+          },
+          "confidence": 0.96
+        },
+        "ms": 252
+      }
+    ],
+    "w85-dsx-ai-factory-infra-controller-3469": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 211
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 1,
+          "probabilities": {
+            "failure_propagation": 0,
+            "failure_handling": 1,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 221
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 1,
+          "probabilities": {
+            "failure_handling": 1,
+            "failure_propagation": 0,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 1
+        },
+        "ms": 278
+      }
+    ],
+    "w85-getappz-agentflare-229": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.62,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.38,
+            "failure_handling": 0.62,
+            "neither": 0
+          },
+          "confidence": 0.49
+        },
+        "ms": 212
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.6,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.4,
+            "check_before_action": 0,
+            "failure_handling": 0.6
+          },
+          "confidence": 0.46
+        },
+        "ms": 254
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.61,
+          "probabilities": {
+            "neither": 0,
+            "failure_propagation": 0.39,
+            "check_before_action": 0,
+            "failure_handling": 0.61
+          },
+          "confidence": 0.48
+        },
+        "ms": 228
+      }
+    ],
+    "w85-iotaledger-iota-10136": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99
+          },
+          "confidence": 0.99
+        },
+        "ms": 265
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "neither": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 199
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 239
+      }
+    ],
+    "w85-liveask-liveask-127": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.65,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.65,
+            "failure_propagation": 0.35,
+            "check_before_action": 0
+          },
+          "confidence": 0.53
+        },
+        "ms": 344
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.68,
+          "probabilities": {
+            "neither": 0,
+            "failure_handling": 0.68,
+            "failure_propagation": 0.32,
+            "check_before_action": 0
+          },
+          "confidence": 0.57
+        },
+        "ms": 251
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.67,
+          "probabilities": {
+            "failure_propagation": 0.33,
+            "failure_handling": 0.67,
+            "neither": 0,
+            "check_before_action": 0
+          },
+          "confidence": 0.56
+        },
+        "ms": 226
+      }
+    ],
+    "w85-mandubian-autonoetic-901": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.42,
+          "probabilities": {
+            "failure_handling": 0.11,
+            "neither": 0.42,
+            "failure_propagation": 0.12,
+            "check_before_action": 0.35
+          },
+          "confidence": 0.23
+        },
+        "ms": 220
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.44,
+          "probabilities": {
+            "neither": 0.44,
+            "check_before_action": 0.33,
+            "failure_handling": 0.13,
+            "failure_propagation": 0.1
+          },
+          "confidence": 0.25
+        },
+        "ms": 252
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.42,
+          "probabilities": {
+            "check_before_action": 0.31,
+            "failure_propagation": 0.12,
+            "neither": 0.42,
+            "failure_handling": 0.15
+          },
+          "confidence": 0.23
+        },
+        "ms": 234
+      }
+    ],
+    "w85-moltis-org-moltis-1064": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.98,
+          "probabilities": {
+            "failure_handling": 0.02,
+            "failure_propagation": 0.98,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.97
+        },
+        "ms": 255
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0.99,
+            "neither": 0,
+            "failure_handling": 0.01,
+            "check_before_action": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 229
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "failure_handling": 0.01,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 221
+      }
+    ],
+    "w85-oxidezap-whatsapp-rust-759": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.76,
+          "probabilities": {
+            "neither": 0.02,
+            "failure_handling": 0.04,
+            "failure_propagation": 0.76,
+            "check_before_action": 0.18
+          },
+          "confidence": 0.68
+        },
+        "ms": 195
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.8,
+          "probabilities": {
+            "check_before_action": 0.15,
+            "neither": 0.01,
+            "failure_propagation": 0.8,
+            "failure_handling": 0.04
+          },
+          "confidence": 0.74
+        },
+        "ms": 281
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.8099999999999999,
+          "probabilities": {
+            "failure_propagation": 0.8099999999999999,
+            "failure_handling": 0.03,
+            "check_before_action": 0.14,
+            "neither": 0.02
+          },
+          "confidence": 0.76
+        },
+        "ms": 274
+      }
+    ],
+    "w85-ratazzi-quebec-136": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.91,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "failure_handling": 0.08,
+            "failure_propagation": 0.91,
+            "neither": 0
+          },
+          "confidence": 0.88
+        },
+        "ms": 214
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.89,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "failure_propagation": 0.89,
+            "failure_handling": 0.1,
+            "neither": 0
+          },
+          "confidence": 0.85
+        },
+        "ms": 246
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.88,
+          "probabilities": {
+            "check_before_action": 0.01,
+            "neither": 0,
+            "failure_propagation": 0.88,
+            "failure_handling": 0.11
+          },
+          "confidence": 0.85
+        },
+        "ms": 258
+      }
+    ],
+    "w85-shubhattin-lipilekhika-127": [
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_propagation": 0.99,
+            "neither": 0,
+            "check_before_action": 0,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.99
+        },
+        "ms": 208
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "check_before_action": 0,
+            "failure_propagation": 0.99,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 232
+      },
+      {
+        "answer": {
+          "choice": "failure_propagation",
+          "probability": 0.99,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0.99,
+            "check_before_action": 0,
+            "neither": 0
+          },
+          "confidence": 0.99
+        },
+        "ms": 288
+      }
+    ],
+    "w85-yottayoshida-omamori-553": [
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.48,
+          "probabilities": {
+            "failure_handling": 0.48,
+            "failure_propagation": 0.3,
+            "neither": 0.21,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.31
+        },
+        "ms": 229
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.53,
+          "probabilities": {
+            "failure_propagation": 0.29,
+            "failure_handling": 0.53,
+            "neither": 0.17,
+            "check_before_action": 0.01
+          },
+          "confidence": 0.38
+        },
+        "ms": 221
+      },
+      {
+        "answer": {
+          "choice": "failure_handling",
+          "probability": 0.5,
+          "probabilities": {
+            "neither": 0.21,
+            "check_before_action": 0.01,
+            "failure_propagation": 0.28,
+            "failure_handling": 0.5
+          },
+          "confidence": 0.34
+        },
+        "ms": 219
+      }
+    ],
+    "w85-yottayoshida-omamori-554": [
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.5,
+          "probabilities": {
+            "failure_handling": 0.19,
+            "neither": 0.5,
+            "check_before_action": 0.3,
+            "failure_propagation": 0.01
+          },
+          "confidence": 0.34
+        },
+        "ms": 248
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.54,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "failure_handling": 0.16,
+            "neither": 0.54,
+            "check_before_action": 0.29
+          },
+          "confidence": 0.38
+        },
+        "ms": 241
+      },
+      {
+        "answer": {
+          "choice": "neither",
+          "probability": 0.51,
+          "probabilities": {
+            "failure_handling": 0.17,
+            "failure_propagation": 0.01,
+            "check_before_action": 0.31,
+            "neither": 0.51
+          },
+          "confidence": 0.35
+        },
+        "ms": 207
+      }
+    ],
+    "w85-yottayoshida-omamori-557": [
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.71,
+          "probabilities": {
+            "neither": 0.28,
+            "failure_propagation": 0,
+            "check_before_action": 0.71,
+            "failure_handling": 0.01
+          },
+          "confidence": 0.6
+        },
+        "ms": 224
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.7,
+          "probabilities": {
+            "failure_propagation": 0.01,
+            "failure_handling": 0.03,
+            "neither": 0.26,
+            "check_before_action": 0.7
+          },
+          "confidence": 0.61
+        },
+        "ms": 261
+      },
+      {
+        "answer": {
+          "choice": "check_before_action",
+          "probability": 0.68,
+          "probabilities": {
+            "failure_handling": 0.01,
+            "failure_propagation": 0,
+            "check_before_action": 0.68,
+            "neither": 0.31
+          },
+          "confidence": 0.57
+        },
+        "ms": 206
+      }
+    ]
+  }
+}

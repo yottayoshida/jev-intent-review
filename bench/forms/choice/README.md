@@ -85,3 +85,16 @@ owner's, and is recorded in ADR 0008.
 Measured on 2026-09-22 (216 requests, `bench/logs/form-choice-v1.json`): all three met — 0 of 18,
 10 of 11, 4 of 43. The table and what it does and does not say are in `docs/local-check-cli.md`
 under "How Jev reads the form of a sentence"; the ruling is in ADR 0008.
+
+## Set 3: with `failure_handling` offered (#85, ADR 0026)
+
+`v3.ts` builds the question the run would send with every form offered (`buildFormQuestion`, the
+run's own function, in declared order) and scores it with ADR 0026's lines, written before the first
+request. `--set 3` puts it to the 79 sentences of sets 1 and 2 and to `sentences-v3.json` — 23
+sentences written from dev pull requests, each labelled by how its fixed code handles the failure,
+read from the diff by readers who saw neither the text nor the question (`written-85/README.md`;
+`written-85/combine.ts` builds the set and `--check` holds it to the readers' files). `--set 1c` puts
+the question sent now to the 79 on the same day, for comparison; its table prints no lines. Sets 1
+and 2 are scored as before, with their own keyword rule. Logs `bench/logs/form-choice-v3.json` and
+`form-choice-v1c.json`; the numbers and the ruling (not wired) are in ADR 0026 and
+`docs/local-check-cli.md`.
