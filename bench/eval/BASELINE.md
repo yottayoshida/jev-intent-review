@@ -42,7 +42,8 @@ constants `SYSTEM_PROMPT` and `userPrompt` of `baseline.ts`; the first run took 
 question of a few words (`logs/baseline-poc.json`), so no default system prompt or tool definition rode along.
 
 A run counts when the one model asked answered (`modelUsage` names `claude-opus-5-5` and nothing else)
-and the answer is a JSON array of `{file, function, call, claim}` (a code fence around it is removed).
+and the answer is a JSON array of `{file, function, call, claim}`, read out of a code fence or of text
+around it; an element naming no file, function and call is no finding and is dropped.
 A run that does not count is recorded with why and taken again, up to five attempts a version; a
 version with fewer than three counted runs is no hit for the baseline.
 
@@ -50,7 +51,10 @@ version with fewer than three counted runs is no hit for the baseline.
 
 Gathered by `gather`, in this order, each file once and whole, until the budget. **A file that does not
 fit is skipped and the next tried** (stopping at the first left 7–35 % of the budget unused on dev); if the
-requirement or the diff does not fit, nothing after it is given:
+requirement does not fit, nothing is given; if the diff does not fit, it is given file by file — the files of
+the functions the change touched first, then the rest, each group by path, every piece that fits — and
+nothing after it (owner, 2026-09-26: on 18 of the 75 versions of the first sealed run the diff alone was
+over the budget, and the baseline was given the requirement only):
 
 1. the requirement;
 2. `git diff base..head`;
