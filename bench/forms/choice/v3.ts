@@ -13,6 +13,8 @@ import { join } from "node:path";
 import { buildFormQuestion, FORM_QUESTION, readOption } from "../../../src/plan/forms.ts";
 import { BAR } from "../../../src/plan/local-check.ts";
 import { REQUIREMENT_FORMS, type ChoiceAnswer } from "../../../src/types.ts";
+import { wilson } from "../../sentence-choice/replay.ts";
+import { QUESTION_HASH } from "./question.ts";
 import type { Kind, Reading } from "./score.ts";
 
 const sha256 = (text: string) => createHash("sha256").update(text).digest("hex");
@@ -67,8 +69,8 @@ export interface Log3 {
 }
 
 export const SETS3 = {
-  "3": { files: ["sentences.json", "sentences-v2.json", "sentences-v3.json"], log: "bench/logs/form-choice-v3.json", question: FORM_QUESTION_V3, offered: LABELS3 },
-  "1c": { files: ["sentences.json", "sentences-v2.json"], log: "bench/logs/form-choice-v1c.json", question: FORM_QUESTION, offered: LABELS_NOW },
+  "3": { files: ["sentences.json", "sentences-v2.json", "sentences-v3.json"], log: "bench/logs/form-choice-v3.json", question: FORM_QUESTION_V3, questionHash: QUESTION_V3_HASH, offered: LABELS3 },
+  "1c": { files: ["sentences.json", "sentences-v2.json"], log: "bench/logs/form-choice-v1c.json", question: FORM_QUESTION, questionHash: QUESTION_HASH, offered: LABELS_NOW },
 } as const;
 export type Set3Name = keyof typeof SETS3;
 
@@ -145,17 +147,6 @@ export function rows3(sentences: readonly Sentence3[], log: Pick<Log3, "conditio
   });
 }
 
-/** Wilson's 95% interval for k of n; rows are taken as independent, which they are not quite (ADR 0026). */
-export function wilson(k: number, n: number): [number, number] {
-  if (n === 0) return [0, 1];
-  const z = 1.96;
-  const p = k / n;
-  const d = 1 + (z * z) / n;
-  const c = p + (z * z) / (2 * n);
-  const r = z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n));
-  return [(c - r) / d, (c + r) / d];
-}
-
 /** The pull requests the main line reads, and whether there are enough of them to read it (ADR 0026). */
 export function stopLine(sentences: readonly Sentence3[]): { prs: number; repos: number; enough: boolean } {
   const main = sentences.filter((s) => s.origin.kind === "written-85" && s.truth?.decided === "handles_locally");
@@ -178,7 +169,8 @@ export function barLines3(v3: readonly Row3[], now?: readonly Row3[]): string[] 
 
   const main = v3.filter((r) => r.kind === "written-85" && r.truth === "handles_locally");
   const mainRight = count(main, (r) => r.rightEveryRun);
-  const [lo, hi] = wilson(mainRight, main.length);
+  // Rows are taken as independent, which they are not quite (ADR 0026).
+  const { lo, hi } = wilson(mainRight, main.length, 1.959963984540054);
   const repos = new Set(main.map((r) => r.repo)).size;
   const outside = main.filter((r) => r.repo !== OMAMORI);
   const enough = main.length >= 8 && repos >= 4;
@@ -244,18 +236,25 @@ export function renderTables3(sentences: readonly Sentence3[], log: Log3, offere
     }
   }
   out.push("");
-  for (const l of barLines3(all, nowRows)) out.push(`- ${l}`);
-  for (const l of recordLines3(all)) out.push(`- (record) ${l}`);
+  // Set 1c is what set 3's lines are compared with, not a set the lines are read on: under the
+  // question sent now, failure_handling is not an option and there is no main line.
+  const offersHandling = offered.includes("failure_handling");
+  if (offersHandling) {
+    for (const l of barLines3(all, nowRows)) out.push(`- ${l}`);
+    for (const l of recordLines3(all)) out.push(`- (record) ${l}`);
+  } else out.push("- the question sent now, the same day: ADR 0026's lines are read on set 3, beside these rows");
   const missing = all.filter((r) => r.readings.length < runs);
   if (missing.length > 0) out.push(`- not fully measured: ${missing.map((r) => r.id).join(", ")}`);
   out.push("");
-  const main = all.filter((r) => r.kind === "written-85" && r.truth === "handles_locally");
-  const byRepo = new Map<string, Row3[]>();
-  for (const r of main) byRepo.set(r.repo ?? "?", [...(byRepo.get(r.repo ?? "?") ?? []), r]);
-  out.push(`| repository (main line) | pull requests | read as failure_handling in ${runs}/${runs} |`);
-  out.push("|---|---|---|");
-  for (const [repo, rs] of [...byRepo].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))) out.push(`| ${repo} | ${rs.length} | ${rs.filter((r) => r.rightEveryRun).length} |`);
-  out.push("");
+  if (offersHandling) {
+    const main = all.filter((r) => r.kind === "written-85" && r.truth === "handles_locally");
+    const byRepo = new Map<string, Row3[]>();
+    for (const r of main) byRepo.set(r.repo ?? "?", [...(byRepo.get(r.repo ?? "?") ?? []), r]);
+    out.push(`| repository (main line) | pull requests | read as failure_handling in ${runs}/${runs} |`);
+    out.push("|---|---|---|");
+    for (const [repo, rs] of [...byRepo].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))) out.push(`| ${repo} | ${rs.length} | ${rs.filter((r) => r.rightEveryRun).length} |`);
+    out.push("");
+  }
   const cols = Array.from({ length: runs }, (_, i) => i);
   out.push(`| sentence | label | who wrote it | fixed code | ${cols.map((i) => `run ${i + 1}`).join(" | ")} | keyword |${nowRows ? " same day, question sent now |" : ""}`);
   out.push(`|---|---|---|---|${cols.map(() => "---|").join("")}---|${nowRows ? "---|" : ""}`);

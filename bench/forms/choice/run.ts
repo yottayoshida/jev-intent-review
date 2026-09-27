@@ -33,7 +33,7 @@ import { JevProvider } from "../../../src/judgments/jev.ts";
 import { BAR } from "../../../src/plan/local-check.ts";
 import { FORM_QUESTION, QUESTION_HASH } from "./question.ts";
 import { duplicates, isFragment, KINDS, LABELS, normalise, renderTables, requirementSentencesIn, requirementsIn, type Log, type Reading, type Sentence, type SentenceSet } from "./score.ts";
-import { KINDS3, LABELS3, QUESTION_V3_HASH, readSet3, renderTables3, SETS3, stopLine, TRUTHS, type Log3, type Sentence3, type Set3File, type Set3Name } from "./v3.ts";
+import { LABELS3, QUESTION_V3_HASH, readSet3, renderTables3, SETS3, stopLine, TRUTHS, type Log3, type Sentence3, type Set3File, type Set3Name } from "./v3.ts";
 
 const HERE = new URL("./", import.meta.url).pathname;
 const ROOT = new URL("../../../", import.meta.url).pathname;
@@ -144,7 +144,7 @@ function verifySet(set: SentenceSet): number {
 function verifySet3(file: Set3File): number {
   let bad = 0;
   for (const s of file.sentences) {
-    if (!LABELS3.includes(s.label) || s.origin.kind !== "written-85" || !KINDS3.includes(s.origin.kind)) {
+    if (!LABELS3.includes(s.label) || s.origin.kind !== "written-85") {
       console.log(`${s.id}: label ${s.label} / kind ${s.origin.kind} is not one of sentences-v3.json's`);
       bad += 1;
       continue;
@@ -240,10 +240,9 @@ function measured(name: SetName | Set3Name): Measured {
   }
   const { sentences, hashes } = readSet3(HERE, name);
   const spec = SETS3[name];
-  const questionHash = name === "3" ? QUESTION_V3_HASH : QUESTION_HASH;
   return {
     sentences,
-    conditions: { sentences: hashes, question: questionHash, bar: BAR, runsPerSentence: 0, provider: "" },
+    conditions: { sentences: hashes, question: spec.questionHash, bar: BAR, runsPerSentence: 0, provider: "" },
     question: spec.question,
     log: join(ROOT, spec.log),
     table: (log) => renderTables3(sentences, log, spec.offered),
@@ -258,7 +257,7 @@ function score3(name: Set3Name): number {
     const log = JSON.parse(readFileSync(path, "utf8")) as Log3;
     const { hashes } = readSet3(HERE, n);
     if (JSON.stringify(log.conditions.sentences) !== JSON.stringify(hashes)) throw new Error(`${SETS3[n].log} was taken on other files (${JSON.stringify(log.conditions.sentences)}, now ${JSON.stringify(hashes)})`);
-    const want = n === "3" ? QUESTION_V3_HASH : QUESTION_HASH;
+    const want = SETS3[n].questionHash;
     if (log.conditions.question !== want) throw new Error(`${SETS3[n].log} was taken with another wording of the question (${log.conditions.question}, now ${want})`);
     return log;
   };

@@ -1,7 +1,7 @@
 # 0026. Whether Jev reads a handled-failure sentence as `failure_handling` is measured before the form is offered to sentences
 
-Status: Proposed (the lines below were written before the first request; the numbers and the owner's
-ruling are added under them)
+Status: Accepted (the owner's ruling of 2026-09-27: not wired; the lines below were written before the
+first request, the numbers and the ruling after)
 
 ## Context
 
@@ -29,6 +29,7 @@ declared order, so what is measured is what the run would send with the flag set
 **The sentences.** The 79 of sets 1 and 2, labels unchanged, and sentences written from dev pull
 requests (`bench/forms/choice/written-85/README.md`): the 41 Rust pull requests of `bench/eval/pool.json`
 whose requirement #85's annotators judged writable in either failure form (43 rows; pool is all dev).
+(Measured afterwards: 17 of the 41 ids are omamori issues, not pull requests — see *The numbers*.)
 Two readers per pull request, who see neither each other nor the form question:
 
 - **The truth is read from the diff**, by three annotators who see only the diff: after the change, does
@@ -91,7 +92,42 @@ keep theirs, so their tables do not change.
   memory, but runs the workspace's session-end hook, which pushes the workspace; it is not used for six
   readers.
 - The main line's pull requests lean on one repository whose issues were largely written by a model.
+  (Measured afterwards: its ids were mostly issues, left out, and 2 of the main line's 10 are omamori.)
 - One wording and one order of the options.
+
+### The numbers and the ruling (2026-09-27)
+
+The readers: all three annotators gave the same answer for every one of the 41 (the same model reading
+the same diff — agreement, not independence). 17 of the 41 ids are omamori *issues*, not pull requests:
+`gh pr diff` found no pull request, every annotator answered `unclear`, and they were left out as the
+rule says; dolang#337 is `other`. 23 sentences: 10 whose fixed code handles the failure locally, from
+8 repositories (2 omamori), and 13 that return it. The main line had enough to be read.
+
+543 requests to Cloudflare, all answered (`form-choice-v3.json` 306, `form-choice-v1c.json` 237; the
+table is in `docs/local-check-cli.md`, `run.ts score --set 3` recomputes it, and
+`test/form-choice-v3.test.ts` holds the logs to the counts below):
+
+1. **Main: 4 of 10 — not met** (Wilson 0.17–0.69; outside omamori 4 of 8). The six misses: three
+   sentences say what the issue asked in the words of propagation ("surface the error", "must be
+   propagated", "let the error reach the … backoff loop") and were read as `failure_propagation` at
+   0.67–0.92; three are not sentences about a failure's handling and were under the bar at 0.42–0.54.
+2. Failure sentences that say the failure goes back: 0 of 21 as check, 0 of 21 as `failure_handling` — met.
+3. Check: 10 of 11 in every run, the same as the question sent now that day; 0 of 11 as
+   `failure_handling` — met.
+4. Neither: 2 of 43 as check (4 under the question sent now, that day), 3 of 43 as `failure_handling` — met.
+5. Recorded: of the 13 sentences whose fix returns the failure, 9 read as `failure_propagation` in every
+   run and 3 as `failure_handling` in some run (two in every run, at 0.60–0.68); none of the four
+   failure sentences that say what is shown or reported was read as `failure_handling`.
+
+On the 79 sentences of sets 1 and 2, offering the form cost the other classes almost nothing (the 23 new
+sentences have no same-day comparison: of the 13 whose fix returns the failure, 3 were read as
+`failure_handling` in some run and omamori #557's as check in every run). And it would not send most requirements whose
+fixed code handles a failure to it: what decides the route is whether the issue's words say how the
+failure is to be handled, and more than half of these do not say it in the form's terms.
+
+**Ruling: not wired.** `failure_handling` stays offered to no sentence and is used when a spec names it.
+#85 stays open. Measuring again on more pull requests — the omamori issues read through the pull
+requests that fixed them — would be a new version of `written-85`, not an addition to this one.
 
 ## Alternatives considered
 
@@ -111,6 +147,6 @@ keep theirs, so their tables do not change.
 - One more set, two more logs (`form-choice-v3.json`, `form-choice-v1c.json`), `node bench/forms/choice/run.ts
   score --set 3` recomputes the table `docs/local-check-cli.md` quotes. The run sends and prints what it
   did.
-- If the lines are met and the owner says so, the next pull request sets `failure_handling`'s
-  `chosenBySentence`, moves `test/forms.test.ts`'s hash to set 3's log, and says in `CHANGELOG.md` which
-  requirements are now asked what.
+- The lines were not all met and the form is not offered (above). Had it been, the next pull request would
+  set `failure_handling`'s `chosenBySentence`, move `test/forms.test.ts`'s hash to set 3's log, and say in
+  `CHANGELOG.md` which requirements are now asked what.

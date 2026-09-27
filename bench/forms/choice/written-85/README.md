@@ -77,3 +77,12 @@ With `<LIST>` the writer's pull requests and `<PATH>` the file:
 > entry per id, in the order given.
 >
 > <LIST>
+
+## What the readers found (2026-09-27, after the files were read)
+
+Recorded, not a change to the rule above. 17 of the 41 ids are `yottayoshida/omamori` *issues*, not
+pull requests (the pool's rows name an issue where a pull request fixed one). `gh pr diff` found none,
+all three annotators answered `unclear`, and the rule left them out. The writers read those issues'
+text, as the prompt's `gh issue view` allowed; their sentences are in the draft files and are not in
+the set. The annotators agreed on every one of the 41. `combine.ts`: 23 sentences, 10
+`handles_locally` from 8 repositories, 13 `returns_to_caller`; 18 left out.

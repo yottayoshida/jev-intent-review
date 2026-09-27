@@ -4,11 +4,12 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { keywordForm } from "../bench/forms/choice/question.ts";
+import { keywordForm, QUESTION_HASH } from "../bench/forms/choice/question.ts";
 import type { SentenceSet } from "../bench/forms/choice/score.ts";
-import { barLines3, FORM_QUESTION_V3, isStrictFailure, keywordForm3, LABELS_NOW, majorityTruth, recordLines3, renderTables3, rows3, stopLine, wilson, type Log3, type Sentence3 } from "../bench/forms/choice/v3.ts";
+import { barLines3, FORM_QUESTION_V3, isStrictFailure, keywordForm3, LABELS_NOW, majorityTruth, QUESTION_V3_HASH, readSet3, recordLines3, renderTables3, rows3, SETS3, stopLine, type Log3, type Sentence3 } from "../bench/forms/choice/v3.ts";
 import { buildFormQuestion, CHOSEN_FORMS, FORM_QUESTION, FORMS } from "../src/plan/forms.ts";
 import { REQUIREMENT_FORMS } from "../src/types.ts";
 import { answer } from "./helpers/fakes.ts";
@@ -53,12 +54,6 @@ test("the failure sentences that say the failure goes back are 21 of the 25, and
   assert.deepEqual(failures.filter((s) => !isStrictFailure(s)).map((s) => s.id).sort(), ["corpus-omamori-553-R1", "corpus-omamori-553-R2", "fixture-integrity-rust-R1", "golden-omamori-553-1"]);
   // A written-85 sentence is never one of them, whatever its words.
   assert.equal(isStrictFailure({ label: "failure_propagation", text: "It must reach the caller.", origin: { kind: "written-85" } }), false);
-});
-
-test("wilson's interval", () => {
-  const [lo, hi] = wilson(8, 10);
-  assert.ok(Math.abs(lo - 0.49) < 0.01 && Math.abs(hi - 0.943) < 0.01, `${lo} ${hi}`);
-  assert.deepEqual(wilson(0, 0), [0, 1]);
 });
 
 const w85 = (id: string, repo: string, truth: "handles_locally" | "returns_to_caller"): Sentence3 => ({
@@ -157,4 +152,53 @@ test("sentences-v3.json is what combine.ts builds from the six readers' files, a
   const v3 = JSON.parse(readFileSync(`${ROOT}bench/forms/choice/sentences-v3.json`, "utf8")) as { sentences: Sentence3[]; dropped: unknown[] };
   assert.deepEqual([v3.sentences.length, v3.dropped.length], [23, 18]);
   assert.deepEqual(stopLine(v3.sentences), { prs: 10, repos: 8, enough: true });
+});
+
+/** A committed set-3 or set-1c log, after checking it was taken on its files and its question, as `run.ts score` does. */
+const committedLog3 = (name: "3" | "1c"): Log3 => {
+  const log = JSON.parse(readFileSync(`${ROOT}${SETS3[name].log}`, "utf8")) as Log3;
+  assert.deepEqual(log.conditions.sentences, readSet3(`${ROOT}bench/forms/choice/`, name).hashes, `${SETS3[name].log} was taken on other files`);
+  assert.equal(log.conditions.question, SETS3[name].questionHash);
+  assert.equal(SETS3[name].questionHash, name === "3" ? QUESTION_V3_HASH : QUESTION_HASH);
+  assert.equal(createHash("sha256").update(JSON.stringify(log.question)).digest("hex"), log.conditions.question, "the question the log holds is the one its hash names");
+  return log;
+};
+
+test("set 3's log scores as ADR 0026 records: the main line is not met, every other line is", () => {
+  const log = committedLog3("3");
+  const { sentences } = readSet3(`${ROOT}bench/forms/choice/`, "3");
+  assert.equal(sentences.length, 102);
+  assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 306);
+  const now = committedLog3("1c");
+  const all = rows3(sentences, log, SETS3["3"].offered);
+  const nowRows = rows3(sentences.filter((s) => s.origin.kind !== "written-85"), now, LABELS_NOW);
+  const lines = barLines3(all, nowRows);
+  assert.match(lines[0]!, / 4 of 10 \(40%; .*8 repositories; outside yottayoshida\/omamori 4 of 8\) .* — not met$/);
+  assert.deepEqual(lines.slice(1).map((l) => l.endsWith("— met")), [true, true, true, true, true, true], lines.join("\n"));
+  assert.match(lines[1]!, /: 0 of 21 /);
+  assert.match(lines[2]!, /: 0 of 21 /);
+  assert.match(lines[3]!, /: 10 of 11 .*the same day's 10 under/);
+  assert.match(lines[4]!, /: 0 of 11 /);
+  assert.match(lines[5]!, /: 2 of 43 /);
+  assert.match(lines[6]!, /: 3 of 43 /);
+  const records = recordLines3(all);
+  assert.match(records[0]!, /every run 9 of 13, as failure_handling in any run 3$/);
+  assert.match(records[1]!, /: read as failure_handling in any run 0 of 4$/);
+  assert.match(records[2]!, /default in any run 6, read as check_before_action in any run 0$/);
+  // omamori #557, whose fix returns the failure, read as check in every run (ADR 0026, the numbers).
+  const r557 = all.find((r) => r.id === "w85-yottayoshida-omamori-557")!;
+  assert.deepEqual(r557.readings, ["check_before_action", "check_before_action", "check_before_action"]);
+});
+
+test("set 1c's log, the question sent now the same day, reads as the documentation says, and prints no lines", () => {
+  const log = committedLog3("1c");
+  const { sentences } = readSet3(`${ROOT}bench/forms/choice/`, "1c");
+  assert.equal(sentences.length, 79);
+  assert.equal(Object.values(log.runs).reduce((n, r) => n + r.length, 0), 237);
+  const all = rows3(sentences, log, LABELS_NOW);
+  const count = (label: string, f: (r: (typeof all)[number]) => boolean) => all.filter((r) => r.label === label && f(r)).length;
+  assert.deepEqual([count("failure_propagation", (r) => r.rightEveryRun), count("check_before_action", (r) => r.rightEveryRun), count("neither", (r) => r.inAnyRun.check_before_action)], [23, 10, 4]);
+  const out = execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", "1c"], { encoding: "utf8" });
+  assert.match(out, /lines are read on set 3/);
+  assert.doesNotMatch(out, /^- main:/m);
 });
