@@ -11,7 +11,7 @@
 //   - a function returns `Wrapped<(), Error>`, and the repository says
 //     `type Wrapped<T, E> = Context<Result<T, E>>`.
 //
-// (Each measured on a real pull request: docs/local-check-cli.md, *Reading whole signatures*.)
+// (Each measured on a real pull request: docs/measurements.md, *Reading whole signatures*.)
 //
 // So the return type is taken from the signature itself — past the generics and the parameter
 // list, up to the body, a `;` or `where` — and every name in it is resolved: a rename in the same

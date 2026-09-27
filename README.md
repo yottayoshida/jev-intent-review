@@ -2,10 +2,14 @@
 
 **Intent-aware review beyond the diff.**
 
-`jev-intent-review` checks whether a pull request actually satisfies the intent behind it — including code the diff did not touch.
+`jev-intent-review` reads a requirement written in a spec, an issue or the pull request, and lists the calls that may break it — including calls in code the diff did not touch — with the evidence for each, so a person can check or reject it.
 It starts from the requirement, not from the changed lines: **the diff is a search hint, not the review boundary.**
 
-It reads **Rust** only, and requirements written in **two shapes** — a requirements section or a `Property:` paragraph — asking one of **two things** of each call: how a failure must reach the caller, or that a check passes before an action — and, when a spec names it, a third: that a failure is returned, logged or recorded rather than silently dropped.
+What it reads today:
+
+* **Rust** only.
+* Requirements in **two shapes**: a requirements section or a `Property:` paragraph.
+* **Two questions** it can ask of a call: how a failure must reach the caller, or that a check passes before an action. A third — that a failure is returned, logged or recorded rather than silently dropped — only when a spec names it.
 
 ## Demo
 
@@ -53,7 +57,7 @@ reason, is in the artifact. Pull requests from forks are not reviewed. Why, and 
 
 Experimental. Calls are read in Rust repositories only (in any other language only the change question runs), and Jev is the only model it sends anything to.
 It does not claim repository-wide verification, and no finding does not prove a requirement holds.
-Surfacing a defect in an unchanged caller is the goal; how far it gets today is in [what has been measured](docs/local-check-cli.md#what-has-been-measured).
+Surfacing a defect in an unchanged caller is the goal; how far it gets today is in [what has been measured](docs/measurements.md#what-has-been-measured).
 
 ## Docs
 
@@ -62,7 +66,8 @@ Surfacing a defect in an unchanged caller is the goal; how far it gets today is 
 * [Using the command](docs/usage.md) — flags, `--json`, the JevFuzz trace, how intent is read, Jev hosts, development
 * [GitHub Action](docs/github-action.md) — inputs, what a run leaves, reused answers, limits, which pull requests are reviewed
 * [Writing requirements](docs/writing-requirements.md) — the two forms, issue and pull request templates
-* [The local check](docs/local-check-cli.md) — exact behavior, the output, exit codes, every measurement
+* [The local check](docs/local-check-cli.md) — exact behavior, the output, exit codes
+* [Measurements](docs/measurements.md) — what has been measured, and the record of how v0.1 got here
 * [Design](docs/SPEC.md) and [decisions](docs/adr/)
 
 ## License

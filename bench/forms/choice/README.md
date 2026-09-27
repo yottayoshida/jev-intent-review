@@ -15,7 +15,7 @@ this measures whether it can (ADR 0008). Nothing here changes what the run sends
 - `run.ts verify | measure [runs] | score` — see the file's head. `measure` needs `JEV_PROVIDER` and
   that host's key; the log is `bench/logs/form-choice-v1.json`, or `form-choice-v2.json` with
   `--set 2`.
-- `score.ts` — the table `docs/local-check-cli.md` quotes, from the log.
+- `score.ts` — the table `docs/measurements.md` quotes, from the log.
 
 ## The set
 
@@ -83,7 +83,7 @@ sentences read as check in any run. `score` prints each with its number. The dec
 owner's, and is recorded in ADR 0008.
 
 Measured on 2026-09-22 (216 requests, `bench/logs/form-choice-v1.json`): all three met — 0 of 18,
-10 of 11, 4 of 43. The table and what it does and does not say are in `docs/local-check-cli.md`
+10 of 11, 4 of 43. The table and what it does and does not say are in `docs/measurements.md`
 under "How Jev reads the form of a sentence"; the ruling is in ADR 0008.
 
 ## Set 3: with `failure_handling` offered (#85, ADR 0026)
@@ -97,4 +97,4 @@ read from the diff by readers who saw neither the text nor the question (`writte
 the question sent now to the 79 on the same day, for comparison; its table prints no lines. Sets 1
 and 2 are scored as before, with their own keyword rule. Logs `bench/logs/form-choice-v3.json` and
 `form-choice-v1c.json`; the numbers and the ruling (not wired) are in ADR 0026 and
-`docs/local-check-cli.md`.
+`docs/measurements.md`.

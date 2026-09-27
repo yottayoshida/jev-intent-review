@@ -45,7 +45,7 @@ Suppose the PR correctly fixes one path, but an unchanged caller still converts 
 
 `jev-intent-review` is meant to surface that call even though the call itself is outside the diff.
 
-In v0.1.1 that is a goal, not yet a result. v0.1.1 lists the callers one hop out of the functions a change touched, and among the real pull requests examined that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question. Since then (unreleased), measured again on the same cases after `#45`, moltis#1064's defect in an unchanged caller was listed at its own call in three runs of three — on a case used to tune the tool by then — and the check also reads, past the callers, the other callers of what the changed code calls; a defect in such a function has not been measured on real code yet. See [what has been measured](local-check-cli.md#what-has-been-measured).
+In v0.1.1 that is a goal, not yet a result. v0.1.1 lists the callers one hop out of the functions a change touched, and among the real pull requests examined that were not used for tuning, in all three where the fixed call could be asked about, the call from the unchanged caller to the changed function reached no question. Since then (unreleased), measured again on the same cases after `#45`, moltis#1064's defect in an unchanged caller was listed at its own call in three runs of three — on a case used to tune the tool by then — and the check also reads, past the callers, the other callers of what the changed code calls; a defect in such a function has not been measured on real code yet. See [what has been measured](measurements.md#what-has-been-measured).
 
 A finding contains the requirement, the relevant code, the assumed failure, and the typed judgments that caused it to be listed.
 
@@ -89,7 +89,7 @@ It does **not** yet claim complete repository-wide verification or a requirement
 
 No finding also does not prove that the requirement is satisfied.
 
-See [docs/local-check-cli.md](local-check-cli.md) for the exact current behavior and measured experiments.
+See [docs/local-check-cli.md](local-check-cli.md) for the exact current behavior, and [docs/measurements.md](measurements.md) for what has been measured.
 
 ## What this is aiming at
 

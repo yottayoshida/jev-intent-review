@@ -282,8 +282,8 @@ test("a case marked as first measured in a log is in that log, once the log is c
 
 // ---- 3b. The document says what the committed record says, byte for byte ------------------------
 
-test("the table in docs/local-check-cli.md is exactly what the committed log and cases produce", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the table in docs/measurements.md is exactly what the committed log and cases produce", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- acceptance:begin -->\n";
   const end = "\n<!-- acceptance:end -->";
   assert.equal(doc.split(begin).length, 2, "exactly one acceptance:begin marker");
@@ -293,8 +293,8 @@ test("the table in docs/local-check-cli.md is exactly what the committed log and
   assert.equal(block, render(loadCases(), log, candidates));
 });
 
-test("the re-run's table in docs/local-check-cli.md is exactly what acceptance-v2.json produces, and one is not there without the other", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the re-run's table in docs/measurements.md is exactly what acceptance-v2.json produces, and one is not there without the other", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- acceptance-v2:begin -->\n";
   const end = "\n<!-- acceptance-v2:end -->";
   const logged = existsSync(new URL("../bench/logs/acceptance-v2.json", import.meta.url));
@@ -307,8 +307,8 @@ test("the re-run's table in docs/local-check-cli.md is exactly what acceptance-v
   assert.equal(block, render(loadCases(), log, candidates));
 });
 
-test("the table after #38 in docs/local-check-cli.md is exactly what acceptance-v4.json produces, and every A and B defect in it was answered three of three", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the table after #38 in docs/measurements.md is exactly what acceptance-v4.json produces, and every A and B defect in it was answered three of three", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- acceptance-v4:begin -->\n";
   const end = "\n<!-- acceptance-v4:end -->";
   const logged = existsSync(new URL("../bench/logs/acceptance-v4.json", import.meta.url));

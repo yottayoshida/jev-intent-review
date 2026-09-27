@@ -16,7 +16,7 @@ opposite: requirement × evidence → small typed Jev judgments → a determinis
 `satisfies` / `violates` / `unknown` / `aside`, where the requirement may change and the machinery
 does not.
 
-Measured before this decision (#36, `docs/local-check-cli.md`): on unseen pull requests the failure
+Measured before this decision (#36, `docs/measurements.md`): on unseen pull requests the failure
 questions read the fixed call right, three runs of three; with the deciding code moved into a
 helper whose body is not sent, Jev still answered with confidence (0.92–0.96).
 
@@ -96,7 +96,7 @@ helper whose body is not sent, Jev still answered with confidence (0.92–0.96).
 - A new shape of requirement is a new form, not a new algorithm, and it is reported in the same four
   values.
 - `satisfies` means two readings agreed, and nothing more. Where the deciding code is in a body that
-  is not sent, #36 measured a confident agreement that was wrong. `docs/local-check-cli.md` says so
+  is not sent, #36 measured a confident agreement that was wrong. `docs/measurements.md` says so
   next to the value.
 - The report's sections change:
   - "Read as required by the requirement" is split into "Worth checking", "Read as holding" and

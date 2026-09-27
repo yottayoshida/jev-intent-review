@@ -124,7 +124,7 @@ probe and are not rebuilt) — so hidden and helper are told apart by the helper
   does not govern, which the old words themselves held in only two runs of three. The line said
   none; the owner ruled (2026-09-25) that this one is the line's coarseness — it counted
   observations without the mapping, which would set that call aside — and adopted arm 1 with the
-  exception written here and in `docs/local-check-cli.md`.
+  exception written here and in `docs/measurements.md`.
 
 What the probe does not show: that Jev evaluates rather than skims in general. It shows that on
 these three functions, given the checks' bodies and the case, it read the helper's body both ways;
