@@ -39,14 +39,14 @@ used to fix anything becomes a regression case from then on and is never counted
 
 Used so far:
 - **moltis-1064 and grovedb-500, measured again after `#38`** (`bench/logs/acceptance-v4.json`,
-  `docs/local-check-cli.md`, *The acceptance set after `#38`*): the check that every defect at A or
+  `docs/measurements.md`, *The acceptance set after `#38`*): the check that every defect at A or
   B is asked about inside the default budget and answered in three runs of three. How the budget is
   split (ADR 0015) was chosen by where these cases' targets fell, so this is a regression check of
   it, not evidence for it. `run.ts measure` names its log since: `sibling` writes v3, whose claim is
   one sibling's defect (`#37`), and `again` writes v4.
 
 - **The same 20 runs again, with grovedb-500 and whatsapp-rust-759 against Jev**, judged the cap of
-  calls a function (`#38`, second part; `docs/local-check-cli.md`, *The calls of a function,
+  calls a function (`#38`, second part; `docs/measurements.md`, *The calls of a function,
   measured*; `bench/logs/budget-by-origin-v2.json`, `bench/logs/calls-per-function-jev-v1.json`).
   `candidates.json` says grovedb-500's `apply_chunk` "lists exactly 40" and whatsapp-rust-759's
   fixed file hit the listing cap: both are true of the tool they were examined with, and the record
@@ -60,17 +60,17 @@ Used so far:
   (`bench/logs/budget-by-origin-v1.json`), and none of them is free evidence for it.
 
 - **kontor-385** chose the order inside a function (the calls into a function the change touched
-  first; `docs/local-check-cli.md`, *The order inside a function*). It has no `case.json` — it
+  first; `docs/measurements.md`, *The order inside a function*). It has no `case.json` — it
   stopped at condition (c) and was never built or sent to Jev — so this line is the record.
 - **moltis-1064, kontor-385 and grovedb-501** were what the whole-signature reading was built on
-  (`#45`, first part; `docs/local-check-cli.md`, *Reading whole signatures*). moltis-1064's
+  (`#45`, first part; `docs/measurements.md`, *Reading whole signatures*). moltis-1064's
   `case.json` says `regression` since the re-run after `#45` (`acceptance-v2.json`).
 - **grovedb-500**, with moltis-1064, was what the order inside a function and the whole-signature
   reading were judged by: "every defect inside the diff stays inside the budget" named both cases'
-  versions (`docs/local-check-cli.md`, *The order inside a function*, *Reading whole signatures*).
+  versions (`docs/measurements.md`, *The order inside a function*, *Reading whole signatures*).
   Its `case.json` says `regression` since the same re-run.
 - **cce-rust#168 and dataprof#370** — two pull requests outside this set — were what the narrowing
-  of a name defined more than once was built on (`#45`, second part; `docs/local-check-cli.md`,
+  of a name defined more than once was built on (`#45`, second part; `docs/measurements.md`,
   *Names defined more than once*). They have no case here; this line is the record, and they are
   not free evidence for anything that narrowing decides from now on.
 

@@ -104,7 +104,7 @@ rule says; dolang#337 is `other`. 23 sentences: 10 whose fixed code handles the 
 8 repositories (2 omamori), and 13 that return it. The main line had enough to be read.
 
 543 requests to Cloudflare, all answered (`form-choice-v3.json` 306, `form-choice-v1c.json` 237; the
-table is in `docs/local-check-cli.md`, `run.ts score --set 3` recomputes it, and
+table is in `docs/measurements.md`, `run.ts score --set 3` recomputes it, and
 `test/form-choice-v3.test.ts` holds the logs to the counts below):
 
 1. **Main: 4 of 10 — not met** (Wilson 0.17–0.69; outside omamori 4 of 8). The six misses: three
@@ -145,7 +145,7 @@ requests that fixed them — would be a new version of `written-85`, not an addi
 ## Consequences
 
 - One more set, two more logs (`form-choice-v3.json`, `form-choice-v1c.json`), `node bench/forms/choice/run.ts
-  score --set 3` recomputes the table `docs/local-check-cli.md` quotes. The run sends and prints what it
+  score --set 3` recomputes the table `docs/measurements.md` quotes. The run sends and prints what it
   did.
 - The lines were not all met and the form is not offered (above). Had it been, the next pull request would
   set `failure_handling`'s `chosenBySentence`, move `test/forms.test.ts`'s hash to set 3's log, and say in

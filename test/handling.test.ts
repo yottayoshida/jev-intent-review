@@ -77,7 +77,7 @@ test("a function that returns nothing is asked about when its callee can fail, a
   assert.equal(!failure.ok && failure.kind, "target_not_result");
 });
 
-test("the probe's log meets both of its lines, as docs/local-check-cli.md says", async () => {
+test("the probe's log meets both of its lines, as docs/measurements.md says", async () => {
   const { score } = await import("../bench/handling/probe.ts");
   const plan = JSON.parse(readFileSync(new URL("../bench/handling/probe.json", import.meta.url), "utf8"));
   const log = JSON.parse(readFileSync(new URL("../bench/logs/handling-probe-v1.json", import.meta.url), "utf8"));
