@@ -28,7 +28,8 @@ test("the material follows the fixed order, and a file that does not fit whole i
   // Step 3 the changed file, step 4 its caller, step 5 by distinct words (e: 2, d: 1).
   assert.deepEqual(all.parts.map((p) => [p.step, p.path ?? null]), [[1, null], [2, null], [3, "src/a.rs"], [4, "src/b.rs"], [5, "src/e.rs"], [5, "src/d.rs"]]);
   assert.equal(all.parts.filter((p) => p.path).every((p) => p.bytes === file), true);
-  const exact = req + diff + 4 * file;
+  // Six pieces: five newlines join them, and are sent too.
+  const exact = req + diff + 4 * file + 5;
   const fits = gather(fake, REQ, "a".repeat(40), "b".repeat(40), exact);
   assert.equal(fits.bytes, exact);
   assert.equal(fits.stoppedAt, undefined);
@@ -56,7 +57,7 @@ test("step 4 takes the rarest changed name first, so a common name cannot push t
   const req = Buffer.byteLength(`--- requirement\n${REQ}\n`);
   const diff = Buffer.byteLength(`--- diff aaaaaaaaaaaa..bbbbbbbbbbbb\n${"D".repeat(50)}\n`);
   // Room for the changed file and two more: by path or by name the 30 `a_common` files would take it; by rarity the caller does.
-  const g = gather(repo, REQ, "a".repeat(40), "b".repeat(40), req + diff + 3 * 100);
+  const g = gather(repo, REQ, "a".repeat(40), "b".repeat(40), req + diff + 3 * 100 + 4);
   assert.deepEqual(g.parts.filter((p) => p.step === 4).map((p) => p.path), ["src/zz_caller.rs", "src/aa00.rs"]);
 });
 
@@ -168,4 +169,46 @@ test("a repository is one observation in the difference, and places are reported
   const v = judge(p, []);
   assert.equal(v.uplift.B.wins, 1);
   assert.equal(v.uplift.A.losses, 1);
+});
+
+test("a diff over the budget is given file by file, the changed functions' files first, every piece that fits, and nothing after it", async () => {
+  const { diffPieces } = await import("../bench/eval/baseline.ts");
+  const piece = (path: string, n: number) => `diff --git a/${path} b/${path}\n--- a/${path}\n+++ b/${path}\n${"+x\n".repeat(n)}`;
+  // src/a.rs holds the changed functions (fake.changed); z.rs is small, m.rs too big for what is left.
+  const whole = piece("src/z.rs", 5) + piece("src/m.rs", 400) + piece("src/a.rs", 10);
+  assert.deepEqual(diffPieces(whole).map((p) => p.path), ["src/z.rs", "src/m.rs", "src/a.rs"]);
+  const repo: Repo = { ...fake, diff: () => whole };
+  const req = Buffer.byteLength(`--- requirement\n${REQ}\n`);
+  const r = gather(repo, REQ, "a".repeat(40), "b".repeat(40), req + 400);
+  assert.equal(r.diffCut, true);
+  assert.deepEqual(r.parts.map((p) => [p.step, p.path ?? null]), [[1, null], [2, null], [2, "src/a.rs"], [2, "src/z.rs"]]);
+  assert.deepEqual(r.skipped.map((p) => p.path), ["src/m.rs"]);
+  assert.ok(r.bytes <= req + 400);
+  assert.doesNotMatch(r.text, /--- file:/, "nothing after a diff cut short");
+  // The whole diff fitting is as before: no cut.
+  assert.equal(gather(repo, REQ, "a".repeat(40), "b".repeat(40), 100_000).diffCut, undefined);
+});
+
+test("an answer with text around its array is read, and an element naming no file, function and call is no finding", () => {
+  assert.deepEqual(readFindings('Here they are:\n```json\n[{"file":"a.rs","function":"f","call":"g()","claim":"c"}]\n```\nThat is all.'), [{ file: "a.rs", function: "f", call: "g()", claim: "c" }]);
+  // What folo-751's baseline answered when it was given the requirement only.
+  assert.deepEqual(readFindings('```json\n[{"file":"","function":"","call":"","claim":"no diff was given"}]\n```'), []);
+  assert.equal(readFindings('[{"file":"a.rs","function":"f","call":3,"claim":"c"}]'), null);
+  const unread = readRun(JSON.stringify({ result: "I cannot answer.", usage: { input_tokens: 1, output_tokens: 1 }, modelUsage: { "claude-opus-5-5": {} } }));
+  assert.equal(unread.counted, false);
+  assert.equal(unread.answer, "I cannot answer.", "an answer that cannot be read is kept, to find out why");
+});
+
+test("what is sent is the bytes counted, never over the budget; a piece is named by its +++ line", async () => {
+  const { diffPieces } = await import("../bench/eval/baseline.ts");
+  const piece = (path: string, n: number) => `diff --git a/${path} b/${path}\n--- a/${path}\n+++ b/${path}\n${"+x\n".repeat(n)}`;
+  const repo: Repo = { ...fake, diff: () => Array.from({ length: 40 }, (_, i) => piece(`src/f${i}.rs`, 3)).join("") };
+  for (const budget of [300, 700, 1500, 100_000]) {
+    const g = gather(repo, REQ, "a".repeat(40), "b".repeat(40), budget);
+    assert.equal(Buffer.byteLength(g.text), g.bytes, `budget ${budget}`);
+    assert.ok(g.bytes <= budget, `budget ${budget}`);
+  }
+  // A path holding " b/" is named by its +++ line; a deleted file by its --- line.
+  assert.equal(diffPieces(piece("dir a b/x.rs", 1))[0]!.path, "dir a b/x.rs");
+  assert.equal(diffPieces("diff --git a/gone.rs b/gone.rs\n--- a/gone.rs\n+++ /dev/null\n-x\n")[0]!.path, "gone.rs");
 });

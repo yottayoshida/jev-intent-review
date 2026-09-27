@@ -13,6 +13,9 @@ import { dirname, join, resolve } from "node:path";
 import type { RequirementRun, Target } from "../acceptance/score.ts";
 import { EFFORT, MODEL, type Finding } from "./baseline.ts";
 import { names } from "./compare.ts";
+import { jsonIn } from "./json-in.ts";
+
+export { jsonIn };
 import type { Answer } from "./retro/prompts.ts";
 
 export const ADJUDICATION_VERSION = 1;
@@ -151,25 +154,6 @@ export function assertNoSettings(dir: string): void {
     const up = dirname(d);
     for (const n of [".git", ".claude", "CLAUDE.md"]) if (existsSync(join(up, n)) && (n !== ".claude" || statSync(join(up, n)).isDirectory())) throw new Error(`the source copy is under ${up}, which holds ${n}`);
   }
-}
-
-/**
- * The JSON in an answer: the first fenced block, or else the text from the first `[` or `{` to the last
- * `]` or `}`. An annotator that may read the source often explains its label after the block (the
- * rehearsal on dev row 53 did, every time), which a parse of the whole answer rejects.
- */
-export function jsonIn(text: string): unknown {
-  const fenced = /```(?:json)?\s*([\s\S]*?)```/.exec(text);
-  const candidates = [fenced?.[1], text.trim(), text.slice(Math.min(...["[", "{"].map((c) => (text.indexOf(c) === -1 ? Infinity : text.indexOf(c)))), Math.max(text.lastIndexOf("]"), text.lastIndexOf("}")) + 1)];
-  for (const c of candidates) {
-    if (c === undefined || c.trim() === "") continue;
-    try {
-      return JSON.parse(c.trim());
-    } catch {
-      // the next reading
-    }
-  }
-  return undefined;
 }
 
 /** What `claude -p --output-format json` printed, read into an answer: the model, then the JSON it gave. */

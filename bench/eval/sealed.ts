@@ -356,7 +356,7 @@ export function prepareClone(c: CheckedCase, work: Work): { clone: string; versi
 
 export interface Measured {
   jev: AcceptanceLog;
-  baseline: Record<string, Record<string, BaselineVersion & { budgetFrom?: string; requirementId: string; material: { bytes: number } }>>;
+  baseline: Record<string, Record<string, BaselineVersion & { budgetFrom?: string; requirementId: string; material: { bytes: number; diffCut?: boolean; skipped?: number } }>>;
   adjudication: Record<string, Record<string, VersionAdjudication>>;
   pairs: Pair[];
   falseVersions: FalseVersion[];
@@ -486,7 +486,7 @@ export async function measureCases(input: MeasureInput, measure: (id: string, cl
         runs.push(run);
         if (!run.counted) fail(`${c.id} ${versionId} baseline`)(run.why ?? "not counted");
       }
-      book[versionId] = { budget, budgetFrom: live ? "this version" : "the median of the run", runs, requirementId: req.id, material: { bytes: material.bytes } };
+      book[versionId] = { budget, budgetFrom: live ? "this version" : "the median of the run", runs, requirementId: req.id, material: { bytes: material.bytes, diffCut: material.diffCut === true, skipped: material.skipped.length } };
       writeFileSync(baselineFile, `${JSON.stringify(out.baseline, null, 2)}\n`);
     }
   }

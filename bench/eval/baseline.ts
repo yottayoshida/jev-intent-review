@@ -17,6 +17,7 @@ import { changedFunctions } from "../acceptance/changed-functions.ts";
 import { loadCases } from "../acceptance/replay.ts";
 import type { AcceptanceLog } from "../acceptance/replay.ts";
 import type { CaseFile, Target } from "../acceptance/score.ts";
+import { jsonIn } from "./json-in.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 export const BASELINE_VERSION = 1;
@@ -76,14 +77,30 @@ export function requirementWords(requirement: string): string[] {
 }
 
 /**
+ * A diff cut at each `diff --git`, each piece named by its path after the change: the `+++ b/` line
+ * (the header's `a/… b/…` is ambiguous when a path holds ` b/`), else `--- a/` for a deleted file, else
+ * the header's second path. `gitRepo.diff` fixes the prefixes and does not quote paths.
+ */
+export function diffPieces(diff: string): { path: string; text: string }[] {
+  const out: { path: string; text: string }[] = [];
+  for (const piece of diff.split(/^(?=diff --git )/m)) {
+    if (piece.trim() === "") continue;
+    const path = /^\+\+\+ b\/(.+)$/m.exec(piece)?.[1] ?? /^--- a\/(.+)$/m.exec(piece)?.[1] ?? /^diff --git "?a\/.+?"? "?b\/(.+?)"?$/m.exec(piece)?.[1] ?? "";
+    out.push({ path, text: piece });
+  }
+  return out;
+}
+
+/**
  * The material, in the order of BASELINE.md: the requirement, the diff, the files of the changed
  * functions, the files that name a changed function (the rarest names first), the files the requirement's words hit
  * (most distinct words first, then by path). Each file once and whole: a file that does not fit is
  * skipped and the next one tried, so a large file early on does not leave the rest of the budget unused
- * (on dev, stopping at the first one left 7-35 % of it). If the requirement or the diff does not fit,
- * nothing after it is given.
+ * (on dev, stopping at the first one left 7-35 % of it). If the requirement does not fit, nothing is
+ * given; a diff that does not fit is given file by file, and nothing after it. The newline that joins
+ * two pieces is counted, so what is sent is never over the budget.
  */
-export function gather(repo: Repo, requirement: string, base: string, head: string, budget: number): { text: string; parts: Part[]; bytes: number; skipped: Part[]; stoppedAt?: Part } {
+export function gather(repo: Repo, requirement: string, base: string, head: string, budget: number): { text: string; parts: Part[]; bytes: number; skipped: Part[]; stoppedAt?: Part; diffCut?: boolean } {
   const chunks: string[] = [];
   const parts: Part[] = [];
   const skipped: Part[] = [];
@@ -91,10 +108,12 @@ export function gather(repo: Repo, requirement: string, base: string, head: stri
   const seen = new Set<string>();
   const put = (step: Part["step"], text: string, path?: string): boolean => {
     const b = byteLength(text);
-    if (bytes + b > budget) return false;
+    // The newline `join` puts before every piece but the first is sent too.
+    const sep = chunks.length > 0 ? 1 : 0;
+    if (bytes + sep + b > budget) return false;
     chunks.push(text);
     parts.push({ step, ...(path === undefined ? {} : { path }), bytes: b });
-    bytes += b;
+    bytes += sep + b;
     return true;
   };
   const stop = (step: Part["step"], text: string, path?: string) => ({ text: chunks.join("\n"), parts, bytes, skipped, stoppedAt: { step, ...(path === undefined ? {} : { path }), bytes: byteLength(text) } });
@@ -105,13 +124,23 @@ export function gather(repo: Repo, requirement: string, base: string, head: stri
 
   const req = `--- requirement\n${requirement}\n`;
   if (!put(1, req)) return stop(1, req);
-  const diff = `--- diff ${base.slice(0, 12)}..${head.slice(0, 12)}\n${repo.diff(base, head)}\n`;
-  if (!put(2, diff)) return stop(2, diff);
-
   const changed = repo.changed(base, head).map((s) => {
     const [path, name] = s.split(" · ");
     return { path: path!, name: name! };
   });
+  const whole = repo.diff(base, head);
+  const diff = `--- diff ${base.slice(0, 12)}..${head.slice(0, 12)}\n${whole}\n`;
+  if (!put(2, diff)) {
+    // The diff alone is over the budget (18 of 75 versions of the first sealed run; owner, 2026-09-26):
+    // it is given file by file, the files of the functions the change touched first, then the rest, each
+    // group by path, every piece that fits; nothing after it.
+    const touched = new Set(changed.map((c) => c.path));
+    const pieces = diffPieces(whole).sort((x, y) => Number(touched.has(y.path)) - Number(touched.has(x.path)) || x.path.localeCompare(y.path));
+    if (!put(2, `--- diff ${base.slice(0, 12)}..${head.slice(0, 12)}, the files that fit\n`)) return stop(2, diff);
+    for (const p of pieces) if (!put(2, p.text, p.path)) skipped.push({ step: 2, path: p.path, bytes: byteLength(p.text) });
+    return { text: chunks.join("\n"), parts, bytes, skipped, diffCut: true };
+  }
+
   // Step 4 takes the names that hit the fewest files first, each name's files by path: a changed
   // function named `name` or `id` hits hundreds of files, and by path alone they pushed moltis-1064's
   // caller (`handle_title`, 2 files) out of the budget.
@@ -143,7 +172,8 @@ export function gather(repo: Repo, requirement: string, base: string, head: stri
 export const gitRepo = (clone: string): Repo => {
   const git = (args: string[]) => execFileSync("git", ["-C", clone, ...args], { encoding: "utf8", maxBuffer: 512 * 1024 * 1024 });
   return {
-    diff: (base, head) => git(["diff", "--no-color", base, head]),
+    // Fixed prefixes, no external diff, no quoted paths: the user's configuration cannot change the pieces.
+    diff: (base, head) => git(["-c", "core.quotePath=false", "diff", "--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/", base, head]),
     read: (rev, path) => {
       try {
         return git(["show", `${rev}:${path}`]);
@@ -179,6 +209,8 @@ export interface BaselineRun {
   /** Counted: the model asked answered, and its answer was a readable array. */
   counted: boolean;
   why?: string;
+  /** The start of an answer that could not be read. */
+  answer?: string;
   findings: Finding[];
   /** How many the answer listed before the cap of five. */
   listed: number;
@@ -189,21 +221,21 @@ export interface BaselineRun {
   durationMs: number | null;
 }
 
-/** The array in a model's answer, with a code fence around it or not. */
+/**
+ * The array in a model's answer (`jsonIn`: a fenced block, the whole answer, or the text around it). An
+ * element naming no file, function and call is no finding — it is what the model writes when it has
+ * nothing to review (folo-751 of the first sealed run answered "no diff was given" that way) — and is
+ * dropped.
+ */
 export function readFindings(result: string): Finding[] | null {
-  const body = result.trim().replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    return null;
-  }
+  const parsed = jsonIn(result);
   if (!Array.isArray(parsed)) return null;
   const out: Finding[] = [];
   for (const x of parsed) {
     if (typeof x !== "object" || x === null) return null;
     const { file, function: fn, call, claim } = x as Record<string, unknown>;
     if (typeof file !== "string" || typeof fn !== "string" || typeof call !== "string" || typeof claim !== "string") return null;
+    if (file.trim() === "" && fn.trim() === "" && call.trim() === "") continue;
     out.push({ file, function: fn, call, claim });
   }
   return out;
@@ -226,7 +258,8 @@ export function readRun(stdout: string): BaselineRun {
   if (model.length !== 1 || model[0] !== MODEL) return { counted: false, why: `answered by ${model.join(", ") || "no model"}, not ${MODEL}`, findings: [], listed: 0, ...base };
   if (j.is_error === true || typeof j.result !== "string") return { counted: false, why: "the run ended in an error", findings: [], listed: 0, ...base };
   const findings = readFindings(j.result);
-  if (findings === null) return { counted: false, why: "the answer was not a JSON array of findings", findings: [], listed: 0, ...base };
+  // The answer is kept when it cannot be read, to find out why (the logs stay outside the repository).
+  if (findings === null) return { counted: false, why: "the answer was not a JSON array of findings", answer: j.result.slice(0, 4000), findings: [], listed: 0, ...base };
   return { counted: true, findings: findings.slice(0, MAX_FINDINGS), listed: findings.length, ...base };
 }
 
@@ -296,7 +329,8 @@ async function dev(clones: string, only?: string, onlyVersion?: string) {
       if (budget === null) continue;
       const req = requirementOf(c, v.targets);
       const material = gather(gitRepo(clone), req.text, v.base, v.head, budget);
-      const run = runClaude(userPrompt(req.text, material.text), empty);
+      // dev's log is committed: an answer that could not be read is not kept in it.
+      const { answer: _unread, ...run } = runClaude(userPrompt(req.text, material.text), empty);
       (cases[c.id] ??= {})[versionId] = { base: v.base, head: v.head, requirementId: req.id, budget, material: { bytes: material.bytes, parts: material.parts, skipped: material.skipped.length, stoppedAt: material.stoppedAt ?? null }, runs: [run] };
       writeFileSync(out, `${JSON.stringify(book, null, 2)}\n`);
       console.log(`${c.id} ${versionId}: ${material.bytes}/${budget} bytes, counted=${run.counted}${run.why ? ` (${run.why})` : ""}, ${run.findings.length} findings, $${run.costUsd}`);

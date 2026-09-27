@@ -281,7 +281,7 @@ const prepared = new Map<string, { work: Work; cases: (CheckedCase & { clone: st
 function decidingFiles(): Record<string, string> {
   const files = [
     "bench/eval/run.ts", "bench/eval/sealed.ts", "bench/eval/baseline.ts", "bench/eval/compare.ts", "bench/eval/adjudicate.ts", "bench/eval/metrics.ts", "bench/eval/split.ts",
-    "bench/eval/retro/prompts.ts", "bench/eval/retro/calibrate.ts", "bench/eval/sealed-batches.json",
+    "bench/eval/json-in.ts", "bench/eval/retro/prompts.ts", "bench/eval/retro/calibrate.ts", "bench/eval/sealed-batches.json",
     "bench/acceptance/run.ts", "bench/acceptance/score.ts", "bench/acceptance/replay.ts",
   ];
   return Object.fromEntries(files.map((f) => [f, sha256(readFileSync(join(ROOT, f)))]));
