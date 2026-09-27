@@ -12,7 +12,7 @@ import { checksAt } from "../bench/eval/retro/checks.ts";
 import type { Bundle } from "../bench/eval/retro/material.ts";
 import { CAUGHT_SYSTEM, CHECK_SYSTEM, LABEL_SYSTEM, WRITE_SYSTEM, type Answer } from "../bench/eval/retro/prompts.ts";
 import { DIFF_NOT_SERVED, diffRefused, isGone } from "../bench/eval/retro/gh.ts";
-import { batchProblem, COUNT_KEYS, countsOf, overSize, type RowRecord, reposWithinCap, SCREEN, screenRows, verdictsFile, writeRow, writeVerdicts, yieldVerdict, type Row, type ScreenDeps } from "../bench/eval/retro/screen.ts";
+import { batchProblem, COUNT_KEYS, countsOf, nextBatch, unplacedBatch, overSize, type RowRecord, reposWithinCap, SCREEN, screenRows, verdictsFile, writeRow, writeVerdicts, yieldVerdict, type Row, type ScreenDeps } from "../bench/eval/retro/screen.ts";
 
 const MARK = "SECRET-ROW-TEXT";
 
@@ -166,7 +166,7 @@ test("nothing of a row reaches the counts or the stop reason, an error carrying 
   const rows = rowsOf([["a/1", 1], ["a/2", 2]]);
   const r = run(rows, { 2: { throws: true } });
   assert.match(r.stopped!, /^row 2: stopped at the fix by Error$/);
-  const out = { batch: SCREEN.batch, ...countsOf(r, 10, rows.length), sha256: null };
+  const out = { batch: "b1", ...countsOf(r, 10, rows.length), sha256: null };
   assert.ok(!JSON.stringify(out).includes(MARK));
   assert.deepEqual(Object.keys(out).filter((k) => !(COUNT_KEYS as readonly string[]).includes(k)), []);
   // The records hold it, and are only written to the records directory.
@@ -183,15 +183,15 @@ test("the verdicts file lists every row file's sha256, and a changed byte is fou
   const dir = mkdtempSync(join(tmpdir(), "jir-screen-"));
   const rows = rowsOf([["a/1", 1], ["a/2", 2]]);
   const r = run(rows, { 2: { label: "propagates" } });
-  for (const rec of r.records) writeRow(dir, rec);
-  const sha = writeVerdicts(dir, rows, countsOf(r, 10, rows.length));
-  assert.equal(sha, createHash("sha256").update(readFileSync(verdictsFile(dir))).digest("hex"));
-  assert.equal(batchProblem(dir), null);
-  const file = join(dir, `89-${SCREEN.batch}`, "2.json");
+  for (const rec of r.records) writeRow(dir, "b1", rec);
+  const sha = writeVerdicts(dir, "b1", rows, countsOf(r, 10, rows.length));
+  assert.equal(sha, createHash("sha256").update(readFileSync(verdictsFile(dir, "b1"))).digest("hex"));
+  assert.equal(batchProblem(dir, "b1"), null);
+  const file = join(dir, "89-b1", "2.json");
   const bytes = readFileSync(file);
   bytes[bytes.length - 2] = bytes[bytes.length - 2]! ^ 1;
   writeFileSync(file, bytes);
-  assert.equal(batchProblem(dir), "row 2's file is not the one hashed");
+  assert.equal(batchProblem(dir, "b1"), "row 2's file is not the one hashed");
 });
 
 test("the checks at the merge: finished before it, none at all, or a list cut short", () => {
@@ -225,13 +225,15 @@ test("another measurement's repositories are in neither r nor M", () => {
 });
 
 const screenTs = join(import.meta.dirname, "..", "bench", "eval", "retro", "screen.ts");
+/** The batch the real command reads next, from the lines main holds. */
+const NEXT = nextBatch(JSON.parse(readFileSync(join(import.meta.dirname, "..", "bench", "eval", "sealed-batches.json"), "utf8")).batches).id;
 
 test("nothing runs past the number allowed, the N=1 run included", () => {
   const dir = mkdtempSync(join(tmpdir(), "jir-screen-"));
-  writeFileSync(join(dir, `89-${SCREEN.batch}.runs.json`), JSON.stringify({ runs: 40 }));
+  writeFileSync(join(dir, `89-${NEXT}.runs.json`), JSON.stringify({ runs: 40 }));
   const p = spawnSync(process.execPath, [screenTs, "run", "no-clones", dir, "40"], { encoding: "utf8" });
   assert.equal(p.stderr, "");
-  assert.deepEqual(JSON.parse(p.stdout), { batch: SCREEN.batch, stopped: "40 of the 40 runs allowed are spent", runs: 40 });
+  assert.deepEqual(JSON.parse(p.stdout), { batch: NEXT, stopped: "40 of the 40 runs allowed are spent", runs: 40 });
   // Room for the N=1 run but not for a row after it: the N=1 run is not spent for nothing.
   const q = spawnSync(process.execPath, [screenTs, "run", "no-clones", dir, String(40 + SCREEN.worstPerRow)], { encoding: "utf8" });
   assert.equal(q.stderr, "");
@@ -241,7 +243,7 @@ test("nothing runs past the number allowed, the N=1 run included", () => {
 test("a batch whose verdicts are written is not run again", () => {
   const dir = mkdtempSync(join(tmpdir(), "jir-screen-"));
   mkdirSync(dir, { recursive: true });
-  writeFileSync(verdictsFile(dir), "{}");
+  writeFileSync(verdictsFile(dir, NEXT), "{}");
   const p = spawnSync(process.execPath, [screenTs, "run", "no-clones", dir, "100"], { encoding: "utf8" });
   assert.equal(p.stdout, "");
   assert.equal(p.stderr.trim(), "screen.ts stopped: Error");
@@ -308,4 +310,43 @@ test("the cap: exactly the most bytes is sent, one byte more is not", () => {
   assert.equal(overSize(system, "r".repeat(SCREEN.maxRequestBytes - 1000)), null);
   assert.equal(overSize(system, "r".repeat(SCREEN.maxRequestBytes - 999)), SCREEN.maxRequestBytes + 1);
   assert.equal(overSize("", "é".repeat(SCREEN.maxRequestBytes / 2 + 1)), SCREEN.maxRequestBytes + 2, "bytes, not characters");
+});
+
+test("the next batch reads on from the last row main holds, named in order", () => {
+  const line = (measurement: "#80" | "#89", id: string, from: number, to: number) => ({ measurement, id, from, to, rows: to - from + 1, kept: 0, sha256: "a".repeat(64) });
+  assert.deepEqual(nextBatch([]), { id: "b1", from: 1, to: 100 });
+  assert.deepEqual(nextBatch([line("#80", "b1", 1, 100), line("#80", "b2", 101, 200), line("#89", "b1", 1, 100)]), { id: "b2", from: 101, to: 200 }, "#80's lines are not this measurement's");
+  assert.deepEqual(nextBatch([line("#89", "b1", 1, 100), line("#89", "b2", 101, 200)]), { id: "b3", from: 201, to: 300 });
+});
+
+test("a repository with a case from an earlier batch is skipped, not left out as another measurement's", () => {
+  const r = run(rowsOf([["Old/Case", 1], ["a/2", 2]]), {}, { hasCase: new Set(["old/case"]) });
+  assert.equal(r.records[0]!.why, "skipped: its repository has a case");
+  assert.equal(r.records[1]!.outcome, "case");
+  assert.equal(countsOf(r, 10, 2).reposRead, 2, "the skipped repository was read");
+});
+
+test("a batch line out of order, or past the cap, stops the next batch", () => {
+  const line = (id: string, from: number, to: number) => ({ measurement: "#89" as const, id, from, to, rows: to - from + 1, kept: 0, sha256: "a".repeat(64) });
+  assert.throws(() => nextBatch([line("b1", 1, 100), line("b3", 101, 200)]), /is b3 101-200, not b2 101-200/);
+  assert.throws(() => nextBatch([line("b1", 1, 100), line("b2", 150, 249)]), /not b2 101-200/);
+  const eight = Array.from({ length: 8 }, (_, i) => line(`b${i + 1}`, i * 100 + 1, (i + 1) * 100));
+  assert.throws(() => nextBatch(eight), /800 rows have been examined/);
+  assert.deepEqual(nextBatch(eight.slice(0, 7)), { id: "b8", from: 701, to: 800 });
+});
+
+test("the next batch waits until every earlier batch's repositories are placed", () => {
+  const b1 = { measurement: "#89" as const, id: "b1", from: 1, to: 100, rows: 100, kept: 2, sha256: "a".repeat(64) };
+  const entry = (repo: string) => ({ repo, side: "sealed" as const, fixed: false, why: ["t"], salt: "s", batch: { measurement: "#89" as const, id: "b1" } });
+  assert.match(unplacedBatch([b1], { repos: [entry("x/one")] })!, /kept 2 and 1 are on the split/);
+  assert.equal(unplacedBatch([b1], { repos: [entry("x/one"), entry("x/two")] }), null);
+  assert.equal(unplacedBatch([], { repos: [] }), null);
+});
+
+test("the yield check is given on b1 only", () => {
+  const rows = rowsOf([["a/1", 1]]);
+  const r = run(rows, {});
+  assert.notEqual(countsOf(r, 100, 1).go, null);
+  const later = countsOf(r, 100, 1, false);
+  assert.deepEqual([later.go, later.projection, later.projectionLower], [null, null, null]);
 });
