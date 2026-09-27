@@ -1,4 +1,4 @@
-# The retrospective measurement, version 4 (issue #89)
+# The retrospective measurement, version 5 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -40,6 +40,18 @@ the row is left out (owner, 2026-09-27). It is found when F is fetched, before s
 is counted under that reason even when it has no O. The clones are full clones, and a clones directory
 holding a partial one is refused: `blame -C` fetched a file at a time from a `blob:none` clone, and one
 line's blame took 22 s against 0 s in a full clone.
+
+**Version 5** (rows 1 to 18 of `b1` decided, row 19 not) caps what one request may send at
+600,000 bytes: `claude -p` takes the request as an argument, the system's limit on one is 1 MB, and
+row 19's check came to 1.4 MB, so the run stopped on it. A request over the cap is not sent, spends no
+run, and counts against the tool (owner, 2026-09-27): the screen's leaves the row out, as a fix whose
+material cannot be read; "caught before the merge" counts as not caught, so the case stays in the
+primary denominator; the writer's or the checker's makes the case one whose requirement could not be
+written. The largest request of rows 1 to 18 was 445,233 bytes, so none of them is decided differently.
+A case counted as not caught this way counts as not caught in the yield check as well, where it leans
+toward going on. The steps and bytes of a request not sent are kept in the row's record (`notSent`).
+The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
+Linux limits one argument to 128 KB, and a run there needs its own cap).
 
 ## The question
 
@@ -241,7 +253,7 @@ the ones of `BASELINE.md`, and are not these.)
 - **A detection**: the defect's call in O is listed in 3 runs of 3, as `PROTOCOL.md` counts.
 - **The primary metric**: detections over **every case that was not caught before the merge —
   including those whose requirement could not be written or was left out by the check, counted as
-  not detected** (owner, 2026-09-25). The tool does nothing without a requirement, so a case where one
+  not detected** (owner, 2026-09-25) — a requirement not sent for its size (version 5) among them. The tool does nothing without a requirement, so a case where one
   could not be written is a defect it would not have listed. The rate over only the cases with a
   requirement is reported beside it.
 - **Stages**, with the same interval: the share of cases with a requirement, the share of those whose
