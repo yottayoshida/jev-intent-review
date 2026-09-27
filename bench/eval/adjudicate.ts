@@ -16,7 +16,14 @@ import { names } from "./compare.ts";
 import { jsonIn } from "./json-in.ts";
 
 export { jsonIn };
-import type { Answer } from "./retro/prompts.ts";
+/** One `claude -p` answer: counted or why not, the JSON it gave, what was sent, the models that answered. */
+export interface Answer {
+  counted: boolean;
+  why?: string;
+  json?: unknown;
+  sent: { system: string; request: string; bytes: number };
+  model: string[];
+}
 
 export const ADJUDICATION_VERSION = 1;
 export const LABELS = ["real_defect", "false", "duplicate", "cannot_decide"] as const;
