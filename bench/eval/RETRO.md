@@ -73,6 +73,10 @@ complete, and 12 later rows of a repository that had its case. 308 annotator run
 (owner), the N=1 runs and the diagnosis of rows 19 and 63 included. The run stopped four times — row
 19's request over the argument limit (version 5), row 63's screen answering what was not JSON four
 times, and two failures of GitHub or the network — and was resumed each time at the row it stopped on.
+Its 19 case repositories are placed by the salt `52d60c0` (the merge of #127, the first main merge
+commit holding the batch's sha256): **13 sealed, 6 dev**. The case caught before the merge is on the
+sealed side, so 12 of the 13 count toward the 17. Sealed is short of 17, so the next batch reads on from
+row 101.
 
 ## The question
 
