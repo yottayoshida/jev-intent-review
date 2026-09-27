@@ -186,7 +186,7 @@ export function leftParts(report: ReviewReport): string[] {
 /**
  * One line of what a requirement's section rests on (#38): of the calls that could be asked — the
  * changed functions', their callers' and the siblings' together — how many were read and answered,
- * read without an answer, held before their question, or over the budgets; and how many could not be
+ * read without an answer, set aside before their question, or over the budgets; and how many could not be
  * asked at all. "All … were read and answered" only when that is every call and none could not be
  * asked, so a requirement that left calls never reads as checked in full.
  */
@@ -199,9 +199,9 @@ export function coverageLine(r: LocalCheckResult, context: { nothingSent?: boole
   const cannot = c.notApplicable + (s?.notApplicable ?? 0);
   const none = unansweredIn(r);
   // `wouldAsk` holds every call a budget took, siblings' too, and a run asks every one of them or
-  // holds it before its question with a reason; a record without it reads as none held.
+  // sets it aside before its question with a reason; a record without it reads as none set aside.
   const budgeted = r.wouldAsk?.length ?? 0;
-  const held = Math.max(0, budgeted - asked);
+  const setAside = Math.max(0, budgeted - asked);
   const cannotPart = cannot > 0 ? ` ${plural(cannot, "more call")} could not be asked.` : "";
   const unread = r.unreached?.length ?? 0;
   const notes = unread > 0 ? ` ${notesSay(unread)}.` : "";
@@ -213,7 +213,7 @@ export function coverageLine(r: LocalCheckResult, context: { nothingSent?: boole
   if (asked - none === couldAsk && cannot === 0 && unread === 0) return `All ${plural(couldAsk, "call")} that could be asked were read and answered.${notes}`;
   const parts = [`${asked - none} read and answered`];
   if (none > 0) parts.push(`${none} without an answer`);
-  if (held > 0) parts.push(`${held} held before their question`);
+  if (setAside > 0) parts.push(`${setAside} set aside before their question`);
   if (over > 0) parts.push(`${over} over the budgets`);
   return `Of the ${plural(couldAsk, "call")} that could be asked: ${parts.join(", ")}.${cannotPart}${notes}`;
 }
@@ -304,7 +304,7 @@ export function requirementSection(r: LocalCheckResult, context: { nothingSent?:
   if (r.observed.length === 0) {
     lines.push("_Nothing was read._", "");
     // Only the ones that are not already below with a reason of their own. A budgeted call every
-    // one of which was held reads, otherwise, as a list of calls nothing was asked about for no
+    // one of which was set aside reads, otherwise, as a list of calls nothing was asked about for no
     // stated reason — while the real reasons sit in the next section.
     const withReason = new Set(r.unchecked.map((u) => `${u.function}\u0000${u.call}`));
     const silent = r.wouldAsk.filter((w) => !withReason.has(`${w.function}\u0000${w.call}`));
@@ -386,7 +386,7 @@ export function counts(report: ReviewReport): { read: number; worthChecking: num
 
 /**
  * A run that built the set and stopped (`--candidates-only`): what it has to say is which calls fit.
- * Told apart from a finished run that sent nothing because every budgeted call was held before its
+ * Told apart from a finished run that sent nothing because every budgeted call was set aside before its
  * question — a body that did not fit, a call it could not locate — by what such a run leaves: those
  * calls are under *Not checked* with a reason, and a run that stopped puts none of them there.
  */

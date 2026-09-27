@@ -179,7 +179,7 @@ that file taken out the same way, had the same 158,708 calls in scope.
 Every silent miss and every false positive of the record before is gone: the turbofish, the names
 refused as a macro's, the strings continuing at column 0, the comments, strings, patterns, keywords,
 definition lines, nested functions' second listings and test code. The parser could not read 5 of the
-1,815 files in places; none of those places held an in-scope call (`omitted_unread` 0, bar 0.5%).
+1,815 files in places; none of those places contained an in-scope call (`omitted_unread` 0, bar 0.5%).
 
 As estimates (`bench/eval/PROTOCOL.md`: the mean over repositories, Clopper–Pearson at 95 %, 8
 repositories): calls dropped silently 0.0% (0.0% – 36.9%), candidates that are not calls 0.0% (0.0% –

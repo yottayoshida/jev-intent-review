@@ -51,7 +51,7 @@ itself. For `check_before_action` the words of the sentence and of `searchHints`
 calls are asked about (below), so a requirement that names no action — "every session-creation
 path must enforce the same guard" — reaches no call, and one whose action is not a call
 (`return Ok(Session { .. })`) or is `write`/`writeln` (never listed as a call) reaches nothing
-either. The report says why for each call it holds.
+either. The report says why for each call it sets aside.
 
 The issue and the pull request work too, in two ways of writing read as written (ADR 0004,
 [writing-requirements.md](writing-requirements.md)): the items of a requirements section
@@ -156,7 +156,7 @@ exists, and are counted in `counts` as they are with no sibling; the siblings ar
 Their calls carry `origin: shares_call` and `via`, the seed that tied them, and so does a finding in
 a sibling — a finding of the other two budgets carries neither, as before. The report's first line and
 the Action's check run count the siblings with everything else: a sibling's call read is a call
-read. A sibling's held and left-over calls are under *Not checked*, so the check run can be neutral
+read. A sibling's set-aside and left-over calls are under *Not checked*, so the check run can be neutral
 where it was green, and a finding in a sibling is a finding for `policy.fail_on`.
 
 ### The budget
@@ -188,11 +188,11 @@ measured*).
   the words as well as a verb; and the rest follow in the order they appear. The failure form marks no
   call named, so its order is the one before. When a
   function gets fewer questions than it has askable calls, that decides which calls they go to; when
-  more functions hold an askable call than the budget, the functions late in the order get none, and
+  more functions contain an askable call than the budget, the functions late in the order get none, and
   each of the others gets one, for its first call. This is the order they had when they shared the
   budget with their callers, with the callers taken out: every call it reached then it reaches now.
 - **Their callers** take 10 and whatever the changed functions left of their 20 — places in the
-  budget, so a changed function's call that takes a place and is then held (a body too long, a call
+  budget, so a changed function's call that takes a place and is then set aside (a body too long, a call
   it cannot point at) keeps it: first the calls
   into a changed function, one per caller at a time, then the rest, one per caller at a time. A
   caller is in the set because it calls a changed function, so with more callers than their budget
@@ -254,9 +254,9 @@ read from each one's signature — never from how the call's line looks:
 
 A reason that says a function "does not return a Result" names the definition it read and quotes
 its return type. The callee is still found by its name: `File::open(p)?` in a repository that
-defines one `fn open(&self) -> bool` is held with "the one function named open in this repository
+defines one `fn open(&self) -> bool` is set aside with "the one function named open in this repository
 (…) returns `bool`" — true of that function, and the call is not asked about. A call that cannot
-reach that one definition is held as having no definition here: a method call (`x.name(…)`) to a
+reach that one definition is set aside as having no definition here: a method call (`x.name(…)`) to a
 function that takes no `self`, or a number of arguments the function does not take — counted only
 where no closure, comparison, turbofish or character literal is among the arguments. So `"".to_string()` does not
 meet a repository's `fn to_string(accessor, value)`. These checks can only rule a definition out,
@@ -296,7 +296,7 @@ How it is read:
 - **A method call is not matched, whatever the table holds.** Rust resolves a method by the type of
   its receiver, which this does not read; `Metadata::file_type` returns a `FileType` and
   `DirEntry::file_type` an `io::Result<FileType>`, and both are written `entry.file_type()`. This
-  is why pybun#428's fixed call is still held.
+  is why pybun#428's fixed call is still set aside.
 - **`crate::`, `self::` and `super::` say the callee is in this repository**, so the table does not
   answer for them.
 - **A path written `std::` is answered by the table before this repository's definitions are read**
@@ -317,7 +317,7 @@ How it is read:
   wrong number is not caught here.
 - A repository that declares `mod std;` of its own would make `std::` mean something else; nothing
   here checks for that. A rename (`use std::fs as stdfs;`) is not followed, so `stdfs::read(p)`
-  stays held.
+  stays set aside.
 
 Every row is there because `bench/outside-results-check.ts` read the standard library's own source
 and a machine's cargo registry and found no definition a call could reach that way returning
@@ -328,7 +328,7 @@ measured on.
 #### Which definition a call reaches
 
 A name this repository defines more than once used to end the reading there. Three things narrow
-it, in this order, and what none of them settles is held as before. A name defined **once** is
+it, in this order, and what none of them settles is set aside as before. A name defined **once** is
 unchanged: the path is not read at all, and that one definition is the callee as it always was.
 
 - **The path the call writes.** `SyncState::load_strict(root)` keeps the definitions inside an
@@ -339,23 +339,23 @@ unchanged: the path is not read at all, and that one definition is the callee as
   definition sits in is read from indentation — the first line above it that is less indented and
   begins an item — so a `fn` written above it inside the same `impl` is not its header. A header
   spread over several lines (`impl<T>` / `Trait for` / `Q` / `{`) cannot be read, and then the call
-  is held: nothing further may settle it, or the form below would pick the very definition the path
+  is set aside: nothing further may settle it, or the form below would pick the very definition the path
   was about to rule out.
 - **The form of the call.** A method call reaches no definition that takes no `self`, and none that
   takes a different number of arguments (counted as above). When that leaves one, it is the one.
-  Past 20 definitions after the path, their signatures are not read and the call is held.
+  Past 20 definitions after the path, their signatures are not read and the call is set aside.
 - **Definitions that are versions of one thing.** A trait's method — the declaration
   `trait X { fn name(…); }` in *this* repository and the implementations of that same trait — or a
   function written once per platform (`#[cfg(unix)]` and `#[cfg(not(unix))]`, at the top of one
   file). Which version runs is not settled, so all of them must return a `Result`; one that does
-  not holds the call, and the reason names it. The declaration must be here: two
+  not sets the call aside, and the reason names it. The declaration must be here: two
   `impl TryFrom<A> for B` blocks do not make `try_from` this repository's method.
 
-**A path that matches none of the definitions is held, never reported as "no definition here".** A
+**A path that matches none of the definitions is set aside, never reported as "no definition here".** A
 type brought in under another name (`use moltis_channels::Error as ChannelError`) and a function
 re-exported from another file (`model::values_to_chat_messages`, written in `model/convert.rs`) are
 both real definitions this does not follow; saying they are not defined would be false. For the
-same reason, a name whose only definitions are in files declared `#[cfg(test)] mod x;` is held with
+same reason, a name whose only definitions are in files declared `#[cfg(test)] mod x;` is set aside with
 that as its reason. A module declared `#[cfg(test)]` in one file and plainly in another — a crate
 whose `main.rs` declares it for tests and whose `lib.rs` declares it outright — is code.
 
@@ -385,7 +385,7 @@ were left, and a run that left calls never reads as having checked everything** 
 in the Action's check run (#38). Right below the functions reached, one line:
 
 ```
-Of the 22 calls that could be asked: 15 read and answered, 7 held before their question. 266 more calls could not be asked. 4 notes under *Notes* say what was not read.
+Of the 22 calls that could be asked: 15 read and answered, 7 set aside before their question. 266 more calls could not be asked. 4 notes under *Notes* say what was not read.
 ```
 
 (grovedb#500 as shipped, against Jev: seven budgeted calls appear twice in their function or do not
@@ -421,7 +421,7 @@ form's.
 | **Read as holding** | the requirement read as applying, and the function's answer keeping it, both over the bar. **Two readings that agree, and nothing more**: where what decides it is in a body that was not sent, they can agree and be wrong — measured below, a decision moved into a helper read as holding with 0.92–0.96 six times of six, and a check moved into a helper the same |
 | **Read, but not required of by the requirement** | `does_not_apply` over the bar |
 | **Every call read** | each call read, with the function's answer and the bodies sent with it |
-| **Not checked** | the form's condition held the call (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
+| **Not checked** | the form's condition set the call aside (no definition here, no `Result`, not settled whether there is one — the reason says what could not be read —, no word of the requirement, a callee read on its own), the body did not fit, the call could not be located, the code the reading turns on could not be sent (below), or the budget was spent |
 
 The command prints all of it. The GitHub Action's check run and job summary print everything up to
 the audit, and in its place one line of counts — so many read as holding, so many not required of,
@@ -452,7 +452,7 @@ is in; each form names, from that body's text and without asking Jev, what else 
   `check(x).map_err(E::from)?;`, `let _ = check(x)?;`), whose own name meets the requirement's words
   and does not start with a capital — are sent with the packet: each body when its name has exactly
   one definition outside the tests and it fits 4,000 characters (8,000 for all of them). A check with
-  more than one definition, or too long, holds the call; one defined inside the function asked about
+  more than one definition, or too long, sets the call aside; one defined inside the function asked about
   is already in the packet. A report lists under each call the bodies that went with it.
 
 Beyond the checks, the functions a sent check calls, one level down, go with it while there is room
@@ -471,10 +471,10 @@ define (a dependency's, the standard library's), and whatever decides from the s
 Those readings rest on what was sent, as before, and *Read as holding*'s warning holds for them.
 Which definition a name reaches is found by the name alone, among the files the run reads
 (`repository.include`): #83 is where that is resolved. A name the repository shares with a library
-(`join`, `retry`) is taken for the repository's, which holds a call that could have been asked — the
+(`join`, `retry`) is taken for the repository's, which sets aside a call that could have been asked — the
 cautious side. `--json` carries, on an observed call and on a finding, `sent` (each body's `name`,
 `path`, `lines` and `depth`) and `notSent` (the names of the second level that did not go), each
-absent when empty; a held call is in `unchecked` with its `why`.
+absent when empty; a call set aside is in `unchecked` with its `why`.
 
 ## Exit codes
 
@@ -583,7 +583,7 @@ the count carried in its cache goes; a run the limit leaves short says so**
   how many were not sent for that reason. The unit is the
   directory: the Action keeps one per pull request; from the command line, whatever shares a
   directory shares the count.
-- **How it holds a run.** At the start, what is left of the limit narrows the run's own
+- **How it bounds a run.** At the start, what is left of the limit narrows the run's own
   `limits.max_requests`; a run with nothing left sends nothing. A question it could not send is
   left without an answer, with the budget as the reason — as under the run's own limit — and the
   notes say "This pull request had sent N requests of its M before this run, so this run could send
@@ -593,13 +593,13 @@ the count carried in its cache goes; a run the limit leaves short says so**
   short — or that sent nothing because its count could not be written — exits 2, it did not
   finish, unless it listed a finding, which exits 1 as before. Either way the check is red: pushing
   until the limit is spent cannot make a change pass unasked. Without that setting it exits 0, as a
-  run held by its own limit does. A run stopped by its own time or bytes is not said to have reached
+  run bounded by its own limit does. A run stopped by its own time or bytes is not said to have reached
   the pull request's limit.
 - **Who sets it.** `.jev-intent-review.yml` at the commit before the change, like every other
-  setting: a pull request that raises it in its own change is still held by the old value.
+  setting: a pull request that raises it in its own change is still bounded by the old value.
 - **When it does not apply.** Without `--answers` there is nowhere to count, and a directory or file
   others can read is not used (the Action makes the restored ones private first); the notes say the
-  limit was not applied, and `limits.max_requests` alone held the run.
+  limit was not applied, and `limits.max_requests` alone bounded the run.
 
 Not guaranteed:
 
@@ -676,18 +676,18 @@ What it shows, and no more than that:
 - **Inside the diff, v0.1 read both unseen cases right.** Each defect was listed at its own call in
   three runs of three, and neither the shipped code nor the rewrite listed it, or anything else.
   That is two requirements from two repositories.
-- **No question reached a defect placed outside the diff.** The unchanged caller in moltis was held
+- **No question reached a defect placed outside the diff.** The unchanged caller in moltis was set aside
   before any question: its return type is `ChannelResult<String>`, a `Result` alias the check did
   not recognise then, and the report said it did not return a `Result` (aliases are read since
   `#45`'s first part — *Reading whole signatures*). The other function is outside
   what v0.1 enumerates by construction; the table says "cap or structure" because the rule fixed
   beforehand gives that label whenever a cap fired in the run. Among the three candidates whose
   fixed call could be asked, the call from the unchanged caller to the changed function reached no
-  question in any: held for the alias here, held for a callee signature wrapped past four lines in
+  question in any: set aside for the alias here, set aside for a callee signature wrapped past four lines in
   Kontor#385, and dropped by the forty-call cap of its function in grovedb#500
   (`bench/acceptance/precheck-shipped.json`). In grovedb#500 the unchanged caller itself was
   reached: three other calls in it were asked about in every run, and read as not governed by the
-  requirement. In moltis#1064 and Kontor#385 every call in it was held before a question.
+  requirement. In moltis#1064 and Kontor#385 every call in it was set aside before a question.
 - **Jev reads through a helper it was not shown.** With the decision moved into a helper whose body
   was not sent, Jev answered `returns_error` at 0.92–0.96 in every run of both cases. The helpers do
   pass the failure through, so the reading happens to be right, but nothing Jev was sent
@@ -747,7 +747,7 @@ What it shows, and no more than that:
 - **A defect outside the diff was asked about, and listed.** moltis-1064's defect-B — an unchanged
   caller that turns the changed function's failure into a success — was listed at its own call in
   three runs of three, and the same call on the shipped code was not listed in any. Before `#45`
-  that call was held before any question: its caller returns `ChannelResult<String>`, an alias.
+  that call was set aside before any question: its caller returns `ChannelResult<String>`, an alias.
   The defect in a function that neither changed nor calls one that did (defect-C) is still outside
   what the tool enumerates.
 - **Jev still reads through a helper it was not shown** (hidden-A, `returns_error` at 0.91–0.95 in
@@ -774,7 +774,7 @@ iota#10136 (not run through the tool in `#36` either: a 470 MB monorepo), and wi
   the tool does not resolve outside the repository (*Functions this repository does not define*).
   Two more fixed calls are not asked: cce-rust#168's `KnowledgeSyncState::load_strict(root)` can be
   asked about and is outside the budget, and agentflare#229's `std::fs::read_to_string(&profile)` is
-  held because the function it is in, `run`, returns `()` — true of that function.
+  set aside because the function it is in, `run`, returns `()` — true of that function.
 - **The unchanged callers' calls**: moltis#1064's and grovedb#501's can be asked about and are
   inside the budget. **Kontor#385's can be asked about and was outside the budget of 20**, so it
   was not asked; since the callers have a budget of their own (`#38`, *The callers' budget,
@@ -815,7 +815,7 @@ the change touched (A) or in an unchanged caller of one (B) — was asked about 
 budget, and both of its questions came back answered, in three runs of three**: moltis-1064's
 defect-A and defect-B and grovedb-500's defect-A (`node bench/acceptance/answered.ts
 bench/logs/acceptance-v4.json`). Whether a call is inside the budget is settled by the commit
-before any request is sent, and so is whether a budgeted call is held before its question (a body
+before any request is sent, and so is whether a budgeted call is set aside before its question (a body
 that does not fit, a call that cannot be pointed at); what three runs add is that each target was
 in fact asked, both questions came back each time, and what Jev read.
 
@@ -849,7 +849,7 @@ Calls other than the targets that were listed in these runs, not scored: 0. Requ
 - **moltis-1064's defect-C is still not reached**: it sits in a function that neither changed nor
   calls one that did, which the run does not read (`#37`). The acceptance set's claim is about A and
   B; C is `#37`'s — and reaching it is not all it takes: its call's callee is not settled at one
-  definition here (`callee_ambiguous` in its `case.json`), so read, it would be held before its
+  definition here (`callee_ambiguous` in its `case.json`), so read, it would be set aside before its
   question. The table's "a cap fired" for it is a note that the callers of another function were
   not followed, not a cap on C's own file.
 - 786 requests over 27 runs, where the measurement after `#45` sent 708: a run of moltis sent 28, one
@@ -896,14 +896,14 @@ Cloudflare, 90 requests.
 | shipped — refuses before creating | refused | holding 3/3 (applies 0.98, does_not_reach 0.99–1.00) | not required of, 3/3 each |
 | defect — audits, then creates anyway | session | **worth checking 3/3** (applies 0.98–0.99, reaches_it 0.99–1.00) | not required of, 3/3 each |
 | rewrite — the same refusal, other branch | refused | holding 3/3 (applies 1.00, does_not_reach 0.82–0.89) | not required of, 3/3 each |
-| hidden — the check in a helper whose body does nothing | session | holding 3/3 (applies 0.98, does_not_reach 0.96–0.97) — **wrong**, as the table said no confident reading would be right | the lookup not required of 3/3; the helper's call held, a callee the run reads on its own |
-| caller — the check in `login`, which calls it | refused through `login`, session called directly | worth checking 3/3 — `open_session` read alone does make the call | in `login`, not required of 3/3; in `open_session`, the lookup not settled 3/3 (the mapping under the bar: `does_not_apply` 0.53 and 0.56, `unknown` 0.50); `login`'s call into `open_session` held |
+| hidden — the check in a helper whose body does nothing | session | holding 3/3 (applies 0.98, does_not_reach 0.96–0.97) — **wrong**, as the table said no confident reading would be right | the lookup not required of 3/3; the helper's call set aside, a callee the run reads on its own |
+| caller — the check in `login`, which calls it | refused through `login`, session called directly | worth checking 3/3 — `open_session` read alone does make the call | in `login`, not required of 3/3; in `open_session`, the lookup not settled 3/3 (the mapping under the bar: `does_not_apply` 0.53 and 0.56, `unknown` 0.50); `login`'s call into `open_session` set aside |
 
 So on code written for it the form separates the defect from the shipped code and a rewrite, and
 misses a check whose body it is not shown, exactly as the failure form does. The first run of this
 case (`-v0.json`) also listed, in every version, `login`'s call into `open_session` — from `login`,
 the call is made whatever `open_session` checks inside — which is why a call into a function the
-run reads on its own is now held and left to be asked about there.
+run reads on its own is now set aside and left to be asked about there.
 
 How far the words reach on real code, with no request (`bench/forms/reach/`): a
 check-before-action sentence written for the changed function of each acceptance case put the
@@ -1030,10 +1030,10 @@ A two-step that reads each check's value from its own body first (the ADR's draf
 grovedb#500's `heights_need_rewrite`, whose body is `true`, as `false` three times of three under
 its doc comment and the sentence's double negative, and is not adopted. On twelve
 check-before-action sentences written from real guards in four pull requests the rules were not
-written on (`bench/decisive/outside/`), of 25 runs the old words read as holding the new words held
+written on (`bench/decisive/outside/`), of 25 runs the old words read as holding, the new words read as holding
 21, read 3 under the bar, and read one as reaching at exactly 0.60 — the snapshot's `decode` under
 the sentence about mutations, a call the sentence does not govern and the old words themselves
-held in two runs of three. The line said none; the owner ruled it the line's coarseness (it counted
+read as holding in two runs of three. The line said none; the owner ruled it the line's coarseness (it counted
 observations without the mapping, which sets that call aside) and adopted the words with this
 written down. What the probe does not show is that Jev evaluates rather than skims in general.
 
@@ -1102,7 +1102,7 @@ version of moltis#1064 and grovedb#500) and the five branches of omamori `#468`,
   and outside it without. When the order was chosen this held only under the wider check below; the
   calls `#45`'s second and third parts made askable made it true of today's check;
 - with a wider check standing in for `#45` (any type whose name ends in `Result` taken as one, and a
-  callee's definition found by `fn <name>` and held when that search is cut — which holds one call
+  callee's definition found by `fn <name>` and set aside when that search is cut — which sets aside one call
   today's check asks about, `verify(...)` in grovedb#500's `finalize`), every
   defect inside the diff stays inside the budget — omamori's two targets, moltis#1064's and
   grovedb#500's in every version, Kontor#385's — and without the order Kontor#385's falls out.
@@ -1316,7 +1316,7 @@ branches, 13 runs (`bench/logs/result-type-v1.json`, `node bench/result-type.ts`
 ### Names defined more than once
 
 Which definition a call reaches, when its name has several (see *Which definition a call reaches*).
-It was built on two pull requests whose fix was held by this — cce-rust#168, where
+It was built on two pull requests whose fixed call was set aside for this reason before — cce-rust#168, where
 `SyncState::load_strict(root)` is one of two `load_strict`, and dataprof#370, where
 `count_table_rows(query)` is a trait's method with three implementations — so those two are
 regression cases from here on, and they are in the acceptance set's record as cases used to tune.
@@ -1337,7 +1337,7 @@ Measured without a request, before and after, on the acceptance pre-check's eigh
   fell out are in a function where another call entered; the other two — cce-rust#168's `cmd_sync`
   and `ensure_index` — lost their function's turn to a function that became askable, so a function
   can lose its question to another function, not only to a call beside it.
-- 349 calls that are held before and after are held for a different reason. 133 of them are held
+- 349 calls that are set aside before and after are set aside for a different reason. 133 of them are set aside
   under a different kind: 63 are now "every definition here is in a file declared
   `#[cfg(test)] mod x;`" (55 of those used to be "does not return a Result" about a definition in
   such a file, 8 "not settled"), 42 moved from "defined N times" to what could not be read, 21 to
@@ -1359,9 +1359,9 @@ Measured without a request, before and after, on the acceptance pre-check's eigh
   the probe condition as a 470 MB monorepo, and every call the second fixes goes to the standard
   library, which this change does not touch. The labels are what stands in for a held-out set —
   they were written without the rules.
-- Of 20 calls still held, sampled five per reason and labelled the same way: 9 reach something
-  outside the repository and 6 reach a definition here that returns no `Result` — held rightly; 4
-  are held as "not settled" where the labels say "not a `Result`", which holds them either way; and
+- Of 20 calls still set aside, sampled five per reason and labelled the same way: 9 reach something
+  outside the repository and 6 reach a definition here that returns no `Result` — set aside rightly; 4
+  are set aside as "not settled" where the labels say "not a `Result`", which sets them aside either way; and
   one — Kontor#385's `simulate(0, tx)` — reaches a definition that does return one, in a file
   declared `#[cfg(test)] mod x;`. That last one is what this deliberately stops asking about.
 
@@ -1376,7 +1376,7 @@ Measured without a request, before and after, on the same 15 runs as the two par
 `bench/logs/outside-results-check-v1.json`, `node bench/outside-results-check.ts`):
 
 - **The wall, counted once per call** rather than once per branch of the same repository: 973 calls
-  were held with "no definition in this repository". 178 of them write a path; 733 are method
+  were set aside with "no definition in this repository". 178 of them write a path; 733 are method
   calls, which this does not open; the other 62 are bare names, and at least 54 of those are not
   calls at all — `let (a, b)` patterns, attributes such as `cfg(unix)`, words in strings such as
   `file(s)` — which the call reader takes for calls and which were never asked about
@@ -1388,7 +1388,7 @@ Measured without a request, before and after, on the same 15 runs as the two par
   `std::env::var` (3), and 12 more with one or two each (`summary.askableCalls`). The other 43
   rows fired on nothing here.
 - **instruckt-tauri#9's fixed call is askable and inside the budget.** pybun#428's
-  `entry.file_type()` is still held, as a method call the table does not answer for.
+  `entry.file_type()` is still set aside, as a method call the table does not answer for.
 - 14 calls fell out of the budget of 20 and 20 entered it. Every defect the acceptance set names
   stays where it was.
 - Scored against what three fresh subagents said each of the 40 calls reaches, reading the calling
