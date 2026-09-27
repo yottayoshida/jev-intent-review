@@ -87,12 +87,38 @@
       ]
     },
     {
+      "repo": "arcinstitute/scx",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "armaxri/termihub",
       "side": "dev",
       "fixed": true,
       "why": [
         "acceptance-v1: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "artemidamoon2223-collab/arcium-messenger-",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "aydiler/md-viewer",
@@ -105,6 +131,19 @@
       "batch": {
         "measurement": "#80",
         "id": "b2"
+      }
+    },
+    {
+      "repo": "bahia-software/polypus",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
       }
     },
     {
@@ -140,12 +179,51 @@
       ]
     },
     {
+      "repo": "biomejs/biome",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
+      "repo": "blackcat-informatics/purrdf",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "boundaryml/baml",
       "side": "dev",
       "fixed": true,
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "brig-sh/hvi-vmm",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "burntsushi/ripgrep",
@@ -166,6 +244,19 @@
       "batch": {
         "measurement": "#80",
         "id": "b2"
+      }
+    },
+    {
+      "repo": "cambriantech/continuum",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
       }
     },
     {
@@ -358,6 +449,19 @@
       }
     },
     {
+      "repo": "fsm1/cipher-box",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "getappz/agentflare",
       "side": "dev",
       "fixed": true,
@@ -401,6 +505,19 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "ibm-granite-community/granite-cli",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "iii-hq/workers",
@@ -451,6 +568,19 @@
       ]
     },
     {
+      "repo": "jsuppers/impresspress",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "keinsleif/sbsp",
       "side": "sealed",
       "fixed": false,
@@ -481,6 +611,19 @@
       "salt": "6d940de64ee2888c769f0b8b0bd232c790609b7d",
       "batch": {
         "measurement": "#80",
+        "id": "b1"
+      }
+    },
+    {
+      "repo": "kkrzysztofik/anyka_ak3918_hacking_journey",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
         "id": "b1"
       }
     },
@@ -586,6 +729,19 @@
       }
     },
     {
+      "repo": "maxi-tools/coreml-rs",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "mnzsss/ivar",
       "side": "sealed",
       "fixed": false,
@@ -608,6 +764,19 @@
       ]
     },
     {
+      "repo": "mostrop2p/mostrix",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "naoray/instruckt-tauri",
       "side": "dev",
       "fixed": true,
@@ -615,6 +784,19 @@
         "acceptance-v1: the tool was run on it for (b)",
         "bench/acceptance/cases/instruckt-tauri-9: built or pre-checked"
       ]
+    },
+    {
+      "repo": "narnaud/git-loom",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "navicore/anz",
@@ -742,6 +924,19 @@
       ]
     },
     {
+      "repo": "praveenvnktsh/minutes",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "qdrant/qdrant",
       "side": "dev",
       "fixed": true,
@@ -757,6 +952,19 @@
         "acceptance-v1: the tool was run on it for (b)",
         "bench/acceptance/cases/quebec-136: built or pre-checked"
       ]
+    },
+    {
+      "repo": "risingtides-dev/ocean-os",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "risingwavelabs/risingwave",
@@ -814,6 +1022,32 @@
       }
     },
     {
+      "repo": "sashiko-dev/sashiko",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
+      "repo": "sauersml/gam",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
+    },
+    {
       "repo": "sendra-lab/sendra",
       "side": "dev",
       "fixed": false,
@@ -849,6 +1083,19 @@
       "why": [
         "acceptance-v2: read for (s)/(d), the wall of #37"
       ]
+    },
+    {
+      "repo": "simohypers/limusic",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b1: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "52d60c07c0ae290caf27698d456c062f430835a3",
+      "batch": {
+        "measurement": "#89",
+        "id": "b1"
+      }
     },
     {
       "repo": "smicry/rosregview",
