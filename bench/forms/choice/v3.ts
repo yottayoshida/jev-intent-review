@@ -30,6 +30,14 @@ export const LABELS_NOW: readonly Label3[] = ["failure_propagation", "check_befo
 export type Truth = "returns_to_caller" | "handles_locally" | "other" | "unclear";
 export const TRUTHS: readonly Truth[] = ["returns_to_caller", "handles_locally", "other", "unclear"];
 
+/** The answer at least two of three give (`written-85/README.md`), or why there is none. */
+export function majorityTruth(votes: readonly (string | undefined)[]): { decided: Truth } | { why: string } {
+  if (votes.some((v) => v === undefined)) return { why: `an annotator gave no answer (${votes.map((v) => v ?? "none").join(", ")})` };
+  if (votes.some((v) => !TRUTHS.includes(v as Truth))) return { why: `an answer is not one of the four (${votes.join(", ")})` };
+  for (const t of TRUTHS) if (votes.filter((v) => v === t).length >= 2) return { decided: t };
+  return { why: `split (${votes.join(", ")})` };
+}
+
 export type Kind3 = Kind | "written-85";
 export const KINDS3: readonly Kind3[] = ["tool", "model", "text", "written", "written-85"];
 

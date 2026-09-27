@@ -3,11 +3,12 @@
 // the first request are computed as written — checked on logs written by hand.
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { keywordForm } from "../bench/forms/choice/question.ts";
 import type { SentenceSet } from "../bench/forms/choice/score.ts";
-import { barLines3, FORM_QUESTION_V3, isStrictFailure, keywordForm3, LABELS_NOW, recordLines3, renderTables3, rows3, stopLine, wilson, type Log3, type Sentence3 } from "../bench/forms/choice/v3.ts";
+import { barLines3, FORM_QUESTION_V3, isStrictFailure, keywordForm3, LABELS_NOW, majorityTruth, recordLines3, renderTables3, rows3, stopLine, wilson, type Log3, type Sentence3 } from "../bench/forms/choice/v3.ts";
 import { buildFormQuestion, CHOSEN_FORMS, FORM_QUESTION, FORMS } from "../src/plan/forms.ts";
 import { REQUIREMENT_FORMS } from "../src/types.ts";
 import { answer } from "./helpers/fakes.ts";
@@ -141,4 +142,19 @@ test("set 3's table has a row per class and author, the lines, the main line by 
   assert.match(md, /\| yottayoshida\/omamori \| 5 \| 5 \|/);
   assert.match(md, /\| f1 \| failure_propagation \(goes back\) \| tool \| {2}\| failure_propagation 0\.90 \| failure_handling 0\.61 \| failure_propagation 0\.90 \| failure_propagation \|/);
   assert.doesNotMatch(md, /not fully measured/);
+});
+
+test("a pull request's truth is the answer two of three give; a split, a missing or an unknown answer is none", () => {
+  assert.deepEqual(majorityTruth(["handles_locally", "returns_to_caller", "handles_locally"]), { decided: "handles_locally" });
+  assert.deepEqual(majorityTruth(["other", "other", "unclear"]), { decided: "other" });
+  assert.match((majorityTruth(["handles_locally", "returns_to_caller", "other"]) as { why: string }).why, /^split/);
+  assert.match((majorityTruth(["handles_locally", undefined, "handles_locally"]) as { why: string }).why, /gave no answer/);
+  assert.match((majorityTruth(["handles_locally", "handled", "handles_locally"]) as { why: string }).why, /not one of the four/);
+});
+
+test("sentences-v3.json is what combine.ts builds from the six readers' files, and its main line is enough to read", () => {
+  assert.match(execFileSync(process.execPath, [`${ROOT}bench/forms/choice/written-85/combine.ts`, "--check"], { encoding: "utf8" }), /is what combine\.ts builds/);
+  const v3 = JSON.parse(readFileSync(`${ROOT}bench/forms/choice/sentences-v3.json`, "utf8")) as { sentences: Sentence3[]; dropped: unknown[] };
+  assert.deepEqual([v3.sentences.length, v3.dropped.length], [23, 18]);
+  assert.deepEqual(stopLine(v3.sentences), { prs: 10, repos: 8, enough: true });
 });
