@@ -76,6 +76,13 @@ touched, and 10 and what those left in their callers — gets two questions to J
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
 an assumption.
 
+A caller is found by searching for the changed function's name, and a function is taken as one only
+where that line refers to it: a line where the name is in a comment or a string, is a field, or is a
+parameter or local of the function that shadows it, is not a caller; a call, or the function passed as
+a value (`.map(name)`), is. A line the parser did not read as calls — inside a macro whose arguments
+are not read, or code it could not read, or a function whose calls were cut — is taken as before: not
+read is not "no call" (#83, `docs/resolution.md`). How many lines were passed over is a note.
+
 **A Rust file is read by a parser (tree-sitter-rust, ADR 0022): every call outside a macro is listed
 under the function it is written in, and nothing that is not a call is listed; what the parser cannot
 read is left out and said so.** Inside a macro, the calls are listed when the macro's arguments read as
@@ -276,7 +283,13 @@ about code it cannot read (ADR 0011):
 How it is read:
 
 - **The path a call writes is what is matched**, by its ending: a row `fs::rename` matches
-  `fs::rename(a, b)` and `std::fs::rename(a, b)`. The four rows in the last line are matched only
+  `fs::rename(a, b)` and `std::fs::rename(a, b)` — **and never another crate's function of that name**
+  (#83). A call written from another crate (`tokio::fs::write`), or whose first name a `use` brings in
+  from another crate (`use tokio::fs;`, `use tokio::{fs::File, …};`), matches nothing. A `use` is read
+  in the block the call is in — the file, a function, a `mod { … }`, which a `use` outside reaches only
+  through `use super::*` — and an alias is read as what it names (`use std::fs::File as F;`). A first
+  name no `use` in the block brings in — through a glob, a `use super::*` from a parent file, a `use`
+  inside a macro — is matched by its ending as before. The four rows in the last line are matched only
   at that length, because the shorter ending means something else somewhere:
   `gix-path`'s `env::var` returns an `Option`, tokio's `io::read_to_string` and futures-util's
   `io::copy` return a future, and a crate's `File::metadata` returns an `Option<&Metadata>`.
@@ -352,7 +365,7 @@ the first of the platform versions. A pull request that changes an implementatio
 declaration is therefore not sorted first by that order.
 
 How often each of these settles the definition rust-analyzer settles, and where it does not, is recorded
-in `docs/resolution.md`; which relations are trusted is ADR 0024's.
+in `docs/resolution.md`; which relations are trusted is ADR 0025's.
 
 ## Reading the output
 

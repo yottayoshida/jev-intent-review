@@ -38,12 +38,13 @@ const beforeRev = git(HERE, "rev-parse", values.before);
 
 // ---- the four tools ----
 
+// `export const` too: #83 exported the two caps of the hop for bench/resolution.ts.
 const CAPS: [string, RegExp, string][] = [
-  ["src/plan/candidates.ts", /^const MAX_FUNCTIONS = \d+;$/m, "const MAX_FUNCTIONS = 100000;"],
-  ["src/plan/candidates.ts", /^const MAX_CALLS_PER_FUNCTION = \d+;$/m, "const MAX_CALLS_PER_FUNCTION = 100000;"],
-  ["src/plan/from-diff.ts", /^const MAX_CHANGED_FUNCTIONS = \d+;$/m, "const MAX_CHANGED_FUNCTIONS = 100000;"],
-  ["src/plan/from-diff.ts", /^const MAX_HOP_NAMES = \d+;$/m, "const MAX_HOP_NAMES = 100000;"],
-  ["src/plan/from-diff.ts", /^const MAX_CALLER_FUNCTIONS = \d+;$/m, "const MAX_CALLER_FUNCTIONS = 100000;"],
+  ["src/plan/candidates.ts", /^(export )?const MAX_FUNCTIONS = \d+;$/m, "$1const MAX_FUNCTIONS = 100000;"],
+  ["src/plan/candidates.ts", /^(export )?const MAX_CALLS_PER_FUNCTION = \d+;$/m, "$1const MAX_CALLS_PER_FUNCTION = 100000;"],
+  ["src/plan/from-diff.ts", /^(export )?const MAX_CHANGED_FUNCTIONS = \d+;$/m, "$1const MAX_CHANGED_FUNCTIONS = 100000;"],
+  ["src/plan/from-diff.ts", /^(export )?const MAX_HOP_NAMES = \d+;$/m, "$1const MAX_HOP_NAMES = 100000;"],
+  ["src/plan/from-diff.ts", /^(export )?const MAX_CALLER_FUNCTIONS = \d+;$/m, "$1const MAX_CALLER_FUNCTIONS = 100000;"],
 ];
 
 function copyOf(from: "before" | "after", uncapped: boolean): string {

@@ -73,6 +73,29 @@ export interface ParsedRust {
   unread: Span[];
   /** Macro invocations holding call-shaped text whose arguments were not read (ADR 0022). */
   macrosNotRead: number;
+  /**
+   * Where every macro invocation whose arguments were not read as calls is — call-shaped or not,
+   * inside a function or outside (`tauri::generate_handler![a::b]`, `json!({…})`, `matches!(…)`).
+   * A name there may be a call nobody read, which is not the same as no call (#83).
+   */
+  macrosUnreadAt: Span[];
+  /** Every name a `use` brings in, with the block it applies to (#83). */
+  uses: UseBinding[];
+  /** Inline `mod x { … }` blocks, which a `use` outside does not reach unless they `use super::*`. */
+  mods: (Span & { superGlob: boolean })[];
+}
+
+/**
+ * A name a `use` brings into a block: `use std::fs;` brings `fs` as `std::fs`, `use std::fs::File as F;`
+ * brings `F` as `std::fs::File`, `use std::fs::{self, OpenOptions};` brings `fs` and `OpenOptions`. A glob
+ * (`use std::io::*;`) brings no name it can be looked up by, and is kept as `glob`.
+ */
+export interface UseBinding {
+  name: string;
+  path: string[];
+  glob?: true;
+  /** The lines of the block the `use` is written in: the file, a `mod`'s body, a function's body. */
+  scope: Span;
 }
 
 /**
@@ -189,7 +212,8 @@ export function parseRust(source: string): ParsedRust {
     return { line: lo + 1, column: index - (lineStarts[lo] as number) };
   };
 
-  const result: ParsedRust = { functions: [], calls: [], items: [], unread: [], macrosNotRead: 0 };
+  const result: ParsedRust = { functions: [], calls: [], items: [], unread: [], macrosNotRead: 0, macrosUnreadAt: [], uses: [], mods: [] };
+  const spanOf = (n: Node, w: Walk): Span => ({ startLine: position(w.offset(n.startIndex)).line, endLine: position(w.offset(Math.max(n.startIndex, n.endIndex - 1))).line });
   /** A node's text in the file, not in what the parser was given. */
   const textIn = (w: Walk) => (n: Node) => source.slice(w.offset(n.startIndex), w.offset(n.endIndex));
 
@@ -225,14 +249,21 @@ export function parseRust(source: string): ParsedRust {
         }
       }
       if (node.type === "call_expression" && nextFn !== null && !nextTest) readCall(node, w, nextFn);
+      if (node.type === "use_declaration" && !w.inMacro) readUse(node, w);
+      if (node.type === "mod_item" && !w.inMacro) {
+        const body = node.childForFieldName("body");
+        if (body) result.mods.push({ ...spanOf(body, w), superGlob: false });
+      }
       if (node.type === "macro_invocation") {
-        if (nextFn !== null && !nextTest) readMacro(node, w, nextFn);
+        let read = false;
+        if (nextFn !== null && !nextTest) read = readMacro(node, w, nextFn);
         // Outside every function (`cfg_if! { … fn plat() { … } }` at the top of a file, a macro in an
         // `impl`): not read, and counted like any macro not read, so its calls are not gone unsaid.
         else if (!nextTest && !w.inMacro) {
           const tokens = node.namedChildren.find((c) => c.type === "token_tree");
           if (tokens && CALL_SHAPE.test(textIn(w)(tokens))) result.macrosNotRead += 1;
         }
+        if (!read && !nextTest) result.macrosUnreadAt.push(spanOf(node, w));
         continue;
       }
       // A token the parser supplied because the file lacks it (`a(1;`, a `)` missing from a signature):
@@ -281,17 +312,68 @@ export function parseRust(source: string): ParsedRust {
     result.calls.push({ fn, line: p.line, column, startColumn, callee, exprStart: w.offset(exprStartNode.startIndex), exprEnd: w.offset(args.endIndex), inMacro: w.inMacro });
   };
 
-  const readMacro = (node: Node, w: Walk, fn: number) => {
+  /** The names a `use` brings in, each with the block the `use` is written in. */
+  const readUse = (node: Node, w: Walk) => {
+    const text = textIn(w);
+    let block: Node | null = node.parent;
+    while (block && block.type !== "source_file" && block.type !== "declaration_list" && block.type !== "block") block = block.parent;
+    const scope: Span = block && block.type !== "source_file" ? spanOf(block, w) : { startLine: 1, endLine: lineStarts.length };
+    const bind = (name: string, path: string[], glob = false) => {
+      if (name === "_" && !glob) return;
+      result.uses.push({ name, path, ...(glob ? { glob: true as const } : {}), scope });
+    };
+    const expand = (n: Node, prefix: string[]) => {
+      switch (n.type) {
+        case "use_as_clause": {
+          const path = n.childForFieldName("path");
+          const alias = n.childForFieldName("alias");
+          const names = path ? pathNames(path, text) : null;
+          // `use std::fs::{self as sfs};` brings `sfs` as `std::fs`.
+          const full = names ? [...prefix, ...names] : null;
+          if (full && alias) bind(text(alias), full.at(-1) === "self" && full.length > 1 ? full.slice(0, -1) : full);
+          return;
+        }
+        case "scoped_use_list": {
+          const path = n.childForFieldName("path");
+          const list = n.childForFieldName("list");
+          const names = path ? (pathNames(path, text) ?? []) : [];
+          if (list) expand(list, [...prefix, ...names]);
+          return;
+        }
+        case "use_list":
+          for (const c of n.namedChildren) if (c) expand(c, prefix);
+          return;
+        case "use_wildcard": {
+          const inner = n.namedChildren[0];
+          bind("*", [...prefix, ...(inner ? (pathNames(inner, text) ?? []) : [])], true);
+          return;
+        }
+        default: {
+          const names = pathNames(n, text);
+          if (!names) return;
+          const full = [...prefix, ...names];
+          // `use std::fs::{self}` brings `fs`.
+          if (full.at(-1) === "self" && full.length > 1) bind(full.at(-2)!, full.slice(0, -1));
+          else bind(full.at(-1)!, full);
+        }
+      }
+    };
+    const argument = node.childForFieldName("argument");
+    if (argument) expand(argument, []);
+  };
+
+  /** Whether the macro's arguments were read as calls. */
+  const readMacro = (node: Node, w: Walk, fn: number): boolean => {
     const tokens = node.namedChildren.find((c) => c.type === "token_tree");
-    if (!tokens) return;
-    if (!CALL_SHAPE.test(textIn(w)(tokens))) return;
+    if (!tokens) return false;
+    if (!CALL_SHAPE.test(textIn(w)(tokens))) return false;
     const macro = node.childForFieldName("macro");
     const name = macro ? (textIn(w)(macro).split("::").pop() ?? "").trim() : "";
     // Read again from what the parser was given, so a `&raw` inside is treated as it is outside.
     const text = parseText.slice(w.offset(tokens.startIndex), w.offset(tokens.endIndex));
     if (NOT_EXPRESSION_MACROS.has(name)) {
       result.macrosNotRead += 1;
-      return;
+      return false;
     }
     // The arguments, read again as an expression: `vec![x; n]` as an array, the rest as arguments.
     const inside = text.slice(1, -1);
@@ -300,13 +382,13 @@ export function parseRust(source: string): ParsedRust {
     const wrapped = parser.parse(prefix + inside + suffix);
     if (!wrapped) {
       result.macrosNotRead += 1;
-      return;
+      return false;
     }
     try {
       // All or nothing: a macro whose arguments do not read as an expression is not read at all.
       if (wrapped.rootNode.hasError) {
         result.macrosNotRead += 1;
-        return;
+        return false;
       }
       const base = w.offset(tokens.startIndex + 1) - prefix.length;
       const body = wrapped.rootNode.namedChildren[0]?.childForFieldName("body");
@@ -316,9 +398,10 @@ export function parseRust(source: string): ParsedRust {
       const given = name === "vec" ? statement?.childForFieldName("value") : statement?.namedChildren[0]?.childForFieldName("arguments");
       if (!given) {
         result.macrosNotRead += 1;
-        return;
+        return false;
       }
       walk(given, { offset: (i) => base + i, inMacro: true }, fn, false);
+      return true;
     } finally {
       wrapped.delete();
     }
@@ -331,6 +414,8 @@ export function parseRust(source: string): ParsedRust {
   }
   try {
     walk(tree.rootNode, { offset: (i) => i, inMacro: false }, null, false);
+    // A `mod` writing `use super::*` in its own body reaches the `use`s outside it (`importOf`).
+    for (const m of result.mods) m.superGlob = result.uses.some((u) => u.glob && u.path.join("::") === "super" && u.scope.startLine === m.startLine && u.scope.endLine === m.endLine);
     for (const top of tree.rootNode.namedChildren) {
       if (top.isError || top.type === "function_item" || top.type === "function_signature_item" || ITEM_TYPES.has(top.type) || top.type.endsWith("comment")) continue;
       result.items.push({ startLine: position(top.startIndex).line, endLine: position(Math.max(top.startIndex, top.endIndex - 1)).line });
@@ -384,4 +469,27 @@ export function parseRust(source: string): ParsedRust {
     for (const line of new Set(orphans)) result.unread.push({ startLine: line, endLine: line });
   }
   return result;
+}
+
+/**
+ * The path a name is brought in by at `line`: the `use` written in the innermost block around the line
+ * that brings it (a `mod x { … }` is not reached by a `use` outside it unless it writes `use super::*`).
+ * Null when no `use` brings it, or when two in the same block bring it by different paths. Globs bring
+ * no name here (#83).
+ */
+export function importOf(parsed: Pick<ParsedRust, "uses" | "mods">, line: number, name: string): string[] | null {
+  const inside = (s: Span) => line >= s.startLine && line <= s.endLine;
+  const size = (s: Span) => s.endLine - s.startLine;
+  // The innermost `mod` a `use` outside cannot reach into: the first, going out, without `use super::*`.
+  const boundary = parsed.mods
+    .filter(inside)
+    .sort((a, b) => size(a) - size(b))
+    .find((m) => !m.superGlob);
+  const found = parsed.uses.filter(
+    (u) => !u.glob && u.name === name && inside(u.scope) && (!boundary || (u.scope.startLine >= boundary.startLine && u.scope.endLine <= boundary.endLine)),
+  );
+  if (found.length === 0) return null;
+  const innermost = Math.min(...found.map((u) => size(u.scope)));
+  const paths = new Set(found.filter((u) => size(u.scope) === innermost).map((u) => u.path.join("::")));
+  return paths.size === 1 ? [...paths][0]!.split("::") : null;
 }
