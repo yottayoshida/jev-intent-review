@@ -53,6 +53,17 @@ toward going on. The steps and bytes of a request not sent are kept in the row's
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
 
+**Batch `b1`** (rows 1 to 100, 2026-09-27; verdicts in the sandbox, sha256 in `sealed-batches.json`):
+72 repositories read, 19 with a case — 1 of them caught before the merge — so `c = 18`, `r = 72`, and
+with `M = 552` the projection is 103.5 repositories (64.3 at the lower bound of `c/r`): **the yield
+check goes on**. Of the 19 cases, 14 had a requirement written and kept by the check, 3 had none the
+writer could write, 1 had a gap in O's bundle and 1 a request over the size. Left out: 39 screened as
+not failure handling, 5 as propagating and 1 as other, 17 without O, 7 whose fix's material was not
+complete, and 12 later rows of a repository that had its case. 308 annotator runs of the 500 allowed
+(owner), the N=1 runs and the diagnosis of rows 19 and 63 included. The run stopped four times — row
+19's request over the argument limit (version 5), row 63's screen answering what was not JSON four
+times, and two failures of GitHub or the network — and was resumed each time at the row it stopped on.
+
 ## The question
 
 Would jev-intent-review, run on a pull request as it was when it merged, have listed a real

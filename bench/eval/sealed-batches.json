@@ -18,6 +18,15 @@
       "rows": 100,
       "kept": 16,
       "sha256": "5039676c2ab04556cb20455e2f471679788909682e1b9209cd94a9159dab98b1"
+    },
+    {
+      "measurement": "#89",
+      "id": "b1",
+      "from": 1,
+      "to": 100,
+      "rows": 100,
+      "kept": 19,
+      "sha256": "1dac6ad5c12b63906acdc35cd596122cbe81aade0ec827b866937b8f456bc900"
     }
   ]
 }
