@@ -43,6 +43,12 @@ export const SCREEN = {
   retries: 3,
   /** Screen 3, caught 3, writer 1, checker 1 — each asked up to `retries + 1` times. */
   worstPerRow: 8 * 4,
+  /**
+   * The most bytes one request may send (RETRO.md v5): past it the request is not sent and the step's
+   * outcome is the one against the tool. `claude -p` takes the request as an argument, and the system's
+   * argument limit is 1 MB; the largest request of rows 1-18 was 445,233 bytes.
+   */
+  maxRequestBytes: 600_000,
 } as const;
 
 /** The checks a pull request had at its merge: read, none at all, or not readable. */
@@ -71,9 +77,10 @@ export type LeftOut =
   | "merged before the floor"
   | "no original pull request"
   | "the fix's own material is not complete"
-  | `screened out as ${Label}`;
+  | `screened out as ${Label}`
+  | "the screen's request is over the size sent";
 
-export type Requirement_ = "written" | "none" | "invalid" | "gap" | "left out by the check";
+export type Requirement_ = "written" | "none" | "invalid" | "gap" | "left out by the check" | "not sent: over the size";
 
 export interface RowRecord {
   row: number;
@@ -84,7 +91,9 @@ export interface RowRecord {
   origin?: Origin;
   labels?: Label[];
   screen?: Label;
-  caught?: { answers: boolean[]; caught: boolean; checks: Checks["state"] };
+  caught?: { answers: boolean[]; caught: boolean; checks: Checks["state"]; overSize?: true };
+  /** Requests over the cap, not sent: the step and the bytes, so the record shows they were over. */
+  notSent?: { step: string; bytes: number }[];
   requirement?: Requirement_;
   requirements?: Requirement[];
   answers: Answer[];
@@ -95,6 +104,15 @@ export interface BatchRun {
   /** Why the run stopped before the batch's last row, or `null`. The row it stopped at is decided neither way. */
   stopped: string | null;
   runs: number;
+}
+
+/** What `ask` gives back for a request over `SCREEN.maxRequestBytes`: nothing was sent. */
+const OVER_SIZE = Symbol("over the size");
+
+/** The bytes a request sends, counted as `annotate` counts them, when they are over the cap; else `null`. */
+export function overSize(system: string, request: string): number | null {
+  const bytes = Buffer.byteLength(system) + Buffer.byteLength(request);
+  return bytes > SCREEN.maxRequestBytes ? bytes : null;
 }
 
 const FIX_SKIPS: Record<string, LeftOut> = {
@@ -134,11 +152,12 @@ export function screenRows(
     if (decidedRows.has(row.order)) continue;
     const repo = row.repo.toLowerCase();
     const answers: Answer[] = [];
+    const notSent: { step: string; bytes: number }[] = [];
     const decide = (rec: RowRecord) => {
       records.push(rec);
       opts.progress?.(runs, rec);
     };
-    const leave = (why: LeftOut, more: Partial<RowRecord> = {}) => decide({ row: row.order, ref: row.ref, repo: row.repo, outcome: "left out", why, ...more, answers });
+    const leave = (why: LeftOut, more: Partial<RowRecord> = {}) => decide({ row: row.order, ref: row.ref, repo: row.repo, outcome: "left out", why, ...more, ...(notSent.length > 0 ? { notSent } : {}), answers });
     if (withCase.has(repo)) {
       leave("skipped: its repository has a case");
       continue;
@@ -152,7 +171,15 @@ export function screenRows(
       break;
     }
     opts.progress?.(runs + SCREEN.worstPerRow, null);
-    const ask = (system: string, request: string, valid: (json: unknown) => boolean): unknown => {
+    let step = "the fix";
+    const ask = (system: string, request: string, valid: (json: unknown) => boolean, sizeOnly = false): unknown => {
+      // Over the size, nothing is sent and no run is spent; the step decides what that counts as.
+      const over = overSize(system, request);
+      if (over !== null) {
+        if (!notSent.some((n) => n.step === step)) notSent.push({ step, bytes: over });
+        return OVER_SIZE;
+      }
+      if (sizeOnly) return null;
       for (let attempt = 0; attempt <= SCREEN.retries; attempt++) {
         runs += 1;
         const a = deps.annotate(system, request);
@@ -161,7 +188,6 @@ export function screenRows(
       }
       throw new Stopped(`row ${row.order}: an annotator gave no answer that could be counted in ${SCREEN.retries + 1} attempts`);
     };
-    let step = "the fix";
     try {
       const fix = deps.fix(row.repo, Number(row.ref.split("#")[1]));
       if ("skip" in fix) {
@@ -181,6 +207,10 @@ export function screenRows(
       step = "the bundle";
       const bundle = deps.bundle(row.repo, origin.number);
       step = "the screen";
+      if (ask(LABEL_SYSTEM, labelRequest(fix.bundle), () => true, true) === OVER_SIZE) {
+        leave("the screen's request is over the size sent", { origin });
+        continue;
+      }
       const labels = [0, 1, 2].map(() => readLabel(ask(LABEL_SYSTEM, labelRequest(fix.bundle), (j) => readLabel(j) !== null)) ?? "cannot_label");
       const screen = majority(labels);
       if (!KEEP_LABELS.includes(screen)) {
@@ -191,24 +221,30 @@ export function screenRows(
       step = "caught before the merge";
       const checks = deps.checks(row.repo, origin.number);
       const defect = `${fix.bundle.pull.title}\n\n${fix.bundle.pull.body}`;
-      const said = [0, 1, 2].map(() => (ask(CAUGHT_SYSTEM, caughtRequest([...bundle.pull.reviews, ...bundle.pull.comments], checks.state === "read" ? checks.items : [], defect), (j) => typeof (j as { caught?: unknown } | null)?.caught === "boolean") as { caught: boolean }).caught);
-      const caught = { answers: said, caught: said.filter(Boolean).length >= 2, checks: checks.state };
+      const caughtReq = caughtRequest([...bundle.pull.reviews, ...bundle.pull.comments], checks.state === "read" ? checks.items : [], defect);
+      // Over the size: not caught — the case stays in the primary denominator, against the tool.
+      const overSize = ask(CAUGHT_SYSTEM, caughtReq, () => true, true) === OVER_SIZE;
+      const said = overSize ? [] : [0, 1, 2].map(() => (ask(CAUGHT_SYSTEM, caughtReq, (j) => typeof (j as { caught?: unknown } | null)?.caught === "boolean") as { caught: boolean }).caught);
+      const caught = { answers: said, caught: said.filter(Boolean).length >= 2, checks: checks.state, ...(overSize ? { overSize: true as const } : {}) };
       step = "the requirement";
       let requirement: Requirement_;
       let requirements: Requirement[] | undefined;
       if (bundle.unavailable.length > 0) requirement = "gap";
       else {
-        const written = acceptRequirements(ask(WRITE_SYSTEM, writeRequest(bundle), () => true), bundle);
-        if ("none" in written) requirement = "none";
+        const answer = ask(WRITE_SYSTEM, writeRequest(bundle), () => true);
+        const written = answer === OVER_SIZE ? null : acceptRequirements(answer, bundle);
+        if (written === null) requirement = "not sent: over the size";
+        else if ("none" in written) requirement = "none";
         else if ("invalid" in written) requirement = "invalid";
         else {
           step = "the check";
           requirements = written.requirements;
-          const checked = ask(CHECK_SYSTEM, checkRequest(bundle, fix, written.requirements), (j) => Array.isArray((j as { leaked?: unknown } | null)?.leaked)) as { leaked: unknown[] };
-          requirement = checked.leaked.length > 0 ? "left out by the check" : "written";
+          const checked = ask(CHECK_SYSTEM, checkRequest(bundle, fix, written.requirements), (j) => Array.isArray((j as { leaked?: unknown } | null)?.leaked));
+          // A requirement the check could not read is not a checked one: it could not be written.
+          requirement = checked === OVER_SIZE ? "not sent: over the size" : (checked as { leaked: unknown[] }).leaked.length > 0 ? "left out by the check" : "written";
         }
       }
-      decide({ row: row.order, ref: row.ref, repo: row.repo, outcome: "case", origin, labels, screen, caught, requirement, ...(requirements ? { requirements } : {}), answers });
+      decide({ row: row.order, ref: row.ref, repo: row.repo, outcome: "case", origin, labels, screen, caught, requirement, ...(requirements ? { requirements } : {}), ...(notSent.length > 0 ? { notSent } : {}), answers });
       withCase.add(repo);
     } catch (error) {
       // Nothing of the row in the reason: its number, the step, the error's kind.

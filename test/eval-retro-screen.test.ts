@@ -12,7 +12,7 @@ import { checksAt } from "../bench/eval/retro/checks.ts";
 import type { Bundle } from "../bench/eval/retro/material.ts";
 import { CAUGHT_SYSTEM, CHECK_SYSTEM, LABEL_SYSTEM, WRITE_SYSTEM, type Answer } from "../bench/eval/retro/prompts.ts";
 import { DIFF_NOT_SERVED, diffRefused, isGone } from "../bench/eval/retro/gh.ts";
-import { batchProblem, COUNT_KEYS, countsOf, type RowRecord, reposWithinCap, SCREEN, screenRows, verdictsFile, writeRow, writeVerdicts, yieldVerdict, type Row, type ScreenDeps } from "../bench/eval/retro/screen.ts";
+import { batchProblem, COUNT_KEYS, countsOf, overSize, type RowRecord, reposWithinCap, SCREEN, screenRows, verdictsFile, writeRow, writeVerdicts, yieldVerdict, type Row, type ScreenDeps } from "../bench/eval/retro/screen.ts";
 
 const MARK = "SECRET-ROW-TEXT";
 
@@ -31,9 +31,12 @@ interface Behaviour {
   broken?: boolean;
   /** The fix's fetch throws, as `execFileSync` does, with the row's text on the error. */
   throws?: boolean;
+  /** Which text is made larger than any request may send. */
+  big?: "fixBody" | "originComments" | "originBody" | "diff";
 }
 
-const bundleOf = (n: number, gap = false): Bundle => ({ repo: "o/r", pull: { number: n, title: `${MARK} title ${n}`, body: `Reading config ${n} must fail loudly. ${MARK}`, comments: [], reviews: [] }, issues: [], unavailable: gap ? ["#1 description"] : [] });
+const HUGE = "x".repeat(SCREEN.maxRequestBytes);
+const bundleOf = (n: number, gap = false, big: "body" | "comments" | null = null): Bundle => ({ repo: "o/r", pull: { number: n, title: `${MARK} title ${n}`, body: `Reading config ${n} must fail loudly. ${MARK}${big === "body" ? HUGE : ""}`, comments: big === "comments" ? [HUGE] : [], reviews: [] }, issues: [], unavailable: gap ? ["#1 description"] : [] });
 
 function fakes(by: Record<number, Behaviour>) {
   let runs = 0;
@@ -43,10 +46,10 @@ function fakes(by: Record<number, Behaviour>) {
       const b = by[number] ?? {};
       if (b.throws) throw Object.assign(new Error(`gh failed on ${MARK}`), { stdout: MARK, stderr: MARK });
       if (b.skip) return { skip: b.skip };
-      return { repo, number, ref: `${repo}#${number}`, title: MARK, body: MARK, diff: MARK, mergedAt: "2026-09-02T00:00:00Z", base: "b", bundle: bundleOf(number, b.fixGap), label80: null };
+      return { repo, number, ref: `${repo}#${number}`, title: MARK, body: MARK, diff: b.big === "diff" ? HUGE : MARK, mergedAt: "2026-09-02T00:00:00Z", base: "b", bundle: bundleOf(number, b.fixGap, b.big === "fixBody" ? "body" : null), label80: null };
     },
     origin: (fix) => (by[fix.number]?.noOrigin ? { number: null, why: "none" } : { number: fix.number, by: "named" }),
-    bundle: (_repo, n) => bundleOf(n, by[n]?.originGap),
+    bundle: (_repo, n) => bundleOf(n, by[n]?.originGap, by[n]?.big === "originComments" ? "comments" : by[n]?.big === "originBody" ? "body" : null),
     checks: (_repo, n) => {
       const s = by[n]?.checks ?? "read";
       return s === "read" ? { state: "read", items: ["ci: success"] } : { state: s };
@@ -276,4 +279,33 @@ test("a clones directory holding a partial clone is refused", async () => {
   const deps = realCalDeps(clones, new Map(), tmpdir());
   const fix = { repo: "o/r", number: 1, ref: "o/r#1", title: "", body: "", diff: "", mergedAt: "2026-09-01T00:00:00Z", base: "HEAD", bundle: bundleOf(1), label80: null };
   assert.throws(() => deps.origin(fix), /a partial clone is in the clones directory/);
+});
+
+test("a request over the size is not sent, and each step counts it against the tool", () => {
+  const rows = rowsOf([["a/1", 1], ["a/2", 2], ["a/3", 3], ["a/4", 4]]);
+  const seen: [number, number | null][] = [];
+  const r = run(rows, { 1: { big: "fixBody" }, 2: { big: "originComments" }, 3: { big: "originBody" }, 4: { big: "diff" } }, { progress: (runs: number, rec: RowRecord | null) => seen.push([runs, rec?.row ?? null]) });
+  assert.equal(r.stopped, null);
+  const by = Object.fromEntries(r.records.map((x) => [x.row, x]));
+  assert.equal(by[1]!.why, "the screen's request is over the size sent", "the screen cannot read the fix: the row is left out");
+  assert.deepEqual([by[2]!.caught!.caught, by[2]!.caught!.overSize, by[2]!.requirement], [false, true, "not sent: over the size"], "not caught, so in the denominator; no requirement");
+  assert.deepEqual([by[3]!.caught!.caught, by[3]!.caught!.overSize, by[3]!.requirement], [false, undefined, "not sent: over the size"], "only the writer's request is over");
+  assert.equal(by[4]!.requirement, "not sent: over the size", "a requirement the check could not read counts as not written");
+  // Runs, decided row by decided row: nothing spent on a request not sent.
+  assert.deepEqual(seen.filter(([, row]) => row !== null).map(([runs, row]) => [row, runs]), [[1, 0], [2, 3], [3, 9], [4, 16]]);
+  const c = countsOf(r, 100, 4);
+  assert.equal(c.notCaught, 3);
+  assert.deepEqual(c.requirement, { "not sent: over the size": 3 });
+  assert.deepEqual(by[1]!.notSent!.map((n) => n.step), ["the screen"]);
+  assert.deepEqual(by[2]!.notSent!.map((n) => n.step), ["caught before the merge", "the requirement"]);
+  assert.deepEqual(by[4]!.notSent!.map((n) => n.step), ["the check"]);
+  assert.ok(by[4]!.notSent![0]!.bytes > SCREEN.maxRequestBytes);
+  assert.equal(by[3]!.caught!.overSize, undefined);
+});
+
+test("the cap: exactly the most bytes is sent, one byte more is not", () => {
+  const system = "s".repeat(1000);
+  assert.equal(overSize(system, "r".repeat(SCREEN.maxRequestBytes - 1000)), null);
+  assert.equal(overSize(system, "r".repeat(SCREEN.maxRequestBytes - 999)), SCREEN.maxRequestBytes + 1);
+  assert.equal(overSize("", "é".repeat(SCREEN.maxRequestBytes / 2 + 1)), SCREEN.maxRequestBytes + 2, "bytes, not characters");
 });
