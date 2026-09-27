@@ -49,12 +49,12 @@ test("a call asked about and left without an answer is not read: a run the reque
   assert.match(firstLine(report({ requirements: [stopped] })), /\*\* 2 without an answer, for the reasons under each requirement\./);
 });
 
-test("a budgeted call held before its question, a call that could not be asked, and the listing's notes are each said", () => {
+test("a budgeted call set aside before its question, a call that could not be asked, and the listing's notes are each said", () => {
   const r = localCheckResult();
   const held: LocalCheckResult = { ...r, wouldAsk: [...budgeted, at("src/auth.rs", "big()")], unreached: r.notes, counts: { ...r.counts, applicable: 3 } };
   assert.equal(
     coverageLine(held),
-    "Of the 3 calls that could be asked: 2 read and answered, 1 held before their question. 1 more call could not be asked. 1 note under *Notes* says what was not read.",
+    "Of the 3 calls that could be asked: 2 read and answered, 1 set aside before their question. 1 more call could not be asked. 1 note under *Notes* says what was not read.",
   );
   // Every call answered, but one could not be asked: not "all".
   const cannot: LocalCheckResult = { ...whole(), counts: { ...whole().counts, notApplicable: 1 } };
@@ -63,13 +63,13 @@ test("a budgeted call held before its question, a call that could not be asked, 
 
 test("the siblings are counted in, and a run that sent nothing says what was inside the budgets", () => {
   const r = whole();
-  // One sibling call budgeted and held before its question (its body did not fit), three over the siblings' budget.
+  // One sibling call budgeted and set aside before its question (its body did not fit), three over the siblings' budget.
   const siblings = { ...r.counts.byOrigin.changed, seeds: ["load"], applicable: 4, asked: 0, overBudget: 3, notApplicable: 0 };
   const withSiblings: LocalCheckResult = { ...r, wouldAsk: [...budgeted, at("src/other.rs", "load(x)")], counts: { ...r.counts, siblings } };
-  assert.equal(coverageLine(withSiblings), "Of the 6 calls that could be asked: 2 read and answered, 1 held before their question, 3 over the budgets.");
+  assert.equal(coverageLine(withSiblings), "Of the 6 calls that could be asked: 2 read and answered, 1 set aside before their question, 3 over the budgets.");
   const built: LocalCheckResult = { ...r, observed: [], mappings: [], findings: [], counts: { ...r.counts, asked: 0, applicable: 5, overBudget: 3 } };
   assert.equal(coverageLine(built, { nothingSent: true }), "Of the 5 calls that could be asked: 2 inside the budgets, nothing asked, 3 over the budgets.");
-  assert.doesNotMatch(coverageLine(built, { nothingSent: true }), /held before/);
+  assert.doesNotMatch(coverageLine(built, { nothingSent: true }), /set aside before/);
   const nothing: LocalCheckResult = { ...r, observed: [], mappings: [], findings: [], wouldAsk: [], counts: { ...r.counts, asked: 0, applicable: 0, notApplicable: 2 } };
   assert.equal(coverageLine(nothing), "No call could be asked. 2 more calls could not be asked.");
 });
@@ -109,7 +109,7 @@ test("a note on what the listing did not read is left too: said in the section, 
   assert.equal(coverageLine(explained.requirements[0]!), "All 2 calls that could be asked were read and answered.");
 });
 
-test("a record from before `wouldAsk` and `unreached` reads as none held and none unread, and does not throw", () => {
+test("a record from before `wouldAsk` and `unreached` reads as none set aside and none unread, and does not throw", () => {
   const { wouldAsk: _w, unreached: _u, ...old } = whole();
   assert.equal(coverageLine(old as LocalCheckResult), "All 2 calls that could be asked were read and answered.");
 });

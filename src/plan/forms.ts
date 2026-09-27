@@ -13,7 +13,7 @@
 // for every form, and a form cannot carry a rule of its own: part 4 is two lists of answer names.
 //
 // `failure_propagation` is v0.1's questions, condition and words, unchanged byte for byte — the
-// measurements in `docs/local-check-cli.md` were taken with them. `check_before_action` is newer, and
+// measurements in `docs/measurements.md` were taken with them. `check_before_action` is newer, and
 // measured on less: a constructed case and one real pull request's code (`bench/forms/`).
 
 import { STOP_WORDS } from "../discovery/discover.ts";

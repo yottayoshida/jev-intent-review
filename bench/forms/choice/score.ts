@@ -1,4 +1,4 @@
-// The table `docs/local-check-cli.md` quotes, computed from the log and from nothing else, and the
+// The table `docs/measurements.md` quotes, computed from the log and from nothing else, and the
 // checks on the labelled set. Nothing here sends a request.
 
 import { readdirSync, readFileSync } from "node:fs";

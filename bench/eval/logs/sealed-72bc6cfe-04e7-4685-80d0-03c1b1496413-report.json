@@ -1,0 +1,239 @@
+{
+  "set": "sealed",
+  "eval": {
+    "set": "sealed",
+    "behind": {
+      "repositories": 17,
+      "requirements": 17,
+      "cases": 17,
+      "targets": 87,
+      "runs": 45
+    },
+    "reported": {
+      "reach": {
+        "estimate": 0.20588235294117646,
+        "lower": 0.052347657050660246,
+        "upper": 0.4672212857963416,
+        "repos": 17,
+        "units": 87
+      },
+      "cannotDetermine": {
+        "estimate": 0,
+        "lower": 0,
+        "upper": 0.5218237501049714,
+        "repos": 5,
+        "units": 45
+      },
+      "unlabelledListed": 0
+    },
+    "costs": [
+      {
+        "case": "luminous-1169",
+        "requests": 378,
+        "bytes": 1263609,
+        "runs": 9
+      },
+      {
+        "case": "ruvector-1014",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "folo-751",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "chokkin-223",
+        "requests": 18,
+        "bytes": 64713,
+        "runs": 9
+      },
+      {
+        "case": "neboto-tui-27",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "cand-30",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "cand-31",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "chaosbox-5",
+        "requests": 144,
+        "bytes": 776298,
+        "runs": 9
+      },
+      {
+        "case": "cand-43",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "libra-499",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "mutsu-8640",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "cand-90",
+        "requests": 360,
+        "bytes": 1330014,
+        "runs": 9
+      },
+      {
+        "case": "cand-91",
+        "requests": 522,
+        "bytes": 1978800,
+        "runs": 9
+      },
+      {
+        "case": "caliban-603",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "dbt-temporal-62",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "cand-104",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      },
+      {
+        "case": "cand-105",
+        "requests": 0,
+        "bytes": 0,
+        "runs": 0
+      }
+    ],
+    "gates": {
+      "precision": {
+        "status": "insufficient_repositories",
+        "needed": 17,
+        "estimate": {
+          "estimate": 0.8333333333333334,
+          "lower": 0.17673609713128258,
+          "upper": 0.9998493639745618,
+          "repos": 3,
+          "units": 4
+        }
+      },
+      "recall": {
+        "status": "fail",
+        "bound": 0.014579316840325873,
+        "estimate": {
+          "estimate": 0.11764705882352941,
+          "lower": 0.014579316840325873,
+          "upper": 0.3644091621012251,
+          "repos": 17,
+          "units": 29
+        }
+      },
+      "falseListing": {
+        "status": "fail",
+        "bound": 0.24361551714488883,
+        "estimate": {
+          "estimate": 0.029411764705882353,
+          "lower": 0.00002846237774178917,
+          "upper": 0.24361551714488883,
+          "repos": 17,
+          "units": 58
+        }
+      },
+      "silentUnmeasured": {
+        "status": "fail",
+        "bound": 0.43431787284427514,
+        "estimate": {
+          "estimate": 0.17647058823529413,
+          "lower": 0.03798506807063973,
+          "upper": 0.43431787284427514,
+          "repos": 17,
+          "units": 87
+        }
+      }
+    },
+    "release": "no_evaluation_verdict"
+  },
+  "comparison": {
+    "verdict": {
+      "status": "fail",
+      "uplift": {
+        "all": {
+          "estimate": -0.47058823529411764,
+          "lower": -0.8298358479317471,
+          "upper": 0.059502344145755615,
+          "repos": 17,
+          "cases": 29,
+          "wins": 2,
+          "losses": 15,
+          "ties": 12
+        },
+        "A": {
+          "estimate": -0.6470588235294118,
+          "lower": -0.9240298638587205,
+          "upper": -0.1313642543114497,
+          "repos": 17,
+          "cases": 17,
+          "wins": 0,
+          "losses": 11,
+          "ties": 6
+        },
+        "B": {
+          "estimate": -0.16666666666666666,
+          "lower": -0.6966955403831321,
+          "upper": 0.44666062863581146,
+          "repos": 12,
+          "cases": 12,
+          "wins": 2,
+          "losses": 4,
+          "ties": 6
+        }
+      },
+      "guard": {
+        "jevEstimate": 0.029411764705882353,
+        "jevUpper": 0.24361551714488883,
+        "baselineEstimate": 0.1764705882352941,
+        "holds": false
+      },
+      "why": [
+        "the lower bound of the difference is -0.830, not above 0.1",
+        "jev's false findings 0.029 against the baseline's 0.176 + 0.1, and the upper bound of its false listing of known targets 0.244 against 0.2"
+      ]
+    },
+    "pairs": 29,
+    "falseVersions": 46,
+    "runs": {
+      "baseline": 225,
+      "adjudication": 56,
+      "failures": 0
+    },
+    "baselineCostUsd": 38.22,
+    "n1": {
+      "problem": null
+    }
+  }
+}

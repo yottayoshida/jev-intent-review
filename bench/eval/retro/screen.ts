@@ -19,7 +19,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { clopperPearson } from "../metrics.ts";
-import type { Label, Split } from "../split.ts";
+import type { Label, SealedBatch, Split } from "../split.ts";
 import { arrivedBetween, n1Problem, readAppended, realCalDeps, Stopped, workspaceState, type LaterFix } from "./calibrate.ts";
 import { fetchChecks } from "./checks.ts";
 import { DIFF_NOT_SERVED, isGone } from "./gh.ts";
@@ -33,11 +33,10 @@ import type { Search } from "./search.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 
-/** RETRO.md v3: the batch, the cap, the retries, and the most runs one row can take. */
+/** RETRO.md v3: a batch's rows, the cap, the retries, and the most runs one row can take. */
 export const SCREEN = {
-  batch: "b1",
-  from: 1,
-  to: 100,
+  /** Rows a batch reads: the first, `b1`, rows 1 to 100; each next one on from the last. */
+  rows: 100,
   /** The cap on rows examined: the projection counts only repositories within it. */
   cap: 800,
   retries: 3,
@@ -134,6 +133,8 @@ export function screenRows(
     maxRuns: number;
     alreadyRun: number;
     placed: ReadonlySet<string>;
+    /** Repositories with a case from an earlier batch (this measurement's entries on the split): their rows are skipped. */
+    hasCase?: ReadonlySet<string>;
     decided?: readonly RowRecord[];
     /**
      * Called before a row is begun, with the runs spent and its worst case reserved, and again with each
@@ -144,7 +145,7 @@ export function screenRows(
   },
 ): BatchRun {
   const records = [...(opts.decided ?? [])];
-  const withCase = new Set(records.filter((r) => r.outcome === "case").map((r) => r.repo.toLowerCase()));
+  const withCase = new Set([...(opts.hasCase ?? []), ...records.filter((r) => r.outcome === "case").map((r) => r.repo.toLowerCase())]);
   const decidedRows = new Set(records.map((r) => r.row));
   let runs = opts.alreadyRun;
   let stopped: string | null = null;
@@ -277,7 +278,12 @@ export function reposWithinCap(rows: readonly Pick<Row, "order" | "repo">[], pla
   return new Set([...rows].sort((a, b) => a.order - b.order).slice(0, SCREEN.cap).map((r) => r.repo.toLowerCase()).filter((r) => !placed.has(r))).size;
 }
 
-export function countsOf(run: BatchRun, M: number, rowsInBatch: number) {
+/**
+ * The counts of a run. The yield check is defined on batch `b1` alone (RETRO.md, "Candidates"): on a
+ * later batch the skipped rows of repositories placed by an earlier one would thin `c/r`, so `go` and the
+ * projections are `null` there.
+ */
+export function countsOf(run: BatchRun, M: number, rowsInBatch: number, yieldCheck = true) {
   const cases = run.records.filter((r) => r.outcome === "case");
   const notCaught = cases.filter((r) => !r.caught!.caught).length;
   // Repositories another measurement placed are not this measurement's: not in `r`, as not in `M`.
@@ -287,6 +293,7 @@ export function countsOf(run: BatchRun, M: number, rowsInBatch: number) {
   const leftOut: Record<string, number> = {};
   for (const r of run.records) if (r.outcome === "left out") leftOut[r.why!] = (leftOut[r.why!] ?? 0) + 1;
   const complete = run.stopped === null && run.records.length === rowsInBatch;
+  const judged = complete && yieldCheck;
   const y = yieldVerdict(notCaught, reposRead, M);
   return {
     rowsRead: run.records.length,
@@ -302,53 +309,88 @@ export function countsOf(run: BatchRun, M: number, rowsInBatch: number) {
     leftOut,
     M,
     // The verdict only on a whole batch.
-    projection: complete ? y.projection : null,
-    projectionLower: complete ? y.projectionLower : null,
-    go: complete ? y.go : null,
+    projection: judged ? y.projection : null,
+    projectionLower: judged ? y.projectionLower : null,
+    go: judged ? y.go : null,
   };
 }
 
 const sha256 = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
-const rowFile = (dir: string, row: number) => join(dir, `89-${SCREEN.batch}`, `${row}.json`);
-export const verdictsFile = (dir: string) => join(dir, `89-${SCREEN.batch}.json`);
-
-/** Each row's record, written as it is decided. */
-export function writeRow(dir: string, rec: RowRecord): void {
-  mkdirSync(join(dir, `89-${SCREEN.batch}`), { recursive: true });
-  writeFileSync(rowFile(dir, rec.row), `${JSON.stringify(rec, null, 2)}\n`);
+/** A batch of this measurement: its id and the rows it reads. */
+export interface Batch {
+  id: string;
+  from: number;
+  to: number;
 }
 
-export function readRows(dir: string, rows: readonly Row[]): RowRecord[] {
-  return rows.filter((r) => existsSync(rowFile(dir, r.order))).map((r) => JSON.parse(readFileSync(rowFile(dir, r.order), "utf8")) as RowRecord);
+/**
+ * The next batch, from the lines main holds (`sealed-batches.json`): `b<n+1>`, on from the last row read.
+ * Taken from main's record, never chosen, so no row is judged twice and none is skipped.
+ */
+export function nextBatch(lines: readonly SealedBatch[]): Batch {
+  const own = lines.filter((l) => l.measurement === "#89");
+  // Named b1, b2, … in order and read on from each other, or the next one could overlap an earlier one.
+  own.forEach((l, i) => {
+    if (l.id !== `b${i + 1}` || l.from !== i * SCREEN.rows + 1 || l.to !== (i + 1) * SCREEN.rows) throw new Error(`#89's batch line ${i + 1} is ${l.id} ${l.from}-${l.to}, not b${i + 1} ${i * SCREEN.rows + 1}-${(i + 1) * SCREEN.rows}`);
+  });
+  const from = own.length * SCREEN.rows + 1;
+  if (from > SCREEN.cap) throw new Error(`${SCREEN.cap} rows have been examined: the cap (RETRO.md, "Candidates")`);
+  return { id: `b${own.length + 1}`, from, to: from + SCREEN.rows - 1 };
+}
+
+/**
+ * Why a new batch may not be run yet, or `null`: every earlier batch of this measurement must have its
+ * case repositories on the split — as many as its `kept` — or a repository whose case is in a batch
+ * main holds but has not placed would be examined again and could take a second case.
+ */
+export function unplacedBatch(lines: readonly SealedBatch[], split: Pick<Split, "repos">): string | null {
+  for (const l of lines.filter((x) => x.measurement === "#89")) {
+    const placed = split.repos.filter((e) => e.batch?.measurement === "#89" && e.batch.id === l.id).length;
+    if (placed !== l.kept) return `batch #89 ${l.id} kept ${l.kept} and ${placed} are on the split: place it before the next batch`;
+  }
+  return null;
+}
+
+const rowFile = (dir: string, batch: string, row: number) => join(dir, `89-${batch}`, `${row}.json`);
+export const verdictsFile = (dir: string, batch: string) => join(dir, `89-${batch}.json`);
+
+/** Each row's record, written as it is decided. */
+export function writeRow(dir: string, batch: string, rec: RowRecord): void {
+  mkdirSync(join(dir, `89-${batch}`), { recursive: true });
+  writeFileSync(rowFile(dir, batch, rec.row), `${JSON.stringify(rec, null, 2)}\n`);
+}
+
+export function readRows(dir: string, batch: string, rows: readonly Row[]): RowRecord[] {
+  return rows.filter((r) => existsSync(rowFile(dir, batch, r.order))).map((r) => JSON.parse(readFileSync(rowFile(dir, batch, r.order), "utf8")) as RowRecord);
 }
 
 /** The verdicts file: each row's outcome and its file's sha256, and the counts. Its sha256 is returned. */
-export function writeVerdicts(dir: string, rows: readonly Row[], counts: object): string {
+export function writeVerdicts(dir: string, batch: string, rows: readonly Row[], counts: object): string {
   const verdicts = {
     measurement: "#89",
-    id: SCREEN.batch,
+    id: batch,
     from: rows[0]!.order,
     to: rows.at(-1)!.order,
     promptsVersion: PROMPTS_VERSION,
     // Each file read once, from disk: the hash is of what is there, not of what was meant to be written.
     rows: rows.map((r) => {
-      const bytes = readFileSync(rowFile(dir, r.order));
+      const bytes = readFileSync(rowFile(dir, batch, r.order));
       const rec = JSON.parse(bytes.toString("utf8")) as RowRecord;
       return { row: r.order, ref: r.ref, outcome: rec.outcome, why: rec.why ?? null, sha256: sha256(bytes) };
     }),
     counts,
   };
   const text = `${JSON.stringify(verdicts, null, 2)}\n`;
-  writeFileSync(verdictsFile(dir), text);
+  writeFileSync(verdictsFile(dir, batch), text);
   return sha256(text);
 }
 
 /** Why the batch's files do not match its verdicts, or `null`: every row file's sha256 as listed. */
-export function batchProblem(dir: string): string | null {
-  const v = JSON.parse(readFileSync(verdictsFile(dir), "utf8")) as { rows: { row: number; sha256: string }[] };
+export function batchProblem(dir: string, batch: string): string | null {
+  const v = JSON.parse(readFileSync(verdictsFile(dir, batch), "utf8")) as { rows: { row: number; sha256: string }[] };
   for (const r of v.rows) {
-    if (!existsSync(rowFile(dir, r.row))) return `row ${r.row} has no file`;
-    if (sha256(readFileSync(rowFile(dir, r.row))) !== r.sha256) return `row ${r.row}'s file is not the one hashed`;
+    if (!existsSync(rowFile(dir, batch, r.row))) return `row ${r.row} has no file`;
+    if (sha256(readFileSync(rowFile(dir, batch, r.row))) !== r.sha256) return `row ${r.row}'s file is not the one hashed`;
   }
   return null;
 }
@@ -356,9 +398,13 @@ export function batchProblem(dir: string): string | null {
 // ---- The real run -------------------------------------------------------------------------------
 
 const searchRows = (): Row[] => (JSON.parse(readFileSync(join(HERE, "search-v1.json"), "utf8")) as Search).rows.map((r) => ({ order: r.order, ref: r.ref, repo: r.repo }));
-const inBatch = (rows: readonly Row[]) => rows.filter((r) => r.order >= SCREEN.from && r.order <= SCREEN.to);
-/** Every repository on the split, a fork's `readAs` too: another measurement's. */
-const placedRepos = () => new Set((JSON.parse(readFileSync(join(HERE, "..", "split.json"), "utf8")) as Split).repos.flatMap((r) => [r.repo, ...(r.readAs === undefined ? [] : [r.readAs])]).map((r) => r.toLowerCase()));
+const inBatch = (rows: readonly Row[], b: Batch) => rows.filter((r) => r.order >= b.from && r.order <= b.to);
+const batchLines = () => (JSON.parse(readFileSync(join(HERE, "..", "sealed-batches.json"), "utf8")) as { batches: SealedBatch[] }).batches;
+const splitEntries = () => (JSON.parse(readFileSync(join(HERE, "..", "split.json"), "utf8")) as Split).repos;
+/** Every repository on the split but this measurement's, a fork's `readAs` too: another measurement's. */
+const placedRepos = () => new Set(splitEntries().filter((e) => e.batch?.measurement !== "#89").flatMap((r) => [r.repo, ...(r.readAs === undefined ? [] : [r.readAs])]).map((r) => r.toLowerCase()));
+/** This measurement's repositories on the split, a fork's `readAs` too: each has its case from an earlier batch. */
+const ownCases = () => new Set(splitEntries().filter((e) => e.batch?.measurement === "#89").flatMap((r) => [r.repo, ...(r.readAs === undefined ? [] : [r.readAs])]).map((r) => r.toLowerCase()));
 
 function realDeps(clones: string, empty: string): ScreenDeps {
   const cal = realCalDeps(clones, new Map(), empty);
@@ -383,9 +429,11 @@ export function main(argv: readonly string[]) {
   const [mode, clones, records, max] = argv;
   const search = searchRows();
   const placed = placedRepos();
-  const rows = inBatch(search);
+  const lines = batchLines();
+  const batch = nextBatch(lines);
+  const rows = inBatch(search, batch);
   const M = reposWithinCap(search, placed);
-  if (mode === "reach") return print({ batch: SCREEN.batch, M });
+  if (mode === "reach") return print({ batch: batch.id, M });
   if (mode === "dry") {
     // The steps that run no annotator, over the batch: how many rows reach the screen. Nothing is written.
     const deps = realDeps(clones!, mkdtempSync(join(tmpdir(), "jir-annotator-")));
@@ -397,19 +445,21 @@ export function main(argv: readonly string[]) {
       if (deps.origin(fix).number === null) continue;
       reach += 1;
     }
-    return print({ batch: SCREEN.batch, rowsRead: rows.length, M, reachScreen: reach });
+    return print({ batch: batch.id, rowsRead: rows.length, M, reachScreen: reach });
   }
   if (mode !== "run") throw new Error("usage: screen.ts reach | dry <clones> | run <clones> <records> <max runs>");
   const maxRuns = Number(max);
   if (!Number.isInteger(maxRuns) || maxRuns < 1 || !records) throw new Error("usage: screen.ts run <clones> <records> <max runs>");
   // A batch whose verdicts are written is hashed and may be on main: it is never run again.
-  if (existsSync(verdictsFile(records))) throw new Error("this batch's verdicts are written; it is not run again");
-  const decided = readRows(records, rows);
-  const spentFile = join(records, `89-${SCREEN.batch}.runs.json`);
+  if (existsSync(verdictsFile(records, batch.id))) throw new Error("this batch's verdicts are written; it is not run again");
+  const unplaced = unplacedBatch(lines, { repos: splitEntries() });
+  if (unplaced !== null) throw new Error(unplaced);
+  const decided = readRows(records, batch.id, rows);
+  const spentFile = join(records, `89-${batch.id}.runs.json`);
   const spent = existsSync(spentFile) ? (JSON.parse(readFileSync(spentFile, "utf8")) as { runs: number }).runs : 0;
   // Nothing runs, the N=1 run included, past the number allowed — nor the N=1 run when no row would fit after it.
   const needed = decided.length < rows.length ? 1 + SCREEN.worstPerRow : 1;
-  if (spent + needed > maxRuns) return print({ batch: SCREEN.batch, stopped: `${spent} of the ${maxRuns} runs allowed are spent`, runs: spent });
+  if (spent + needed > maxRuns) return print({ batch: batch.id, stopped: `${spent} of the ${maxRuns} runs allowed are spent`, runs: spent });
   const empty = mkdtempSync(join(tmpdir(), "jir-annotator-"));
   const deps = realDeps(clones!, empty);
   // N=1 first, as the calibration: one writer's run and the workspace's state around it. Counted.
@@ -418,22 +468,23 @@ export function main(argv: readonly string[]) {
   const after = workspaceState();
   const problem = n1Problem(arrivedBetween(before.originMain, after.originMain), readAppended(before.auditBytes), empty, probe.counted);
   writeFileSync(spentFile, `${JSON.stringify({ runs: spent + 1, n1: { before, after, problem } }, null, 2)}\n`);
-  if (problem !== null) return print({ batch: SCREEN.batch, stopped: `N=1: ${problem}`, runs: spent + 1 });
+  if (problem !== null) return print({ batch: batch.id, stopped: `N=1: ${problem}`, runs: spent + 1 });
   const spend = (runs: number) => writeFileSync(spentFile, `${JSON.stringify({ runs, n1: { before, after, problem } }, null, 2)}\n`);
   const result = screenRows(rows, deps, {
     maxRuns,
     alreadyRun: spent + 1,
     placed,
+    hasCase: ownCases(),
     decided,
     progress: (runs, rec) => {
-      if (rec !== null) writeRow(records, rec);
+      if (rec !== null) writeRow(records, batch.id, rec);
       spend(runs);
     },
   });
   spend(result.runs);
-  const counts = countsOf(result, M, rows.length);
-  const whole = counts.go !== null;
-  return print({ batch: SCREEN.batch, ...counts, sha256: whole ? writeVerdicts(records, rows, counts) : null });
+  const counts = countsOf(result, M, rows.length, batch.id === "b1");
+  const whole = result.stopped === null && result.records.length === rows.length;
+  return print({ batch: batch.id, ...counts, sha256: whole ? writeVerdicts(records, batch.id, rows, counts) : null });
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

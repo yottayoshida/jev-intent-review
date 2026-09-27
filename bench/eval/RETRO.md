@@ -1,4 +1,4 @@
-# The retrospective measurement, version 5 (issue #89)
+# The retrospective measurement, version 6 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -52,6 +52,31 @@ A case counted as not caught this way counts as not caught in the yield check as
 toward going on. The steps and bytes of a request not sent are kept in the row's record (`notSent`).
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
+
+**Version 6** (after `b1`, before any repository was placed) changes when this measurement's opening is
+written and where its cases stay; nothing about how a row is examined. `run.ts` no longer opens every
+sealed repository of `split.json`: #80's opening takes #80's repositories only (`sealed.ts`, `openSet`,
+held by a test that places a #89 repository beside them), so placing this measurement's repositories
+mixes nothing into #80's openings. Opening them is added to `run.ts` together with their run, not
+before it: an opening written first would be checked against files the run then changes, and a
+repository's openings are counted for good, so one spent that way is never given back (owner,
+2026-09-27). The cases stay on the sandbox's `batches` branch, where the verdicts' sha256 on main
+already holds them; version 3 had them moved to `sealed` or `dev` once placed, which added nothing.
+
+**Batch `b1`** (rows 1 to 100, 2026-09-27; verdicts in the sandbox, sha256 in `sealed-batches.json`):
+72 repositories read, 19 with a case — 1 of them caught before the merge — so `c = 18`, `r = 72`, and
+with `M = 552` the projection is 103.5 repositories (64.3 at the lower bound of `c/r`): **the yield
+check goes on**. Of the 19 cases, 14 had a requirement written and kept by the check, 3 had none the
+writer could write, 1 had a gap in O's bundle and 1 a request over the size. Left out: 39 screened as
+not failure handling, 5 as propagating and 1 as other, 17 without O, 7 whose fix's material was not
+complete, and 12 later rows of a repository that had its case. 308 annotator runs of the 500 allowed
+(owner), the N=1 runs and the diagnosis of rows 19 and 63 included. The run stopped four times — row
+19's request over the argument limit (version 5), row 63's screen answering what was not JSON four
+times, and two failures of GitHub or the network — and was resumed each time at the row it stopped on.
+Its 19 case repositories are placed by the salt `52d60c0` (the merge of #127, the first main merge
+commit holding the batch's sha256): **13 sealed, 6 dev**. The case caught before the merge is on the
+sealed side, so 12 of the 13 count toward the 17. Sealed is short of 17, so the next batch reads on from
+row 101.
 
 ## The question
 
@@ -299,7 +324,7 @@ Dev records are in `bench/eval/retro/`. **Sealed records — F, O, the bundle, t
 answer — live in the private `yottayoshida/jev-review-sandbox`, on its `batches` branch** (version 3;
 version 2 said `sealed`): each row's record in `batches/89-<batch>/<row>.json`, and the batch's
 verdicts in `batches/89-<batch>.json` — each row's outcome and the sha256 of each row's file — as
-`PROTOCOL.md` rule 5 keeps #80's. Once a case's side is known it goes to `sealed` or `dev`. This
+`PROTOCOL.md` rule 5 keeps #80's. A case stays there once its side is known (version 6). This
 repository holds only the batch's line in `sealed-batches.json` — the rows read, `kept` (the
 repositories with a case, those caught before the merge included: every one of them is placed) and the
 sha256 of the verdicts file; the salt that places a batch's repositories is the first main merge commit
@@ -307,11 +332,10 @@ holding that hash. `retro/screen.ts` prints only counts; an error names the row,
 error's kind, never the row's text.
 
 Opening sealed retrospective cases goes through `bench/eval/run.ts --set sealed open`, on a line of its
-own with `#89` in the reason, and is counted per repository with every other opening. **`run.ts` opens
-every sealed repository of `split.json` on one line today**, and runs nothing yet (its run is wired with
-the second part of #80). Opening only this measurement's repositories on a line of their own is added to
-`run.ts` before the first sealed retrospective case is placed; until then no sealed retrospective case
-is opened, and none exists.
+own with `#89` in the reason, and is counted per repository with every other opening. #80's opening
+takes #80's repositories only, so a placed retrospective repository is never opened by it. Opening this
+measurement's repositories is added to `run.ts` with their run (version 6); until then no sealed
+retrospective case is opened.
 
 ## Annotator runs
 
