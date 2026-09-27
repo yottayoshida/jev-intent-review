@@ -534,10 +534,32 @@ export async function targetOf(discoverer: Discoverer, fn: FunctionCandidate): P
 /**
  * Where a call's callee settled, whatever it returns. `repository` is one definition here;
  * `versions` is several read as one thing (a trait's method, or a function written once per
- * platform under `#[cfg(…)]`), named by the first; `outside` is a row of the table of functions
- * outside the repository (ADR 0011). `null` when nothing settled it.
+ * platform under `#[cfg(…)]`), named by the first and listed whole in `all`; `outside` is a row of
+ * the table of functions outside the repository (ADR 0011). `null` when nothing settled it.
  */
-export type CalleeLocation = { kind: "repository" | "versions"; path: string; line: number } | { kind: "outside"; row: string } | null;
+export type CalleeLocation =
+  | { kind: "repository"; path: string; line: number }
+  | { kind: "versions"; path: string; line: number; all: { path: string; line: number }[] }
+  | { kind: "outside"; row: string }
+  | null;
+
+/**
+ * How far a callee was resolved, read from `calleeOf`'s answer (ADR 0024). The axis is where it
+ * settled, not whether it returns a `Result`: a callee settled to one definition that returns
+ * something else is resolved all the same.
+ *
+ *   - `resolved`: one definition here, or a row of the table outside;
+ *   - `ambiguous`: several read as one thing, several and none chosen, or definitions compiled only
+ *     for tests (the name is defined; which one a build outside tests reaches is not);
+ *   - `unsupported`: no definition reached — a name defined nowhere here, one the search was cut
+ *     short on, or a callee that is not a name.
+ *
+ * Nothing in the product reads this; the record (docs/resolution.md) and ADR 0024 do.
+ */
+export function resolutionOf(result: Applicability, at: CalleeLocation): "resolved" | "ambiguous" | "unsupported" {
+  if (at !== null) return at.kind === "versions" ? "ambiguous" : "resolved";
+  return !result.ok && result.kind === "callee_ambiguous" ? "ambiguous" : "unsupported";
+}
 
 /**
  * The second half of `applicabilityOf`: what the callee is and whether it returns a `Result`,
@@ -597,14 +619,15 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
   }
 
   // Versions of one thing: which one runs is not settled, so all of them must return a Result.
+  const versions: CalleeLocation = { kind: "versions", path: def.path, line: def.line, all: definitions.map((d) => ({ path: d.path, line: d.line })) };
   const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
   for (const [i, reading] of readings.entries()) {
     if (reading.kind === "returns") continue;
     const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
     const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
-    return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: { kind: "versions", path: def.path, line: def.line } };
+    return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: versions };
   }
-  return { result: { ok: true, calleeDefinedAt: at }, at: { kind: "versions", path: def.path, line: def.line } };
+  return { result: { ok: true, calleeDefinedAt: at }, at: versions };
 }
 
 /**

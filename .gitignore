@@ -7,3 +7,4 @@ coverage/
 dist/
 *.tgz
 bench/call-oracle/target/
+bench/resolution-oracle/target/

@@ -1,0 +1,639 @@
+{
+ "what": "#83's second part, the plan's third check: renaming the definition rust-analyzer names breaks a same or voided call there, and renaming the product's own pick of a wrong call does not (bar 95% each). Written by `node bench/resolution.ts rustc`.",
+ "perClass": 20,
+ "seed": "83-resolution-v1",
+ "tally": {
+  "same": {
+   "checked": 20,
+   "broke": 18,
+   "held": 2,
+   "notRenamed": 0
+  },
+  "voided": {
+   "checked": 20,
+   "broke": 20,
+   "held": 0,
+   "notRenamed": 0
+  },
+  "wrongProductPick": {
+   "checked": 20,
+   "broke": 0,
+   "held": 20,
+   "notRenamed": 0
+  }
+ },
+ "passedOver": {
+  "why": "the Cargo project does not build before any rename (a toolchain file this cargo does not read, a wasm target not installed, a C++ build)",
+  "rows": {
+   "grovedb-500 .": 40,
+   "kontor-385 core": 33,
+   "whatsapp-rust-759 .": 26,
+   "moltis-1064 .": 42,
+   "kontor-385 test-contracts": 4,
+   "grovedb-501 .": 9,
+   "kontor-385 native-contracts": 2
+  }
+ },
+ "results": [
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/installer.rs",
+   "line": 1435,
+   "callee": "is_omamori_hook_path",
+   "renamed": "src/installer.rs:1220",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/audit/verify.rs",
+   "line": 426,
+   "callee": "mark_unverifiable_tail",
+   "renamed": "src/audit/verify.rs:238",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/resolver.rs",
+   "line": 751,
+   "callee": "active_python_cp_tag",
+   "renamed": "src/resolver.rs:479",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/cli/doctor.rs",
+   "line": 51,
+   "callee": "flag_value",
+   "renamed": "src/util.rs:117",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/module_finder.rs",
+   "line": 42,
+   "callee": "default_extensions",
+   "renamed": "src/module_finder.rs:57",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/commands/test.rs",
+   "line": 111,
+   "callee": "find_python_env",
+   "renamed": "src/env.rs:63",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/commands/mod.rs",
+   "line": 945,
+   "callee": "RenderDetail::error",
+   "renamed": "src/commands/mod.rs:60",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/config.rs",
+   "line": 876,
+   "callee": "RuleConfig::new",
+   "renamed": "src/rules.rs:121",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 502,
+   "callee": "tbl",
+   "renamed": "src/schema_builder.rs:25",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/cli/doctor.rs",
+   "line": 407,
+   "callee": "crate::break_glass::read_active_entries",
+   "renamed": "src/break_glass.rs:186",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/resolver.rs",
+   "line": 56,
+   "callee": "versions_equal",
+   "renamed": "src/resolver.rs:1502",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/runtime.rs",
+   "line": 256,
+   "callee": "pep425_macos_arm64_tags",
+   "renamed": "src/runtime.rs:179",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/commands/test.rs",
+   "line": 279,
+   "callee": "info",
+   "renamed": "src/schema.rs:537",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/drift.rs",
+   "line": 165,
+   "callee": "extract_package_name_from_dep",
+   "renamed": "src/drift.rs:450",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/integrity.rs",
+   "line": 198,
+   "callee": "baseline_path",
+   "renamed": "src/integrity.rs:125",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/telemetry.rs",
+   "line": 91,
+   "callee": "Self::default",
+   "renamed": "src/telemetry.rs:72",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "benches/audit_append.rs",
+   "line": 102,
+   "callee": "RuleConfig::new",
+   "renamed": "src/rules.rs:121",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/unwrap.rs",
+   "line": 1476,
+   "callee": "basename",
+   "renamed": "src/unwrap.rs:2034",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/types.rs",
+   "line": 514,
+   "callee": "extract_kwarg_or_env_opt",
+   "renamed": "src/types.rs:57",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "same",
+   "probe": "oracle",
+   "path": "src/worker.rs",
+   "line": 1731,
+   "callee": "get_db",
+   "renamed": "src/context.rs:1467",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/entities/quebec_failed_executions.rs",
+   "line": 225,
+   "callee": "query_builder::failed_executions::delete_by_job_id",
+   "renamed": "src/query_builder.rs:2465",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 1678,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/control_plane/handlers/health.rs",
+   "line": 82,
+   "callee": "query_builder::claimed_executions::oldest_created_at",
+   "renamed": "src/query_builder.rs:1920",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/dispatcher.rs",
+   "line": 469,
+   "callee": "query_builder::blocked_executions::delete_by_id",
+   "renamed": "src/query_builder.rs:2094",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 902,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 285,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 415,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 487,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 315,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "pybun-428",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/commands/install.rs",
+   "line": 80,
+   "callee": "root",
+   "renamed": "src/project.rs:138",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/types.rs",
+   "line": 1009,
+   "callee": "crate::query_builder::jobs::find_by_id",
+   "renamed": "src/query_builder.rs:288",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/engine/hook.rs",
+   "line": 333,
+   "callee": "message",
+   "renamed": "src/unwrap.rs:95",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 563,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 429,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 203,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/query_builder.rs",
+   "line": 414,
+   "callee": "col",
+   "renamed": "src/query_builder.rs:220",
+   "broke": true
+  },
+  {
+   "case": "omamori-468",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/config.rs",
+   "line": 526,
+   "callee": "as_str",
+   "renamed": "src/rules.rs:41",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 555,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/control_plane/handlers/failed_jobs.rs",
+   "line": 103,
+   "callee": "query_builder::failed_executions::count_all",
+   "renamed": "src/query_builder.rs:2485",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "voided",
+   "probe": "oracle",
+   "path": "src/schema_builder.rs",
+   "line": 324,
+   "callee": "col",
+   "renamed": "src/schema_builder.rs:20",
+   "broke": true
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/worker.rs",
+   "line": 678,
+   "callee": "name",
+   "renamed": "src/config.rs:454",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/installer.rs",
+   "line": 1522,
+   "callee": "get",
+   "renamed": "src/audit/secret.rs:574",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/installer.rs",
+   "line": 843,
+   "callee": "is_empty",
+   "renamed": "src/audit/secret.rs:578",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/cli/break_glass_cmd.rs",
+   "line": 394,
+   "callee": "iter",
+   "renamed": "src/audit/secret.rs:582",
+   "broke": false
+  },
+  {
+   "case": "instruckt-tauri-9",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/store.rs",
+   "line": 59,
+   "callee": "lock_exclusive",
+   "renamed": "src/store.rs:53",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/cli/doctor.rs",
+   "line": 116,
+   "callee": "iter",
+   "renamed": "src/audit/secret.rs:582",
+   "broke": false
+  },
+  {
+   "case": "pybun-428",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/commands/test.rs",
+   "line": 427,
+   "callee": "len",
+   "renamed": "src/snapshot.rs:128",
+   "broke": false
+  },
+  {
+   "case": "pybun-428",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/commands/run.rs",
+   "line": 775,
+   "callee": "len",
+   "renamed": "src/snapshot.rs:128",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/config.rs",
+   "line": 368,
+   "callee": "to_string",
+   "renamed": "src/config.rs:90",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/config.rs",
+   "line": 343,
+   "callee": "serde_yaml::from_str",
+   "renamed": "src/database_url.rs:165",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/break_glass.rs",
+   "line": 353,
+   "callee": "is_empty",
+   "renamed": "src/audit/secret.rs:578",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/worker.rs",
+   "line": 188,
+   "callee": "crate::context::RateLimitConflict::default",
+   "renamed": "src/context.rs:143",
+   "broke": false
+  },
+  {
+   "case": "instruckt-tauri-9",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/store.rs",
+   "line": 70,
+   "callee": "lock_shared",
+   "renamed": "src/store.rs:64",
+   "broke": false
+  },
+  {
+   "case": "pybun-428",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/commands/maintenance.rs",
+   "line": 646,
+   "callee": "len",
+   "renamed": "src/snapshot.rs:128",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/config.rs",
+   "line": 80,
+   "callee": "to_string",
+   "renamed": "src/config.rs:90",
+   "broke": false
+  },
+  {
+   "case": "omamori-468",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/engine/hook.rs",
+   "line": 1496,
+   "callee": "get",
+   "renamed": "src/audit/secret.rs:574",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/control_plane/handlers/scheduled_jobs.rs",
+   "line": 180,
+   "callee": "to_string",
+   "renamed": "src/config.rs:90",
+   "broke": false
+  },
+  {
+   "case": "quebec-136",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/config.rs",
+   "line": 136,
+   "callee": "to_string",
+   "renamed": "src/config.rs:90",
+   "broke": false
+  },
+  {
+   "case": "pybun-428",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/test_discovery.rs",
+   "line": 849,
+   "callee": "contains",
+   "renamed": "src/snapshot.rs:123",
+   "broke": false
+  },
+  {
+   "case": "pybun-428",
+   "class": "wrong",
+   "probe": "product",
+   "path": "src/commands/tooling.rs",
+   "line": 342,
+   "callee": "len",
+   "renamed": "src/snapshot.rs:128",
+   "broke": false
+  }
+ ]
+}

@@ -22,9 +22,9 @@ import type { SiteSource } from "./select.ts";
 /** How many functions the changed lines may contribute. */
 const MAX_CHANGED_FUNCTIONS = 40;
 /** How many changed functions have their callers looked up. */
-const MAX_HOP_NAMES = 12;
+export const MAX_HOP_NAMES = 12;
 /** How many caller functions the hop may contribute. */
-const MAX_CALLER_FUNCTIONS = 20;
+export const MAX_CALLER_FUNCTIONS = 20;
 /**
  * A name referenced from more files than this is infrastructure rather than the thing the change
  * protects, and its callers are not a lead. `Discoverer` draws the same line at 40 for the whole
