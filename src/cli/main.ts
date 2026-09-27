@@ -528,7 +528,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     let budget: PullRequestBudget | null = null;
     let runConfig = config;
     if (perPullRequest !== undefined) {
-      const unapplied = (why: string) => `limits.max_requests_per_pull_request (${perPullRequest}) was not applied: ${why}. This run was held by limits.max_requests (${config.limits.max_requests}) alone.`;
+      const unapplied = (why: string) => `limits.max_requests_per_pull_request (${perPullRequest}) was not applied: ${why}. This run was bounded by limits.max_requests (${config.limits.max_requests}) alone.`;
       const opened = answersDir === undefined ? { refused: "" } : await PullRequestBudget.open(answersDir);
       if ("refused" in opened) notes.push(unapplied(answersDir === undefined ? "what a pull request has sent is counted in the --answers directory, and this run has none" : `the count in --answers could not be used (${opened.refused})`));
       else {

@@ -16,7 +16,7 @@ A real run on omamori's [PR #476](https://github.com/yottayoshida/omamori/pull/4
 
 The image is drawn from that run's output by [`docs/demo/render.py`](docs/demo/render.py), which refuses to draw a line the output does not contain.
 
-Without `--candidates-only`, each of those calls is asked about and the report sorts them into *worth checking*, *holding*, *not settled* and *not required of by the requirement* — see [reading the output](docs/local-check-cli.md#reading-the-output).
+Without `--candidates-only`, each of those calls is asked about and the report sorts them into *worth checking*, *not settled*, *read as holding* and *read, but not required of by the requirement* — see [reading the output](docs/local-check-cli.md#reading-the-output).
 
 ## Quick start
 

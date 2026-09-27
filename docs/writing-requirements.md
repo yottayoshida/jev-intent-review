@@ -64,7 +64,7 @@ Jev once, over the sentence alone, which form it says, and checks under that for
 (0.6 or more); otherwise, and when Jev reads neither, under failure propagation, as before. The
 report says which form and who chose it. A sentence that names the operation it forbids — "A
 disabled API key must never create a session." — reaches the calls that share a word with it; one
-that names none reaches no call, and the report says so for each call it held.
+that names none reaches no call, and the report says so for each call it set aside.
 
 A third form, `failure_handling` — a failure may be returned, logged or recorded, and must not be
 turned silently into a success — is never chosen this way: it is used only when a spec names it

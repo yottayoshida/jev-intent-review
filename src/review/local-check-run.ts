@@ -583,7 +583,7 @@ export async function runLocalCheck(
 
     const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere, calleeResultOf });
     const selection = await selectSites([...fromChange.sources.values()], decide, options.budget, callerBudget);
-    for (const h of selection.held) into.unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
+    for (const h of selection.held) into.unchecked.push({ file: h.fn.path, function: h.fn.name, call: shown(h.call), origin: h.origin, why: h.applicability && !h.applicability.ok ? h.applicability.reason : "set aside before its question" });
     const spent = { changed: `the budget of ${options.budget} was already spent`, calls_changed: `the callers' budget of ${selection.byOrigin.calls_changed.budget} was already spent` } satisfies Record<FunctionOrigin, string>;
     for (const o of selection.overBudget) into.unchecked.push({ file: o.fn.path, function: o.fn.name, call: shown(o.call), origin: o.origin, why: spent[o.fnOrigin as FunctionOrigin] });
 
@@ -696,7 +696,7 @@ export async function runLocalCheck(
     for (const { requirement, form, quote, result } of passes) {
       const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere, calleeResultOf });
       const selection = await selectSiblings(siblings.siblings, decide, budget);
-      for (const h of selection.held) result.unchecked.push({ ...placeOf(h), why: h.applicability && !h.applicability.ok ? h.applicability.reason : "held" });
+      for (const h of selection.held) result.unchecked.push({ ...placeOf(h), why: h.applicability && !h.applicability.ok ? h.applicability.reason : "set aside before its question" });
       for (const o of selection.overBudget) result.unchecked.push({ ...placeOf(o), why: `the siblings' budget of ${budget} was already spent` });
       result.wouldAsk.push(...selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin, ...(s.via === undefined ? {} : { via: s.via }) })));
       const into: Collected = { observed: [], unchecked: result.unchecked, mappings: [], findings: result.findings };
