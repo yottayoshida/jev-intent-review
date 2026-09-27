@@ -54,6 +54,26 @@ export interface RustCall {
   exprEnd: number;
   /** Inside a macro whose arguments were read again as expressions (ADR 0022). */
   inMacro: boolean;
+  /** For a method call (`x.name(…)`), what it is called on as far as it is written (#83, ADR 0027). */
+  receiver?: Receiver;
+}
+
+/**
+ * What a method call is called on (#83, ADR 0027): `self`, a name, another call — by the line and the
+ * column the listing records it at, so its callee is looked up as any listed call's is — or not read.
+ */
+export type Receiver = { kind: "self" } | { kind: "name"; name: string } | { kind: "call"; line: number; startColumn: number } | { kind: "type"; path: string[] } | { kind: "unread" };
+
+/**
+ * A name a function binds, over the lines it is in force (#83): a parameter or a `let` with its written
+ * `type`, a `let` set from a call or a name (`value`), or something this does not read the type of.
+ */
+export interface Binding {
+  name: string;
+  scope: Span;
+  type?: string;
+  value?: Receiver;
+  unread?: true;
 }
 
 export interface RustItem extends Span {
@@ -81,6 +101,8 @@ export interface ParsedRust {
   macrosUnreadAt: Span[];
   /** Every name a `use` brings in, with the block it applies to (#83). */
   uses: UseBinding[];
+  /** What names functions bind, and where (#83, ADR 0027). */
+  bindings: Binding[];
   /** Inline `mod x { … }` blocks, which a `use` outside does not reach unless they `use super::*`. */
   mods: (Span & { superGlob: boolean })[];
 }
@@ -212,7 +234,7 @@ export function parseRust(source: string): ParsedRust {
     return { line: lo + 1, column: index - (lineStarts[lo] as number) };
   };
 
-  const result: ParsedRust = { functions: [], calls: [], items: [], unread: [], macrosNotRead: 0, macrosUnreadAt: [], uses: [], mods: [] };
+  const result: ParsedRust = { functions: [], calls: [], items: [], unread: [], macrosNotRead: 0, macrosUnreadAt: [], uses: [], mods: [], bindings: [] };
   const spanOf = (n: Node, w: Walk): Span => ({ startLine: position(w.offset(n.startIndex)).line, endLine: position(w.offset(Math.max(n.startIndex, n.endIndex - 1))).line });
   /** A node's text in the file, not in what the parser was given. */
   const textIn = (w: Walk) => (n: Node) => source.slice(w.offset(n.startIndex), w.offset(n.endIndex));
@@ -249,6 +271,7 @@ export function parseRust(source: string): ParsedRust {
         }
       }
       if (node.type === "call_expression" && nextFn !== null && !nextTest) readCall(node, w, nextFn);
+      if (!nextTest) readBindings(node, w);
       if (node.type === "use_declaration" && !w.inMacro) readUse(node, w);
       if (node.type === "mod_item" && !w.inMacro) {
         const body = node.childForFieldName("body");
@@ -280,10 +303,37 @@ export function parseRust(source: string): ParsedRust {
     }
   };
 
-  const readCall = (node: Node, w: Walk, fn: number) => {
+  /**
+   * What a method call is called on, as far as it is written (#83, ADR 0027): `self`, a name, or
+   * another call (by where the listing records it, so its callee can be looked up as the listing's
+   * is). A field, `?`, `.await`, an index or anything else is not read. `&`, `*` and brackets are.
+   */
+  const receiverOf = (value: Node | null, w: Walk): Receiver => {
+    let n = value;
+    while (n && (n.type === "parenthesized_expression" || n.type === "reference_expression" || (n.type === "unary_expression" && textIn(w)(n).trimStart().startsWith("*")))) {
+      n = n.type === "reference_expression" ? n.childForFieldName("value") : (n.namedChildren.at(-1) ?? null);
+    }
+    if (!n) return { kind: "unread" };
+    if (n.type === "self") return { kind: "self" };
+    if (n.type === "identifier") return { kind: "name", name: textIn(w)(n).replace(/^r#/, "") };
+    // An enum's variant (`Fuel::AddFile.consume(…)`): a value of the enum. CamelCase only — an
+    // associated constant (`Foo::MAX.len()`) is some other type.
+    if (n.type === "scoped_identifier") {
+      const names = pathNames(n, textIn(w));
+      if (names && names.length >= 2 && /^[A-Z][a-z]/.test(names.at(-1)!) && /^[A-Z]/.test(names.at(-2)!)) return { kind: "type", path: names.slice(0, -1) };
+    }
+    if (n.type === "call_expression") {
+      const place = callPlace(n, w);
+      if (place && place.callee !== "") return { kind: "call", line: place.line, startColumn: place.startColumn };
+    }
+    return { kind: "unread" };
+  };
+
+  /** Where a call is, as the listing records it: its callee, the line and column of its last name, where it starts. */
+  const callPlace = (node: Node, w: Walk) => {
     const func = node.childForFieldName("function");
     const args = node.childForFieldName("arguments");
-    if (!func || !args) return;
+    if (!func || !args) return null;
     const text = textIn(w);
     let callee = "";
     let nameNode: Node | null = null;
@@ -309,7 +359,80 @@ export function parseRust(source: string): ParsedRust {
     // Where the callee is written, on the name's line; a callee that is not a name keeps the `(`.
     const written = nameNode ? position(w.offset(exprStartNode.startIndex)) : p;
     const startColumn = nameNode && written.line === p.line ? written.column + (text(exprStartNode).startsWith("r#") ? 2 : 0) : column;
-    result.calls.push({ fn, line: p.line, column, startColumn, callee, exprStart: w.offset(exprStartNode.startIndex), exprEnd: w.offset(args.endIndex), inMacro: w.inMacro });
+    return { line: p.line, column, startColumn, callee, exprStart: w.offset(exprStartNode.startIndex), exprEnd: w.offset(args.endIndex), method: inner?.type === "field_expression" ? inner : null };
+  };
+
+  const readCall = (node: Node, w: Walk, fn: number) => {
+    const place = callPlace(node, w);
+    if (!place) return;
+    const { method, ...at } = place;
+    result.calls.push({ fn, ...at, inMacro: w.inMacro, ...(method ? { receiver: receiverOf(method.childForFieldName("value"), w) } : {}) });
+  };
+
+  /** The names a pattern binds: every identifier in it. */
+  const patternNames = (pattern: Node | null, w: Walk): string[] => {
+    if (!pattern) return [];
+    if (pattern.type === "identifier") return [textIn(w)(pattern).replace(/^r#/, "")];
+    const out: string[] = [];
+    const stack = [pattern];
+    while (stack.length) {
+      const n = stack.pop()!;
+      if (n.type === "identifier") out.push(textIn(w)(n).replace(/^r#/, ""));
+      for (const c of n.namedChildren) if (c) stack.push(c);
+    }
+    return out;
+  };
+
+  /**
+   * What a function binds a name to, and where (#83): a parameter or a `let` with its written type,
+   * or a `let` with the call or name it is set from; anything else — a closure's parameter, `for`,
+   * `if let`, a match arm, a pattern — as not read, so it hides the names outside it.
+   */
+  const readBindings = (node: Node, w: Walk) => {
+    const span = (n: Node): Span => spanOf(n, w);
+    const unread = (names: string[], scope: Span) => {
+      for (const name of names) result.bindings.push({ name, scope, unread: true });
+    };
+    switch (node.type) {
+      case "function_item": {
+        const body = node.childForFieldName("body");
+        if (!body) return;
+        for (const p of node.childForFieldName("parameters")?.namedChildren ?? []) {
+          if (p?.type !== "parameter") continue;
+          const pattern = p.childForFieldName("pattern");
+          const type = p.childForFieldName("type");
+          if (pattern?.type === "identifier" && type) result.bindings.push({ name: textIn(w)(pattern).replace(/^r#/, ""), scope: span(body), type: textIn(w)(type) });
+          else unread(patternNames(pattern, w), span(body));
+        }
+        return;
+      }
+      case "closure_expression":
+        unread(patternNames(node.childForFieldName("parameters"), w), span(node));
+        return;
+      case "let_declaration": {
+        // In force from the line after the statement (`let x = x.clone();` reads the `x` before it), to
+        // the end of the block it is in.
+        const block = node.parent;
+        if (!block) return;
+        const scope = { startLine: span(node).endLine + 1, endLine: span(block).endLine };
+        const pattern = node.childForFieldName("pattern");
+        const type = node.childForFieldName("type");
+        const value = node.childForFieldName("value");
+        if (pattern?.type !== "identifier") return unread(patternNames(pattern, w), scope);
+        const name = textIn(w)(pattern).replace(/^r#/, "");
+        if (type) result.bindings.push({ name, scope, type: textIn(w)(type) });
+        else if (value) result.bindings.push({ name, scope, value: receiverOf(value, w) });
+        else result.bindings.push({ name, scope, unread: true });
+        return;
+      }
+      case "for_expression":
+        unread(patternNames(node.childForFieldName("pattern"), w), span(node));
+        return;
+      case "let_condition":
+      case "match_arm":
+        unread(patternNames(node.childForFieldName("pattern"), w), span(node.type === "let_condition" ? (node.parent ?? node) : node));
+        return;
+    }
   };
 
   /** The names a `use` brings in, each with the block the `use` is written in. */

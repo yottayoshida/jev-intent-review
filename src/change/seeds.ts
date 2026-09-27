@@ -79,17 +79,24 @@ function significant(name: string): boolean {
  * method call is never a keyword: `db.delete(id)` and `query.select(...)` are calls.
  */
 export function calledNames(text: string): Set<string> {
-  const names = new Set<string>();
+  return new Set([...callsIn(text)].map((c) => c.name));
+}
+
+/** Of `calledNames`, the names called as methods (`x.name(…)`) (#83, ADR 0027). */
+export function calledMethods(text: string): Set<string> {
+  return new Set([...callsIn(text)].flatMap((c) => (c.method ? [c.name] : [])));
+}
+
+function* callsIn(text: string): Generator<{ name: string; method: boolean }> {
   for (const line of text.split("\n")) {
     const defines = looksLikeHeader(line) ? definedName(line) : undefined;
     for (const match of line.matchAll(CALL)) {
       const name = match[1] as string;
       const method = line[(match.index ?? 0) - 1] === ".";
       const kept = method ? name.length >= 3 && !BUILTIN_CALLS.has(name) : significant(name);
-      if (name !== defines && kept) names.add(name);
+      if (name !== defines && kept) yield { name, method };
     }
   }
-  return names;
 }
 
 const CONSTRUCTED = /(?:\bnew|\bthrow|\braise)\s+([A-Z][\w$]*)\s*\(/g;

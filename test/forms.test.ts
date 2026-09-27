@@ -579,3 +579,23 @@ test("failure_handling holds a call whose failure goes to this repository's own 
   // The control: not defined here, so nothing decides it elsewhere and the call is asked.
   assert.deepEqual(await FORMS.failure_handling.decisive({ requirement: {} as Requirement, fn: {} as never, call, body, calls: [call], defined: async () => false }), { send: [] });
 });
+
+test("check_before_action: a check named like a standard-library method is sent only where what it is called on is read as this repository's type (#83, ADR 0027)", async () => {
+  const empty = requirementOf("EMPTY", "An empty API key record must never create a session.", "check_before_action");
+  const store = STORE.replace(
+    "pub fn is_disabled(record: &KeyRecord) -> bool {\n    record.disabled\n}\n",
+    "pub struct KeyRecord {\n    empty: bool,\n}\n\nimpl KeyRecord {\n    pub fn is_empty(&self) -> bool {\n        self.empty\n    }\n}\n",
+  );
+  const on = async (binding: string) => {
+    const auth = AUTH.replace("let record = load_key(store, key)?;", binding).replace("if is_disabled(&record) {", "if record.is_empty() {");
+    const [r] = await runOn(fakeRepo({ "src/auth.rs": auth, "src/store.rs": store }, { "src/auth.rs": auth.replace("audit(store)?;", "record_use(store)?;") }, hunk("src/auth.rs", auth, "audit(store)?;", "record_use(store)?;")), [empty], recording().provider);
+    return r!;
+  };
+  // `?` is not read, so what `record` is stays unknown: `is_empty` may be a `Vec`'s, and the call is held.
+  const unread = await on("let record = load_key(store, key)?;");
+  assert.equal(byCall(unread.observed, "create_session"), undefined, "not asked");
+  assert.match(byCall(unread.unchecked, "create_session")?.why ?? "", /the check `is_empty` is also a method of the standard library/);
+  // The control: the type written on the `let` is this repository's, and `is_empty` is in its `impl`.
+  const typed = await on("let record: KeyRecord = load_key(store, key)?;");
+  assert.deepEqual(byCall(typed.observed, "create_session")?.sent?.map((s) => [s.name, s.path]), [["is_empty", "src/store.rs"]]);
+});

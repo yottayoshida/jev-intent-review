@@ -26,7 +26,9 @@ import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 import { cfgPredicate, testOnlyCfg } from "../syntax/cfg.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
 import { namesTheStandardLibrary, outsideResult } from "./outside-results.ts";
-import { importOf } from "../syntax/rust.ts";
+import { importOf, type ParsedRust } from "../syntax/rust.ts";
+import { crateOf, namesOf, receiverType } from "./receiver-type.ts";
+import { STD_METHOD_NAMES } from "./std-methods.ts";
 import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
 
 export type Applicability =
@@ -380,18 +382,6 @@ async function whereWritten(reader: ReturnTypes, definition: Definition): Promis
   return head.kind === "impl" && head.self === undefined ? "unread" : head;
 }
 
-/**
- * Where a file's crate begins: everything up to its `src/`. A path with none — `examples/demo.rs`,
- * or a crate laid out without one — falls back to the file's own directory, never to the whole
- * repository, or a workspace's other crates come back in.
- */
-function crateOf(path: string): string {
-  const at = path.lastIndexOf("/src/");
-  if (at >= 0) return path.slice(0, at + "/src/".length);
-  if (path.startsWith("src/")) return "src/";
-  const directory = path.lastIndexOf("/");
-  return directory >= 0 ? path.slice(0, directory + 1) : "";
-}
 
 /** The type `Self` names where the call is written, or undefined when that cannot be read. */
 async function selfType(reader: ReturnTypes, fn: FunctionCandidate): Promise<string | undefined> {
@@ -544,6 +534,9 @@ export type CalleeLocation =
   | { kind: "outside"; row: string }
   | null;
 
+/** Whether a callee settled to this repository: one definition, or versions of one thing (#83, ADR 0027). */
+export const settlesHere = (at: CalleeLocation | undefined): at is Extract<CalleeLocation, { path: string }> => at?.kind === "repository" || at?.kind === "versions";
+
 /**
  * How far a callee was resolved, read from `calleeOf`'s answer (ADR 0025). The axis is where it
  * settled, not whether it returns a `Result`: a callee settled to one definition that returns
@@ -568,7 +561,7 @@ export function resolutionOf(result: Applicability, at: CalleeLocation): "resolv
  * function that does not return one (the siblings of a change, ADR 0005). `result` is what
  * `applicabilityOf` says of the call once the calling function returns a `Result`, word for word.
  */
-export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<{ result: Applicability; at: CalleeLocation }> {
+export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, depth = 0): Promise<{ result: Applicability; at: CalleeLocation }> {
   const reader = returnTypesFor(discoverer);
   const bare = call.callee.split("::").pop()!;
   // `(self.f)(x)`, `make()(x)`: listed since #83, and no name to look a definition up by.
@@ -600,6 +593,10 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
     return { result: held, at: null };
   }
   const { definitions, sole } = narrowed;
+  // A method whose name the standard library uses too (#83, ADR 0027): the name alone does not say
+  // it is this repository's; what it is called on has to be a type of this crate whose `impl` holds it.
+  const byReceiver = await heldByReceiver(discoverer, fn, call, bare, definitions, parsed, depth);
+  if (byReceiver) return { result: byReceiver, at: null };
   const def = definitions[0]!;
   const at = `${def.path}:${def.line}`;
 
@@ -631,6 +628,84 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
     return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: versions };
   }
   return { result: { ok: true, calleeDefinedAt: at }, at: versions };
+}
+
+/**
+ * For a method call (`x.name(…)`) whose name the standard library uses for a public method, why the
+ * definitions the name reading chose are not kept, or null when they are (#83, ADR 0027). They are
+ * kept when what the call is made on is one of this crate's types and one of them is in that type's
+ * `impl` (an alias of the type, either way, is the same type). Nothing is chosen here that the name
+ * reading had not: a set of versions stays the set.
+ */
+async function heldByReceiver(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, bare: string, definitions: Definition[], parsed: ParsedRust | undefined, depth: number): Promise<Extract<Applicability, { ok: false }> | null> {
+  if (!parsed || !STD_METHOD_NAMES.has(bare)) return null;
+  const written = parsed.calls.find((c) => c.line === call.line && c.startColumn === call.column && c.callee === call.callee);
+  if (!written?.receiver) return null;
+  const reader = returnTypesFor(discoverer);
+  const lines = (await discoverer.index(fn.path))?.lines;
+  let text: string | undefined;
+  const settle = async (line: number, startColumn: number, d: number) => {
+    const inner = parsed.calls.find((c) => c.line === line && c.startColumn === startColumn);
+    if (!inner || inner.callee === "" || !lines) return null;
+    text ??= lines.join("\n");
+    const expression = text.slice(inner.exprStart, inner.exprEnd);
+    const probe: CallCandidate = { id: "", functionId: fn.id, line, text: (lines[line - 1] ?? "").trim(), callee: inner.callee, column: startColumn, expression, expressionComplete: true };
+    const name = inner.callee.split("::").pop()!;
+    const { at } = await calleeOf(discoverer, fn, probe, d);
+    // Versions of one thing are read by the first — a trait's declaration, whose return type every
+    // version shares.
+    if (settlesHere(at)) return { path: at.path, line: at.line, name };
+    // `T::f(…)` where `fn f` is too common for the search (`NodeBuilder::new`): the `fn f` in `impl T`.
+    const segments = inner.callee.split("::");
+    const qualifier = segments.length >= 2 ? segments.at(-2)! : undefined;
+    if (qualifier && /^[A-Z]/.test(qualifier)) {
+      const owner = qualifier === "Self" ? await selfType(reader, fn) : qualifier;
+      const found = owner ? await fnInImplOf(discoverer, owner, name) : null;
+      if (found) return { ...found, name };
+    }
+    return null;
+  };
+  const type = await receiverType(written.receiver, { discoverer, fn, line: call.line, parsed, settle }, depth);
+  const unresolved = (reason: string): Extract<Applicability, { ok: false }> => ({ ok: false, kind: "callee_unresolved", reason });
+  if (!type) return unresolved(`the standard library has a method \`${bare}\` too, and what this call is made on is not read here as one of this repository's types, so which ${bare} it reaches is not established here`);
+  const names = await namesOf(type, discoverer);
+  const inImpl = async (d: Definition) => {
+    const where = await whereWritten(reader, d);
+    if (where === "unread" || where.kind !== "impl" || !where.self) return false;
+    return [...(await namesOf(where.self, discoverer))].some((n) => names.has(n));
+  };
+  if ((await Promise.all(definitions.map(inImpl))).some(Boolean)) return null;
+  return unresolved(`the call is made on a \`${type}\`, and no definition of ${bare} here is in its \`impl\`, so the standard library's may be the one it reaches`);
+}
+
+/**
+ * The one `fn name` written in an `impl` of `type` (inherent or of a trait) in this repository, found
+ * through the type's name rather than the function's: `fn new` is too common for the search to finish,
+ * `NodeBuilder` is not. Null when there is none, more than one, or the search for the type was cut.
+ */
+async function fnInImplOf(discoverer: Discoverer, type: string, name: string): Promise<{ path: string; line: number } | null> {
+  // The headers, not every use of the type: `impl Foo` and `… for Foo`. A header with generics
+  // before the type (`impl<T> Foo<T>`) is found by the second only when it is a trait's.
+  const hits = [];
+  for (const words of [`impl ${type}`, `for ${type}`]) {
+    const found = await discoverer.search(words);
+    if (found.more) return null;
+    hits.push(...found.hits);
+  }
+  const head = new RegExp(`^\\s*(?:pub(?:\\([^)]*\\))?\\s+)?(?:unsafe\\s+)?impl\\b.*\\b${escapeForRegExp(type)}\\b`);
+  const fnLine = new RegExp(`\\bfn\\s+(?:r#)?${escapeForRegExp(name)}\\s*[(<]`);
+  const found: { path: string; line: number }[] = [];
+  for (const hit of hits) {
+    if (!hit.path.endsWith(".rs") || isTestPath(hit.path) || !head.test(hit.text)) continue;
+    const index = await discoverer.index(hit.path);
+    const item = index?.rust?.items.find((i) => i.startLine === hit.line);
+    if (!index || !item) continue;
+    // The header's own type, not a bound or an argument: `impl X for Vec<Foo>` is no `impl Foo`.
+    const written = itemHead(index.lines.slice(hit.line - 1, hit.line + 2).join(" "));
+    if (written.kind !== "impl" || written.self !== type) continue;
+    for (let l = item.startLine; l <= item.endLine; l++) if (fnLine.test(index.lines[l - 1] ?? "")) found.push({ path: hit.path, line: l });
+  }
+  return found.length === 1 ? found[0]! : null;
 }
 
 /**

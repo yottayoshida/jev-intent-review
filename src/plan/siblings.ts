@@ -24,10 +24,11 @@
 // Every name that could not be tied, and every function turned away, is counted in the notes, by
 // reason: that record is what says whether a parser is needed.
 
-import { calledNames, type ChangeAnalysis } from "../change/seeds.ts";
+import { calledMethods, calledNames, type ChangeAnalysis } from "../change/seeds.ts";
 import { isTestPath, refuseWord, type Discoverer } from "../discovery/discover.ts";
 import { redact } from "../evidence/redact.ts";
 import { calleeOf, functionDefinitionsOf, targetOf, type CalleeLocation } from "./applicability.ts";
+import { STD_METHOD_NAMES } from "./std-methods.ts";
 import type { CallCandidate, Candidates, FunctionCandidate } from "./candidates.ts";
 import { COMMON_FILES, isRust, type CandidateFiles } from "./from-diff.ts";
 import { returnTypesFor } from "./result-type.ts";
@@ -113,6 +114,8 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   const spans: ChangedSpan[] = [];
   const changedNames = new Set<string>();
   const removedNames = new Set<string>();
+  /** Of those, the ones a removed line calls as a method. */
+  const removedMethods = new Set<string>();
   const onChanged = new Set<string>();
   const inTests = new Set<string>();
   for (const region of change.regions) {
@@ -133,6 +136,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
       removedNames.add(n);
       onChanged.add(n);
     }
+    for (const n of calledMethods(region.removed.join("\n"))) removedMethods.add(n);
   }
   for (const { fn } of changedSites) {
     changedNames.add(fn.name);
@@ -140,26 +144,41 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   }
 
   // The names the changed code calls, each settled once: by a call the listing read where there is
-  // one, by the name alone where only a removed line held it.
+  // one, by the name alone where only a removed line held it. A method name the standard library uses
+  // too is settled by what each call is made on (#83, ADR 0027), so every call of it is read: calls of
+  // it that settle apart, or one that does not settle, leave the name unsettled — never a seed.
   const settled = new Map<string, { at: CalleeLocation; returns: boolean; regions: number }>();
   for (const { fn, candidates } of changedSites) {
     const seen = new Set<string>();
     for (const call of candidates.calls.filter((c) => c.functionId === fn.id)) {
       const name = bareName(call.callee);
-      if (seen.has(name)) continue;
+      const byReceiver = STD_METHOD_NAMES.has(name);
+      const again = seen.has(name);
+      if (again && !byReceiver) continue;
       seen.add(name);
       const prior = settled.get(name);
-      if (prior) {
+      if (prior && !byReceiver) {
         prior.regions += 1;
         continue;
       }
       const { result, at } = await calleeOf(discoverer, fn, call);
+      if (prior) {
+        if (!again) prior.regions += 1;
+        if (JSON.stringify(prior.at) !== JSON.stringify(at)) settled.set(name, { ...prior, at: null, returns: false });
+        continue;
+      }
       settled.set(name, { at, returns: result.ok, regions: 1 });
     }
   }
   const reader = returnTypesFor(discoverer);
   for (const name of removedNames) {
     if (settled.has(name)) continue;
+    // Called as a method only on a removed line, with nothing it is called on to read: a name the
+    // standard library uses too is not settled there (#83, ADR 0027).
+    if (removedMethods.has(name) && STD_METHOD_NAMES.has(name)) {
+      settled.set(name, { at: null, returns: false, regions: 1 });
+      continue;
+    }
     const { found, more } = await functionDefinitionsOf(discoverer, name);
     if (more || found.length !== 1) {
       settled.set(name, { at: null, returns: false, regions: 1 });

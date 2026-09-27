@@ -357,6 +357,7 @@ export class ReturnTypes {
   readonly #renames = new Map<string, Promise<Map<string, string>>>();
   readonly #aliases = new Map<string, Promise<Alias[] | "cut">>();
   readonly #defined = new Map<string, Promise<"data" | "trait" | "none" | "cut">>();
+  readonly #types = new Map<string, Promise<{ path: string; line: number; keyword: string }[] | "cut">>();
   readonly #code = new Map<string, Promise<string[] | null>>();
 
   constructor(discoverer: Discoverer) {
@@ -518,6 +519,29 @@ export class ReturnTypes {
         return aliases;
       })();
       this.#aliases.set(name, found);
+    }
+    return found;
+  }
+
+  /** What a type alias this repository defines once names (`type CostResult<T, E> = CostContext<…>`), or undefined (#83). */
+  async aliasTarget(name: string): Promise<{ rhs: string; path: string; line: number } | undefined> {
+    const aliases = await this.#aliasesOf(name);
+    if (aliases === "cut" || aliases.length !== 1) return undefined;
+    const [a] = aliases;
+    return { rhs: a!.rhs, path: a!.path, line: a!.line };
+  }
+
+  /** Where this repository defines a type or trait of the name (`struct`, `enum`, `union`, `trait`, `type`), or "cut" (#83). */
+  typeDefinitions(name: string): Promise<{ path: string; line: number; keyword: string }[] | "cut"> {
+    let found = this.#types.get(name);
+    if (!found) {
+      found = (async () => {
+        const keywords = ["struct", "enum", "union", "trait", "type"];
+        const all = await Promise.all(keywords.map((k) => this.#definitionLines(`${k} ${name}`)));
+        if (all.includes("cut")) return "cut";
+        return all.flatMap((hits, i) => (hits as { path: string; line: number }[]).map((h) => ({ ...h, keyword: keywords[i]! })));
+      })();
+      this.#types.set(name, found);
     }
     return found;
   }
