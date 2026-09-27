@@ -59,8 +59,8 @@ test("a version whose target is not inside the budgets is not reached, and the m
   assert.equal(score(once, 3, [one!]).at(-1), "FAIL: every scored version meets its row in each of 3 runs");
 });
 
-test("the table in docs/local-check-cli.md is exactly what check-before-action-real-v1.json scores to", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the table in docs/measurements.md is exactly what check-before-action-real-v1.json scores to", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- check-before-action-real:begin -->\n```\n";
   const end = "\n```\n<!-- check-before-action-real:end -->";
   assert.equal(doc.split(begin).length - 1, 1, "exactly one table");
@@ -69,8 +69,8 @@ test("the table in docs/local-check-cli.md is exactly what check-before-action-r
   assert.equal(block, score(log, 3).join("\n"));
 });
 
-test("the table after ADR 0016 in docs/local-check-cli.md is exactly what check-before-action-real-v2.json scores to", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the table after ADR 0016 in docs/measurements.md is exactly what check-before-action-real-v2.json scores to", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- check-before-action-real-v2:begin -->\n```\n";
   const end = "\n```\n<!-- check-before-action-real-v2:end -->";
   assert.equal(doc.split(begin).length - 1, 1, "exactly one table");
@@ -81,8 +81,8 @@ test("the table after ADR 0016 in docs/local-check-cli.md is exactly what check-
   for (const c of Object.values(log.cases)) for (const v of Object.values(c)) assert.ok(v && !v.notInside && v.runs.length === 3);
 });
 
-test("the table under the adopted words (ADR 0020) in docs/local-check-cli.md is exactly what check-before-action-real-v4.json scores to", () => {
-  const doc = readFileSync(new URL("../docs/local-check-cli.md", import.meta.url), "utf8");
+test("the table under the adopted words (ADR 0020) in docs/measurements.md is exactly what check-before-action-real-v4.json scores to", () => {
+  const doc = readFileSync(new URL("../docs/measurements.md", import.meta.url), "utf8");
   const begin = "<!-- check-before-action-real-v4:begin -->\n```\n";
   const end = "\n```\n<!-- check-before-action-real-v4:end -->";
   assert.equal(doc.split(begin).length - 1, 1, "exactly one table");

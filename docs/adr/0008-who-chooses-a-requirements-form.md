@@ -84,7 +84,7 @@ set — the shared sentences read the same at the bar except two: the fixture's 
 under the bar three times there and twice here, and the sentence read by hand from sideeye #602,
 read as check in two runs of three there and one here. `verify` now enumerates every requirement sentence
 in the repository's spec, fixture and golden files and a test fails when one is not in the set.
-The table is in `docs/local-check-cli.md` ("How Jev reads the form of a sentence"),
+The table is in `docs/measurements.md` ("How Jev reads the form of a sentence"),
 `node bench/forms/choice/run.ts score` recomputes it, and `test/form-choice.test.ts` holds the
 log to its counts.
 

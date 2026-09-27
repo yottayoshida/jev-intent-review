@@ -94,7 +94,7 @@ const MAX_FUNCTIONS = 60;
  *
  * It was 40, which dropped calls before any budget ordered them: a measured unchanged caller calls
  * the changed function past its 40th call. The largest function measured with no cap had 495
- * (docs/local-check-cli.md, *The calls of a function, measured*); this is a guard against generated code, not a
+ * (docs/measurements.md, *The calls of a function, measured*); this is a guard against generated code, not a
  * limit a hand-written function is expected to reach. What it leaves out is still counted, and a
  * function it cut is still not taken for a sibling.
  */

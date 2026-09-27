@@ -186,7 +186,7 @@ const MAX_SIGNATURE_LINES = 200;
  * (`)`, `>`, `where`, `{`) and ends in `{`. `blockEnd` reads a line at the function's own indent that
  * starts with `)` and does not open anything as the end, and a signature whose body opens below it —
  * a `where` clause, a return type over several lines, `{` on its own line — has one, so the whole
- * body used to be missed and listed as no call at all (#38; docs/local-check-cli.md, *The calls of
+ * body used to be missed and listed as no call at all (#38; docs/measurements.md, *The calls of
  * a function, measured*).
  * Deeper lines are parameters and bounds, and any other line at that indent ends the search: a
  * one-line function, a doc example or a declaration keeps its first line. The listing and

@@ -12,7 +12,7 @@
 // every version file; a log started under other files is not added to.
 //
 // This case was written to exercise the form, so it is not one of the cases "not used to tune
-// anything" in `docs/local-check-cli.md`. What it can show is whether the form separates a defect
+// anything" in `docs/measurements.md`. What it can show is whether the form separates a defect
 // from the shipped code and a behaviour-preserving rewrite on code whose names were chosen for it.
 
 import { execFileSync } from "node:child_process";

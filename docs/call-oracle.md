@@ -127,7 +127,7 @@ function's own name on the line that defines it: `fn inner() {`), `keyword` (`le
 scanned as its parent's), `other`.
 
 The cap of 1,000 calls per function has never been reached (the largest function measured had 495,
-`docs/local-check-cli.md`); a measurement stops if a file reaches it, rather than classify what it
+`docs/measurements.md`); a measurement stops if a file reaches it, rather than classify what it
 would cut.
 
 A file with a byte-order mark: the parser drops it and the listing counts it as a character, so the
