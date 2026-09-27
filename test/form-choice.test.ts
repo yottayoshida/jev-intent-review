@@ -57,9 +57,9 @@ test("the second set's log scores as the documentation says", () => {
   assert.match(lines[2]!, /0 of 0 .* — no sentences$/);
 });
 
-test("run.ts takes --set 1 or 2 and nothing else, a name an object has by inheritance included", () => {
-  for (const bad of ["3", "toString"]) {
-    assert.throws(() => execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", bad], { stdio: "pipe" }), (e: { stderr: Buffer }) => /--set is one of 1, 2/.test(String(e.stderr)));
+test("run.ts takes --set 1, 2, 3 or 1c and nothing else, a name an object has by inheritance included", () => {
+  for (const bad of ["4", "toString", "__proto__"]) {
+    assert.throws(() => execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", bad], { stdio: "pipe" }), (e: { stderr: Buffer }) => /--set is one of 1, 2, 3, 1c/.test(String(e.stderr)));
   }
   assert.match(execFileSync(process.execPath, [`${ROOT}bench/forms/choice/run.ts`, "score", "--set", "2"], { encoding: "utf8" }), /\| failure_propagation \| all \| 7 \|/);
 });
