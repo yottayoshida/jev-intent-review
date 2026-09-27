@@ -1,0 +1,1586 @@
+{
+ "what": "#83's second part (docs/resolution.md): the product's name resolution against rust-analyzer's SCIP index, on #80's dev material (#81's nine cases). Written by `node bench/resolution.ts measure`.",
+ "material": "material.dev.json",
+ "fixedBeforeMeasuring": {
+  "seed": "83-resolution-v1",
+  "perCell": 200,
+  "coverageFloor": 0.9,
+  "minPooled": 300,
+  "decided": [
+   "same",
+   "same_in_versions",
+   "wrong",
+   "voided"
+  ],
+  "criteria": {
+   "trusted": "pooled wrong's upper bound ≤ 1%, no repository's wrong over 5%, voided ≤ 20%, at least 300 decided calls",
+   "ambiguous": "wrong's point estimate ≤ 5% and not trusted (or fewer than 300 decided calls)",
+   "unsupported": "wrong's point estimate over 5%; a trait's declaration (dispatch) and macro_rules! are unsupported as forms",
+   "callers": "wrong callers ≤ 5% of the product's and missed (caps aside) ≤ 20% of rust-analyzer's: trusted; wrong over 5%: unsupported; otherwise ambiguous"
+  }
+ },
+ "oracleSources": {
+  "src/main.rs": "7a2843cf332e184919a9d18b1f4ad2bdf1e9cb721c6ab30bb31dde6a937d124a",
+  "Cargo.toml": "5b58e404d1701f94387a7484d7816e8be625abf475b823c7ef4e51c5db744874",
+  "Cargo.lock": "5db021e11fca9afb12f5e87d5a458379e59785638a7fd906e17f0273a9693dea"
+ },
+ "coverage": [
+  {
+   "case": "grovedb-500",
+   "repo": "https://github.com/dashpay/grovedb",
+   "calls": 16444,
+   "covered": 15283,
+   "rate": 0.9293967404524447,
+   "kept": true
+  },
+  {
+   "case": "grovedb-501",
+   "repo": "https://github.com/dashpay/grovedb",
+   "calls": 220,
+   "covered": 220,
+   "rate": 1,
+   "kept": true
+  },
+  {
+   "case": "instruckt-tauri-9",
+   "repo": "https://github.com/Naoray/instruckt-tauri",
+   "calls": 301,
+   "covered": 301,
+   "rate": 1,
+   "kept": true
+  },
+  {
+   "case": "kontor-385",
+   "repo": "https://github.com/KontorProtocol/Kontor",
+   "calls": 8203,
+   "covered": 8064,
+   "rate": 0.9830549798854078,
+   "kept": true
+  },
+  {
+   "case": "moltis-1064",
+   "repo": "https://github.com/moltis-org/moltis",
+   "calls": 78661,
+   "covered": 77059,
+   "rate": 0.9796341261870558,
+   "kept": true
+  },
+  {
+   "case": "omamori-468",
+   "repo": "https://github.com/yottayoshida/omamori",
+   "calls": 4885,
+   "covered": 4850,
+   "rate": 0.9928352098259979,
+   "kept": true
+  },
+  {
+   "case": "pybun-428",
+   "repo": "https://github.com/VOID-TECHNOLOGY-INC/PyBun",
+   "calls": 9300,
+   "covered": 9214,
+   "rate": 0.990752688172043,
+   "kept": true
+  },
+  {
+   "case": "quebec-136",
+   "repo": "https://github.com/ratazzi/quebec",
+   "calls": 6617,
+   "covered": 6561,
+   "rate": 0.9915369502795829,
+   "kept": true
+  },
+  {
+   "case": "whatsapp-rust-759",
+   "repo": "https://github.com/oxidezap/whatsapp-rust",
+   "calls": 19905,
+   "covered": 19698,
+   "rate": 0.9896006028636021,
+   "kept": true
+  }
+ ],
+ "all": {
+  "function": {
+   "calls": 1416,
+   "classes": {
+    "oracle_not_fn": 127,
+    "same": 1005,
+    "voided": 226,
+    "oracle_unresolved": 23,
+    "wrong": 13,
+    "both_unresolved": 9,
+    "dispatch": 3,
+    "oracle_generated": 3,
+    "same_in_versions": 7
+   },
+   "decided": 1251,
+   "wrong": {
+    "count": 13,
+    "rate": 0.010391686650679457,
+    "pooled": {
+     "lower": 0.005544411421709583,
+     "upper": 0.01770454592511328
+    },
+    "worstRepo": 0.042328042328042326,
+    "overRepos": {
+     "estimate": 0.009487807727244347,
+     "lower": 2.842170943040401e-14,
+     "upper": 0.38323457845129383,
+     "repos": 8,
+     "units": 1251
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 1025,
+    "rate": 0.012682926829268294
+   },
+   "dispatch": {
+    "count": 3,
+    "productSettledHere": 1,
+    "ofWhichTraitOutside": 1
+   },
+   "voided": {
+    "count": 226,
+    "rate": 0.1806554756195044,
+    "byReason": {
+     "callee_unresolved": 58,
+     "callee_ambiguous": 168
+    },
+    "byOracle": {
+     "repository": 151,
+     "outside": 75
+    }
+   },
+   "verdict": "ambiguous"
+  },
+  "macro": {
+   "calls": 1428,
+   "classes": {
+    "same": 242,
+    "voided": 975,
+    "oracle_not_fn": 27,
+    "dispatch": 45,
+    "wrong": 109,
+    "same_in_versions": 3,
+    "both_unresolved": 11,
+    "oracle_unresolved": 4,
+    "oracle_generated": 12
+   },
+   "decided": 1329,
+   "wrong": {
+    "count": 109,
+    "rate": 0.08201655379984951,
+    "pooled": {
+     "lower": 0.06782540864739417,
+     "upper": 0.09808690284145882
+    },
+    "worstRepo": 0.21505376344086022,
+    "overRepos": {
+     "estimate": 0.07381119212886898,
+     "lower": 0.0001947092144121143,
+     "upper": 0.46758944900400934,
+     "repos": 8,
+     "units": 1329
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 354,
+    "rate": 0.307909604519774
+   },
+   "dispatch": {
+    "count": 45,
+    "productSettledHere": 9,
+    "ofWhichTraitOutside": 6
+   },
+   "voided": {
+    "count": 975,
+    "rate": 0.7336343115124153,
+    "byReason": {
+     "callee_unresolved": 709,
+     "callee_ambiguous": 257,
+     "callee_return_unknown": 9
+    },
+    "byOracle": {
+     "outside": 853,
+     "repository": 122
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "method": {
+   "calls": 1763,
+   "classes": {
+    "same": 203,
+    "voided": 1189,
+    "dispatch": 136,
+    "both_unresolved": 22,
+    "oracle_unresolved": 7,
+    "wrong": 166,
+    "same_in_versions": 5,
+    "oracle_generated": 35
+   },
+   "decided": 1563,
+   "wrong": {
+    "count": 166,
+    "rate": 0.10620601407549585,
+    "pooled": {
+     "lower": 0.091362411621418,
+     "upper": 0.12254669720149991
+    },
+    "worstRepo": 0.2608695652173913,
+    "overRepos": {
+     "estimate": 0.10433915356267433,
+     "lower": 0.0013925847383404744,
+     "upper": 0.5034228896374486,
+     "repos": 8,
+     "units": 1563
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 374,
+    "rate": 0.44385026737967914
+   },
+   "dispatch": {
+    "count": 136,
+    "productSettledHere": 30,
+    "ofWhichTraitOutside": 4
+   },
+   "voided": {
+    "count": 1189,
+    "rate": 0.7607165706973769,
+    "byReason": {
+     "callee_ambiguous": 266,
+     "callee_unresolved": 923
+    },
+    "byOracle": {
+     "outside": 1102,
+     "repository": 87
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "path": {
+   "calls": 1514,
+   "classes": {
+    "voided": 740,
+    "oracle_not_fn": 249,
+    "same": 397,
+    "oracle_unresolved": 8,
+    "both_unresolved": 22,
+    "oracle_generated": 56,
+    "wrong": 24,
+    "dispatch": 14,
+    "same_in_versions": 4
+   },
+   "decided": 1165,
+   "wrong": {
+    "count": 24,
+    "rate": 0.020600858369098713,
+    "pooled": {
+     "lower": 0.013242870732170786,
+     "upper": 0.030498155174797148
+    },
+    "worstRepo": 0.06666666666666667,
+    "overRepos": {
+     "estimate": 0.018282465796363903,
+     "lower": 8.242295734817162e-13,
+     "upper": 0.3956653123222793,
+     "repos": 8,
+     "units": 1165
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 425,
+    "rate": 0.05647058823529412
+   },
+   "dispatch": {
+    "count": 14,
+    "productSettledHere": 5,
+    "ofWhichTraitOutside": 5
+   },
+   "voided": {
+    "count": 740,
+    "rate": 0.6351931330472103,
+    "byReason": {
+     "callee_ambiguous": 380,
+     "callee_unresolved": 235,
+     "callee_return_unknown": 125
+    },
+    "byOracle": {
+     "outside": 621,
+     "repository": 119
+    }
+   },
+   "verdict": "ambiguous"
+  }
+ },
+ "asked": {
+  "function": {
+   "calls": 769,
+   "classes": {
+    "oracle_not_fn": 61,
+    "same": 573,
+    "voided": 102,
+    "oracle_unresolved": 13,
+    "wrong": 10,
+    "both_unresolved": 1,
+    "oracle_generated": 3,
+    "dispatch": 1,
+    "same_in_versions": 5
+   },
+   "decided": 690,
+   "wrong": {
+    "count": 10,
+    "rate": 0.014492753623188406,
+    "pooled": {
+     "lower": 0.006971137546287309,
+     "upper": 0.026490757028767575
+    },
+    "worstRepo": 0.05755395683453238,
+    "overRepos": {
+     "estimate": 0.010135421074904782,
+     "lower": 2.842170943040401e-14,
+     "upper": 0.38416184375651596,
+     "repos": 8,
+     "units": 690
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 588,
+    "rate": 0.017006802721088437
+   },
+   "dispatch": {
+    "count": 1,
+    "productSettledHere": 0,
+    "ofWhichTraitOutside": 0
+   },
+   "voided": {
+    "count": 102,
+    "rate": 0.14782608695652175,
+    "byReason": {
+     "callee_unresolved": 13,
+     "callee_ambiguous": 89
+    },
+    "byOracle": {
+     "repository": 85,
+     "outside": 17
+    }
+   },
+   "verdict": "ambiguous"
+  },
+  "macro": {
+   "calls": 906,
+   "classes": {
+    "same": 145,
+    "voided": 608,
+    "oracle_not_fn": 20,
+    "dispatch": 27,
+    "wrong": 84,
+    "same_in_versions": 3,
+    "both_unresolved": 7,
+    "oracle_unresolved": 4,
+    "oracle_generated": 8
+   },
+   "decided": 840,
+   "wrong": {
+    "count": 84,
+    "rate": 0.1,
+    "pooled": {
+     "lower": 0.08054918495324159,
+     "upper": 0.12230777967872086
+    },
+    "worstRepo": 0.22857142857142856,
+    "overRepos": {
+     "estimate": 0.08342309810655976,
+     "lower": 0.0004184306656895842,
+     "upper": 0.47911213948449927,
+     "repos": 8,
+     "units": 840
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 232,
+    "rate": 0.3620689655172414
+   },
+   "dispatch": {
+    "count": 27,
+    "productSettledHere": 6,
+    "ofWhichTraitOutside": 3
+   },
+   "voided": {
+    "count": 608,
+    "rate": 0.7238095238095238,
+    "byReason": {
+     "callee_unresolved": 437,
+     "callee_ambiguous": 171
+    },
+    "byOracle": {
+     "outside": 535,
+     "repository": 73
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "method": {
+   "calls": 1114,
+   "classes": {
+    "voided": 715,
+    "same": 162,
+    "dispatch": 92,
+    "oracle_unresolved": 4,
+    "wrong": 102,
+    "both_unresolved": 12,
+    "same_in_versions": 4,
+    "oracle_generated": 23
+   },
+   "decided": 983,
+   "wrong": {
+    "count": 102,
+    "rate": 0.10376398779247202,
+    "pooled": {
+     "lower": 0.08540100330512246,
+     "upper": 0.12453803814631215
+    },
+    "worstRepo": 0.24561403508771928,
+    "overRepos": {
+     "estimate": 0.0997003502714641,
+     "lower": 0.0011107409929707046,
+     "upper": 0.4981166893112743,
+     "repos": 8,
+     "units": 983
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 268,
+    "rate": 0.3805970149253731
+   },
+   "dispatch": {
+    "count": 92,
+    "productSettledHere": 19,
+    "ofWhichTraitOutside": 3
+   },
+   "voided": {
+    "count": 715,
+    "rate": 0.7273652085452695,
+    "byReason": {
+     "callee_ambiguous": 180,
+     "callee_unresolved": 535
+    },
+    "byOracle": {
+     "outside": 656,
+     "repository": 59
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "path": {
+   "calls": 887,
+   "classes": {
+    "voided": 394,
+    "same": 227,
+    "oracle_not_fn": 184,
+    "both_unresolved": 13,
+    "oracle_generated": 37,
+    "oracle_unresolved": 3,
+    "wrong": 16,
+    "dispatch": 10,
+    "same_in_versions": 3
+   },
+   "decided": 640,
+   "wrong": {
+    "count": 16,
+    "rate": 0.025,
+    "pooled": {
+     "lower": 0.014355654038951116,
+     "upper": 0.040281586126326374
+    },
+    "worstRepo": 0.09803921568627451,
+    "overRepos": {
+     "estimate": 0.020843832617316586,
+     "lower": 1.8673063095775433e-11,
+     "upper": 0.3992226105505381,
+     "repos": 8,
+     "units": 640
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 246,
+    "rate": 0.06504065040650407
+   },
+   "dispatch": {
+    "count": 10,
+    "productSettledHere": 4,
+    "ofWhichTraitOutside": 4
+   },
+   "voided": {
+    "count": 394,
+    "rate": 0.615625,
+    "byReason": {
+     "callee_ambiguous": 210,
+     "callee_unresolved": 132,
+     "callee_return_unknown": 52
+    },
+    "byOracle": {
+     "outside": 316,
+     "repository": 78
+    }
+   },
+   "verdict": "ambiguous"
+  }
+ },
+ "excludedCases": [],
+ "byCase": {
+  "grovedb-500": {
+   "commit": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 199
+     }
+    ],
+    "documents": 300,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 210,
+    "notIndexed": 18,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 16444,
+    "byForm": {
+     "function": 882,
+     "method": 10461,
+     "path": 3361,
+     "macro": 1740
+    },
+    "sampled": 800
+   }
+  },
+  "grovedb-501": {
+   "commit": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 24
+     }
+    ],
+    "documents": 300,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 1,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 263
+   },
+   "calls": {
+    "listed": 220,
+    "byForm": {
+     "path": 34,
+     "method": 173,
+     "function": 13
+    },
+    "sampled": 220
+   }
+  },
+  "instruckt-tauri-9": {
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 12
+     }
+    ],
+    "documents": 12,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 9,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 301,
+    "byForm": {
+     "path": 80,
+     "method": 190,
+     "macro": 28,
+     "function": 3
+    },
+    "sampled": 301
+   }
+  },
+  "kontor-385": {
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": "core",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 146
+     },
+     {
+      "root": "kontor-ts/crate",
+      "file": "1.scip",
+      "rc": 0,
+      "seconds": 36
+     },
+     {
+      "root": "native-contracts",
+      "file": "2.scip",
+      "rc": 0,
+      "seconds": 17
+     },
+     {
+      "root": "test-contracts",
+      "file": "3.scip",
+      "rc": 0,
+      "seconds": 16
+     }
+    ],
+    "documents": 176,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 113,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 8203,
+    "byForm": {
+     "path": 1612,
+     "method": 5819,
+     "function": 545,
+     "macro": 227
+    },
+    "sampled": 800
+   }
+  },
+  "moltis-1064": {
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 244
+     }
+    ],
+    "documents": 1024,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 790,
+    "notIndexed": 4,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 3
+   },
+   "calls": {
+    "listed": 78661,
+    "byForm": {
+     "path": 14386,
+     "method": 55736,
+     "function": 6634,
+     "macro": 1905
+    },
+    "sampled": 800
+   }
+  },
+  "omamori-468": {
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 25
+     }
+    ],
+    "documents": 46,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 37,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 4885,
+    "byForm": {
+     "path": 852,
+     "method": 2942,
+     "macro": 324,
+     "function": 767
+    },
+    "sampled": 800
+   }
+  },
+  "pybun-428": {
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 18
+     }
+    ],
+    "documents": 112,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 58,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 9300,
+    "byForm": {
+     "method": 6740,
+     "function": 590,
+     "path": 1518,
+     "macro": 452
+    },
+    "sampled": 800
+   }
+  },
+  "quebec-136": {
+   "commit": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 30
+     }
+    ],
+    "documents": 53,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 46,
+    "notIndexed": 1,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 6617,
+    "byForm": {
+     "macro": 334,
+     "method": 4368,
+     "path": 1386,
+     "function": 529
+    },
+    "sampled": 800
+   }
+  },
+  "whatsapp-rust-759": {
+   "commit": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 32
+     }
+    ],
+    "documents": 327,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 242,
+    "notIndexed": 1,
+    "notRead": 1,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 19905,
+    "byForm": {
+     "method": 14279,
+     "path": 3852,
+     "macro": 558,
+     "function": 1216
+    },
+    "sampled": 800
+   }
+  }
+ },
+ "callers": {
+  "verdict": {
+   "product": 72,
+   "dispatch": 0,
+   "wrong": 26,
+   "wrongRate": 0.3611111111111111,
+   "oracle": 83,
+   "capped": 35,
+   "missed": 2,
+   "missedRate": 0.041666666666666664,
+   "verdict": "unsupported"
+  },
+  "byCase": {
+   "grovedb-500": {
+    "changedFunctions": [
+     {
+      "path": "merk/src/merk/restore.rs",
+      "name": "finalize",
+      "startLine": 501,
+      "inOracle": true
+     }
+    ],
+    "names": 1,
+    "product": 12,
+    "oracle": 1,
+    "both": 1,
+    "wrong": [
+     {
+      "path": "grovedb-bulk-append-tree/src/tree/hash.rs",
+      "name": "compute_state_root",
+      "line": 11,
+      "why": "wrong"
+     },
+     {
+      "path": "grovedb-commitment-tree/src/lib.rs",
+      "name": "compute_commitment_tree_state_root",
+      "line": 54,
+      "why": "wrong"
+     },
+     {
+      "path": "grovedb-dense-fixed-sized-merkle-tree/src/hash.rs",
+      "name": "node_hash",
+      "line": 28,
+      "why": "wrong"
+     },
+     {
+      "path": "grovedb-merkle-mountain-range/src/node.rs",
+      "name": "leaf_hash",
+      "line": 203,
+      "why": "wrong"
+     },
+     {
+      "path": "grovedb/src/operations/proof/verify.rs",
+      "name": "verify_commitment_tree_lower_layer",
+      "line": 880,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "value_hash",
+      "line": 29,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "kv_hash",
+      "line": 52,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "kv_digest_to_kv_hash",
+      "line": 77,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "node_hash",
+      "line": 100,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "combine_hash",
+      "line": 125,
+      "why": "wrong"
+     },
+     {
+      "path": "merk/src/tree/hash.rs",
+      "name": "node_hash_with_count",
+      "line": 141,
+      "why": "wrong"
+     }
+    ],
+    "missed": {},
+    "missedRows": [],
+    "capped": {},
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 6
+   },
+   "grovedb-501": {
+    "changedFunctions": [
+     {
+      "path": "merk/src/merk/restore.rs",
+      "name": "process_chunk",
+      "startLine": 88,
+      "inOracle": true
+     }
+    ],
+    "names": 1,
+    "product": 3,
+    "oracle": 3,
+    "both": 3,
+    "wrong": [],
+    "missed": {},
+    "missedRows": [],
+    "capped": {},
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 10
+   },
+   "instruckt-tauri-9": {
+    "changedFunctions": [
+     {
+      "path": "src/commands.rs",
+      "name": "get_annotations",
+      "startLine": 8,
+      "inOracle": true
+     },
+     {
+      "path": "src/commands.rs",
+      "name": "create_annotation",
+      "startLine": 19,
+      "inOracle": true
+     },
+     {
+      "path": "src/commands.rs",
+      "name": "update_annotation",
+      "startLine": 33,
+      "inOracle": true
+     },
+     {
+      "path": "src/mcp/server.rs",
+      "name": "get_all_pending",
+      "startLine": 43,
+      "inOracle": true
+     },
+     {
+      "path": "src/mcp/server.rs",
+      "name": "resolve",
+      "startLine": 107,
+      "inOracle": false
+     },
+     {
+      "path": "src/mcp/server.rs",
+      "name": "get_source_location",
+      "startLine": 140,
+      "inOracle": false
+     },
+     {
+      "path": "src/mcp/server.rs",
+      "name": "get_component_stack",
+      "startLine": 180,
+      "inOracle": false
+     },
+     {
+      "path": "src/mcp/server.rs",
+      "name": "get_project_structure",
+      "startLine": 214,
+      "inOracle": false
+     },
+     {
+      "path": "src/screenshot.rs",
+      "name": "delete_screenshot",
+      "startLine": 23,
+      "inOracle": true
+     }
+    ],
+    "names": 9,
+    "product": 2,
+    "oracle": 2,
+    "both": 2,
+    "wrong": [],
+    "missed": {},
+    "missedRows": [],
+    "capped": {},
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 2
+   },
+   "kontor-385": {
+    "changedFunctions": [
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "process_decided_batch",
+      "startLine": 29,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "make_value",
+      "startLine": 169,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "validate_and_accept_proposal",
+      "startLine": 246,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "try_fulfill_pending_proposal",
+      "startLine": 339,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "handle_get_value",
+      "startLine": 506,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/batches.rs",
+      "name": "handle_finalized",
+      "startLine": 550,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/blocks.rs",
+      "name": "rollback",
+      "startLine": 24,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/blocks.rs",
+      "name": "handle_block",
+      "startLine": 203,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "get_decided_from_anchor",
+      "startLine": 370,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "load_raw_txs_if_unfinalized",
+      "startLine": 416,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "batch_to_decided",
+      "startLine": 449,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "get_decided_range",
+      "startLine": 477,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "min_decided_height",
+      "startLine": 504,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/consensus_state.rs",
+      "name": "validate_batch",
+      "startLine": 539,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/handlers.rs",
+      "name": "handle_received_proposal_part",
+      "startLine": 56,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/handlers.rs",
+      "name": "handle_get_decided_values",
+      "startLine": 86,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/handlers.rs",
+      "name": "handle_consensus_msg",
+      "startLine": 168,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/mod.rs",
+      "name": "refresh_validator_set",
+      "startLine": 130,
+      "inOracle": true
+     },
+     {
+      "path": "core/indexer/src/reactor/mod.rs",
+      "name": "build_validator_set",
+      "startLine": 416,
+      "inOracle": true
+     },
+     {
+      "path": "native-contracts/staking/src/lib.rs",
+      "name": "set_genesis_set",
+      "startLine": 204,
+      "inOracle": true
+     }
+    ],
+    "names": 20,
+    "product": 9,
+    "oracle": 6,
+    "both": 5,
+    "wrong": [
+     {
+      "path": "core/indexer/src/reactor/blocks.rs",
+      "name": "simulate",
+      "line": 109,
+      "why": "wrong"
+     },
+     {
+      "path": "core/indexer/src/runtime/call.rs",
+      "name": "handle_call",
+      "line": 233,
+      "why": "wrong"
+     },
+     {
+      "path": "core/indexer/src/runtime/file_ledger.rs",
+      "name": "add_file",
+      "line": 110,
+      "why": "no_reference"
+     },
+     {
+      "path": "core/indexer/src/runtime/mod.rs",
+      "name": "publish",
+      "line": 278,
+      "why": "wrong"
+     }
+    ],
+    "missed": {},
+    "missedRows": [],
+    "capped": {
+     "hop_names_cap": 1
+    },
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 0
+   },
+   "moltis-1064": {
+    "changedFunctions": [
+     {
+      "path": "crates/chat/src/service/chat_impl/send.rs",
+      "name": "send_impl",
+      "startLine": 39,
+      "inOracle": true
+     },
+     {
+      "path": "crates/gateway/src/channel_events/commands/session_handlers.rs",
+      "name": "handle_title",
+      "startLine": 181,
+      "inOracle": true
+     },
+     {
+      "path": "crates/gateway/src/methods/services/sessions.rs",
+      "name": "register",
+      "startLine": 3,
+      "inOracle": true
+     },
+     {
+      "path": "crates/gateway/src/session/title.rs",
+      "name": "generate_title_if_needed",
+      "startLine": 29,
+      "inOracle": true
+     },
+     {
+      "path": "crates/gateway/src/session/title.rs",
+      "name": "try_generate_title_if_needed",
+      "startLine": 36,
+      "inOracle": true
+     },
+     {
+      "path": "crates/gateway/src/session/title.rs",
+      "name": "generate_title_for_session",
+      "startLine": 61,
+      "inOracle": true
+     }
+    ],
+    "names": 6,
+    "product": 3,
+    "oracle": 4,
+    "both": 2,
+    "wrong": [
+     {
+      "path": "crates/gateway/src/chat.rs",
+      "name": "trigger_auto_title",
+      "line": 263,
+      "why": "wrong"
+     }
+    ],
+    "missed": {
+     "found_not_taken": 1
+    },
+    "missedRows": [
+     {
+      "path": "crates/gateway/src/chat.rs",
+      "name": "broadcast",
+      "line": 32,
+      "why": "found_not_taken"
+     }
+    ],
+    "capped": {
+     "not_followed": 1
+    },
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 3
+   },
+   "omamori-468": {
+    "changedFunctions": [
+     {
+      "path": "src/atomic_file.rs",
+      "name": "open_read_regular",
+      "startLine": 151,
+      "inOracle": true
+     },
+     {
+      "path": "src/atomic_file.rs",
+      "name": "reject_non_regular",
+      "startLine": 167,
+      "inOracle": true
+     },
+     {
+      "path": "src/atomic_file.rs",
+      "name": "describe_file_type",
+      "startLine": 184,
+      "inOracle": true
+     },
+     {
+      "path": "src/atomic_file.rs",
+      "name": "read_to_string_capped",
+      "startLine": 215,
+      "inOracle": true
+     },
+     {
+      "path": "src/audit/mod.rs",
+      "name": "read_hwm",
+      "startLine": 470,
+      "inOracle": true
+     },
+     {
+      "path": "src/audit/secret.rs",
+      "name": "read_secret",
+      "startLine": 713,
+      "inOracle": true
+     },
+     {
+      "path": "src/audit/secret.rs",
+      "name": "open_read_nofollow",
+      "startLine": 841,
+      "inOracle": true
+     },
+     {
+      "path": "src/audit/secret.rs",
+      "name": "open_audit_rw",
+      "startLine": 853,
+      "inOracle": true
+     },
+     {
+      "path": "src/break_glass.rs",
+      "name": "is_bypassed_inner",
+      "startLine": 113,
+      "inOracle": true
+     },
+     {
+      "path": "src/break_glass.rs",
+      "name": "read_state",
+      "startLine": 173,
+      "inOracle": true
+     },
+     {
+      "path": "src/cli/config_cmd.rs",
+      "name": "mutate_config",
+      "startLine": 225,
+      "inOracle": true
+     },
+     {
+      "path": "src/cli/config_cmd.rs",
+      "name": "run_override_disable",
+      "startLine": 934,
+      "inOracle": true
+     },
+     {
+      "path": "src/config.rs",
+      "name": "load_config",
+      "startLine": 157,
+      "inOracle": true
+     },
+     {
+      "path": "src/config.rs",
+      "name": "raw_rule_names",
+      "startLine": 221,
+      "inOracle": true
+     },
+     {
+      "path": "src/config.rs",
+      "name": "read_raw_rule_state",
+      "startLine": 278,
+      "inOracle": true
+     },
+     {
+      "path": "src/config.rs",
+      "name": "raw_override_disables",
+      "startLine": 318,
+      "inOracle": true
+     },
+     {
+      "path": "src/engine/shim.rs",
+      "name": "ensure_hooks_current_at_with_verifier_and_exe",
+      "startLine": 191,
+      "inOracle": true
+     },
+     {
+      "path": "src/engine/shim.rs",
+      "name": "ensure_settings_current_for",
+      "startLine": 337,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "generate_baseline",
+      "startLine": 134,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "read_baseline",
+      "startLine": 211,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "check_cursor_snippet",
+      "startLine": 407,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "check_claude_settings_integration_with_verifier",
+      "startLine": 532,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "check_hook_hash",
+      "startLine": 867,
+      "inOracle": true
+     },
+     {
+      "path": "src/integrity.rs",
+      "name": "read_config_entry",
+      "startLine": 1278,
+      "inOracle": true
+     }
+    ],
+    "names": 24,
+    "product": 20,
+    "oracle": 52,
+    "both": 19,
+    "wrong": [
+     {
+      "path": "src/audit/secret.rs",
+      "name": "with_key_store_lock",
+      "line": 185,
+      "why": "no_reference"
+     }
+    ],
+    "missed": {},
+    "missedRows": [],
+    "capped": {
+     "caller_cap": 2,
+     "hop_names_cap": 31
+    },
+    "oracleOutsideFunction": 12,
+    "oracleTestCode": 83
+   },
+   "pybun-428": {
+    "changedFunctions": [
+     {
+      "path": "src/build.rs",
+      "name": "collect_inputs_recursive",
+      "startLine": 202,
+      "inOracle": true
+     },
+     {
+      "path": "src/commands/python.rs",
+      "name": "python_which",
+      "startLine": 142,
+      "inOracle": true
+     },
+     {
+      "path": "src/drift.rs",
+      "name": "analyze",
+      "startLine": 56,
+      "inOracle": true
+     },
+     {
+      "path": "src/progress.rs",
+      "name": "listener",
+      "startLine": 38,
+      "inOracle": true
+     },
+     {
+      "path": "src/progress.rs",
+      "name": "finish",
+      "startLine": 57,
+      "inOracle": true
+     }
+    ],
+    "names": 5,
+    "product": 13,
+    "oracle": 6,
+    "both": 6,
+    "wrong": [
+     {
+      "path": "src/commands/run.rs",
+      "name": "run_script",
+      "line": 140,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/commands/run.rs",
+      "name": "run_python_code",
+      "line": 1152,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/mcp/schema.rs",
+      "name": "build_tools_list",
+      "line": 10,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/resolver.rs",
+      "name": "resolve_with_options",
+      "line": 828,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/schema.rs",
+      "name": "set_event_listener",
+      "line": 452,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/schema.rs",
+      "name": "notify_listener",
+      "line": 456,
+      "why": "no_reference"
+     },
+     {
+      "path": "src/schema.rs",
+      "name": "fmt",
+      "line": 592,
+      "why": "wrong"
+     }
+    ],
+    "missed": {},
+    "missedRows": [],
+    "capped": {},
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 16
+   },
+   "quebec-136": {
+    "changedFunctions": [
+     {
+      "path": "src/scheduler.rs",
+      "name": "enqueue_job",
+      "startLine": 166,
+      "inOracle": true
+     }
+    ],
+    "names": 1,
+    "product": 4,
+    "oracle": 3,
+    "both": 2,
+    "wrong": [
+     {
+      "path": "src/core.rs",
+      "name": "perform_later",
+      "line": 95,
+      "why": "wrong"
+     },
+     {
+      "path": "src/worker.rs",
+      "name": "parse_job_arguments_from_json",
+      "line": 856,
+      "why": "no_reference"
+     }
+    ],
+    "missed": {
+     "outside_function": 1
+    },
+    "missedRows": [
+     {
+      "path": "src/types.rs",
+      "name": "run_recurring_now",
+      "line": 3931,
+      "why": "outside_function"
+     }
+    ],
+    "capped": {},
+    "oracleOutsideFunction": 1,
+    "oracleTestCode": 0
+   },
+   "whatsapp-rust-759": {
+    "changedFunctions": [
+     {
+      "path": "wacore/src/appstate_sync.rs",
+      "name": "download_external_blobs",
+      "startLine": 49,
+      "inOracle": true
+     },
+     {
+      "path": "wacore/src/appstate_sync.rs",
+      "name": "process_parsed_patch_list",
+      "startLine": 155,
+      "inOracle": true
+     },
+     {
+      "path": "wacore/src/appstate_sync.rs",
+      "name": "process_patch_lists",
+      "startLine": 216,
+      "inOracle": true
+     }
+    ],
+    "names": 3,
+    "product": 6,
+    "oracle": 6,
+    "both": 6,
+    "wrong": [],
+    "missed": {},
+    "missedRows": [],
+    "capped": {},
+    "oracleOutsideFunction": 0,
+    "oracleTestCode": 4
+   }
+  }
+ }
+}

@@ -1,0 +1,838 @@
+{
+ "what": "#83's second part (docs/resolution.md): the product's name resolution against rust-analyzer's SCIP index, on #80's dev material (#81's nine cases). Written by `node bench/resolution.ts measure`.",
+ "material": "material.dev.json",
+ "fixedBeforeMeasuring": {
+  "seed": "83-resolution-v1",
+  "perCell": 200,
+  "coverageFloor": 0.9,
+  "minPooled": 300,
+  "decided": [
+   "same",
+   "same_in_versions",
+   "wrong",
+   "voided"
+  ],
+  "criteria": {
+   "trusted": "pooled wrong's upper bound ≤ 1%, no repository's wrong over 5%, voided ≤ 20%, at least 300 decided calls",
+   "ambiguous": "wrong's point estimate ≤ 5% and not trusted (or fewer than 300 decided calls)",
+   "unsupported": "wrong's point estimate over 5%; a trait's declaration (dispatch) and macro_rules! are unsupported as forms",
+   "callers": "wrong callers ≤ 5% of the product's and missed (caps aside) ≤ 20% of rust-analyzer's: trusted; wrong over 5%: unsupported; otherwise ambiguous"
+  }
+ },
+ "oracleSources": {
+  "src/main.rs": "7a2843cf332e184919a9d18b1f4ad2bdf1e9cb721c6ab30bb31dde6a937d124a",
+  "Cargo.toml": "5b58e404d1701f94387a7484d7816e8be625abf475b823c7ef4e51c5db744874",
+  "Cargo.lock": "5db021e11fca9afb12f5e87d5a458379e59785638a7fd906e17f0273a9693dea"
+ },
+ "coverage": [
+  {
+   "case": "grovedb-500",
+   "repo": "https://github.com/dashpay/grovedb",
+   "calls": 16444,
+   "covered": 15283,
+   "rate": 0.9293967404524447,
+   "kept": true
+  },
+  {
+   "case": "grovedb-501",
+   "repo": "https://github.com/dashpay/grovedb",
+   "calls": 220,
+   "covered": 220,
+   "rate": 1,
+   "kept": true
+  },
+  {
+   "case": "instruckt-tauri-9",
+   "repo": "https://github.com/Naoray/instruckt-tauri",
+   "calls": 301,
+   "covered": 301,
+   "rate": 1,
+   "kept": true
+  },
+  {
+   "case": "kontor-385",
+   "repo": "https://github.com/KontorProtocol/Kontor",
+   "calls": 8203,
+   "covered": 8064,
+   "rate": 0.9830549798854078,
+   "kept": true
+  },
+  {
+   "case": "moltis-1064",
+   "repo": "https://github.com/moltis-org/moltis",
+   "calls": 78661,
+   "covered": 77059,
+   "rate": 0.9796341261870558,
+   "kept": true
+  },
+  {
+   "case": "omamori-468",
+   "repo": "https://github.com/yottayoshida/omamori",
+   "calls": 4885,
+   "covered": 4850,
+   "rate": 0.9928352098259979,
+   "kept": true
+  },
+  {
+   "case": "pybun-428",
+   "repo": "https://github.com/VOID-TECHNOLOGY-INC/PyBun",
+   "calls": 9300,
+   "covered": 9214,
+   "rate": 0.990752688172043,
+   "kept": true
+  },
+  {
+   "case": "quebec-136",
+   "repo": "https://github.com/ratazzi/quebec",
+   "calls": 6617,
+   "covered": 6561,
+   "rate": 0.9915369502795829,
+   "kept": true
+  },
+  {
+   "case": "whatsapp-rust-759",
+   "repo": "https://github.com/oxidezap/whatsapp-rust",
+   "calls": 19905,
+   "covered": 19698,
+   "rate": 0.9896006028636021,
+   "kept": true
+  }
+ ],
+ "broken": {
+  "shifted": 2113,
+  "movedSameToWrong": 1730
+ },
+ "all": {
+  "function": {
+   "calls": 1416,
+   "classes": {
+    "oracle_not_fn": 127,
+    "wrong": 1018,
+    "voided": 226,
+    "oracle_unresolved": 23,
+    "both_unresolved": 9,
+    "dispatch": 3,
+    "oracle_generated": 3,
+    "same_in_versions": 7
+   },
+   "decided": 1251,
+   "wrong": {
+    "count": 1018,
+    "rate": 0.8137490007993605,
+    "pooled": {
+     "lower": 0.7910479922574893,
+     "upper": 0.8349646344244945
+    },
+    "worstRepo": 1,
+    "overRepos": {
+     "estimate": 0.8348562457290377,
+     "lower": 0.4309228037730861,
+     "upper": 0.9908886218745749,
+     "repos": 8,
+     "units": 1251
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 1025,
+    "rate": 0.9931707317073171
+   },
+   "dispatch": {
+    "count": 3,
+    "productSettledHere": 1,
+    "ofWhichTraitOutside": 1
+   },
+   "voided": {
+    "count": 226,
+    "rate": 0.1806554756195044,
+    "byReason": {
+     "callee_unresolved": 58,
+     "callee_ambiguous": 168
+    },
+    "byOracle": {
+     "repository": 151,
+     "outside": 75
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "macro": {
+   "calls": 1428,
+   "classes": {
+    "wrong": 334,
+    "voided": 975,
+    "oracle_not_fn": 27,
+    "dispatch": 45,
+    "same_in_versions": 3,
+    "both_unresolved": 11,
+    "oracle_unresolved": 4,
+    "oracle_generated": 12,
+    "same": 17
+   },
+   "decided": 1329,
+   "wrong": {
+    "count": 334,
+    "rate": 0.2513167795334838,
+    "pooled": {
+     "lower": 0.22819043461473143,
+     "upper": 0.27554807126219316
+    },
+    "worstRepo": 0.47468354430379744,
+    "overRepos": {
+     "estimate": 0.23059853738084019,
+     "lower": 0.025554619030828007,
+     "upper": 0.633029213921958,
+     "repos": 8,
+     "units": 1329
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 354,
+    "rate": 0.943502824858757
+   },
+   "dispatch": {
+    "count": 45,
+    "productSettledHere": 9,
+    "ofWhichTraitOutside": 6
+   },
+   "voided": {
+    "count": 975,
+    "rate": 0.7336343115124153,
+    "byReason": {
+     "callee_unresolved": 709,
+     "callee_ambiguous": 257,
+     "callee_return_unknown": 9
+    },
+    "byOracle": {
+     "outside": 853,
+     "repository": 122
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "method": {
+   "calls": 1763,
+   "classes": {
+    "wrong": 369,
+    "voided": 1189,
+    "dispatch": 136,
+    "both_unresolved": 22,
+    "oracle_unresolved": 7,
+    "same_in_versions": 5,
+    "oracle_generated": 35
+   },
+   "decided": 1563,
+   "wrong": {
+    "count": 369,
+    "rate": 0.236084452975048,
+    "pooled": {
+     "lower": 0.21522255935914814,
+     "upper": 0.2579423861014618
+    },
+    "worstRepo": 0.3949843260188088,
+    "overRepos": {
+     "estimate": 0.2225595218285608,
+     "lower": 0.023124099692182654,
+     "upper": 0.6254996292634871,
+     "repos": 8,
+     "units": 1563
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 374,
+    "rate": 0.9866310160427807
+   },
+   "dispatch": {
+    "count": 136,
+    "productSettledHere": 30,
+    "ofWhichTraitOutside": 4
+   },
+   "voided": {
+    "count": 1189,
+    "rate": 0.7607165706973769,
+    "byReason": {
+     "callee_ambiguous": 266,
+     "callee_unresolved": 923
+    },
+    "byOracle": {
+     "outside": 1102,
+     "repository": 87
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "path": {
+   "calls": 1514,
+   "classes": {
+    "voided": 740,
+    "oracle_not_fn": 249,
+    "wrong": 321,
+    "oracle_unresolved": 8,
+    "both_unresolved": 22,
+    "oracle_generated": 56,
+    "same": 100,
+    "dispatch": 14,
+    "same_in_versions": 4
+   },
+   "decided": 1165,
+   "wrong": {
+    "count": 321,
+    "rate": 0.2755364806866953,
+    "pooled": {
+     "lower": 0.2500449638046973,
+     "upper": 0.302166419435963
+    },
+    "worstRepo": 0.5565217391304348,
+    "overRepos": {
+     "estimate": 0.27492548626535723,
+     "lower": 0.04080059755793286,
+     "upper": 0.6730703565781653,
+     "repos": 8,
+     "units": 1165
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 425,
+    "rate": 0.7552941176470588
+   },
+   "dispatch": {
+    "count": 14,
+    "productSettledHere": 5,
+    "ofWhichTraitOutside": 5
+   },
+   "voided": {
+    "count": 740,
+    "rate": 0.6351931330472103,
+    "byReason": {
+     "callee_ambiguous": 380,
+     "callee_unresolved": 235,
+     "callee_return_unknown": 125
+    },
+    "byOracle": {
+     "outside": 621,
+     "repository": 119
+    }
+   },
+   "verdict": "unsupported"
+  }
+ },
+ "asked": {
+  "function": {
+   "calls": 769,
+   "classes": {
+    "oracle_not_fn": 61,
+    "wrong": 583,
+    "voided": 102,
+    "oracle_unresolved": 13,
+    "both_unresolved": 1,
+    "oracle_generated": 3,
+    "dispatch": 1,
+    "same_in_versions": 5
+   },
+   "decided": 690,
+   "wrong": {
+    "count": 583,
+    "rate": 0.8449275362318841,
+    "pooled": {
+     "lower": 0.8157273736488548,
+     "upper": 0.8711389000541487
+    },
+    "worstRepo": 1,
+    "overRepos": {
+     "estimate": 0.8523070967284534,
+     "lower": 0.4490804399983688,
+     "upper": 0.9938857174832094,
+     "repos": 8,
+     "units": 690
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 588,
+    "rate": 0.9914965986394558
+   },
+   "dispatch": {
+    "count": 1,
+    "productSettledHere": 0,
+    "ofWhichTraitOutside": 0
+   },
+   "voided": {
+    "count": 102,
+    "rate": 0.14782608695652175,
+    "byReason": {
+     "callee_unresolved": 13,
+     "callee_ambiguous": 89
+    },
+    "byOracle": {
+     "repository": 85,
+     "outside": 17
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "macro": {
+   "calls": 906,
+   "classes": {
+    "wrong": 216,
+    "voided": 608,
+    "oracle_not_fn": 20,
+    "dispatch": 27,
+    "same_in_versions": 3,
+    "both_unresolved": 7,
+    "oracle_unresolved": 4,
+    "oracle_generated": 8,
+    "same": 13
+   },
+   "decided": 840,
+   "wrong": {
+    "count": 216,
+    "rate": 0.2571428571428571,
+    "pooled": {
+     "lower": 0.22788642166202067,
+     "upper": 0.2881141296311114
+    },
+    "worstRepo": 0.5036496350364964,
+    "overRepos": {
+     "estimate": 0.2359078951654639,
+     "lower": 0.027218407536594214,
+     "upper": 0.637955588691824,
+     "repos": 8,
+     "units": 840
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 232,
+    "rate": 0.9310344827586207
+   },
+   "dispatch": {
+    "count": 27,
+    "productSettledHere": 6,
+    "ofWhichTraitOutside": 3
+   },
+   "voided": {
+    "count": 608,
+    "rate": 0.7238095238095238,
+    "byReason": {
+     "callee_unresolved": 437,
+     "callee_ambiguous": 171
+    },
+    "byOracle": {
+     "outside": 535,
+     "repository": 73
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "method": {
+   "calls": 1114,
+   "classes": {
+    "voided": 715,
+    "wrong": 264,
+    "dispatch": 92,
+    "oracle_unresolved": 4,
+    "both_unresolved": 12,
+    "same_in_versions": 4,
+    "oracle_generated": 23
+   },
+   "decided": 983,
+   "wrong": {
+    "count": 264,
+    "rate": 0.2685656154628688,
+    "pooled": {
+     "lower": 0.24107774369096546,
+     "upper": 0.297447146903977
+    },
+    "worstRepo": 0.42592592592592593,
+    "overRepos": {
+     "estimate": 0.2348161752255755,
+     "lower": 0.026872540292998792,
+     "upper": 0.636945609440005,
+     "repos": 8,
+     "units": 983
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 268,
+    "rate": 0.9850746268656716
+   },
+   "dispatch": {
+    "count": 92,
+    "productSettledHere": 19,
+    "ofWhichTraitOutside": 3
+   },
+   "voided": {
+    "count": 715,
+    "rate": 0.7273652085452695,
+    "byReason": {
+     "callee_ambiguous": 180,
+     "callee_unresolved": 535
+    },
+    "byOracle": {
+     "outside": 656,
+     "repository": 59
+    }
+   },
+   "verdict": "unsupported"
+  },
+  "path": {
+   "calls": 887,
+   "classes": {
+    "voided": 394,
+    "wrong": 175,
+    "oracle_not_fn": 184,
+    "both_unresolved": 13,
+    "oracle_generated": 37,
+    "oracle_unresolved": 3,
+    "same": 68,
+    "dispatch": 10,
+    "same_in_versions": 3
+   },
+   "decided": 640,
+   "wrong": {
+    "count": 175,
+    "rate": 0.2734375,
+    "pooled": {
+     "lower": 0.23923641161835008,
+     "upper": 0.30974373321149073
+    },
+    "worstRepo": 0.6065573770491803,
+    "overRepos": {
+     "estimate": 0.2788786224525875,
+     "lower": 0.042303643359986154,
+     "upper": 0.6765249517972904,
+     "repos": 8,
+     "units": 640
+    }
+   },
+   "wrongOfSettled": {
+    "settled": 246,
+    "rate": 0.7113821138211383
+   },
+   "dispatch": {
+    "count": 10,
+    "productSettledHere": 4,
+    "ofWhichTraitOutside": 4
+   },
+   "voided": {
+    "count": 394,
+    "rate": 0.615625,
+    "byReason": {
+     "callee_ambiguous": 210,
+     "callee_unresolved": 132,
+     "callee_return_unknown": 52
+    },
+    "byOracle": {
+     "outside": 316,
+     "repository": 78
+    }
+   },
+   "verdict": "unsupported"
+  }
+ },
+ "excludedCases": [],
+ "byCase": {
+  "grovedb-500": {
+   "commit": "c0e02819ac99a545e70a858208f2095c5fb461c7",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 199
+     }
+    ],
+    "documents": 300,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 210,
+    "notIndexed": 18,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 16444,
+    "byForm": {
+     "function": 882,
+     "method": 10461,
+     "path": 3361,
+     "macro": 1740
+    },
+    "sampled": 800
+   }
+  },
+  "grovedb-501": {
+   "commit": "e9fcd18eef345a4a1c5ea645fc2875e408d15e6e",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 24
+     }
+    ],
+    "documents": 300,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 1,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 263
+   },
+   "calls": {
+    "listed": 220,
+    "byForm": {
+     "path": 34,
+     "method": 173,
+     "function": 13
+    },
+    "sampled": 220
+   }
+  },
+  "instruckt-tauri-9": {
+   "commit": "a808734a5b264a433e74f96126b9a8159c19e641",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 12
+     }
+    ],
+    "documents": 12,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 9,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 301,
+    "byForm": {
+     "path": 80,
+     "method": 190,
+     "macro": 28,
+     "function": 3
+    },
+    "sampled": 301
+   }
+  },
+  "kontor-385": {
+   "commit": "5523cc5ad646537cce8fd160c1d7aef6b0cb897b",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": "core",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 146
+     },
+     {
+      "root": "kontor-ts/crate",
+      "file": "1.scip",
+      "rc": 0,
+      "seconds": 36
+     },
+     {
+      "root": "native-contracts",
+      "file": "2.scip",
+      "rc": 0,
+      "seconds": 17
+     },
+     {
+      "root": "test-contracts",
+      "file": "3.scip",
+      "rc": 0,
+      "seconds": 16
+     }
+    ],
+    "documents": 176,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 113,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 8203,
+    "byForm": {
+     "path": 1612,
+     "method": 5819,
+     "function": 545,
+     "macro": 227
+    },
+    "sampled": 800
+   }
+  },
+  "moltis-1064": {
+   "commit": "4106d46dad04481a932597141739e42a5452cc86",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 244
+     }
+    ],
+    "documents": 1024,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 790,
+    "notIndexed": 4,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 3
+   },
+   "calls": {
+    "listed": 78661,
+    "byForm": {
+     "path": 14386,
+     "method": 55736,
+     "function": 6634,
+     "macro": 1905
+    },
+    "sampled": 800
+   }
+  },
+  "omamori-468": {
+   "commit": "e58c04f6df082146969320b91f09aa7a0123ac1f",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 25
+     }
+    ],
+    "documents": 46,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 37,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 4885,
+    "byForm": {
+     "path": 852,
+     "method": 2942,
+     "macro": 324,
+     "function": 767
+    },
+    "sampled": 800
+   }
+  },
+  "pybun-428": {
+   "commit": "cc9df1bc8781b5bf85ed9a98afda3fda2445b420",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 18
+     }
+    ],
+    "documents": 112,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 58,
+    "notIndexed": 0,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 9300,
+    "byForm": {
+     "method": 6740,
+     "function": 590,
+     "path": 1518,
+     "macro": 452
+    },
+    "sampled": 800
+   }
+  },
+  "quebec-136": {
+   "commit": "33cd86eea40565d08b2cd662d8c9c31e7a3de147",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 30
+     }
+    ],
+    "documents": 53,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 46,
+    "notIndexed": 1,
+    "notRead": 0,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 6617,
+    "byForm": {
+     "macro": 334,
+     "method": 4368,
+     "path": 1386,
+     "function": 529
+    },
+    "sampled": 800
+   }
+  },
+  "whatsapp-rust-759": {
+   "commit": "f46e703543e434c91fe3031184a48eebb7b63d1b",
+   "index": {
+    "tool": "rust-analyzer 1.97.1 (8bab26f4 2026-07-14)",
+    "roots": [
+     {
+      "root": ".",
+      "file": "0.scip",
+      "rc": 0,
+      "seconds": 32
+     }
+    ],
+    "documents": 327,
+    "misaligned": 0
+   },
+   "files": {
+    "listed": 242,
+    "notIndexed": 1,
+    "notRead": 1,
+    "duplicatesOfEarlierCases": 0
+   },
+   "calls": {
+    "listed": 19905,
+    "byForm": {
+     "method": 14279,
+     "path": 3852,
+     "macro": 558,
+     "function": 1216
+    },
+    "sampled": 800
+   }
+  }
+ }
+}

@@ -351,6 +351,9 @@ inside a function compares against (*The order inside a function*) — is the tr
 the first of the platform versions. A pull request that changes an implementation rather than the
 declaration is therefore not sorted first by that order.
 
+How often each of these settles the definition rust-analyzer settles, and where it does not, is recorded
+in `docs/resolution.md`; which relations are trusted is ADR 0024's.
+
 ## Reading the output
 
 ```
