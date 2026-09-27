@@ -26,6 +26,7 @@ import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 import { cfgPredicate, testOnlyCfg } from "../syntax/cfg.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
 import { namesTheStandardLibrary, outsideResult } from "./outside-results.ts";
+import { importOf } from "../syntax/rust.ts";
 import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
 
 export type Applicability =
@@ -544,7 +545,7 @@ export type CalleeLocation =
   | null;
 
 /**
- * How far a callee was resolved, read from `calleeOf`'s answer (ADR 0024). The axis is where it
+ * How far a callee was resolved, read from `calleeOf`'s answer (ADR 0025). The axis is where it
  * settled, not whether it returns a `Result`: a callee settled to one definition that returns
  * something else is resolved all the same.
  *
@@ -554,7 +555,7 @@ export type CalleeLocation =
  *   - `unsupported`: no definition reached — a name defined nowhere here, one the search was cut
  *     short on, or a callee that is not a name.
  *
- * Nothing in the product reads this; the record (docs/resolution.md) and ADR 0024 do.
+ * Nothing in the product reads this; the record (docs/resolution.md) and ADR 0025 do.
  */
 export function resolutionOf(result: Applicability, at: CalleeLocation): "resolved" | "ambiguous" | "unsupported" {
   if (at !== null) return at.kind === "versions" ? "ambiguous" : "resolved";
@@ -572,7 +573,9 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
   const bare = call.callee.split("::").pop()!;
   // `(self.f)(x)`, `make()(x)`: listed since #83, and no name to look a definition up by.
   if (bare === "") return { result: { ok: false, kind: "callee_unresolved", reason: "the callee is not a name (a closure or a function value), so what it returns is not established here" }, at: null };
-  const outside = outsideResult(call.callee);
+  // The file's `use` statements, so a row of the table is matched only from its own crate (#83).
+  const parsed = (await discoverer.index(fn.path))?.rust;
+  const outside = outsideResult(call.callee, parsed ? (name) => importOf(parsed, call.line, name) : undefined);
   // A call that writes `std::` says which library it means, and no definition here is that library.
   if (outside && namesTheStandardLibrary(call.callee)) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
   const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);

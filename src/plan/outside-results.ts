@@ -8,6 +8,12 @@
 // the same name means different things on different types (`Metadata::file_type` returns a
 // `FileType`, `DirEntry::file_type` an `io::Result<FileType>`).
 //
+// The ending alone is not enough: tokio has an `fs::write` and a `File::open` too (#83, ADR 0025).
+// Where the file's `use` statements can be read, a row is not matched to another crate's function of
+// that name: a call whose first name a `use` brings in from another crate (`use tokio::fs;`), or that
+// is written from another crate (`tokio::fs::write`), matches nothing. A first name no `use` brings in —
+// a glob, a `use super::*`, a `use` inside a macro — is matched by its ending as before.
+//
 // Every row is here because `bench/outside-results-check.ts` read the standard library's own source
 // and a machine's cargo registry and found no definition a call could reach that way returning
 // anything but a `Result`. The rows are taken from those sources, not from the repositories this
@@ -98,16 +104,33 @@ for (const row of OUTSIDE_RESULTS) {
   byName.set(name, [...(byName.get(name) ?? []), row]);
 }
 
+/** The crate a row is defined in, from where its source is: `std/src/fs.rs:340` → `std`, `serde_json-1.0.151/src/…` → `serde_json`. */
+export const crateOf = (row: OutsideResult): string => row.from.split("/")[0]!.replace(/-\d[\w.-]*$/, "");
+
 /**
  * The row a call's written path matches, or undefined. A call with no path (`entry.file_type()`)
  * matches nothing: the table is for paths, and a method is resolved by its receiver's type.
+ *
+ * `imports` gives the path a `use` brings a name in by at the call (`importOf`), or null when none
+ * does. Without it — a file not read as Rust — the ending alone is matched, as before #83.
  */
-export function outsideResult(callee: string): OutsideResult | undefined {
+export function outsideResult(callee: string, imports?: (name: string) => string[] | null): OutsideResult | undefined {
   const written = callee.split("::");
   if (written.length < 2 || INSIDE.has(written[0]!)) return undefined;
-  return byName.get(written.at(-1)!)?.find((row) => {
+  let lookup = written;
+  const brought = imports?.(written[0]!) ?? null;
+  // An alias is read as what it names (`use std::fs::File as F;` — `F::open` is `File::open`), so a
+  // call written through one can match a row it did not match before #83.
+  if (brought && brought.at(-1) !== written[0]) lookup = [brought.at(-1)!, ...written.slice(1)];
+  return byName.get(lookup.at(-1)!)?.find((row) => {
     const wanted = row.path.split("::");
-    return wanted.length <= written.length && wanted.every((segment, i) => segment === written[written.length - wanted.length + i]);
+    if (!(wanted.length <= lookup.length && wanted.every((segment, i) => segment === lookup[lookup.length - wanted.length + i]))) return false;
+    if (!imports) return true;
+    // Brought in by a `use`: from the row's crate only.
+    if (brought) return brought[0] === crateOf(row);
+    // Not brought in: the call is the row's path as it stands (`fs::write`), or written from the row's
+    // crate (`std::fs::write`) — not from another (`tokio::fs::write`).
+    return lookup.length === wanted.length || lookup[0] === crateOf(row);
   });
 }
 

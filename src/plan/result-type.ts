@@ -53,8 +53,13 @@ export const quoted = (type: string) => (type.length > QUOTED ? `${type.slice(0,
 // newlines kept, so every offset still points where it did. `fn parse() in a comment` and
 // `"fn emit() {}"` are not definitions. A lifetime's `'` is not a quote.
 //
-// ponytail: a raw string holding a `"` (`r#"say "hi""#`) ends early here, and the rest of it reads
-// as code; nested block comments close at the first `*/`.
+// A raw string (`r"C:\"`, `r#"say "hi""#`, `br"…"`) ends at its own closing quote and hashes, not at
+// the first `"` — read as an ordinary string, `\"` escaped the end and the lines after it were blanked
+// as string (#83).
+//
+// ponytail: nested block comments close at the first `*/`.
+const RAW_START = /b?r(#*)"/y;
+
 export function codeOnly(text: string): string {
   const out = text.split("");
   const blank = (from: number, to: number) => {
@@ -62,7 +67,19 @@ export function codeOnly(text: string): string {
   };
   for (let i = 0; i < text.length; i++) {
     const c = text[i]!;
-    if (c === '"') {
+    const next = c === "b" ? text[i + 2] : text[i + 1];
+    let raw: RegExpExecArray | null = null;
+    if ((c === "r" || (c === "b" && text[i + 1] === "r")) && (next === '"' || next === "#") && !/[\w$]/.test(text[i - 1] ?? "")) {
+      RAW_START.lastIndex = i;
+      raw = RAW_START.exec(text);
+    }
+    if (raw) {
+      const close = `"${raw[1]}`;
+      const end = text.indexOf(close, i + raw[0].length);
+      const to = end < 0 ? text.length : end;
+      blank(i + raw[0].length, to);
+      i = end < 0 ? text.length : end + close.length - 1;
+    } else if (c === '"') {
       let j = i + 1;
       while (j < text.length && text[j] !== '"') j += text[j] === "\\" ? 2 : 1;
       blank(i + 1, j);

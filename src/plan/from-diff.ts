@@ -16,7 +16,8 @@
 
 import { isTestPath, refuseWord, type Discoverer } from "../discovery/discover.ts";
 import { declaredForTestsOnly } from "./applicability.ts";
-import { emptyCandidates, enumerate, type Candidates } from "./candidates.ts";
+import { emptyCandidates, enumerate, type Candidates, type FunctionCandidate } from "./candidates.ts";
+import { returnTypesFor } from "./result-type.ts";
 import type { SiteSource } from "./select.ts";
 
 /** How many functions the changed lines may contribute. */
@@ -77,6 +78,34 @@ export interface ChangeSites {
 }
 
 export const isRust = (path: string) => path.endsWith(".rs");
+
+/**
+ * Whether a line the name search hit names the changed function in code (#83, ADR 0025), in order:
+ *   1. the listing holds a call of `name` on the line — a call;
+ *   2. the name is only in a string or a comment there — not;
+ *   3. the line is inside a macro whose arguments were not read as calls, inside what the parser could
+ *      not read, or in a function whose calls were cut — taken as before: not read is not "no call";
+ *   4. the function binds the name itself up to the line (a parameter, a `let`, a `for`, a closure's
+ *      parameter, a match arm's pattern), or the line declares it (`name: …`, `.name`) — a local or a
+ *      field, not;
+ *   5. anything else — the function passed as a value (`.map(name)`, `Some(name)`), a path — is taken.
+ */
+export async function readsAsCall(discoverer: Discoverer, listing: Candidates, enclosing: FunctionCandidate, path: string, line: number, name: string): Promise<boolean> {
+  if (listing.calls.some((c) => c.line === line && c.callee.split("::").pop() === name)) return true;
+  const code = await returnTypesFor(discoverer).codeLinesOf(path);
+  const word = `(?<![\\w$])${name}(?![\\w$])`;
+  const here = code?.[line - 1];
+  if (here !== undefined && !new RegExp(word).test(here)) return false;
+  const parsed = (await discoverer.index(path))?.rust;
+  const within = (s: { startLine: number; endLine: number }) => line >= s.startLine && line <= s.endLine;
+  if (enclosing.callsCut || !parsed || !code) return true;
+  if (parsed.macrosUnreadAt.some(within) || parsed.unread.some(within)) return true;
+  const binds = new RegExp(`\\b(?:let|for)\\b[^=;]*?${word}|\\|[^|]*?${word}[^|]*?\\||${word}\\s*:(?!:)|${word}[\\s)\\],]*=>`);
+  // The line itself too: `let name = …`, `for name in …`, `Some(name) =>` bind it there.
+  for (let l = enclosing.startLine; l <= line; l++) if (binds.test(code[l - 1] ?? "")) return false;
+  // A field of that name (`self.name`) on the line.
+  return !new RegExp(`\\.\\s*${word}`).test(here ?? "");
+}
 
 /**
  * The sources the change contributes, at the after commit.
@@ -151,6 +180,7 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
   let callers = 0;
   let dropped = 0;
   let outsideAnyFunction = 0;
+  let notACall = 0;
   const unreadableCallers = new Set<string>();
   const names = [...new Map(changedFunctions.map((f) => [f.name, f])).values()];
   for (const [i, fn] of names.entries()) {
@@ -190,6 +220,10 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
       }
       if (enclosing.name === fn.name) continue; // its own definition
       if (source.changed?.includes(enclosing.id) || source.callsChanged?.includes(enclosing.id)) continue;
+      if (!(await readsAsCall(discoverer, source.candidates, enclosing, hit.path, hit.line, fn.name))) {
+        notACall += 1;
+        continue;
+      }
       if (callers >= MAX_CALLER_FUNCTIONS) {
         dropped += 1;
         continue;
@@ -199,6 +233,8 @@ export async function sitesFromChange(files: CandidateFiles, discoverer: Discove
     }
   }
   if (dropped > 0) left(`${dropped} more callers were found than the cap of ${MAX_CALLER_FUNCTIONS} functions allows`);
+  // Not left out of the run: a name in a comment, a string or a parameter is no caller (#83, ADR 0025).
+  if (notACall > 0) notes.push(`${notACall} lines naming a changed function do not refer to it there (a comment, a string, or a parameter, local or field of that name) and were not taken as callers`);
   if (outsideAnyFunction > 0) left(`${outsideAnyFunction} references to a changed function are in no function this reads (a use line, a macro body, a function past the cap)`);
   if (unreadableCallers.size > 0) left(`${unreadableCallers.size} files referencing a changed function could not be read here: ${[...unreadableCallers].slice(0, 5).join(", ")}`);
 

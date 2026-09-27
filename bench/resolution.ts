@@ -28,7 +28,7 @@ import { Discoverer, isTestPath, refuseWord } from "../src/discovery/discover.ts
 import { isSensitivePath } from "../src/evidence/redact.ts";
 import { calleeOf, declaredForTestsOnly, targetOf, type CalleeLocation } from "../src/plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../src/plan/candidates.ts";
-import { CandidateFiles, COMMON_FILES, isRust, MAX_CALLER_FUNCTIONS, MAX_HOP_NAMES, readListing, sitesFromChange } from "../src/plan/from-diff.ts";
+import { CandidateFiles, COMMON_FILES, isRust, MAX_CALLER_FUNCTIONS, MAX_HOP_NAMES, readListing, readsAsCall, sitesFromChange } from "../src/plan/from-diff.ts";
 import { Git } from "../src/repository/git.ts";
 import { isMethodCandidate } from "./call-oracle/classify.ts";
 import { clopperPearson, estimateOver } from "./eval/metrics.ts";
@@ -332,8 +332,12 @@ async function callers(s: Setting, k: { case: string; commit: string }, oracle: 
       else {
         const listing = await files.of(hit.path);
         if (!listing) hitFate.set(key, "unreadable");
-        else if (!listing.functions.some((f) => hit.line >= f.startLine && hit.line <= f.endLine)) hitFate.set(key, "outside_function");
-        else hitFate.set(key, "found");
+        else {
+          const around = listing.functions.find((f) => hit.line >= f.startLine && hit.line <= f.endLine);
+          if (!around) hitFate.set(key, "outside_function");
+          // The product takes a hit only where it reads as a call (#83, readsAsCall).
+          else hitFate.set(key, (await readsAsCall(s.discoverer, listing, around, hit.path, hit.line, fn.name)) ? "found" : "not_a_call");
+        }
       }
     }
   }

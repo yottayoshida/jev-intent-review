@@ -99,7 +99,7 @@
   }
  ],
  "broken": {
-  "shifted": 2113,
+  "shifted": 2112,
   "movedSameToWrong": 1730
  },
  "all": {
@@ -107,8 +107,8 @@
    "calls": 1416,
    "classes": {
     "oracle_not_fn": 127,
-    "wrong": 1018,
-    "voided": 226,
+    "wrong": 1017,
+    "voided": 227,
     "oracle_unresolved": 23,
     "both_unresolved": 9,
     "dispatch": 3,
@@ -117,24 +117,24 @@
    },
    "decided": 1251,
    "wrong": {
-    "count": 1018,
-    "rate": 0.8137490007993605,
+    "count": 1017,
+    "rate": 0.8129496402877698,
     "pooled": {
-     "lower": 0.7910479922574893,
-     "upper": 0.8349646344244945
+     "lower": 0.7902150122132241,
+     "upper": 0.8342027351225454
     },
     "worstRepo": 1,
     "overRepos": {
-     "estimate": 0.8348562457290377,
-     "lower": 0.4309228037730861,
-     "upper": 0.9908886218745749,
+     "estimate": 0.8341805700533621,
+     "lower": 0.4302298825292894,
+     "upper": 0.9907601550807783,
      "repos": 8,
      "units": 1251
     }
    },
    "wrongOfSettled": {
-    "settled": 1025,
-    "rate": 0.9931707317073171
+    "settled": 1024,
+    "rate": 0.9931640625
    },
    "dispatch": {
     "count": 3,
@@ -142,14 +142,14 @@
     "ofWhichTraitOutside": 1
    },
    "voided": {
-    "count": 226,
-    "rate": 0.1806554756195044,
+    "count": 227,
+    "rate": 0.18145483613109512,
     "byReason": {
      "callee_unresolved": 58,
-     "callee_ambiguous": 168
+     "callee_ambiguous": 169
     },
     "byOracle": {
-     "repository": 151,
+     "repository": 152,
      "outside": 75
     }
    },
@@ -263,9 +263,9 @@
   "path": {
    "calls": 1514,
    "classes": {
-    "voided": 740,
+    "voided": 744,
     "oracle_not_fn": 249,
-    "wrong": 321,
+    "wrong": 317,
     "oracle_unresolved": 8,
     "both_unresolved": 22,
     "oracle_generated": 56,
@@ -275,24 +275,24 @@
    },
    "decided": 1165,
    "wrong": {
-    "count": 321,
-    "rate": 0.2755364806866953,
+    "count": 317,
+    "rate": 0.2721030042918455,
     "pooled": {
-     "lower": 0.2500449638046973,
-     "upper": 0.302166419435963
+     "lower": 0.24672001845763702,
+     "upper": 0.29864192194153816
     },
     "worstRepo": 0.5565217391304348,
     "overRepos": {
-     "estimate": 0.27492548626535723,
-     "lower": 0.04080059755793286,
-     "upper": 0.6730703565781653,
+     "estimate": 0.2718879544587415,
+     "lower": 0.039661007510318314,
+     "upper": 0.670403326458171,
      "repos": 8,
      "units": 1165
     }
    },
    "wrongOfSettled": {
-    "settled": 425,
-    "rate": 0.7552941176470588
+    "settled": 421,
+    "rate": 0.7529691211401425
    },
    "dispatch": {
     "count": 14,
@@ -300,15 +300,15 @@
     "ofWhichTraitOutside": 5
    },
    "voided": {
-    "count": 740,
-    "rate": 0.6351931330472103,
+    "count": 744,
+    "rate": 0.6386266094420601,
     "byReason": {
      "callee_ambiguous": 380,
-     "callee_unresolved": 235,
+     "callee_unresolved": 239,
      "callee_return_unknown": 125
     },
     "byOracle": {
-     "outside": 621,
+     "outside": 625,
      "repository": 119
     }
    },
@@ -317,32 +317,32 @@
  },
  "asked": {
   "function": {
-   "calls": 769,
+   "calls": 770,
    "classes": {
     "oracle_not_fn": 61,
     "wrong": 583,
-    "voided": 102,
+    "voided": 103,
     "oracle_unresolved": 13,
     "both_unresolved": 1,
     "oracle_generated": 3,
     "dispatch": 1,
     "same_in_versions": 5
    },
-   "decided": 690,
+   "decided": 691,
    "wrong": {
     "count": 583,
-    "rate": 0.8449275362318841,
+    "rate": 0.8437047756874095,
     "pooled": {
-     "lower": 0.8157273736488548,
-     "upper": 0.8711389000541487
+     "lower": 0.8144465947293895,
+     "upper": 0.8699894410540026
     },
     "worstRepo": 1,
     "overRepos": {
-     "estimate": 0.8523070967284534,
-     "lower": 0.4490804399983688,
-     "upper": 0.9938857174832094,
+     "estimate": 0.8510918189506755,
+     "lower": 0.4477992582140189,
+     "upper": 0.9936972327697333,
      "repos": 8,
-     "units": 690
+     "units": 691
     }
    },
    "wrongOfSettled": {
@@ -355,14 +355,14 @@
     "ofWhichTraitOutside": 0
    },
    "voided": {
-    "count": 102,
-    "rate": 0.14782608695652175,
+    "count": 103,
+    "rate": 0.14905933429811866,
     "byReason": {
      "callee_unresolved": 13,
-     "callee_ambiguous": 89
+     "callee_ambiguous": 90
     },
     "byOracle": {
-     "repository": 85,
+     "repository": 86,
      "outside": 17
     }
    },
@@ -422,9 +422,9 @@
    "verdict": "unsupported"
   },
   "method": {
-   "calls": 1114,
+   "calls": 1116,
    "classes": {
-    "voided": 715,
+    "voided": 717,
     "wrong": 264,
     "dispatch": 92,
     "oracle_unresolved": 4,
@@ -432,21 +432,21 @@
     "same_in_versions": 4,
     "oracle_generated": 23
    },
-   "decided": 983,
+   "decided": 985,
    "wrong": {
     "count": 264,
-    "rate": 0.2685656154628688,
+    "rate": 0.26802030456852793,
     "pooled": {
-     "lower": 0.24107774369096546,
-     "upper": 0.297447146903977
+     "lower": 0.2405794940696353,
+     "upper": 0.29685521414060645
     },
     "worstRepo": 0.42592592592592593,
     "overRepos": {
-     "estimate": 0.2348161752255755,
-     "lower": 0.026872540292998792,
-     "upper": 0.636945609440005,
+     "estimate": 0.23416794704925745,
+     "lower": 0.026668092093103724,
+     "upper": 0.6363451858207725,
      "repos": 8,
-     "units": 983
+     "units": 985
     }
    },
    "wrongOfSettled": {
@@ -459,14 +459,14 @@
     "ofWhichTraitOutside": 3
    },
    "voided": {
-    "count": 715,
-    "rate": 0.7273652085452695,
+    "count": 717,
+    "rate": 0.7279187817258883,
     "byReason": {
-     "callee_ambiguous": 180,
-     "callee_unresolved": 535
+     "callee_ambiguous": 181,
+     "callee_unresolved": 536
     },
     "byOracle": {
-     "outside": 656,
+     "outside": 658,
      "repository": 59
     }
    },
@@ -475,8 +475,8 @@
   "path": {
    "calls": 887,
    "classes": {
-    "voided": 394,
-    "wrong": 175,
+    "voided": 397,
+    "wrong": 172,
     "oracle_not_fn": 184,
     "both_unresolved": 13,
     "oracle_generated": 37,
@@ -487,24 +487,24 @@
    },
    "decided": 640,
    "wrong": {
-    "count": 175,
-    "rate": 0.2734375,
+    "count": 172,
+    "rate": 0.26875,
     "pooled": {
-     "lower": 0.23923641161835008,
-     "upper": 0.30974373321149073
+     "lower": 0.23475708540601659,
+     "upper": 0.30489194538907327
     },
     "worstRepo": 0.6065573770491803,
     "overRepos": {
-     "estimate": 0.2788786224525875,
-     "lower": 0.042303643359986154,
-     "upper": 0.6765249517972904,
+     "estimate": 0.2749570538251365,
+     "lower": 0.04081251094063987,
+     "upper": 0.6730980162007256,
      "repos": 8,
      "units": 640
     }
    },
    "wrongOfSettled": {
-    "settled": 246,
-    "rate": 0.7113821138211383
+    "settled": 243,
+    "rate": 0.7078189300411523
    },
    "dispatch": {
     "count": 10,
@@ -512,15 +512,15 @@
     "ofWhichTraitOutside": 4
    },
    "voided": {
-    "count": 394,
-    "rate": 0.615625,
+    "count": 397,
+    "rate": 0.6203125,
     "byReason": {
      "callee_ambiguous": 210,
-     "callee_unresolved": 132,
+     "callee_unresolved": 135,
      "callee_return_unknown": 52
     },
     "byOracle": {
-     "outside": 316,
+     "outside": 319,
      "repository": 78
     }
    },

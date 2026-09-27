@@ -4,7 +4,7 @@
 fixed sample of them per form and for every caller of a changed function there is a record of whether
 the definition the product settled by name is the one rust-analyzer settles, a different one, or none
 (and why); which relations are trusted and which are ambiguous or unsupported is decided from that
-record by ADR 0024.**
+record by ADR 0025.**
 
 The product finds a call's definition by its name (`calleeOf` in `src/plan/applicability.ts`,
 *Which definition a call reaches* in `docs/local-check-cli.md`) and a changed function's callers by
@@ -136,6 +136,37 @@ are not on rust-analyzer's side.
 | behind a cap (`MAX_HOP_NAMES`, a name in more than 20 files, `MAX_CALLER_FUNCTIONS`) | 35 |
 
 26 of 72 (36%) are not callers: verdict **unsupported**.
+
+## The record after two of the fixes (#83, third part)
+
+ADR 0025 named three causes. Two are fixed, and measured with the bench above unchanged — the same
+sample, the same classes — row by row against the record before them:
+
+- **A row of the table outside is matched only from its own crate** (`outsideResult` reads the
+  file's `use` statements): the four calls that matched a row by their ending from tokio —
+  `tokio::fs::write`, `tokio::fs::remove_file`, a `fs::create_dir_all` under `use tokio::{fs, …}`,
+  a `File::open` under `use tokio::{fs::File, …}` — are `voided` now. A name no `use` brings in is
+  matched by its ending as before, so no call the table matched correctly was lost. Asked path calls:
+  wrong 16 → 13, wrong of settled 6.5% → 5.3%. No verdict changes.
+- **A raw string ends at its own closing quote** (`codeOnly`, which reads signatures and definitions
+  too): `r#"<?xml version="1.0" …"#` ended at its first inner `"` and the lines after it were blanked,
+  so moltis's second `fn run_systemctl` was not seen and its one call settled to the other crate's.
+  It is `voided` now — the one `wrong` between two of the repository's own definitions. Nothing else
+  moved: of the 6,121 sampled calls, five changed class, all `wrong` to `voided`.
+- **A caller is taken only where its line reads as a call** (`readsAsCall` in `from-diff.ts`): the
+  product's callers 72 → 65 and those that are not callers 26 → 18 — the eight lines that named a
+  changed function in a comment (4), a string (3) or a parameter (1) are gone; the ninth, a local
+  binding of the same name that is called, stays. A line that passes the function as a value
+  (`.map(name)`) is still a caller; one that uses a parameter or local of that name is not. The callers rust-analyzer confirms rose 46 → 47: in
+  omamori, a line that was not a call had taken one of `MAX_CALLER_FUNCTIONS`' 20 places, and a real
+  caller has it now. Still **unsupported** (18 of 65, 28%): 17 of the 18 are another function of the
+  same name (grovedb-500's `finalize` alone 11), which this does not fix.
+
+On the acceptance runs (`bench/budget-by-origin.ts`, `bench/logs/budget-by-origin-v4.json`, before = `5f2f922`), every known target is inside the budget where it was, and every check holds on all 20 runs; the callers' askable calls change with who is a caller — pybun#428 90 → 36, omamori `#468` 55 → 60 (a real caller in place of a line that was not a call), Kontor#385 24 → 23.
+
+The third cause — a method called on a standard-library or dependency type settled to the one
+function of that name here — is 283 of the 307 wrong calls left and is not fixed yet: it needs the type of
+what a method is called on, and is the next change.
 
 ## Checks
 

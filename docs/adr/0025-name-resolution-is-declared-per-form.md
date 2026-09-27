@@ -1,6 +1,9 @@
-# 0024. Resolving a call by its name: trusted nowhere yet, ambiguous for plain and path calls, unsupported for methods, macro arguments and callers
+# 0025. Resolving a call by its name: trusted nowhere yet, ambiguous for plain and path calls, unsupported for methods, macro arguments and callers
 
 Status: Accepted (the owner's ruling of 2026-09-26: declare the boundary in stages, fix the causes next)
+
+Numbered 0024 when it was merged (pull request #115, commit `92a2243`), beside another 0024 that reached
+main first (`0024-the-sealed-set-is-opened-once-checked.md`); renumbered 0025.
 
 ## Context
 
@@ -61,9 +64,12 @@ rust-analyzer's definition breaks 20 of 20 of those checked (17 of them in one r
    - a method call is not settled to the repository's one definition of its name on the name alone;
    - a row of the table outside matches only when the call names the row's crate, or nothing here
      brings another crate's function of that name in;
-   - the callers' search takes a function as a caller only where its listing holds a call of that
-     name — which leaves out comments, strings and parameters (a local closure of the same name
-     stays: 1 of the 9).
+   - the callers' search takes a function as a caller only where a line naming the changed function
+     refers to it — a call, or the function passed as a value — leaving out comments, strings, fields
+     and a parameter or local of the same name (a local binding of the same name that is called stays:
+     1 of the 9); a line the parser did not read as calls is taken as before. (Worded when the fix was
+     made, in #83's third part: first written as "only where its listing holds a call of that name",
+     which would have dropped the function passed as a value.)
    A fix is kept when `wrong` falls and neither `same` nor the callers rust-analyzer confirms falls.
 4. **rust-analyzer is not built into the product.** It is the oracle here, and stays one.
 
