@@ -363,6 +363,16 @@ inside a function compares against ([*The order inside a function*](measurements
 the first of the platform versions. A pull request that changes an implementation rather than the
 declaration is therefore not sorted first by that order.
 
+**A method named like one of the standard library's is kept only through what it is called on**
+(#83, ADR 0027). For `x.len()`, `x.clone()`, `x.map_err(…)` — a method call whose name the standard
+library uses for a public method — the definition the reading above chose is kept only when `x` is one
+of this repository's types and the definition is in that type's `impl`; otherwise the call is set aside. `x`
+is read as far as it is written: `self`, a parameter or `let` with a written type, a `let` set from a
+call, an enum's variant, a call's written return type (three steps deep). A field, `?`, `.await`, a
+closure's parameter or a pattern is not read, and neither is what a `Box`, `Rc` or `Arc` holds — the
+call is set aside. A standard-library type is never this repository's: a `v.len()` on a `Vec` is `Vec`'s,
+whatever trait here implements `len` for it. Nothing is settled here that the reading above had not.
+
 How often each of these settles the definition rust-analyzer settles, and where it does not, is recorded
 in `docs/resolution.md`; which relations are trusted is ADR 0025's.
 

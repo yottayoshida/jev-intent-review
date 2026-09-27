@@ -8,10 +8,11 @@
 // middleware protects; with the middleware's body it answers "satisfies".
 
 import { defines } from "../change/blocks.ts";
-import { calledNames, identifiers } from "../change/seeds.ts";
+import { calledMethods, calledNames, identifiers } from "../change/seeds.ts";
 import { IMPORT_LINE, isTestPath, type Discoverer } from "../discovery/discover.ts";
 import type { Candidate, Cut, Location, Requirement } from "../types.ts";
 import { functionDefinitionsOf } from "../plan/applicability.ts";
+import { STD_METHOD_NAMES } from "../plan/std-methods.ts";
 import type { GrepHit } from "../repository/git.ts";
 import { cut, redact } from "./redact.ts";
 
@@ -288,11 +289,15 @@ export async function decisiveBodies(discoverer: Discoverer, names: readonly str
     checks.push({ name, code: b.code });
   }
   for (const check of checks) {
-    for (const name of calledNames(withoutStrings(check.code))) {
+    const code = withoutStrings(check.code);
+    const methods = calledMethods(code);
+    for (const name of calledNames(code)) {
       if (taken.has(name) || name === check.name || /^[A-Z]/.test(name)) continue;
       const b = await bodyOf(name);
       if (b === null) continue;
-      if ("why" in b || b.code.length > limits.each || used + b.code.length > limits.total) {
+      // Called as a method in the check's text, by a name the standard library uses too: nothing says
+      // this repository's is the one (#83, ADR 0027), so it is named, not sent.
+      if ((methods.has(name) && STD_METHOD_NAMES.has(name)) || "why" in b || b.code.length > limits.each || used + b.code.length > limits.total) {
         notSent.push(name);
         continue;
       }

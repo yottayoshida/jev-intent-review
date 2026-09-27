@@ -46,7 +46,8 @@ import { FATAL_KINDS, ProviderError } from "../judgments/client.ts";
 import type { JudgmentProvider, Questions } from "../judgments/provider.ts";
 import type { Git } from "../repository/git.ts";
 import { EXIT, ToolError, type Candidate, type ChoiceAnswer, type Requirement, type RequirementForm } from "../types.ts";
-import { applicabilityOf, calleeOf, definitionsOfName, functionDefinitionsOf } from "../plan/applicability.ts";
+import { applicabilityOf, calleeOf, definitionsOfName, functionDefinitionsOf, settlesHere } from "../plan/applicability.ts";
+import { STD_METHOD_NAMES } from "../plan/std-methods.ts";
 import type { CallCandidate, Candidates, FunctionCandidate } from "../plan/candidates.ts";
 import { chooseForm, FORM_QUESTION, FORMS, formOf } from "../plan/forms.ts";
 import { CandidateFiles, readListing, sitesFromChange } from "../plan/from-diff.ts";
@@ -469,6 +470,17 @@ export async function runLocalCheck(
     if ("hold" in decisive) {
       into.unchecked.push({ ...placeOf(site), why: decisive.hold });
       return tally;
+    }
+    // A check whose name the standard library uses for a method too is sent only where every call of
+    // it here settles to this repository's definition by what it is called on (#83, ADR 0027);
+    // otherwise its body is not known to be the one, and the call is not asked about.
+    for (const name of decisive.send.filter((n) => STD_METHOD_NAMES.has(n))) {
+      const calls = (await callsOf(site.fn)).filter((c) => c.callee.split("::").pop() === name);
+      const settled = await Promise.all(calls.map((c) => calleeOf(discoverer, site.fn, c)));
+      if (calls.length === 0 || settled.some(({ at }) => !settlesHere(at))) {
+        into.unchecked.push({ ...placeOf(site), why: `the check \`${name}\` is also a method of the standard library, and not every call of it here settles to this repository's definition, so which body it runs is not known and the call is not asked about` });
+        return tally;
+      }
     }
     let sent: SentBody[] = [];
     let notSent: string[] = [];

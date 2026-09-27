@@ -165,8 +165,57 @@ sample, the same classes — row by row against the record before them:
 On the acceptance runs (`bench/budget-by-origin.ts`, `bench/logs/budget-by-origin-v4.json`, before = `5f2f922`), every known target is inside the budget where it was, and every check holds on all 20 runs; the callers' askable calls change with who is a caller — pybun#428 90 → 36, omamori `#468` 55 → 60 (a real caller in place of a line that was not a call), Kontor#385 24 → 23.
 
 The third cause — a method called on a standard-library or dependency type settled to the one
-function of that name here — is 283 of the 307 wrong calls left and is not fixed yet: it needs the type of
-what a method is called on, and is the next change.
+function of that name here — is 283 of the 307 wrong calls left, and is the fourth part's.
+
+## The record after the third fix (#83, fourth part, ADR 0027)
+
+A method call whose name the standard library uses for a public method keeps the definition the name
+reading chose only when what it is called on is one of this repository's types whose `impl` holds it.
+Measured with the same bench, row by row against the record after the second and third fixes:
+
+- **254 `wrong` calls are not settled** (method 147, macro 107), and 12 more reach code the repository
+  generates, so are `oracle_generated`. **No call became `wrong`.**
+- **15 `same` calls are not settled** (method 9, macro 6). The owner's bar: at most 10 before
+  measuring, 15 once measured (ADR 0025, ADR 0027). Why each could not be read:
+
+  | case | place | call | why |
+  |---|---|---|---|
+  | grovedb-501 | `merk/src/merk/restore.rs:209`, `:217` | `tree.hash().unwrap()` | `hash` has 12 definitions here, of different return types |
+  | grovedb-501 | `merk/src/merk/restore.rs:265`, `:301` | `value_hash(…).unwrap()` | `value_hash` has 5 definitions, of different return types |
+  | grovedb-501 | `merk/src/merk/restore.rs:440`, `:453` | `….walk(…).unwrap()` | `walk` has 4 definitions, of different return types |
+  | grovedb-501 | `merk/src/merk/restore.rs:403` | `.storage.put(…).unwrap()` | `put` has 12 definitions, called on a field |
+  | grovedb-500 | `grovedb/src/operations/auxiliary.rs:99` | `aux_storage.delete_aux(…).map_err(…)` | `delete_aux` has 13 definitions |
+  | grovedb-500 | `grovedb-merkle-mountain-range/benches/mmr_benchmark.rs:17` | `mmr.push(…).unwrap()` | `push` has 2 definitions |
+  | grovedb-500 | `grovedb/benches/branch_chunk_queries.rs:2447` | `latency_stats.max()` | the binding is not read |
+  | grovedb-500 | `grovedb/src/batch/estimated_costs/average_case_costs.rs:377` | `k.as_slice()` | a closure's parameter |
+  | quebec-136 | `src/config.rs:50` | `q.to_string()` | a closure's parameter |
+  | omamori-468 | `src/engine/hook.rs:1474` | `logger.append(event)` | `let logger = match …` |
+  | pybun-428 | `src/commands/install.rs:1193` | `project.path()` | `let mut project = …?` |
+  | moltis-1064 | `crates/browser/src/detect.rs:583` | `command.display()` | the binding is not read |
+
+- Of the `dispatch` calls the product had settled here, 6 macro and 5 method ones are not settled now —
+  10 of them for a trait that is not this repository's, so no longer wrong in effect, and one method
+  call that may have been right; they are outside the counts above, as `dispatch` always is.
+
+The calls the product asks about:
+
+| form | wrong | upper 95% | wrong of settled | voided | verdict |
+|---|---|---|---|---|---|
+| function | 10 (1.4%) | 2.6% | 1.7% | 103 (14.9%) | ambiguous |
+| path | 13 (2.0%) | 3.4% | 5.3% | 397 (62.0%) | ambiguous |
+| method | 5 (0.5%) | 1.2% | 3.0% (was 38.1%) | 813 (83.2%) | ambiguous (was unsupported) |
+| macro | 2 (0.2%) | 0.9% | 1.4% (was 36.2%) | 693 (82.5%) | ambiguous (was unsupported) |
+
+On the acceptance runs (`bench/budget-by-origin.ts`, `bench/logs/budget-by-origin-v5.json`, before = `139d2df`),
+every check holds on all 20 runs and every known target is inside the budget, no later than before
+(earlier on two: moltis#1064's B 22nd → 13th of 30, grovedb#500's B 7th → 5th). The places set-aside
+calls leave go to the callers (ADR 0015): moltis#1064's changed functions ask 11 where they asked 20,
+its callers 19 where they asked 10. `--candidates-only` on moltis#1064 took 31.0 s where it took
+32.7 s (one run each, in the same log).
+
+Method calls and calls inside a macro's arguments are ambiguous now, not unsupported: of what the
+product settles there, about 1 in 30 is another definition. They are not trusted: the upper bound is
+over 1%, and most such calls are not settled at all (`voided` 83%).
 
 ## Checks
 

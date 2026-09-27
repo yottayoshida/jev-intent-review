@@ -71,6 +71,8 @@ rust-analyzer's definition breaks 20 of 20 of those checked (17 of them in one r
      made, in #83's third part: first written as "only where its listing holds a call of that name",
      which would have dropped the function passed as a value.)
    A fix is kept when `wrong` falls and neither `same` nor the callers rust-analyzer confirms falls.
+   For the first cause the owner ruled (2026-09-27) that a correct call may become unsettled but never
+   wrong, the rows listed: at most 10, then, measured, 15 (ADR 0027).
 4. **rust-analyzer is not built into the product.** It is the oracle here, and stays one.
 
 ## Alternatives Considered
