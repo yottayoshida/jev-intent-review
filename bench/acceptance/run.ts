@@ -18,7 +18,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { isAbsolute, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import type * as Main from "../../src/cli/main.ts";
 import type * as Client from "../../src/judgments/client.ts";
@@ -79,8 +79,10 @@ async function dist() {
 }
 type Dist = Awaited<ReturnType<typeof dist>>;
 
-const caseDir = (id: string) => join(HERE, "cases", id);
-const readCase = (id: string) => JSON.parse(readFileSync(join(caseDir(id), "case.json"), "utf8")) as CaseFile & { precheck?: Record<string, unknown> };
+/** The acceptance cases' directory; `measure` is given another for the cases of bench/eval (the sandbox's). */
+const CASES = join(HERE, "cases");
+const caseDir = (id: string, root = CASES) => join(root, id);
+const readCase = (id: string, root = CASES) => JSON.parse(readFileSync(join(caseDir(id, root), "case.json"), "utf8")) as CaseFile & { precheck?: Record<string, unknown> };
 const writeJson = (path: string, value: unknown) => writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
 const sha256 = (text: string | Buffer) => createHash("sha256").update(text).digest("hex");
 
@@ -92,12 +94,12 @@ async function callMain(d: Dist, clone: string, args: string[], env: NodeJS.Proc
   return { code, stdout, stderr };
 }
 
-const specArgs = (id: string, base: string, head: string) => ["--skip-change-check", "--base", base, "--head", head, "--intent-spec", join(caseDir(id), "spec.json"), "--json"];
+const specArgs = (id: string, base: string, head: string, root = CASES) => ["--skip-change-check", "--base", base, "--head", head, "--intent-spec", join(caseDir(id, root), "spec.json"), "--json"];
 
 /** The enumeration of one branch. It depends on the commits alone, so it is taken once. */
-async function enumerationOf(d: Dist, id: string, clone: string, base: string, head: string): Promise<Enumeration & { counts: unknown }> {
+async function enumerationOf(d: Dist, id: string, clone: string, base: string, head: string, root = CASES): Promise<Enumeration & { counts: unknown }> {
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !(d.client.JUDGMENT_ENV as readonly string[]).includes(k)));
-  const { code, stdout, stderr } = await callMain(d, clone, [...specArgs(id, base, head), "--candidates-only"], env);
+  const { code, stdout, stderr } = await callMain(d, clone, [...specArgs(id, base, head, root), "--candidates-only"], env);
   if (code !== 0) throw new Error(`candidates-only exited ${code}: ${stderr.trim()}`);
   const r = (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements[0]!;
   const rows = <T extends { file: string; function: string; call: string }>(xs: T[]) => xs.map(({ file, function: fn, call, ...rest }) => ({ file, function: fn, call, ...rest }));
@@ -159,7 +161,7 @@ async function precheck(id: string, clone: string) {
 const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10 } as const;
 
 /** Requests one run can send at most: two questions per call, every budget of calls, and room for retries. */
-function perRun(c: CaseFile, versionId: string): number {
+export function perRun(c: CaseFile, versionId: string): number {
   const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
   return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget) * 1.1);
 }
@@ -168,7 +170,7 @@ function perRun(c: CaseFile, versionId: string): number {
 function precheckedCases(): (CaseFile & { precheck?: Record<string, { live?: boolean }> })[] {
   return readdirSync(join(HERE, "cases"))
     .filter((id) => existsSync(join(caseDir(id), "case.json")))
-    .map(readCase)
+    .map((id) => readCase(id))
     .filter((c) => c.precheck !== undefined) as (CaseFile & { precheck?: Record<string, { live?: boolean }> })[];
 }
 
@@ -194,6 +196,8 @@ function distil(r: LocalCheck.LocalCheckResult) {
 export interface LogTarget {
   file: string;
   claim?: string;
+  /** Where the cases are, when not in bench/acceptance/cases (the sealed and dev cases of bench/eval). */
+  cases?: string;
 }
 
 /**
@@ -213,9 +217,13 @@ export async function measure(id: string, clone: string, limit: number, log: Log
   // The log names the commit its source was built from; changes beside the log itself would make that
   // untrue. The log is left out: measuring a second case, or resuming, writes to it before any commit.
   // What runs is the build in dist/, which this does not check — build from the committed source.
-  const dirty = (await self.text(["status", "--porcelain", "--", ".", `:(exclude)${relative(join(HERE, "..", ".."), LOG)}`])).trim();
+  // A log outside the repository (bench/eval's sealed and dev logs) needs no exclusion, and git refuses one.
+  const logRel = relative(join(HERE, "..", ".."), LOG);
+  const inside = logRel !== "" && !logRel.startsWith("..") && !isAbsolute(logRel);
+  const dirty = (await self.text(["status", "--porcelain", "--", ".", ...(inside ? [`:(exclude)${logRel}`] : [])])).trim();
   if (dirty !== "") throw new Error(`the working tree has uncommitted changes besides the log; commit them first:\n${dirty}`);
-  const c = readCase(id);
+  const root = log.cases ?? CASES;
+  const c = readCase(id, root);
   const book: AcceptanceLog = existsSync(LOG) ? JSON.parse(readFileSync(LOG, "utf8")) : { conditions: {}, cases: {} };
   const toolCommit = (await self.text(["rev-parse", "HEAD"])).trim();
   // Every file a question's words come from. `plan/forms.js` joined when questions became forms; a log
@@ -234,7 +242,7 @@ export async function measure(id: string, clone: string, limit: number, log: Log
   if (entry.role !== undefined && entry.role !== c.role) throw new Error(`${id} was measured in this log as ${entry.role} and its case.json now says ${c.role}`);
   entry.role = c.role;
   for (const [versionId, version] of Object.entries(c.versions)) {
-    const enumeration = await enumerationOf(d, id, clone, version.base, version.head);
+    const enumeration = await enumerationOf(d, id, clone, version.base, version.head, root);
     const targetApplicability: Record<string, { ok: boolean; kind?: string }> = {};
     for (const [key, target] of Object.entries(version.targets)) {
       const f = await targetFacts(d, clone, version.head, target);
@@ -276,7 +284,7 @@ export async function measure(id: string, clone: string, limit: number, log: Log
         },
       };
       const started = new Date().toISOString();
-      const { code, stdout, stderr } = await callMain(d, clone, specArgs(id, version.base, version.head), process.env, deps);
+      const { code, stdout, stderr } = await callMain(d, clone, specArgs(id, version.base, version.head, root), process.env, deps);
       const counted = client?.sent ?? { requests: 0, bytes: 0 };
       spent += counted.requests;
       let requirements: RunRecord["requirements"] = [];

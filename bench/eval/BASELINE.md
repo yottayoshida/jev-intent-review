@@ -67,7 +67,12 @@ jev-intent-review's own list of calls is never used: it would hand the baseline 
 ## Budget
 
 **The same bytes** (owner, 2026-09-25): for each version, the baseline may be given as many bytes as
-jev-intent-review sent to Jev on it, the median of its three runs. The same bytes are not the same cost
+jev-intent-review sent to Jev on it, the median of its three runs. A version jev sent nothing on — it
+held its target or had none inside its budget, so its enumeration settled it — gives the baseline the
+median of the bytes jev sent on the run's other versions (owner, 2026-09-26): a defect jev did not reach is
+one the baseline may still find, and d is then −1. Given 0 bytes the baseline could not run, and every such
+version would be a tie in jev's favour (the rehearsal on dev row 143 was one). A version jev sent on but
+finished no run of stops the run instead. The same bytes are not the same cost
 — Opus and Jev are priced very differently — so cost in dollars, tokens and time are reported beside
 every result. jev sends the same requirement and function more than once; the baseline gets that many
 bytes with little repetition, which favours the baseline.
@@ -149,10 +154,21 @@ and the repositories, cases and runs behind every number.
 
 ## Sealed
 
-Opening the sealed set runs both systems under one opening of `run.ts --set sealed` (`PROTOCOL.md`);
-wiring the baseline into it, and recording its host (`claude-code`) and model in the opening line, comes
-with the second part of #80. Up to about 255 runs of `claude -p` (17 repositories, up to five versions,
-three runs) are allowed on the condition that user-level hooks are not loaded (owner, 2026-09-25).
+Opening the sealed set runs both systems and the adjudication under one opening of `run.ts --set sealed`
+(`PROTOCOL.md`, ADR 0024); the opening line records the baseline's host (`claude-code`), model, effort and
+version, and the sha256 of `baseline.ts`, `compare.ts` and `adjudicate.ts`, whose prompts are fixed
+before the set is opened. Up to about 255 runs of `claude -p` for the baseline (17 repositories, up to
+five versions, three runs) and about 184 for the adjudication (46 correct versions, a rewriter and three
+annotators) are allowed on the condition that user-level hooks are not loaded (owner, 2026-09-25 and
+2026-09-26). The rewriter runs with no tools; the annotators with `Read,Grep,Glob` only, in a copy of the
+version's source (`git archive`, with every `.claude/`, `CLAUDE.md` and `CLAUDE.local.md` removed) under the
+system's temporary directory, so the sandbox's labels and the systems' logs are outside what they may
+read. Before the opening line is written, two `claude -p` runs with the annotators' tools check that a
+file in their directory is read and a file in the run's own directory is not (`probeConfinement`). They
+are the first `claude -p`, and the workspace's `origin/main` and omamori's audit log are recorded around
+them (`retro/calibrate.ts`, `n1Problem`): an auto-backup commit arriving in between refuses the opening.
+The audit log shows nothing of these runs whatever happens — with `Read,Grep,Glob` no Bash hook runs —
+so it is recorded, not checked.
 
 ## Dev
 

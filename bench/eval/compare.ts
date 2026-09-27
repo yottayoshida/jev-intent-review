@@ -6,8 +6,9 @@
 // takes metrics.ts's Clopper–Pearson over the number of repositories — the same interval as every
 // other rate of the protocol. Nothing here reads a repository or sends anything.
 
-import type { RequirementRun, Target } from "../acceptance/score.ts";
-import type { Finding } from "./baseline.ts";
+import { RUNS as SCORE_RUNS, scoreVersion, type CaseFile, type RequirementRun, type Target, type VersionLog } from "../acceptance/score.ts";
+import type { AdjLabel, Item } from "./adjudicate.ts";
+import type { BaselineRun, Finding } from "./baseline.ts";
 import { MAX_FINDINGS } from "./baseline.ts";
 import { clopperPearson, CONFIDENCE, estimateOver, GATES, requiredRepos, type RepoCount } from "./metrics.ts";
 
@@ -148,4 +149,79 @@ export function judge(pairs: readonly Pair[], falseVersions: readonly FalseVersi
     guard: { jevEstimate: j.estimate, jevUpper: known.upper, baselineEstimate: b.estimate, holds },
     why,
   };
+}
+
+// ---------------------------------------------------------------------------------------------
+// From the logs of one opening to the pairs and the correct versions `judge` takes.
+
+/** What the baseline did on one version: the bytes it was given (0 when jev sent nothing) and its runs. */
+export interface BaselineVersion {
+  budget: number;
+  runs: BaselineRun[];
+}
+
+/** What was adjudicated on one correct version: the items, each with the label two of three gave. */
+export interface AdjudicatedVersion {
+  items: Item[];
+  decided: Record<number, AdjLabel>;
+}
+
+/** jev's top five of each of the first three finished runs, for one requirement. */
+export function jevRunsOf(v: VersionLog | undefined, requirementId: string): RequirementRun["findings"][] {
+  if (v === undefined) return [];
+  return v.runs
+    .filter((r) => r.finished)
+    .slice(0, SCORE_RUNS)
+    .map((run) => {
+      const r = run.requirements.find((x) => x.requirementId === requirementId);
+      return r === undefined ? [] : jevTopFindings(r);
+    });
+}
+
+/**
+ * The pairs of one case: every target expected listed on a `defect-A` or `defect-B` version, jev's hit
+ * against the baseline's. A version jev sent nothing on is no hit of jev's; the baseline ran on it with
+ * the median of the run (BASELINE.md, "Budget"). A budget of 0 is no run, and no hit.
+ */
+export function pairsOf(repo: string, c: CaseFile, jev: Record<string, VersionLog>, baseline: Record<string, BaselineVersion>): Pair[] {
+  const out: Pair[] = [];
+  for (const [versionId, version] of Object.entries(c.versions)) {
+    const m = /^defect-([AB])$/.exec(versionId);
+    if (!m) continue;
+    for (const [key, expected] of Object.entries(version.expected)) {
+      if (expected !== "listed") continue;
+      const t = version.targets[key]!;
+      const b = baseline[versionId];
+      out.push({ repo, place: m[1] as "A" | "B", jev: hit(jevRunsOf(jev[versionId], t.requirementId), t), baseline: b !== undefined && b.budget > 0 && hit(baselineFindings(b.runs), t) });
+    }
+  }
+  return out;
+}
+
+/**
+ * The correct versions of one case (`shipped`, `rewrite-*`): whether each system made a false finding —
+ * one naming a known target, or one adjudicated false — and #80's false listing of its known targets,
+ * counted from the score's rows as `countsOf` counts it (listed in any run, before the cut to five).
+ */
+export function falseVersionsOf(repo: string, c: CaseFile, jev: Record<string, VersionLog>, baseline: Record<string, BaselineVersion>, adjudicated: Record<string, AdjudicatedVersion>): FalseVersion[] {
+  const out: FalseVersion[] = [];
+  for (const [versionId, version] of Object.entries(c.versions)) {
+    if (!/^(shipped|rewrite-[AB])$/.test(versionId)) continue;
+    const targets = Object.values(version.targets);
+    const requirementIds = [...new Set(targets.map((t) => t.requirementId))];
+    const jevFindings = requirementIds.flatMap((id) => jevRunsOf(jev[versionId], id)).flat();
+    const b = baseline[versionId];
+    const baseFindings = b === undefined || b.budget === 0 ? [] : baselineFindings(b.runs).slice(0, RUNS).flat();
+    const adj = adjudicated[versionId];
+    const judgedFalse = (by: "jev" | "baseline") => adj !== undefined && adj.items.some((i) => i.by.includes(by) && adj.decided[i.n] === "false");
+    const namesTarget = (fs: readonly { file: string; function: string; call: string }[]) => fs.some((f) => targets.some((t) => names(f, t)));
+    const rows = jev[versionId] === undefined ? [] : scoreVersion(c, versionId, jev[versionId]!).filter((r) => r.expected === "not_listed");
+    out.push({
+      repo,
+      jev: namesTarget(jevFindings) || judgedFalse("jev"),
+      baseline: namesTarget(baseFindings) || judgedFalse("baseline"),
+      jevKnown: { listed: rows.filter((r) => r.runs.some((x) => x.listed)).length, targets: rows.length },
+    });
+  }
+  return out;
 }
