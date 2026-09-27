@@ -22,7 +22,7 @@ import { clopperPearson } from "../metrics.ts";
 import type { Label, Split } from "../split.ts";
 import { arrivedBetween, n1Problem, readAppended, realCalDeps, Stopped, workspaceState, type LaterFix } from "./calibrate.ts";
 import { fetchChecks } from "./checks.ts";
-import { isGone } from "./gh.ts";
+import { DIFF_NOT_SERVED, isGone } from "./gh.ts";
 import type { Bundle } from "./material.ts";
 import type { Origin } from "./origin.ts";
 import {
@@ -97,7 +97,12 @@ export interface BatchRun {
   runs: number;
 }
 
-const FIX_SKIPS: Record<string, LeftOut> = { "not a pull request": "not a pull request", "not merged": "not merged" };
+const FIX_SKIPS: Record<string, LeftOut> = {
+  "not a pull request": "not a pull request",
+  "not merged": "not merged",
+  // A diff GitHub does not serve is F's material not complete (RETRO.md v4).
+  [DIFF_NOT_SERVED]: "the fix's own material is not complete",
+};
 
 /**
  * The rows of a batch, in order, from the first not in `decided`. A row is started only when its worst

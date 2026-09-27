@@ -11,7 +11,7 @@ import type { LaterFix } from "../bench/eval/retro/calibrate.ts";
 import { checksAt } from "../bench/eval/retro/checks.ts";
 import type { Bundle } from "../bench/eval/retro/material.ts";
 import { CAUGHT_SYSTEM, CHECK_SYSTEM, LABEL_SYSTEM, WRITE_SYSTEM, type Answer } from "../bench/eval/retro/prompts.ts";
-import { isGone } from "../bench/eval/retro/gh.ts";
+import { DIFF_NOT_SERVED, diffRefused, isGone } from "../bench/eval/retro/gh.ts";
 import { batchProblem, COUNT_KEYS, countsOf, type RowRecord, reposWithinCap, SCREEN, screenRows, verdictsFile, writeRow, writeVerdicts, yieldVerdict, type Row, type ScreenDeps } from "../bench/eval/retro/screen.ts";
 
 const MARK = "SECRET-ROW-TEXT";
@@ -256,4 +256,24 @@ test("only GitHub no longer having the pull request makes O's bundle a gap; a ra
   assert.equal(isGone(Object.assign(new Error("Command failed"), { stderr: "gh: API rate limit exceeded (HTTP 403)" })), false);
   assert.equal(isGone(Object.assign(new Error("Command failed"), { stderr: "gh: Gone (HTTP 410)" })), true);
   assert.equal(isGone(new Error("getaddrinfo ENOTFOUND api.github.com")), false);
+});
+
+test("a fix whose diff GitHub does not serve is a row whose fix's material is not complete", () => {
+  const r = run(rowsOf([["a/1", 1], ["a/2", 2]]), { 1: { skip: DIFF_NOT_SERVED } });
+  assert.equal(r.records[0]!.why, "the fix's own material is not complete");
+  assert.equal(r.records[1]!.outcome, "case", "the run goes on to the next row");
+  assert.equal(diffRefused(Object.assign(new Error("Command failed"), { stderr: "gh: Sorry, the diff exceeded the maximum number of lines (20000) (HTTP 406)" })), true);
+  assert.equal(diffRefused(Object.assign(new Error("Command failed"), { stderr: "gh: Not Found (HTTP 404)" })), false);
+});
+
+test("a clones directory holding a partial clone is refused", async () => {
+  const { realCalDeps } = await import("../bench/eval/retro/calibrate.ts");
+  const clones = mkdtempSync(join(tmpdir(), "jir-clones-"));
+  const dir = join(clones, "o__r");
+  mkdirSync(dir);
+  spawnSync("git", ["init", "-q", dir]);
+  spawnSync("git", ["-C", dir, "config", "remote.origin.partialclonefilter", "blob:none"]);
+  const deps = realCalDeps(clones, new Map(), tmpdir());
+  const fix = { repo: "o/r", number: 1, ref: "o/r#1", title: "", body: "", diff: "", mergedAt: "2026-09-01T00:00:00Z", base: "HEAD", bundle: bundleOf(1), label80: null };
+  assert.throws(() => deps.origin(fix), /a partial clone is in the clones directory/);
 });

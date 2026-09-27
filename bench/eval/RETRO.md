@@ -1,4 +1,4 @@
-# The retrospective measurement, version 3 (issue #89)
+# The retrospective measurement, version 4 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -32,6 +32,14 @@ repository's one case, placed like the others, and out of the primary denominato
 yield is counted in repositories, and the rows it is compared with stop at the cap of 800. The inputs
 of "Caught before the merge" are named, and the runs are allowed in whole rows. The sealed records
 move from the sandbox's `sealed` branch to its `batches` branch, as `PROTOCOL.md` rule 5 keeps #80's.
+
+**Version 4** (before any row of `b1` was decided; the dry pass of steps 1 and 2, which sends nothing to
+a model, had been run and counted only) says what to do with a fix whose diff GitHub does not serve —
+four of the first 100 rows answer HTTP 406, too large, every time: F's material is not complete, and
+the row is left out (owner, 2026-09-27). It is found when F is fetched, before step 1, so such a row
+is counted under that reason even when it has no O. The clones are full clones, and a clones directory
+holding a partial one is refused: `blame -C` fetched a file at a time from a `blob:none` clone, and one
+line's blame took 22 s against 0 s in a full clone.
 
 ## The question
 
@@ -88,8 +96,8 @@ of the measurement and is reported with it.
   2. The bundle is built (below, "What the writer sees"); a gap makes the case one without a
      requirement.
   3. **F is screened**: F's bundle — its title, description, comments, reviews and the issues it
-     connected, cut at F's merge the way O's bundle is (a gap in it leaves the row out: it falls before
-     the side is known) — is read by three annotators with `LABEL_SYSTEM` (`retro/prompts.ts`), whose labels are
+     connected, cut at F's merge the way O's bundle is (a gap in it, or a diff GitHub does not serve,
+     leaves the row out: it falls before the side is known) — is read by three annotators with `LABEL_SYSTEM` (`retro/prompts.ts`), whose labels are
      `PROTOCOL.md`'s "Labels", word for word. Two of three decide; three different labels make
      `cannot_label`. F is kept when the label is `swallows_as_success`, `falls_back_or_degrades`,
      `logs_or_warns` or `records_or_handles_locally` — the code before F did not bring the failure to

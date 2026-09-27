@@ -11,14 +11,14 @@
 // agree), ten requirements written by an annotator shown the fix (`LEAK_SYSTEM`) and how many the check
 // catches, and the v2 screen of each fix set against #80's label for it.
 
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { randomInt } from "node:crypto";
 import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Label, Pool } from "../split.ts";
-import { ghApi, PIPED } from "./gh.ts";
+import { DIFF_NOT_SERVED, diffRefused, ghApi, PIPED } from "./gh.ts";
 import { fetchBundle, type Bundle } from "./material.ts";
 import { DEV_SEARCH, type Search } from "./search.ts";
 import { namedOrigins, originOf, realDeps, type Origin } from "./origin.ts";
@@ -62,7 +62,7 @@ export interface LaterFix extends Fix {
 }
 
 export interface CalDeps {
-  /** The fix, or why it is not one: not a pull request, not merged, merged before the floor. */
+  /** The fix, or why it is not one: not a pull request, not merged, merged before the floor, its diff not served (HTTP 406). */
   fix(repo: string, number: number): LaterFix | { skip: string };
   origin(fix: LaterFix): Origin;
   bundle(repo: string, number: number): Bundle;
@@ -308,9 +308,16 @@ export function realCalDeps(clones: string, labels80: Map<string, Label>, empty:
   const defaults = new Map<string, string>();
   const cloneOf = (repo: string) => {
     const dir = join(clones, repo.replace("/", "__"));
-    if (!existsSync(dir)) execFileSync("git", ["clone", "-q", "--filter=blob:none", "--no-checkout", `https://github.com/${repo}.git`, dir], { stdio: "ignore" });
-    // A clone taken before the fix merged may not hold its base: fetched every time it is used.
-    else execFileSync("git", ["-C", dir, "fetch", "-q", "origin"], { stdio: "ignore" });
+    // Not a partial clone (as `bench/packet-reuse.ts`): `blame -C` reads the files of every commit it
+    // walks, and a `blob:none` clone fetches each one over the network — measured 2026-09-27 on a dev
+    // repository, 22 s for one line's blame against 0 s in a full clone, and hours on a large one.
+    if (!existsSync(dir)) execFileSync("git", ["clone", "-q", "--no-checkout", `https://github.com/${repo}.git`, dir], { stdio: "ignore" });
+    // A clone taken before the fix merged may not hold its base: fetched every time it is used. A partial
+    // clone left from before stays partial on fetch: refused, so the run never goes back to it.
+    else {
+      if (spawnSync("git", ["-C", dir, "config", "--get", "remote.origin.partialclonefilter"], { stdio: PIPED }).status === 0) throw new Error("a partial clone is in the clones directory; use a new one");
+      execFileSync("git", ["-C", dir, "fetch", "-q", "origin"], { stdio: "ignore" });
+    }
     return dir;
   };
   return {
@@ -328,7 +335,15 @@ export function realCalDeps(clones: string, labels80: Map<string, Label>, empty:
       if (p.merged_at < EARLIEST_FIX) return { skip: `merged before ${EARLIEST_FIX}` };
       // The API's raw diff, escape sequences allowed: `gh pr diff` and `gh api` both refuse a diff holding them
       // (beboite/boite-legacy#187 stopped the first attempt, 2026-09-25). It is only ever read as text.
-      const diff = execFileSync("gh", ["api", "--allow-escape-sequences", "-H", "Accept: application/vnd.github.v3.diff", `repos/${repo}/pulls/${number}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: PIPED });
+      let diff: string;
+      try {
+        diff = execFileSync("gh", ["api", "--allow-escape-sequences", "-H", "Accept: application/vnd.github.v3.diff", `repos/${repo}/pulls/${number}`], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: PIPED });
+      } catch (error) {
+        // GitHub does not serve the diff of a pull request that is too large (HTTP 406, 2026-09-27): a fact
+        // about the fix, the same every time, and its material is not complete (RETRO.md v4).
+        if (diffRefused(error)) return { skip: DIFF_NOT_SERVED };
+        throw error;
+      }
       return { repo, number, ref: `${repo}#${number}`, title: p.title, body: p.body ?? "", diff, mergedAt: p.merged_at, base: p.base.sha, bundle: fetchBundle(repo, number), label80: labels80.get(`${repo}#${number}`) ?? null };
     },
     origin(fix) {
