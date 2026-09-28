@@ -310,15 +310,16 @@ export interface SentRecord {
  * Whether a run did not ask everything it set out to, so that it does not count as finished even
  * though it exited 0: a request that failed on the run's own budget, or a sibling's call inside its
  * budget that came back without an answer for any reason (a limit, a timeout, a host that failed).
- * The siblings are asked last (ADR 0005), so a limit reached late cuts them alone, and the run would
- * score a sibling's defect as missed when it was never asked.
+ * The siblings are asked last (ADR 0005) and the bodies of what the changed code calls just before them
+ * (ADR 0028), so a limit reached late cuts those alone, and the run would score a defect there as
+ * missed when it was never asked.
  */
 export function cutShort(requirements: readonly RequirementRun[], sent: readonly SentRecord[]): boolean {
   if (sent.some((r) => /: budget$/.test(r.error ?? ""))) return true;
   return requirements.some((r) =>
     r.observed.some((o) => {
       const origin = (o as { origin?: string }).origin;
-      if (origin !== "shares_call") return false;
+      if (origin !== "shares_call" && origin !== "called_by_changed") return false;
       const mapping = r.mappings.find((m) => (m as { callId?: string }).callId === (o as { callId?: string }).callId);
       const why = (o.result as { why?: string }).why ?? "";
       return mapping?.verdict === "no_answer" || /not answered/.test(why);

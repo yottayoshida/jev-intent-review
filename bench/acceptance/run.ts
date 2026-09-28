@@ -3,7 +3,7 @@
 //
 //   node bench/acceptance/run.ts precheck <case> <clone>          no request; writes case.json
 //   node bench/acceptance/run.ts estimate                          no request; the planned total
-//   node bench/acceptance/run.ts measure  <case> <clone> <limit> <sibling|again>
+//   node bench/acceptance/run.ts measure  <case> <clone> <limit> <sibling|again|callee>
 //                                                                  requests; appends to the log named
 //
 // It drives the built command (`dist/cli/main.js`, run `npm run build` first) through `main`, the
@@ -42,11 +42,13 @@ const DIST = new URL("../../dist/", import.meta.url);
  * Where a measurement is written, named on the command line so that none is written by default,
  * with what it is about for `replay.ts` to state and to gate: `sibling` is the measurement of one
  * sibling's defect (`claim: "sibling"`, candidates-v2.json, #37), `again` the
- * acceptance set measured again with a later tool, of the same kind as v2 (#38).
+ * acceptance set measured again with a later tool, of the same kind as v2 (#38), `callee` moltis#1064
+ * with the bodies of what the changed code calls read (#37, ADR 0028; defect-C is in one of them).
  */
 const LOGS = {
   sibling: { file: join(HERE, "..", "logs", "acceptance-v3.json"), claim: "sibling" },
   again: { file: join(HERE, "..", "logs", "acceptance-v4.json"), claim: undefined },
+  callee: { file: join(HERE, "..", "logs", "acceptance-v5.json"), claim: "callee" },
 } as const;
 type LogName = keyof typeof LOGS;
 const RUNS = 3;
@@ -158,12 +160,12 @@ async function precheck(id: string, clone: string) {
  * this file imports no value from `src/`, so `dist()` refuses a build whose defaults are not these.
  * The changed functions and their callers ask at most `budget + callerBudget` together (ADR 0015).
  */
-const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10 } as const;
+const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10, calleeBudget: 10 } as const;
 
 /** Requests one run can send at most: two questions per call, every budget of calls, and room for retries. */
 export function perRun(c: CaseFile, versionId: string): number {
   const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
-  return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget) * 1.1);
+  return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget + BUDGETS.calleeBudget) * 1.1);
 }
 
 /** The cases a measurement can send for: built, and pre-checked. A regression case is measured again too. */
@@ -291,7 +293,8 @@ export async function measure(id: string, clone: string, limit: number, log: Log
       let finished = false;
       try {
         requirements = (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements.map(distil) as unknown as RunRecord["requirements"];
-        // Exit 0 is not enough: the siblings are asked last, and a limit reached there cuts them alone.
+        // Exit 0 is not enough: the callees of the change and the siblings are asked last, and a limit
+        // reached there cuts them alone.
         finished = code === 0 && !cutShort(requirements, sent);
       } catch {
         finished = false;
@@ -308,8 +311,8 @@ if (process.argv[1] === undefined || realpathSync(process.argv[1]) !== fileURLTo
   // Imported (bench/eval/run.ts): no command line to read.
 } else if (mode === "precheck" && id && clone) await precheck(id, clone);
 else if (mode === "estimate") console.log(`planned at most ${estimate(id)} requests across the live branches${id ? ` of ${id}` : ""}`);
-else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again")) await measure(id, clone, Number(limit), LOGS[which]);
+else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again" || which === "callee")) await measure(id, clone, Number(limit), LOGS[which]);
 else {
-  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again>");
+  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again|callee>");
   process.exitCode = 2;
 }

@@ -570,6 +570,7 @@ export async function main(argv: string[], io: Io, deps: Deps = {}): Promise<num
     // Last, the siblings of the change (ADR 0005): on the run's limits after everything above, so
     // they never take a request or a second from what the run asked before siblings were read.
     const siblings = await run.askSiblings();
+    for (const r of run.requirements) if (r.counts.calledByChanged) trace(`${r.requirementId} called by the change -> ${r.counts.calledByChanged.asked} read of ${r.counts.calledByChanged.functions} function(s)`);
     for (const r of run.requirements) if (r.counts.siblings) trace(`${r.requirementId} siblings -> ${r.counts.siblings.asked} read of ${r.counts.siblings.functions} function(s)`);
     // Reached the host and could not read one answer from it, over both passes: the host is wrong
     // or not answering, and a report of nothing settled would pass for a run that judged. The local

@@ -104,7 +104,10 @@ test("the CLI reads the calls of the functions the change touched, lists the one
 
     const markdown = io(repo.dir, CREDENTIALS);
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", RUST_SPEC], markdown.value, fakeDeps()), EXIT.ok);
-    assert.match(markdown.out(), /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* 2 not checked, 1 note on what was not read, for the reasons under each requirement\. No requirement verdict is stated\./);
+    // The third is in `read_capped`'s own body, which the changed code calls (#37, ADR 0028).
+    assert.match(markdown.out(), /^# jev-intent-review\n\n\*\*Result: 1 call worth checking of 2 read\.\*\* 3 not checked, 1 note on what was not read, for the reasons under each requirement\. No requirement verdict is stated\./);
+    assert.match(markdown.out(), /- src\/util\.rs · read_capped — `String::new\(\)` _\(in a function the changed code calls, which the change did not touch\)_/);
+    assert.match(markdown.out(), /^Called by the change: 1 function the changed code calls, read for their own calls\.$/m);
     assert.match(markdown.out(), /#### src\/integrity\.rs:\d+-\d+ · read_baseline — `crate::atomic_file::read_capped\(&path, MAX\)`/);
     for (const word of ["VERIFIED", "VIOLATION", "UNKNOWN"]) assert.ok(!markdown.out().includes(word), `${word} is not in the report`);
   } finally {
@@ -127,7 +130,7 @@ test("--experimental-local-check changes nothing, and a requirement of the other
     // The set built and nothing sent: the report says that, not that two questions were put to Jev.
     const set = io(repo.dir, {});
     assert.equal(await main(["--base", repo.base, "--head", repo.head, "--intent-spec", RUST_SPEC, "--candidates-only"], set.value, fakeDeps()), EXIT.ok);
-    assert.match(set.out(), /\*\*Result: the set was built and nothing was asked\.\*\* 2 calls inside the budget, 2 calls not checked/);
+    assert.match(set.out(), /\*\*Result: the set was built and nothing was asked\.\*\* 2 calls inside the budget, 3 calls not checked/);
     assert.match(set.out(), /^Nothing was asked: the set was built and the run stopped\./m);
     assert.ok(!set.out().includes("what the requirement requires of the call, and what the function does under an assumption"), "the opening that says two questions were put is not printed");
     assert.match(set.out(), /^Form: `failure_propagation` \(the default\)\. Nothing was asked; the form would ask this\./m);

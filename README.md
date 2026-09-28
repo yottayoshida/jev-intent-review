@@ -50,7 +50,7 @@ reason, is in the artifact. Pull requests from forks are not reviewed. Why, and 
 ## What it does
 
 * **Reads requirements as written.** From a requirements section (`## Acceptance criteria`, `## Done when`, …) or a `Property:` paragraph in the issue or pull request. No model writes them or picks them out of prose ([writing requirements](docs/writing-requirements.md)).
-* **Looks past the diff.** The functions the change touched, their callers one hop out, and the other callers of what the changed code calls — the path a fix may have missed.
+* **Looks past the diff.** The functions the change touched, their callers one hop out, the bodies of what the changed code calls, and the other callers of those — the path a fix may have missed.
 * **Asks small typed questions, not for a review.** Each call is put to [Jev](https://docs.typesafe.ai/introduction) as fixed questions with probabilities, and the evidence and answers are printed so a person can check or reject them. A call worth checking is a candidate, not a verdict: the exit code stays 0 unless `policy.fail_on: [finding]` is set.
 
 ## Status

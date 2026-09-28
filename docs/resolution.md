@@ -217,6 +217,22 @@ Method calls and calls inside a macro's arguments are ambiguous now, not unsuppo
 product settles there, about 1 in 30 is another definition. They are not trusted: the upper bound is
 over 1%, and most such calls are not settled at all (`voided` 83%).
 
+## A method on `dyn T` or `impl T` (#37, ADR 0028)
+
+A method call whose receiver is written `dyn T` or `impl T`, with `T` a trait of this repository, is
+read as `T`'s declaration and its `impl T for …` versions, found from the trait's side where the
+name alone does not settle it (more than one definition, or a search cut short). Every listed
+method call read so on #81's nine cases — not a sample — was put against rust-analyzer
+(`node bench/resolution.ts trait`, `bench/logs/resolution-trait-dev.json`): 224 of 100,708 method
+calls (moltis#1064 173, whatsapp-rust#759 51, none elsewhere). rust-analyzer reads 223 of them as a
+dispatch on a trait's method and cannot resolve the other one; in all 223 the trait it names is the
+trait the product chose, by name, and in none another. No call read so is `wrong`.
+
+The sample's classes do not move with it — rust-analyzer's class of a dispatch does not depend on
+what the product answers — and neither does any rate above. What moves is how many of the sampled
+dispatches the product settles here: methods 16 → 17 among the calls asked and 25 → 27 among all,
+calls inside a macro's arguments 3 → 4 in both.
+
 ## Checks
 
 - **The classes, by name**: `test/resolution.test.ts` runs rust-analyzer's committed index of

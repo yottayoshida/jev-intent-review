@@ -89,9 +89,15 @@ export interface LocalCheckOptions {
    * sibling exists. Unset is the default.
    */
   siblingBudget?: number;
+  /**
+   * How many calls a requirement may be judged at in the bodies of what the changed code calls — the
+   * siblings' seeds (#37, ADR 0028). A budget of its own, asked after the functions the change reached
+   * and before the siblings. Unset is the default.
+   */
+  calleeBudget?: number;
 }
 
-export const DEFAULT_LOCAL_CHECK = { budget: 20, callerBudget: 10, siblingBudget: 10, maxPrimaryChars: 8000, maxRelatedChars: 0 } satisfies LocalCheckOptions;
+export const DEFAULT_LOCAL_CHECK = { budget: 20, callerBudget: 10, siblingBudget: 10, calleeBudget: 10, maxPrimaryChars: 8000, maxRelatedChars: 0 } satisfies LocalCheckOptions;
 
 export interface Observed {
   file: string;
@@ -132,8 +138,11 @@ export interface Unchecked {
  */
 export interface Finding {
   requirementId: string;
-  /** Present only for a sibling's call (ADR 0005): how the run reached it, and what tied it. */
-  origin?: "shares_call";
+  /**
+   * Present only for a sibling's call (ADR 0005) or a call in the body of what the changed code calls
+   * (#37, ADR 0028): how the run reached it, and what tied it — the seed, or the changed function.
+   */
+  origin?: "shares_call" | "called_by_changed";
   via?: string;
   file: string;
   /** Where in the file, so a reader can open it rather than search for it. */
@@ -240,6 +249,11 @@ export interface LocalCheckResult {
      * number above means what it meant before siblings were read. Absent when no sibling was read.
      */
     siblings?: SiblingCounts;
+    /**
+     * The bodies of what the changed code calls, counted apart against their own budget (#37, ADR
+     * 0028). Absent when no such body was read.
+     */
+    calledByChanged?: OriginCounts;
   };
   notes: string[];
   /**
@@ -544,7 +558,7 @@ export async function runLocalCheck(
       into.findings.push({
         requirementId: requirement.id,
         // Said only of a sibling, so the record of every other run is what it was.
-        ...(site.origin === "shares_call" ? { origin: site.origin, via: site.via } : {}),
+        ...(site.origin === "shares_call" || site.origin === "called_by_changed" ? { origin: site.origin, via: site.via } : {}),
         file: place.file,
         lines: `${site.fn.startLine}-${site.fn.endLine}`,
         function: place.function,
@@ -704,12 +718,14 @@ export async function runLocalCheck(
     const callers = await askCallers();
     const [reachedBefore, answeredBefore] = [hostReached, answered];
     const siblings = await siblingSetOf();
-    const budget = options.siblingBudget ?? DEFAULT_LOCAL_CHECK.siblingBudget;
-    for (const { requirement, form, quote, result } of passes) {
+    // One budget over a set of functions, as the siblings' is dealt (ADR 0005): its counts.
+    const SPENT = { called_by_changed: (n: number) => `the budget of what the changed code calls, ${n}, was already spent`, shares_call: (n: number) => `the siblings' budget of ${n} was already spent` } as const;
+    const askOver = async (pass: (typeof passes)[number], entries: Parameters<typeof selectSiblings>[0], budget: number, origin: keyof typeof SPENT): Promise<OriginCounts> => {
+      const { requirement, form, quote, result } = pass;
       const decide = (fn: FunctionCandidate, call: CallCandidate) => form.askable({ requirement, fn, call, resultOf, readHere, calleeResultOf });
-      const selection = await selectSiblings(siblings.siblings, decide, budget);
+      const selection = await selectSiblings(entries, decide, budget, origin);
       for (const h of selection.held) result.unchecked.push({ ...placeOf(h), why: h.applicability && !h.applicability.ok ? h.applicability.reason : "set aside before its question" });
-      for (const o of selection.overBudget) result.unchecked.push({ ...placeOf(o), why: `the siblings' budget of ${budget} was already spent` });
+      for (const o of selection.overBudget) result.unchecked.push({ ...placeOf(o), why: SPENT[origin](budget) });
       result.wouldAsk.push(...selection.budgeted.map((s) => ({ file: s.fn.path, function: s.fn.name, call: shown(s.call), origin: s.origin, ...(s.via === undefined ? {} : { via: s.via }) })));
       const into: Collected = { observed: [], unchecked: result.unchecked, mappings: [], findings: result.findings };
       let asked = 0;
@@ -721,9 +737,8 @@ export async function runLocalCheck(
       }
       result.observed.push(...into.observed);
       result.mappings.push(...into.mappings);
-      result.counts.siblings = {
+      return {
         budget,
-        seeds: siblings.seeds.map((s) => s.name),
         functions: selection.functions,
         calls: selection.widened.length,
         applicable: selection.applicable.length,
@@ -734,8 +749,20 @@ export async function runLocalCheck(
         notApplicable: selection.held.length,
         outcomes: Object.fromEntries(OUTCOMES.map((o) => [o, into.observed.filter((x) => x.outcome === o).length])) as Record<Outcome, number>,
       };
-      result.notes = [...new Set([...result.notes, ...siblings.notes])];
-      result.unreached = [...new Set([...(result.unreached ?? []), ...siblings.unreached])];
+    };
+    // The bodies of what the changed code calls first, for every requirement, then the siblings last
+    // (#37, ADR 0028; the owner's ruling of 2026-09-23 keeps the siblings last). A body is no sibling
+    // (`siblingsOf`), so no call is listed by both budgets.
+    const calleeBudget = options.calleeBudget ?? DEFAULT_LOCAL_CHECK.calleeBudget;
+    const bodies = siblings.bodies.map((b) => ({ ...b, tying: [] }));
+    if (bodies.length > 0) for (const pass of passes) pass.result.counts.calledByChanged = await askOver(pass, bodies, calleeBudget, "called_by_changed");
+    const budget = options.siblingBudget ?? DEFAULT_LOCAL_CHECK.siblingBudget;
+    const asSiblings = siblings.siblings.map((s) => ({ ...s, via: s.seed }));
+    for (const pass of passes) {
+      const counts = await askOver(pass, asSiblings, budget, "shares_call");
+      pass.result.counts.siblings = { ...counts, seeds: siblings.seeds.map((s) => s.name) };
+      pass.result.notes = [...new Set([...pass.result.notes, ...siblings.notes])];
+      pass.result.unreached = [...new Set([...(pass.result.unreached ?? []), ...siblings.unreached])];
     }
     return { reached: callers.reached + hostReached - reachedBefore, answered: callers.answered + answered - answeredBefore };
   };

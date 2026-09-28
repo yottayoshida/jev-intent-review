@@ -26,8 +26,8 @@ import { isTestPath, type Discoverer } from "../discovery/discover.ts";
 import { cfgPredicate, testOnlyCfg } from "../syntax/cfg.ts";
 import { isRustFunction, type CallCandidate, type FunctionCandidate } from "./candidates.ts";
 import { namesTheStandardLibrary, outsideResult } from "./outside-results.ts";
-import { importOf, type ParsedRust } from "../syntax/rust.ts";
-import { crateOf, namesOf, receiverType } from "./receiver-type.ts";
+import { importOf, type ParsedRust, type Receiver } from "../syntax/rust.ts";
+import { crateOf, namesOf, receiverTrait, receiverType, type ReceiverContext } from "./receiver-type.ts";
 import { STD_METHOD_NAMES } from "./std-methods.ts";
 import { codeOnly, itemHead, quoted, returnTypesFor, topLevel, type ItemHead, type ReturnTypes } from "./result-type.ts";
 
@@ -571,7 +571,20 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
   const outside = outsideResult(call.callee, parsed ? (name) => importOf(parsed, call.line, name) : undefined);
   // A call that writes `std::` says which library it means, and no definition here is that library.
   if (outside && namesTheStandardLibrary(call.callee)) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
-  const { found, more, testOnly } = await functionDefinitionsOf(discoverer, bare);
+  // A method on `dyn T` / `impl T` is `T`'s: its versions, found from the trait's side (#37, ADR 0028).
+  const byName = await functionDefinitionsOf(discoverer, bare);
+  // Only where the name alone does not settle it — several definitions, or a search cut short — is
+  // what the call is made on read at all: most calls are not on a trait object, and reading one's
+  // receiver settles the calls it is made from.
+  const throughTrait = parsed && (byName.more || byName.found.length > 1) ? await definitionsThroughTrait(discoverer, fn, call, bare, parsed, depth) : null;
+  // One definition — a trait's default body no `impl` overrides — is that definition, as the name
+  // reading would settle it: not versions, so what was a seed stays one.
+  if (throughTrait?.length === 1) {
+    const def = throughTrait[0]!;
+    return readOne(reader, def, `the definition of ${bare} this call reaches (${def.path}:${def.line})`, await reader.signature(def.path, def.line, bare));
+  }
+  if (throughTrait) return readVersions(reader, bare, throughTrait, throughTrait.length);
+  const { found, more, testOnly } = byName;
   if (more) return { result: { ok: false, kind: "callee_return_unknown", reason: `the search for \`fn ${bare}\` stopped at its cap, so not every definition of ${bare} was seen` }, at: null };
   if (found.length === 0) {
     // Nothing here defines the name, and the path the call writes is one this tool knows from
@@ -608,26 +621,19 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
       if (why && outside) return { result: { ok: true, calleeDefinedAt: outside.path }, at: { kind: "outside", row: outside.path } };
       if (why) return { result: { ok: false, kind: "callee_unresolved", reason: `${named} ${why}, so this call does not reach it and what it returns is not established here` }, at: null };
     }
-    const callee = await reader.readingOf(signature, def.path);
-    if (callee.kind === "not") {
-      return { result: { ok: false, kind: "callee_not_result", reason: `${named} returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` }, at: { kind: "repository", path: def.path, line: def.line } };
-    }
-    if (callee.kind === "unknown") {
-      return { result: { ok: false, kind: "callee_return_unknown", reason: `whether ${named} returns a Result is not settled here: ${callee.why}` }, at: { kind: "repository", path: def.path, line: def.line } };
-    }
-    return { result: { ok: true, calleeDefinedAt: at }, at: { kind: "repository", path: def.path, line: def.line } };
+    return readOne(reader, def, named, signature);
   }
 
-  // Versions of one thing: which one runs is not settled, so all of them must return a Result.
-  const versions: CalleeLocation = { kind: "versions", path: def.path, line: def.line, all: definitions.map((d) => ({ path: d.path, line: d.line })) };
-  const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
-  for (const [i, reading] of readings.entries()) {
-    if (reading.kind === "returns") continue;
-    const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
-    const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
-    return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${found.length} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: versions };
-  }
-  return { result: { ok: true, calleeDefinedAt: at }, at: versions };
+  return readVersions(reader, bare, definitions, found.length);
+}
+
+/** One definition the call reaches: what it returns, named as `named`. */
+async function readOne(reader: ReturnTypes, def: Definition, named: string, signature: Awaited<ReturnType<ReturnTypes["signature"]>>): Promise<{ result: Applicability; at: CalleeLocation }> {
+  const at: CalleeLocation = { kind: "repository", path: def.path, line: def.line };
+  const callee = await reader.readingOf(signature, def.path);
+  if (callee.kind === "not") return { result: { ok: false, kind: "callee_not_result", reason: `${named} returns \`${quoted(callee.type)}\` and does not return a Result, so it has no error to assume` }, at };
+  if (callee.kind === "unknown") return { result: { ok: false, kind: "callee_return_unknown", reason: `whether ${named} returns a Result is not settled here: ${callee.why}` }, at };
+  return { result: { ok: true, calleeDefinedAt: `${def.path}:${def.line}` }, at };
 }
 
 /**
@@ -639,6 +645,27 @@ export async function calleeOf(discoverer: Discoverer, fn: FunctionCandidate, ca
  */
 async function heldByReceiver(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, bare: string, definitions: Definition[], parsed: ParsedRust | undefined, depth: number): Promise<Extract<Applicability, { ok: false }> | null> {
   if (!parsed || !STD_METHOD_NAMES.has(bare)) return null;
+  const read = await receiverOf(discoverer, fn, call, parsed);
+  if (!read) return null;
+  const reader = returnTypesFor(discoverer);
+  const type = await receiverType(read.receiver, read.ctx, depth);
+  const unresolved = (reason: string): Extract<Applicability, { ok: false }> => ({ ok: false, kind: "callee_unresolved", reason });
+  if (!type) return unresolved(`the standard library has a method \`${bare}\` too, and what this call is made on is not read here as one of this repository's types, so which ${bare} it reaches is not established here`);
+  const names = await namesOf(type, discoverer);
+  const inImpl = async (d: Definition) => {
+    const where = await whereWritten(reader, d);
+    if (where === "unread" || where.kind !== "impl" || !where.self) return false;
+    return [...(await namesOf(where.self, discoverer))].some((n) => names.has(n));
+  };
+  if ((await Promise.all(definitions.map(inImpl))).some(Boolean)) return null;
+  return unresolved(`the call is made on a \`${type}\`, and no definition of ${bare} here is in its \`impl\`, so the standard library's may be the one it reaches`);
+}
+
+/**
+ * A method call's receiver as the parser wrote it, with what reading it needs: the calls it is made
+ * from settle through `calleeOf` itself. Null for a call that is no method call the parser listed.
+ */
+async function receiverOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, parsed: ParsedRust): Promise<{ receiver: Receiver; ctx: ReceiverContext } | null> {
   const written = parsed.calls.find((c) => c.line === call.line && c.startColumn === call.column && c.callee === call.callee);
   if (!written?.receiver) return null;
   const reader = returnTypesFor(discoverer);
@@ -665,17 +692,91 @@ async function heldByReceiver(discoverer: Discoverer, fn: FunctionCandidate, cal
     }
     return null;
   };
-  const type = await receiverType(written.receiver, { discoverer, fn, line: call.line, parsed, settle }, depth);
-  const unresolved = (reason: string): Extract<Applicability, { ok: false }> => ({ ok: false, kind: "callee_unresolved", reason });
-  if (!type) return unresolved(`the standard library has a method \`${bare}\` too, and what this call is made on is not read here as one of this repository's types, so which ${bare} it reaches is not established here`);
-  const names = await namesOf(type, discoverer);
-  const inImpl = async (d: Definition) => {
-    const where = await whereWritten(reader, d);
-    if (where === "unread" || where.kind !== "impl" || !where.self) return false;
-    return [...(await namesOf(where.self, discoverer))].some((n) => names.has(n));
-  };
-  if ((await Promise.all(definitions.map(inImpl))).some(Boolean)) return null;
-  return unresolved(`the call is made on a \`${type}\`, and no definition of ${bare} here is in its \`impl\`, so the standard library's may be the one it reaches`);
+  return { receiver: written.receiver, ctx: { discoverer, fn, line: call.line, parsed, settle } };
+}
+
+/**
+ * For a method call made on what is written `dyn T` or `impl T` (#37, ADR 0028): `T`'s declaration of
+ * the method and its `impl T for …` versions, found from the trait's side so a name as common as
+ * `complete` is not cut by the name's own search. Null when the receiver is no such trait, `T` declares
+ * no such method, a definition sits in `impl dyn T`, or a search was cut — the name reading decides then.
+ */
+async function definitionsThroughTrait(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate, bare: string, parsed: ParsedRust, depth: number): Promise<Definition[] | null> {
+  if (STD_METHOD_NAMES.has(bare)) return null;
+  const read = await receiverOf(discoverer, fn, call, parsed);
+  const trait = read ? await receiverTrait(read.receiver, read.ctx, depth) : null;
+  return trait ? traitVersions(discoverer, trait, bare) : null;
+}
+
+/** Whether `calleeOf` reads this call through a trait: the definitions it would take, or null (the record, docs/resolution.md). */
+export async function throughTraitOf(discoverer: Discoverer, fn: FunctionCandidate, call: CallCandidate): Promise<Definition[] | null> {
+  const parsed = (await discoverer.index(fn.path))?.rust;
+  const bare = call.callee.split("::").pop()!;
+  const byName = await functionDefinitionsOf(discoverer, bare);
+  // The same condition `calleeOf` reads a receiver under.
+  return parsed && (byName.more || byName.found.length > 1) ? definitionsThroughTrait(discoverer, fn, call, bare, parsed, 0) : null;
+}
+
+const traitVersionsRead = new WeakMap<Discoverer, Map<string, Promise<Definition[] | null>>>();
+
+/** `traitVersionsOf`, once per trait and name: the answer depends on nothing else. */
+function traitVersions(discoverer: Discoverer, trait: string, name: string): Promise<Definition[] | null> {
+  let read = traitVersionsRead.get(discoverer);
+  if (!read) traitVersionsRead.set(discoverer, (read = new Map()));
+  const key = `${trait}\u0000${name}`;
+  let found = read.get(key);
+  if (!found) read.set(key, (found = traitVersionsOf(discoverer, trait, name)));
+  return found;
+}
+
+async function traitVersionsOf(discoverer: Discoverer, trait: string, name: string): Promise<Definition[] | null> {
+  const reader = returnTypesFor(discoverer);
+  const hits = [];
+  for (const words of [`trait ${trait}`, `${trait} for`, `impl dyn ${trait}`]) {
+    const found = await discoverer.search(words);
+    if (found.more) return null;
+    hits.push(...found.hits);
+  }
+  const declarations: Definition[] = [];
+  const implementations: Definition[] = [];
+  const seen = new Set<string>();
+  for (const hit of hits) {
+    const key = `${hit.path}:${hit.line}`;
+    if (seen.has(key) || !hit.path.endsWith(".rs") || isTestPath(hit.path)) continue;
+    seen.add(key);
+    const index = await discoverer.index(hit.path);
+    const item = index?.rust?.items.find((i) => i.startLine === hit.line);
+    if (!index || !item) continue;
+    if ((index.testRegions ?? []).some((r) => hit.line >= r.start && hit.line <= r.end)) continue;
+    if (await declaredForTestsOnly(discoverer, hit.path)) continue;
+    // Trimmed: an `impl` inside a `mod` block is indented, and `itemHead` reads from the first column.
+    const head = itemHead(index.lines.slice(hit.line - 1, hit.line + 2).join(" ").trim());
+    const inherentOnDyn = head.kind === "impl" && head.trait === undefined && head.self === "dyn";
+    const into = head.kind === "trait" && head.name === trait ? declarations : head.kind === "impl" && head.trait === trait ? implementations : inherentOnDyn ? [] : null;
+    if (!into) continue;
+    for (let l = item.startLine + 1; l <= item.endLine; l++) {
+      const code = await reader.codeLine(hit.path, l);
+      if (code === null || !isRustFunction(code, name)) continue;
+      // `impl dyn T { fn name … }` is a method of the trait object itself, and may be the one it reaches.
+      if (inherentOnDyn) return null;
+      into.push({ path: hit.path, line: l, text: index.lines[l - 1] ?? "" });
+    }
+  }
+  return declarations.length === 1 ? [declarations[0]!, ...implementations] : null;
+}
+
+/** Versions of one thing: which one runs is not settled, so all of them must return a Result. */
+async function readVersions(reader: ReturnTypes, bare: string, definitions: Definition[], total: number): Promise<{ result: Applicability; at: CalleeLocation }> {
+  const def = definitions[0]!;
+  const versions: CalleeLocation = { kind: "versions", path: def.path, line: def.line, all: definitions.map((d) => ({ path: d.path, line: d.line })) };
+  const readings = await Promise.all(definitions.map(async (d) => reader.readingOf(await reader.signature(d.path, d.line, bare), d.path)));
+  for (const [i, reading] of readings.entries()) {
+    if (reading.kind === "returns") continue;
+    const where = `${definitions[i]!.path}:${definitions[i]!.line}`;
+    const why = reading.kind === "not" ? `returns \`${quoted(reading.type)}\` and does not return a Result` : `is not settled: ${reading.why}`;
+    return { result: { ok: false, kind: "callee_ambiguous", reason: `${bare} is defined ${total} times here as one thing written ${definitions.length} times, and one of them (${where}) ${why}, so this call has no error to assume` }, at: versions };
+  }
+  return { result: { ok: true, calleeDefinedAt: `${def.path}:${def.line}` }, at: versions };
 }
 
 /**
