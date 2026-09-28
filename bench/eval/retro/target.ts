@@ -123,7 +123,8 @@ export function nameTarget(c: { row: number; ref: string; repo: string; origin: 
   const landed = deps.landed(c.repo, c.origin);
   const rec = (target: Named | null, why?: NotNamed): TargetRecord => ({ row: c.row, ref: c.ref, repo: c.repo, origin: c.origin, landed, target, ...(why ? { why } : {}), answers });
   const fix = deps.fix(c.repo, Number(c.ref.split("#")[1]));
-  const files = changedFiles(fix.diff).flatMap((p): [string, string][] => {
+  // Rust files only: the tool reads Rust, and a defect elsewhere is one it cannot list (dev, 2026-09-28).
+  const files = changedFiles(fix.diff).filter((p) => p.endsWith(".rs")).flatMap((p): [string, string][] => {
     const text = deps.fileAt(c.repo, landed.head, p);
     return text === null ? [] : [[p, text]];
   });

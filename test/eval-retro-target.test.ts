@@ -141,3 +141,10 @@ test("sealed prints nothing about how many were named; dev prints the yield", ()
   assert.deepEqual([dev.named, dev.notNamed], [1, { "the checker does not agree": 1 }]);
   assert.ok(!JSON.stringify(dev).includes(MARK));
 });
+
+test("only Rust files are given: a fix that changed none has no file to name from", () => {
+  const { d, calls } = deps();
+  const r = nameTarget(c, { ...d, fix: () => ({ bundle, diff: "diff --git a/.github/w.yml b/.github/w.yml\n+x\n" }) });
+  assert.deepEqual([r.target, r.why, calls.length], [null, "no file of the fix at O's head", 0]);
+  assert.deepEqual(changedFiles(DIFF + "diff --git a/run.sh b/run.sh\n").filter((p) => p.endsWith(".rs")), ["src/a.rs"]);
+});
