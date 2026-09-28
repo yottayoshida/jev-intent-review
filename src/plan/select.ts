@@ -52,7 +52,7 @@ export type Askability =
  * does, or its function calls what the changed code calls and nothing the change touched
  * (`shares_call`, `siblings.ts`, ADR 0005).
  */
-export type SiteOrigin = "changed" | "calls_changed" | "shares_call";
+export type SiteOrigin = "changed" | "calls_changed" | "shares_call" | "called_by_changed";
 
 /** How a *function* the change itself reached got into the set. A call inherits it. */
 export type FunctionOrigin = "changed" | "calls_changed";
@@ -315,18 +315,23 @@ export interface SiblingSelection {
  * are the same set whether or not a sibling exists. Siblings take their turns in seed order, one
  * call each at a time, and inside each the calls that tied it to a seed come first: that is where
  * a missed path's defect sits, and without it first a sibling's other calls would spend the budget.
+ *
+ * The seeds' own bodies (`called_by_changed`, #37, ADR 0028) are dealt the same way under their own
+ * budget, with no call tying them. `via` is what a site says tied it: for a sibling the seed, for a
+ * body the changed function that calls it.
  */
 export async function selectSiblings(
-  siblings: readonly { fn: FunctionCandidate; candidates: Candidates; seed: string; tying: readonly CallCandidate[] }[],
+  siblings: readonly { fn: FunctionCandidate; candidates: Candidates; via: string; tying: readonly CallCandidate[] }[],
   decide: (fn: FunctionCandidate, call: CallCandidate) => Promise<Askability>,
   budget: number,
+  origin: "shares_call" | "called_by_changed" = "shares_call",
 ): Promise<SiblingSelection> {
   const widened: Site[] = [];
   for (const sibling of siblings) {
     const tying = new Set(sibling.tying.map((c) => c.id));
     const calls = sibling.candidates.calls.filter((k) => k.functionId === sibling.fn.id);
     for (const call of [...calls.filter((k) => tying.has(k.id)), ...calls.filter((k) => !tying.has(k.id))]) {
-      widened.push({ call, fn: sibling.fn, origin: "shares_call", fnOrigin: "shares_call", via: sibling.seed });
+      widened.push({ call, fn: sibling.fn, origin, fnOrigin: origin, via: sibling.via });
     }
   }
   const applicable: Site[] = [];

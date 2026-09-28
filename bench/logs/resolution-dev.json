@@ -188,7 +188,7 @@
    },
    "dispatch": {
     "count": 45,
-    "productSettledHere": 3,
+    "productSettledHere": 4,
     "ofWhichTraitOutside": 0
    },
    "voided": {
@@ -241,7 +241,7 @@
    },
    "dispatch": {
     "count": 136,
-    "productSettledHere": 25,
+    "productSettledHere": 27,
     "ofWhichTraitOutside": 0
    },
    "voided": {
@@ -403,7 +403,7 @@
    },
    "dispatch": {
     "count": 27,
-    "productSettledHere": 3,
+    "productSettledHere": 4,
     "ofWhichTraitOutside": 0
    },
    "voided": {
@@ -455,7 +455,7 @@
    },
    "dispatch": {
     "count": 92,
-    "productSettledHere": 16,
+    "productSettledHere": 17,
     "ofWhichTraitOutside": 0
    },
    "voided": {

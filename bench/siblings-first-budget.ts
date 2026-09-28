@@ -68,7 +68,8 @@ for (const b of branches) {
   const after = cli(HERE, b);
   const rows = before.requirements.map((r, i) => {
     const a = after.requirements[i]!;
-    const near = a.wouldAsk.filter((w) => w.origin !== "shares_call");
+    // The first budget alone: not the siblings, nor the bodies of what the changed code calls (ADR 0028).
+    const near = a.wouldAsk.filter((w) => w.origin !== "shares_call" && w.origin !== "called_by_changed");
     return {
       requirement: r.requirementId,
       firstBudgetSame: JSON.stringify(near.map(key)) === JSON.stringify(r.wouldAsk.map(key)),

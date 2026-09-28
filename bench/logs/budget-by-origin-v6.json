@@ -1,0 +1,2666 @@
+{
+  "what": "The selection before and after a change to how calls are listed or chosen — v1 the callers' own budget (ADR 0015), v2 the cap of calls a function (#38, second part) — with the listing's caps and without them, the checks on the capped tools. No request sent.",
+  "budgets": {
+    "budget": 20,
+    "callerBudget": 10
+  },
+  "before": "1e9809fc1fb3d55976f9f7f5157bd39c23076e8b",
+  "after": "src/ sha256 6febb32f6f02dcc27e1360e6c7eccbb679f7fa0119d265ee51214f841f598d47",
+  "uncapped": [
+    "src/plan/candidates.ts: $1const MAX_FUNCTIONS = 100000;",
+    "src/plan/candidates.ts: $1const MAX_CALLS_PER_FUNCTION = 100000;",
+    "src/plan/from-diff.ts: $1const MAX_CHANGED_FUNCTIONS = 100000;",
+    "src/plan/from-diff.ts: $1const MAX_HOP_NAMES = 100000;",
+    "src/plan/from-diff.ts: $1const MAX_CALLER_FUNCTIONS = 100000;"
+  ],
+  "rows": [
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 32.4,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 35.1,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 30.9,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 32.4,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "before, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 35.9,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 34.7,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 33.9,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 37.4,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "before, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 35.2,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 36.8,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 33.3,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 38.5,
+          "reportBytes": 296705,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "before, capped": {
+        "applicable": 38,
+        "budgeted": 30,
+        "changedAsked": 12,
+        "callersApplicable": 26,
+        "callersAsked": 18,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (14 of 30)"
+        },
+        "command": {
+          "seconds": 33.7,
+          "reportBytes": 273712,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 38,
+        "budgeted": 30,
+        "changedAsked": 12,
+        "callersApplicable": 26,
+        "callersAsked": 18,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (14 of 30)"
+        },
+        "command": {
+          "seconds": 38.9,
+          "reportBytes": 297055,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 38,
+        "budgeted": 30,
+        "changedAsked": 12,
+        "callersApplicable": 26,
+        "callersAsked": 18,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (14 of 30)"
+        },
+        "command": {
+          "seconds": 50.3,
+          "reportBytes": 273712,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 38,
+        "budgeted": 30,
+        "changedAsked": 12,
+        "callersApplicable": 26,
+        "callersAsked": 18,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (6 of 30)",
+          "B": "inside (14 of 30)"
+        },
+        "command": {
+          "seconds": 36.3,
+          "reportBytes": 297055,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "before, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 33.8,
+          "reportBytes": 274012,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 37.2,
+          "reportBytes": 297355,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 36.4,
+          "reportBytes": 274012,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 36.4,
+          "reportBytes": 297355,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-C",
+      "before, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 33.3,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 36.5,
+          "reportBytes": 297040,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 33.4,
+          "reportBytes": 273362,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 37,
+        "budgeted": 30,
+        "changedAsked": 11,
+        "callersApplicable": 26,
+        "callersAsked": 19,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 4,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 30)",
+          "B": "inside (13 of 30)"
+        },
+        "command": {
+          "seconds": 38,
+          "reportBytes": 297040,
+          "siblingFunctions": 1,
+          "siblingApplicable": 1,
+          "siblingsInBudget": 1,
+          "siblingNames": [
+            "run_silent_memory_turn"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 1,
+          "calleesInBudget": [
+            "generate_title complete(&messages, &[]) (via generate_title_for_session)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 13.7,
+          "reportBytes": 79367,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 15.6,
+          "reportBytes": 89200,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 12.6,
+          "reportBytes": 79354,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 15.5,
+          "reportBytes": 89187,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "before, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 20.6,
+          "reportBytes": 79367,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 16.3,
+          "reportBytes": 89200,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 13.4,
+          "reportBytes": 79354,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 15.8,
+          "reportBytes": 89187,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "before, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 26.3,
+          "reportBytes": 79367,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 18.1,
+          "reportBytes": 89200,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 15.8,
+          "reportBytes": 79354,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 4,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 3,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (3 of 16)",
+          "B": "inside (5 of 16)"
+        },
+        "command": {
+          "seconds": 20.5,
+          "reportBytes": 89187,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 3,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "before, capped": {
+        "applicable": 17,
+        "budgeted": 17,
+        "changedAsked": 5,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 17)",
+          "B": "inside (6 of 17)"
+        },
+        "command": {
+          "seconds": 27.5,
+          "reportBytes": 79597,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 17,
+        "budgeted": 17,
+        "changedAsked": 5,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 17)",
+          "B": "inside (6 of 17)"
+        },
+        "command": {
+          "seconds": 20.5,
+          "reportBytes": 89430,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 4,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 17,
+        "budgeted": 17,
+        "changedAsked": 5,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 17)",
+          "B": "inside (6 of 17)"
+        },
+        "command": {
+          "seconds": 13.9,
+          "reportBytes": 79584,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 17,
+        "budgeted": 17,
+        "changedAsked": 5,
+        "callersApplicable": 12,
+        "callersAsked": 12,
+        "changedLineCalls": 4,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (4 of 17)",
+          "B": "inside (6 of 17)"
+        },
+        "command": {
+          "seconds": 15.1,
+          "reportBytes": 89417,
+          "siblingFunctions": 2,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "open_base",
+            "open_standalone"
+          ],
+          "calleeFunctions": 4,
+          "calleeApplicable": 7,
+          "calleesInBudget": [
+            "rewrite_heights rewrite_child_heights(walker, &mut batch, grove_version) (via finalize)",
+            "load_base_root get_root(ROOT_KEY_KEY) (via finalize)",
+            "verify_height verify_tree_height(tree, tree.height(), grove_version) (via finalize)",
+            "rewrite_heights commit_batch(batch) (via finalize)",
+            "load_base_root flat_map_ok(|tree_root_key_opt| { // In case of successful seek for root key check if it exists if let Some(tree_root_key) = tree_root_key_opt { // Trying to build a tree out of it, costs will be accumulated because // `Tree::ge (via finalize)",
+            "load_base_root TreeNode::get( &self.storage, tree_root_key, value_defined_cost_fn, grove_version, ) (via finalize)",
+            "load_base_root map_ok(|tree| { if let Some(t) = tree.as_ref() { self.root_tree_key = Cell::new(Some(t.key().to_vec())); } self.tree = Cell::new(tree); }) (via finalize)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 20.3,
+          "reportBytes": 28922,
+          "siblingFunctions": 2,
+          "siblingApplicable": 7,
+          "siblingsInBudget": 7,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 14.9,
+          "reportBytes": 77206,
+          "siblingFunctions": 2,
+          "siblingApplicable": 7,
+          "siblingsInBudget": 7,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit"
+          ],
+          "calleeFunctions": 5,
+          "calleeApplicable": 4,
+          "calleesInBudget": [
+            "rewrite_parent_link merk::fetch_node( &self.merk.storage, parent_key.as_slice(), None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, ) (via process_chunk)",
+            "verify_chunk execute(chunk.clone().into_iter().map(Ok), false, |node| { if matches!( node, Node::KVValueHashFeatureType(..) | Node::KV(..) | Node::KVValueHash(..) | Node::KVCount(..) ) { (via process_chunk)",
+            "write_chunk visit_refs_track_traversal_and_parent( traversal_instruction, None, &mut |proof_node, node_traversal_instruction, parent_key| { match &proof_node.node { Node::KVValueHashFeatureType(key, value, vh, feature_type) => { (via process_chunk)",
+            "write_chunk commit_batch(batch) (via process_chunk)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 11.3,
+          "reportBytes": 32450,
+          "siblingFunctions": 3,
+          "siblingApplicable": 9,
+          "siblingsInBudget": 9,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit",
+            "update_base_merk_root_key"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 8,
+        "budgeted": 8,
+        "changedAsked": 5,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "fixed": "inside (3 of 8)",
+          "B": "inside (7 of 8)"
+        },
+        "command": {
+          "seconds": 14.3,
+          "reportBytes": 80734,
+          "siblingFunctions": 3,
+          "siblingApplicable": 9,
+          "siblingsInBudget": 9,
+          "siblingNames": [
+            "chunk",
+            "multi_chunk_with_limit",
+            "update_base_merk_root_key"
+          ],
+          "calleeFunctions": 5,
+          "calleeApplicable": 4,
+          "calleesInBudget": [
+            "rewrite_parent_link merk::fetch_node( &self.merk.storage, parent_key.as_slice(), None::<&fn(&[u8], &GroveVersion) -> Option<ValueDefinedCostType>>, grove_version, ) (via process_chunk)",
+            "verify_chunk execute(chunk.clone().into_iter().map(Ok), false, |node| { if matches!( node, Node::KVValueHashFeatureType(..) | Node::KV(..) | Node::KVValueHash(..) | Node::KVCount(..) ) { (via process_chunk)",
+            "write_chunk visit_refs_track_traversal_and_parent( traversal_instruction, None, &mut |proof_node, node_traversal_instruction, parent_key| { match &proof_node.node { Node::KVValueHashFeatureType(key, value, vh, feature_type) => { (via process_chunk)",
+            "write_chunk commit_batch(batch) (via process_chunk)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 74,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 23,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 16.9,
+          "reportBytes": 207879,
+          "siblingFunctions": 7,
+          "siblingApplicable": 12,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 74,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 23,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 16.3,
+          "reportBytes": 227479,
+          "siblingFunctions": 7,
+          "siblingApplicable": 12,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ],
+          "calleeFunctions": 8,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "decode_commit_certificate decode_signature(signature) (via batch_to_decided)",
+            "select_batches_in_range query_batches( conn, &format!(\"WHERE b.consensus_height >= {start} AND b.consensus_height <= {end}\"), ) (via get_decided_range)",
+            "decode_commit_certificate Address::from_proto(address) (via batch_to_decided)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 75,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 24,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 15,
+          "reportBytes": 216652,
+          "siblingFunctions": 7,
+          "siblingApplicable": 12,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 75,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 24,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 2,
+        "changedFunctions": 19,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "A": "inside (12 of 30)",
+          "B": "inside (22 of 30)"
+        },
+        "command": {
+          "seconds": 18.5,
+          "reportBytes": 236252,
+          "siblingFunctions": 7,
+          "siblingApplicable": 12,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "_get_primitive",
+            "create_runtime_executor",
+            "decode_synced_value",
+            "from_proto",
+            "get_block_latest",
+            "get_info"
+          ],
+          "calleeFunctions": 8,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "decode_commit_certificate decode_signature(signature) (via batch_to_decided)",
+            "select_batches_in_range query_batches( conn, &format!(\"WHERE b.consensus_height >= {start} AND b.consensus_height <= {end}\"), ) (via get_decided_range)",
+            "decode_commit_certificate Address::from_proto(address) (via batch_to_decided)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 4,
+          "reportBytes": 57143,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 5.7,
+          "reportBytes": 65805,
+          "siblingFunctions": 1,
+          "siblingApplicable": 2,
+          "siblingsInBudget": 2,
+          "siblingNames": [
+            "read_screenshot"
+          ],
+          "calleeFunctions": 4,
+          "calleeApplicable": 9,
+          "calleesInBudget": [
+            "get_annotation read_all() (via get_source_location)",
+            "get_pending read_all() (via get_all_pending)",
+            "read_all lock_shared() (via get_annotations)",
+            "create_annotation lock_exclusive() (via create_annotation)",
+            "read_all std::fs::read_to_string(&path) (via get_annotations)",
+            "create_annotation read_all_locked() (via create_annotation)",
+            "read_all serde_json::from_str(&contents) (via get_annotations)",
+            "create_annotation screenshot::save_screenshot(&self.screenshots_dir(), &id, data_url) (via create_annotation)",
+            "create_annotation write_all_locked(&annotations) (via create_annotation)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 3.7,
+          "reportBytes": 57143,
+          "siblingFunctions": 3,
+          "siblingApplicable": 4,
+          "siblingsInBudget": 4,
+          "siblingNames": [
+            "get_annotation",
+            "get_pending",
+            "read_screenshot"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 16,
+        "budgeted": 16,
+        "changedAsked": 13,
+        "callersApplicable": 3,
+        "callersAsked": 3,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 8,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 4.2,
+          "reportBytes": 65805,
+          "siblingFunctions": 1,
+          "siblingApplicable": 2,
+          "siblingsInBudget": 2,
+          "siblingNames": [
+            "read_screenshot"
+          ],
+          "calleeFunctions": 4,
+          "calleeApplicable": 9,
+          "calleesInBudget": [
+            "get_annotation read_all() (via get_source_location)",
+            "get_pending read_all() (via get_all_pending)",
+            "read_all lock_shared() (via get_annotations)",
+            "create_annotation lock_exclusive() (via create_annotation)",
+            "read_all std::fs::read_to_string(&path) (via get_annotations)",
+            "create_annotation read_all_locked() (via create_annotation)",
+            "read_all serde_json::from_str(&contents) (via get_annotations)",
+            "create_annotation screenshot::save_screenshot(&self.screenshots_dir(), &id, data_url) (via create_annotation)",
+            "create_annotation write_all_locked(&annotations) (via create_annotation)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 43,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 36,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 14.2,
+          "reportBytes": 549205,
+          "siblingFunctions": 19,
+          "siblingApplicable": 101,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 43,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 36,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 17,
+          "reportBytes": 560601,
+          "siblingFunctions": 19,
+          "siblingApplicable": 101,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "find_python_env std::env::var(\"PYBUN_ENV\") (via python_which)",
+            "load fs::read_to_string(&path) (via analyze)",
+            "find_python_env std::env::var(\"PYBUN_PYTHON\") (via python_which)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 43,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 36,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 16.6,
+          "reportBytes": 549043,
+          "siblingFunctions": 19,
+          "siblingApplicable": 101,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 43,
+        "budgeted": 30,
+        "changedAsked": 7,
+        "callersApplicable": 36,
+        "callersAsked": 23,
+        "changedLineCalls": 1,
+        "changedLineLeft": 0,
+        "changedFunctions": 2,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 17.6,
+          "reportBytes": 560439,
+          "siblingFunctions": 19,
+          "siblingApplicable": 101,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "call_doctor",
+            "call_lint",
+            "call_type_check",
+            "execute_tool",
+            "find_python_interpreter",
+            "install",
+            "lock_dependencies",
+            "resolve_ruff_runner",
+            "run_build",
+            "run_upgrade"
+          ],
+          "calleeFunctions": 2,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "find_python_env std::env::var(\"PYBUN_ENV\") (via python_which)",
+            "load fs::read_to_string(&path) (via analyze)",
+            "find_python_env std::env::var(\"PYBUN_PYTHON\") (via python_which)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 14,
+        "budgeted": 14,
+        "changedAsked": 9,
+        "callersApplicable": 5,
+        "callersAsked": 5,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 7.8,
+          "reportBytes": 150667,
+          "siblingFunctions": 8,
+          "siblingApplicable": 21,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "after_executed",
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "route_retried_job"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 14,
+        "budgeted": 14,
+        "changedAsked": 9,
+        "callersApplicable": 5,
+        "callersAsked": 5,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 8.4,
+          "reportBytes": 189336,
+          "siblingFunctions": 8,
+          "siblingApplicable": 21,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "after_executed",
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "route_retried_job"
+          ],
+          "calleeFunctions": 5,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "acquire_semaphore_with_constraint acquire_semaphore( db, table_config, constraint.key.clone(), constraint.limit, constraint.duration, ) (via enqueue_job)",
+            "insert_returning execute_insert_returning(db, query, |id| { Query::select() .column(Asterisk) .from(Alias::new(&table_name)) .and_where(Expr::col(col(\"id\")).eq(id)) .to_owned() }) (via enqueue_job)",
+            "mark_finished execute_update(db, query) (via enqueue_job)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 14,
+        "budgeted": 14,
+        "changedAsked": 9,
+        "callersApplicable": 5,
+        "callersAsked": 5,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 7.8,
+          "reportBytes": 187009,
+          "siblingFunctions": 11,
+          "siblingApplicable": 34,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "release_next_blocked_job",
+            "route_retried_job",
+            "try_consume_rate_for_candidate",
+            "unblock_next_job"
+          ],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 14,
+        "budgeted": 14,
+        "changedAsked": 9,
+        "callersApplicable": 5,
+        "callersAsked": 5,
+        "changedLineCalls": 2,
+        "changedLineLeft": 0,
+        "changedFunctions": 1,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 8.8,
+          "reportBytes": 229197,
+          "siblingFunctions": 11,
+          "siblingApplicable": 34,
+          "siblingsInBudget": 10,
+          "siblingNames": [
+            "discard",
+            "discard_all",
+            "enqueue_job",
+            "handle_concurrency_conflict",
+            "insert_all_returning",
+            "release_next_blocked_job",
+            "route_retried_job",
+            "try_consume_rate_for_candidate",
+            "unblock_next_job"
+          ],
+          "calleeFunctions": 6,
+          "calleeApplicable": 3,
+          "calleesInBudget": [
+            "acquire_semaphore_with_constraint acquire_semaphore( db, table_config, constraint.key.clone(), constraint.limit, constraint.duration, ) (via enqueue_job)",
+            "insert_returning execute_insert_returning(db, query, |id| { Query::select() .column(Asterisk) .from(Alias::new(&table_name)) .and_where(Expr::col(col(\"id\")).eq(id)) .to_owned() }) (via enqueue_job)",
+            "mark_finished execute_update(db, query) (via enqueue_job)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "before, capped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 7.7,
+          "reportBytes": 47760,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": [],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, capped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 8.5,
+          "reportBytes": 68027,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": [],
+          "calleeFunctions": 1,
+          "calleeApplicable": 13,
+          "calleesInBudget": [
+            "process_patch_list prefetch_keys(&pl) (via process_parsed_patch_list)",
+            "process_patch_list get_version(pl.name.as_str()) (via process_parsed_patch_list)",
+            "process_patch_list process_snapshot( &snapshot_clone, &mut snapshot_state, |key_id| lookup_app_state_key(&keys_map, key_id), validate_macs, &collection_name_owned, ) (via process_parsed_patch_list)",
+            "process_patch_list lookup_app_state_key(&keys_map, key_id) (via process_parsed_patch_list)",
+            "process_patch_list set_version(collection_name, state.clone()) (via process_parsed_patch_list)",
+            "process_patch_list put_mutation_macs( collection_name, state.version, &snapshot_result.mutation_macs, ) (via process_parsed_patch_list)",
+            "process_patch_list get_mutation_macs(collection_name, &need_db_lookup) (via process_parsed_patch_list)",
+            "process_patch_list process_patch( &patch_clone, &mut state, |key_id| lookup_app_state_key(&keys, key_id), get_prev_value_mac, validate_macs, &coll, ) (via process_parsed_patch_list)",
+            "process_patch_list lookup_app_state_key(&keys, key_id) (via process_parsed_patch_list)",
+            "process_patch_list set_version(collection_name, state.clone()) (via process_parsed_patch_list)"
+          ]
+        }
+      },
+      "before, uncapped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 7.7,
+          "reportBytes": 47760,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": [],
+          "calleeFunctions": 0,
+          "calleeApplicable": 0,
+          "calleesInBudget": []
+        }
+      },
+      "after, uncapped": {
+        "applicable": 32,
+        "budgeted": 30,
+        "changedAsked": 8,
+        "callersApplicable": 24,
+        "callersAsked": 22,
+        "changedLineCalls": 5,
+        "changedLineLeft": 0,
+        "changedFunctions": 3,
+        "changedFunctionsNotAsked": 0,
+        "targets": {},
+        "command": {
+          "seconds": 8.6,
+          "reportBytes": 68027,
+          "siblingFunctions": 0,
+          "siblingApplicable": 0,
+          "siblingsInBudget": 0,
+          "siblingNames": [],
+          "calleeFunctions": 1,
+          "calleeApplicable": 13,
+          "calleesInBudget": [
+            "process_patch_list prefetch_keys(&pl) (via process_parsed_patch_list)",
+            "process_patch_list get_version(pl.name.as_str()) (via process_parsed_patch_list)",
+            "process_patch_list process_snapshot( &snapshot_clone, &mut snapshot_state, |key_id| lookup_app_state_key(&keys_map, key_id), validate_macs, &collection_name_owned, ) (via process_parsed_patch_list)",
+            "process_patch_list lookup_app_state_key(&keys_map, key_id) (via process_parsed_patch_list)",
+            "process_patch_list set_version(collection_name, state.clone()) (via process_parsed_patch_list)",
+            "process_patch_list put_mutation_macs( collection_name, state.version, &snapshot_result.mutation_macs, ) (via process_parsed_patch_list)",
+            "process_patch_list get_mutation_macs(collection_name, &need_db_lookup) (via process_parsed_patch_list)",
+            "process_patch_list process_patch( &patch_clone, &mut state, |key_id| lookup_app_state_key(&keys, key_id), get_prev_value_mac, validate_macs, &coll, ) (via process_parsed_patch_list)",
+            "process_patch_list lookup_app_state_key(&keys, key_id) (via process_parsed_patch_list)",
+            "process_patch_list set_version(collection_name, state.clone()) (via process_parsed_patch_list)"
+          ]
+        }
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "before, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "before, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "before, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 14,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "before, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "before, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, capped": {
+        "applicable": 87,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 60,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "before, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      },
+      "after, uncapped": {
+        "applicable": 143,
+        "budgeted": 30,
+        "changedAsked": 20,
+        "callersApplicable": 116,
+        "callersAsked": 10,
+        "changedLineCalls": 13,
+        "changedLineLeft": 0,
+        "changedFunctions": 13,
+        "changedFunctionsNotAsked": 0,
+        "targets": {
+          "R1": "inside (13 of 30)",
+          "R2": "inside (11 of 30)"
+        },
+        "command": null
+      }
+    }
+  ],
+  "checks": [
+    {
+      "case": "moltis-1064",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "rewrite-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "hidden-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-B",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "moltis-1064",
+      "version": "defect-C",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "defect-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "rewrite-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-500",
+      "version": "hidden-A",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "grovedb-501",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "kontor-385",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "instruckt-tauri-9",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "pybun-428",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "quebec-136",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "whatsapp-rust-759",
+      "version": "shipped",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "correct",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-read-baseline",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-read-baseline",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "m-raw-override",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    },
+    {
+      "case": "omamori-468",
+      "version": "v-raw-override",
+      "capped": {
+        "callersNotFewer": true,
+        "changedLineLeftNotMore": true,
+        "changedFunctionsNotAskedNotMore": true,
+        "targetsInside": true,
+        "atMostBoth": true
+      }
+    }
+  ],
+  "failed": []
+}

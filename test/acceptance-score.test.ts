@@ -237,6 +237,7 @@ test("(j) a run cut short by its own limit is not finished: a request failed on 
   const reqs = (observed: unknown[], mappings: unknown[] = []) => [{ requirementId: "R1", observed, unchecked: [], mappings, findings: [] }] as unknown as RunRecord["requirements"];
   assert.equal(cutShort(reqs([]), [{ error: "ProviderError: budget" }]), true, "a request that failed on the budget");
   assert.equal(cutShort(reqs([sibling]), []), true, "a sibling's call without an answer");
+  assert.equal(cutShort(reqs([{ ...sibling, origin: "called_by_changed" }]), []), true, "a call in the body of what the changed code calls, without an answer (#37, ADR 0028)");
   assert.equal(cutShort(reqs([{ ...sibling, result: { observation: "returns_error", probability: 0.9, why: "read" } }], [{ ...T, callId: "s1", verdict: "no_answer", probability: 0, governs: false }]), []), true, "a sibling's mapping without an answer");
   // The control: the first budget's call without an answer is a reading like any other, as before.
   assert.equal(cutShort(reqs([near]), [{ error: "ProviderError: timeout" }]), false);

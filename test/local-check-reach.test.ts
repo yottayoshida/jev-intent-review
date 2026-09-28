@@ -216,7 +216,7 @@ async function run(options: Partial<LocalCheckOptions> = {}, files?: Record<stri
 }
 
 const key = (w: { file: string; function: string; call: string }) => `${w.file} ${w.function} ${w.call}`;
-const near = <T extends { origin: string }>(list: readonly T[]) => list.filter((w) => w.origin !== "shares_call");
+const near = <T extends { origin: string }>(list: readonly T[]) => list.filter((w) => w.origin !== "shares_call" && w.origin !== "called_by_changed");
 const noteWith = (notes: readonly string[], pattern: RegExp) => notes.find((n) => pattern.test(n));
 const siblingsOf = (r: { wouldAsk: { origin: string; function: string }[]; unchecked: { origin: string; function: string }[] }) => new Set([...r.wouldAsk, ...r.unchecked].filter((w) => w.origin === "shares_call").map((w) => w.function));
 
@@ -517,4 +517,81 @@ test("calleeOf settles a call from a function that returns no Result, and says w
   assert.equal(result.ok, false);
   assert.equal(!result.ok && result.kind, "callee_not_result");
   assert.deepEqual(at, { kind: "repository", path: "src/n.rs", line: 1 });
+});
+
+// --- The bodies of what the changed code calls (#37, ADR 0028) ----------------------------------
+
+/** `read_blob`'s own body turns `fetch`'s failure into a success: the defect is one call down from the change. */
+const SWALLOWING_BLOB = "pub fn read_blob(dir: &Path) -> Result<String, AppError> {\n    let Ok(raw) = fetch(dir) else {\n        return Ok(String::new());\n    };\n    Ok(raw)\n}\n";
+const FETCH = "pub fn fetch(dir: &Path) -> Result<String, AppError> {\n    Ok(String::new())\n}\n";
+
+test("(i) a defect in the body of what the changed code calls is listed, reached as called by the change, and the sibling is as before", async () => {
+  const { r, text } = await run({}, after({ "src/blob.rs": SWALLOWING_BLOB, "src/fetch.rs": FETCH }));
+  const f = r.findings.find((x) => x.function === "read_blob");
+  assert.ok(f, `the callee's body should be listed: ${JSON.stringify(r.findings.map((x) => [x.function, x.call]))}`);
+  assert.equal(f.call, "fetch(dir)");
+  assert.equal(f.origin, "called_by_changed");
+  assert.equal(f.via, "load_settings", "via is the changed function that calls it");
+  assert.ok(r.findings.some((x) => x.function === "load_profile" && x.origin === "shares_call"), "the sibling's finding stays");
+  // Every list entry is accounted for by one budget: the first, the callees', the siblings'.
+  const c = r.counts;
+  assert.equal(c.asked + c.calledByChanged!.asked + c.siblings!.asked, r.observed.length);
+  assert.equal(c.mapped + c.calledByChanged!.mapped + c.siblings!.mapped, r.mappings.length);
+  assert.match(text, /Reached as\*\*: called by the change — `load_settings`, which the change touched, calls `read_blob`/);
+  assert.match(text, /^Called by the change: \d+ functions? the changed code calls, read for their own calls\.$/m);
+  // The control: with the fixture's own `read_blob`, which has nothing to ask, no callee is listed.
+  const { r: plain } = await run();
+  assert.ok(!plain.findings.some((x) => x.origin === "called_by_changed"), JSON.stringify(plain.findings));
+});
+
+test("(j) a body is not also a sibling: a call the callees' budget lists is not listed again by the siblings'", async () => {
+  // `after` writes the distractors last, so `dist2` is replaced past it. It is a seed, and its body calls the seed `read_blob` and swallows it: a callee's body and a sibling at once.
+  const dist2 = "pub fn dist2(dir: &Path) -> Result<u32, AppError> {\n    let Ok(_) = read_blob(dir) else {\n        return Ok(0);\n    };\n    Ok(1)\n}\n";
+  const { r } = await run({}, { ...after(), "src/dist2.rs": dist2 });
+  const listed = [...r.wouldAsk, ...r.unchecked].filter((w) => w.function === "dist2" && w.call === "read_blob(dir)");
+  assert.deepEqual(listed.map((w) => w.origin), ["called_by_changed"], "listed once, by the budget that came first");
+  assert.equal(r.observed.filter((o) => o.function === "dist2").length, 1, "asked once");
+  // Over the callees' budget (0 here), it is under *Not checked* once, for that budget, and the siblings
+  // do not ask it: no call is both read and not checked, nor counted by two budgets.
+  const { r: none } = await run({ calleeBudget: 0 }, { ...after(), "src/dist2.rs": dist2 });
+  const again = [...none.wouldAsk, ...none.unchecked].filter((w) => w.function === "dist2" && w.call === "read_blob(dir)");
+  assert.deepEqual(again.map((w) => [w.origin, "why" in w ? /budget of what the changed code calls, 0/.test(String(w.why)) : "asked"]), [["called_by_changed", true]]);
+  const readKeys = new Set(none.wouldAsk.map(key));
+  assert.ok(!none.unchecked.some((u) => readKeys.has(key(u))), "no call is both inside a budget and not checked");
+  // The control: a sibling that is no seed's body is asked as a sibling, as before.
+  assert.ok(none.wouldAsk.some((w) => w.function === "load_profile" && w.origin === "shares_call"), JSON.stringify(none.wouldAsk));
+});
+
+test("(k) the callees' budget is dealt one function at a time in seed order, so the first seed's body does not spend it all", async () => {
+  // `read_blob` (the first seed) has three askable calls, `dist2` (the second) one; a budget of 2 takes one of each.
+  const blob = "pub fn read_blob(dir: &Path) -> Result<String, AppError> {\n    let a = fetch(dir)?;\n    let b = fetch_more(dir)?;\n    let c = fetch_last(dir)?;\n    Ok(a)\n}\n";
+  const more = "pub fn fetch_more(dir: &Path) -> Result<String, AppError> {\n    Ok(String::new())\n}\npub fn fetch_last(dir: &Path) -> Result<String, AppError> {\n    Ok(String::new())\n}\n";
+  const dist2 = "pub fn dist2(dir: &Path) -> Result<u32, AppError> {\n    let n = measure(dir)?;\n    Ok(1)\n}\n";
+  const { r } = await run({ calleeBudget: 2, candidatesOnly: true }, { ...after({ "src/blob.rs": blob, "src/fetch.rs": FETCH, "src/fetch_more.rs": more }), "src/dist2.rs": dist2 });
+  const inside = r.wouldAsk.filter((w) => w.origin === "called_by_changed").map((w) => `${w.function} ${w.call}`);
+  assert.deepEqual(inside, ["read_blob fetch(dir)", "dist2 measure(dir)"]);
+  const over = r.unchecked.filter((u) => u.origin === "called_by_changed" && /budget of what the changed code calls, 2/.test(u.why)).map((u) => u.call);
+  assert.deepEqual(over, ["fetch_more(dir)", "fetch_last(dir)"]);
+});
+
+test("(l) a seed whose body an earlier budget reads — here a caller of a changed function — is not read again as called by the change", async () => {
+  // `dist3` is a seed and calls `normalize`, which the change touched: it is read one hop out.
+  const dist3 = 'pub fn dist3(dir: &Path) -> Result<u32, AppError> {\n    let s = normalize("x")?;\n    Ok(1)\n}\n';
+  // The twenty callers of `load_settings` would fill the one-hop cap and leave `dist3` out of it; emptied here.
+  const { r } = await run({ candidatesOnly: true }, { ...after(), "src/dist3.rs": dist3, "src/callers_a.rs": "" });
+  const listed = [...r.wouldAsk, ...r.unchecked].filter((w) => w.function === "dist3");
+  assert.ok(listed.length > 0, "dist3 is read");
+  assert.deepEqual([...new Set(listed.map((w) => w.origin))], ["calls_changed"], JSON.stringify(listed));
+});
+
+test("(m) a name only a removed line calls is a seed for the siblings, and its body is not read as called by the change", async () => {
+  // The change replaced `old_read` with `read_blob`: the changed code calls `old_read` no more.
+  const oldRead = "pub fn old_read(dir: &Path) -> Result<String, AppError> {\n    let Ok(raw) = fetch(dir) else {\n        return Ok(String::new());\n    };\n    Ok(raw)\n}\n";
+  const beforeStore = STORE_BEFORE.replace("let raw = read_blob(dir).unwrap_or_default();", "let raw = old_read(dir)?;");
+  const files = { ...after({ "src/old_read.rs": oldRead, "src/fetch.rs": FETCH }) };
+  const { r } = await run({ candidatesOnly: true }, files, undefined, { "src/store.rs": beforeStore });
+  assert.ok(r.counts.siblings!.seeds.includes("old_read"), `a seed: ${JSON.stringify(r.counts.siblings!.seeds)}`);
+  assert.ok(![...r.wouldAsk, ...r.unchecked].some((w) => w.function === "old_read" && w.origin === "called_by_changed"), "its body is not read as called by the change");
+  // The control: read_blob, which the changed code does call, has its body read.
+  assert.ok((r.counts.calledByChanged?.functions ?? 0) > 0);
 });

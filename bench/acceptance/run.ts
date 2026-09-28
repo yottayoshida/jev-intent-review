@@ -158,12 +158,12 @@ async function precheck(id: string, clone: string) {
  * this file imports no value from `src/`, so `dist()` refuses a build whose defaults are not these.
  * The changed functions and their callers ask at most `budget + callerBudget` together (ADR 0015).
  */
-const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10 } as const;
+const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10, calleeBudget: 10 } as const;
 
 /** Requests one run can send at most: two questions per call, every budget of calls, and room for retries. */
 export function perRun(c: CaseFile, versionId: string): number {
   const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
-  return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget) * 1.1);
+  return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget + BUDGETS.calleeBudget) * 1.1);
 }
 
 /** The cases a measurement can send for: built, and pre-checked. A regression case is measured again too. */
@@ -291,7 +291,8 @@ export async function measure(id: string, clone: string, limit: number, log: Log
       let finished = false;
       try {
         requirements = (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements.map(distil) as unknown as RunRecord["requirements"];
-        // Exit 0 is not enough: the siblings are asked last, and a limit reached there cuts them alone.
+        // Exit 0 is not enough: the callees of the change and the siblings are asked last, and a limit
+        // reached there cuts them alone.
         finished = code === 0 && !cutShort(requirements, sent);
       } catch {
         finished = false;

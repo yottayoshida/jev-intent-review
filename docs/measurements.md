@@ -837,6 +837,32 @@ and their callers; the siblings are still asked last and counted apart:
   narrowness happened to match the tool. No request was sent to Jev for the search, and what the
   siblings find in a defect is still not measured.
 
+### What the changed code calls, measured (#37)
+
+The bodies of what the changed code calls, and a method on `dyn T` read as `T`'s (ADR 0028), on the
+same 21 runs before (`1e9809f`) and after, set built only (`bench/logs/budget-by-origin-v6.json`,
+`node bench/budget-by-origin.ts --before 1e9809f`; moltis#1064's defect-C is a run of its own now):
+
+| case | bodies read | askable in them | inside their budget | siblings inside theirs (before → after) | `--candidates-only` (before → after) |
+|---|---|---|---|---|---|
+| moltis#1064 (six versions) | 2–3 | 1 | 1 | 1 → 1 | 32.4–35.9 s → 34.7–38.9 s |
+| grovedb#500 (four versions) | 3–4 | 7 | 7 | 4 → 4 | 13.7–27.5 s → 15.6–20.5 s |
+| grovedb#501 | 5 | 4 | 4 | 7 → 7 | 20.3 s → 14.9 s |
+| Kontor#385 | 8 | 3 | 3 | 10 → 10 | 16.9 s → 16.3 s |
+| instruckt-tauri#9 | 4 | 9 | 9 | 4 → 2 | 4.0 s → 5.7 s |
+| PyBun#428 | 2 | 3 | 3 | 10 → 10 | 14.2 s → 17.0 s |
+| quebec#136 | 5 | 3 | 3 | 10 → 10 | 7.8 s → 8.4 s |
+| whatsapp-rust#759 | 1 | 13 | 10 | 0 → 0 | 7.7 s → 8.5 s |
+
+Every known target is where it was, in all 21 runs, and every check of the log holds; the omamori
+runs have no spec and no command. In every moltis#1064 version the one askable call in a body is
+`complete(&messages, &[])` in `generate_title`, via `generate_title_for_session` — defect-C's call,
+which no run listed before. instruckt-tauri#9's siblings lose two calls: their function is a body, read first. The
+times are one run each, taken while `bench/resolution.ts measure` ran beside them, so both columns
+wander by seconds. A first version that read the receiver of every method call before its name
+took whatsapp-rust#759 from 8.6 s to 25.1 s; the receiver is read only where the name alone does not
+settle the call now.
+
 ### What another push would not have to ask again
 
 Whether keeping a pull request's answers would save anything, measured before anything keeps them

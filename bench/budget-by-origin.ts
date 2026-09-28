@@ -119,6 +119,9 @@ add("moltis-1064", "moltis", [
   ["rewrite-A", "a30a6b6a6594dcec15ceb65b8e7424972e9c88d4", "e14b5b7d1268fc583d428735086583335943e684"],
   ["hidden-A", "d2697974d470b2adde91472e85ed5c14e78174b4", "e5f20ac177a50c402b266ba5516d9559b8938686"],
   ["defect-B", "3eae0c6bcbcafe16167085ca8f4381cbff0051d4", "4697c3977399b015efd2ac38fd9aec6797783117"],
+  // defect-C sits in a function the changed code calls (#37, ADR 0028): its target is read by the
+  // command, from the callees budget; the selection here scores A and B as for the others.
+  ["defect-C", "d07c04faef9832e01f17967fc9903c4a0a9915e2", "3e35d5175e2f0fe27db7259f2741a97f0d424527"],
 ], [MOLTIS_A, MOLTIS_B]);
 add("grovedb-500", "grovedb", [
   ["shipped", "43f4253c33ccb2f74fcc212c9d6e532f78ec95f5", "c0e02819ac99a545e70a858208f2095c5fb461c7"],
@@ -173,10 +176,12 @@ function command(root: string, run: Run) {
   const out = spawnSync("node", [join(root, "src/cli/main.ts"), "--candidates-only", "--skip-change-check", "--base", run.base, "--head", run.head, "--intent-spec", spec, "--json"], { cwd: run.clone, encoding: "utf8", maxBuffer: 1 << 30 });
   const seconds = Math.round((performance.now() - started) / 100) / 10;
   if (out.status !== 0) throw new Error(`${root} on ${run.case} ${run.version}: exit ${out.status}: ${out.stderr.slice(0, 400)}`);
-  const report = JSON.parse(out.stdout) as { requirements: { counts: { siblings?: { functions: number; applicable: number } }; wouldAsk: { origin: string; function: string }[] }[] };
+  const report = JSON.parse(out.stdout) as { requirements: { counts: { siblings?: { functions: number; applicable: number }; calledByChanged?: { functions: number; applicable: number } }; wouldAsk: { origin: string; function: string; call: string; via?: string }[] }[] };
   const r = report.requirements[0]!;
   const siblings = r.wouldAsk.filter((w) => w.origin === "shares_call");
-  return { seconds, reportBytes: Buffer.byteLength(out.stdout), siblingFunctions: r.counts.siblings?.functions ?? 0, siblingApplicable: r.counts.siblings?.applicable ?? 0, siblingsInBudget: siblings.length, siblingNames: [...new Set(siblings.map((w) => w.function))].sort() };
+  // The bodies of what the changed code calls (#37, ADR 0028), which the tool before has no word for.
+  const callees = r.wouldAsk.filter((w) => w.origin === "called_by_changed");
+  return { seconds, reportBytes: Buffer.byteLength(out.stdout), siblingFunctions: r.counts.siblings?.functions ?? 0, siblingApplicable: r.counts.siblings?.applicable ?? 0, siblingsInBudget: siblings.length, siblingNames: [...new Set(siblings.map((w) => w.function))].sort(), calleeFunctions: r.counts.calledByChanged?.functions ?? 0, calleeApplicable: r.counts.calledByChanged?.applicable ?? 0, calleesInBudget: callees.map((w) => `${w.function} ${w.call} (via ${w.via ?? ""})`) };
 }
 
 async function measure(tool: (typeof TOOLS)[string], run: Run) {
