@@ -1,4 +1,4 @@
-# The retrospective measurement, version 8 (issue #89)
+# The retrospective measurement, version 9 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -52,6 +52,12 @@ A case counted as not caught this way counts as not caught in the yield check as
 toward going on. The steps and bytes of a request not sent are kept in the row's record (`notSent`).
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
+
+**Version 9** (while the sealed targets were being named, eight named and none of them read) adds a
+reason a target is not named: an O that GitHub no longer has. The naming stopped on it at its ninth case
+— the pull request answers 404, so its range cannot be taken — and the screen had counted the same
+thing as a gap in O's bundle. It is counted against the tool, as every other reason is, and the naming
+goes on from the ninth case; the eight before it are not asked again (owner, 2026-09-28).
 
 **Version 8** (before any target was named) takes out, for the sealed targets, the runs the command
 printed: the number of answers that reached the checker could be worked out from them, and with it how
@@ -318,7 +324,8 @@ the ones of `BASELINE.md`, and are not these.)
   asked again three times; an answer never counted here makes the target not named (where the
   screen, above, stops instead: a target is one case's, and nothing downstream waits on it). **A case
   whose target is not named** — the checker does not agree, no call is named, a call without `(`, a
-  request over the size, or an answer never counted — is not detected in the primary metric, and
+  request over the size, an answer never counted, or an O that GitHub no longer has (version 9) — is
+  not detected in the primary metric, and
   counted apart. So is one whose target the run does not find in O's head before measuring: no file
   whose path ends, segment by segment, with the target's, no function of that name in it, or no call
   in that function that matches the target (below).
