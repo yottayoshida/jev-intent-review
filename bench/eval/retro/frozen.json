@@ -1,4 +1,10 @@
 {
   "what": "The retrospective's frozen targets (#89, RETRO.md v7-v8, \"Opening and targets\"): one line per naming, its file in the sandbox's batches branch and that file's sha256. Lines are only added; a sealed line refuses a new sealed naming.",
-  "lines": []
+  "lines": [
+    {
+      "side": "sealed",
+      "file": "batches/89-targets.json",
+      "sha256": "1bc4e6bc05d6a7483d6b8b86779608a4165f05d01fb94019bda8541bd3cbac64"
+    }
+  ]
 }
