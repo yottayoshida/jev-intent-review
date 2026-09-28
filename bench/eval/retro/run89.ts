@@ -78,7 +78,9 @@ export function caseFiles(t: TargetRecord, rec: RowRecord, side: "sealed" | "dev
   const targets = t.target === null ? {} : Object.fromEntries(requirements.map((r) => [`T-${r.id}`, { requirementId: r.id, file: t.target!.file, function: t.target!.function, call: t.target!.call }]));
   const id = `c89-${t.row}`;
   const caseFile = { id, repo: t.repo, role: side === "sealed" ? "unseen" : "regression", pr: t.origin, versions: { shipped: { base: t.landed?.base ?? "", head: t.landed?.head ?? "", targets, expected: Object.fromEntries(Object.keys(targets).map((k) => [k, "listed"])) } } };
-  return { id, caseFile, spec: { requirements } };
+  // The tool's own spec format (`src/intent/schema.ts`), as #80's cases hold it; the title is the case's id, nothing of it.
+  const spec = { version: 1, title: id, summary: "", requirements: requirements.map((r) => ({ ...r, kind: "behavior", priority: "required", sourceRefs: [], searchHints: [] })), nonGoals: [], ambiguities: [] };
+  return { id, caseFile, requirements, spec };
 }
 
 /** Lays out and clones every opened case; a case whose O cannot be read is laid out without a clone. */
@@ -86,13 +88,13 @@ export function layOut(targets: readonly TargetRecord[], records: readonly RowRe
   const byRow = new Map(records.map((r) => [r.row, r]));
   return targets.map((t) => {
     const rec = byRow.get(t.row)!;
-    const { id, caseFile, spec } = caseFiles(t, rec, side);
+    const { id, caseFile, requirements, spec } = caseFiles(t, rec, side);
     const dir = join(work.cases, id);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "case.json"), `${JSON.stringify(caseFile, null, 2)}\n`);
     writeFileSync(join(dir, "spec.json"), `${JSON.stringify(spec, null, 2)}\n`);
-    const base: RetroCase = { repo: t.repo.toLowerCase(), order: t.row, id, caseFile: caseFile as unknown as CheckedCase["caseFile"], clone: "", target: t.target, ...(t.why ? { whyNotNamed: t.why } : {}), requirements: spec.requirements, originBy: (rec.origin as { by?: string } | undefined)?.by ?? "unknown", landed: t.landed };
-    if (t.landed === null || spec.requirements.length === 0) return base;
+    const base: RetroCase = { repo: t.repo.toLowerCase(), order: t.row, id, caseFile: caseFile as unknown as CheckedCase["caseFile"], clone: "", target: t.target, ...(t.why ? { whyNotNamed: t.why } : {}), requirements, originBy: (rec.origin as { by?: string } | undefined)?.by ?? "unknown", landed: t.landed };
+    if (t.landed === null || requirements.length === 0) return base;
     return { ...base, clone: prepareClone(base, work).clone };
   });
 }

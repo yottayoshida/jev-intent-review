@@ -10,6 +10,7 @@ import { caseFiles, foundAt, frozenProblem, measureRetro, recordsProblem, report
 import type { RowRecord } from "../bench/eval/retro/screen.ts";
 import type { TargetRecord } from "../bench/eval/retro/target.ts";
 import { workOf } from "../bench/eval/sealed.ts";
+import { validateIntentSpec } from "../src/intent/schema.ts";
 
 const sha = (s: string | Buffer) => createHash("sha256").update(s).digest("hex");
 
@@ -49,6 +50,10 @@ const trec = (over: Partial<TargetRecord> = {}): TargetRecord => ({ row: 7, ref:
 test("a case's files hold the target once under each requirement, and nothing without a requirement or a target", () => {
   const { id, caseFile, spec } = caseFiles(trec(), rec(), "sealed");
   assert.equal(id, "c89-7");
+  // The tool reads it: the spec passes its own schema, with the requirements as they were written.
+  const read = validateIntentSpec(JSON.parse(JSON.stringify(spec)), "spec.json");
+  assert.deepEqual(read.requirements.map((r) => [r.id, r.text]), [["R1", "a failure to read is returned"], ["R2", "a missing file is reported"]]);
+  assert.equal(read.title, "c89-7");
   assert.deepEqual(spec.requirements.map((r) => r.id), ["R1", "R2"]);
   assert.deepEqual(Object.keys(caseFile.versions.shipped.targets), ["T-R1", "T-R2"]);
   assert.equal(caseFile.versions.shipped.targets["T-R2"]!.requirementId, "R2");
