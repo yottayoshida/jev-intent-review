@@ -1,4 +1,4 @@
-# The retrospective measurement, version 9 (issue #89)
+# The retrospective measurement, version 10 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -52,6 +52,13 @@ A case counted as not caught this way counts as not caught in the yield check as
 toward going on. The steps and bytes of a request not sent are kept in the row's record (`notSent`).
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
+
+**Version 10** (after the sealed targets were frozen, before any was opened or run) makes a comma
+before a closing `)` part of the form two calls are compared in: `f(a, b,)` is `f(a, b)`. The dev
+rehearsal of the run showed the tool keeps the comma rustfmt leaves after the last argument of a call
+over several lines (8 of 80 calls it would ask about in one case), and an annotator quotes the call
+without it; under version 9 the tool listing that call would not have matched, and its target would have
+been counted not found in O's head. No sealed case had been run (owner, 2026-09-28).
 
 **Version 9** (while the sealed targets were being named, eight named and none of them read) adds a
 reason a target is not named: an O that GitHub no longer has. The naming stopped on it at its ninth case
@@ -365,7 +372,8 @@ the ones of `BASELINE.md`, and are not these.)
 - **Matching the target** against a run's list, at the run's version: the file when one path ends,
   segment by segment, with the other — the shorter of the two with at least two segments, unless it names
   the only file of that name at that version; the function by the last segment of its path; and the call
-  once both calls are brought to the same form — spaces taken out, a final `?` or `.await` dropped, a
+  once both calls are brought to the same form — spaces taken out, a comma before a `)` dropped
+  (version 10), a final `?` or `.await` dropped, a
   receiver before the called name at the top level (such as `self.`) taken off, and a path before it cut
   to its last segment (`crate::a::Foo::new(x)` to `Foo::new(x)`), since the tool lists a call without its
   receiver and an annotator quotes it as written. When only one side has a path, the path is taken off

@@ -52,7 +52,7 @@ const LOGS = {
 } as const;
 type LogName = keyof typeof LOGS;
 const RUNS = 3;
-const ATTEMPTS = 5;
+export const ATTEMPTS = 5;
 /** The copy of `defaultJudges` below, and where it was copied from. */
 const JUDGES_COPIED_FROM = "src/cli/main.ts defaultJudges (JevClient, JevProvider, LimitedProvider concurrency 8, the client's identity)";
 
@@ -97,6 +97,19 @@ async function callMain(d: Dist, clone: string, args: string[], env: NodeJS.Proc
 }
 
 const specArgs = (id: string, base: string, head: string, root = CASES) => ["--skip-change-check", "--base", base, "--head", head, "--intent-spec", join(caseDir(id, root), "spec.json"), "--json"];
+
+/**
+ * Every requirement's enumeration of one branch: the calls it would ask about, requirement by
+ * requirement. Sends nothing (`--candidates-only`). For #89's stage "covers" (RETRO.md v7), which looks
+ * under any requirement; `enumerationOf` keeps the first requirement's, as #80's scoring reads it.
+ */
+export async function enumerationAll(clone: string, base: string, head: string, specFile: string): Promise<{ requirementId: string; wouldAsk: { file: string; function: string; call: string }[] }[]> {
+  const d = await dist();
+  const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !(d.client.JUDGMENT_ENV as readonly string[]).includes(k)));
+  const { code, stdout, stderr } = await callMain(d, clone, ["--skip-change-check", "--base", base, "--head", head, "--intent-spec", specFile, "--json", "--candidates-only"], env);
+  if (code !== 0) throw new Error(`candidates-only exited ${code}: ${stderr.trim()}`);
+  return (JSON.parse(stdout) as { requirements: LocalCheck.LocalCheckResult[] }).requirements.map((r) => ({ requirementId: r.requirementId, wouldAsk: r.wouldAsk.map(({ file, function: fn, call }) => ({ file, function: fn, call })) }));
+}
 
 /** The enumeration of one branch. It depends on the commits alone, so it is taken once. */
 async function enumerationOf(d: Dist, id: string, clone: string, base: string, head: string, root = CASES): Promise<Enumeration & { counts: unknown }> {
@@ -164,7 +177,11 @@ const BUDGETS = { budget: 20, callerBudget: 10, siblingBudget: 10, calleeBudget:
 
 /** Requests one run can send at most: two questions per call, every budget of calls, and room for retries. */
 export function perRun(c: CaseFile, versionId: string): number {
-  const requirements = new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size;
+  return perRunOf(new Set(Object.values(c.versions[versionId]!.targets).map((t) => t.requirementId)).size);
+}
+
+/** The most requests one run of `requirements` requirements can send (#89 counts its spec's, targets or not). */
+export function perRunOf(requirements: number): number {
   return Math.ceil(requirements * 2 * (BUDGETS.budget + BUDGETS.callerBudget + BUDGETS.siblingBudget + BUDGETS.calleeBudget) * 1.1);
 }
 
@@ -206,7 +223,7 @@ export interface LogTarget {
  * Measures one case into `log`. Exported for bench/eval/run.ts, which names its own log (`eval-dev`);
  * the command line below names one of `LOGS` as before.
  */
-export async function measure(id: string, clone: string, limit: number, log: LogTarget) {
+export async function measure(id: string, clone: string, limit: number, log: LogTarget, opts: { always?: boolean; perRun?: number } = {}) {
   const LOG = log.file;
   const d = await dist();
   // The log names Cloudflare's model; a run sent elsewhere (another JEV_PROVIDER, or JEV_API_URL)
@@ -251,7 +268,9 @@ export async function measure(id: string, clone: string, limit: number, log: Log
       if ("applicability" in f && f.applicability) targetApplicability[key] = f.applicability;
     }
     const v: VersionLog = (entry.versions[versionId] ??= { base: version.base, head: version.head, enumeration: keepForTargets({ ...enumeration, targetApplicability }, Object.values(version.targets)), runs: [] });
-    if (!isLive(version, enumeration)) {
+    // `always` (#89): every version is run, a target within the budget or not, since the guards count
+    // what the tool lists on each case (RETRO.md v7). #80 leaves it unset.
+    if (!opts.always && !isLive(version, enumeration)) {
       console.log(`${id} ${versionId}: no target inside the budget; settled by the enumeration, nothing sent`);
       writeJson(LOG, book);
       continue;
@@ -260,7 +279,9 @@ export async function measure(id: string, clone: string, limit: number, log: Log
     while (v.runs.filter((r) => r.finished).length < RUNS && attempts < ATTEMPTS) {
       attempts += 1;
       const room = limit - spent;
-      if (room < perRun(c, versionId)) throw new Error(`stopping before ${id} ${versionId}: ${spent} of ${limit} requests spent, a run can take ${perRun(c, versionId)}`);
+      // `perRun` (#89): counted from the spec's requirements, since a case without a named target has no targets to count.
+      const most = opts.perRun ?? perRun(c, versionId);
+      if (room < most) throw new Error(`stopping before ${id} ${versionId}: ${spent} of ${limit} requests spent, a run can take ${most}`);
       const sent: { packet: string; questions: string[]; answers?: unknown; error?: string }[] = [];
       let client: Client.JevClient | undefined;
       const deps: Main.Deps = {
@@ -299,7 +320,8 @@ export async function measure(id: string, clone: string, limit: number, log: Log
       } catch {
         finished = false;
       }
-      v.runs.push({ finished, requirements, ...({ started, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, modelIdentity: client ? d.client.modelIdentityOf(client.host, client.identity()) : null, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
+      const ended = new Date().toISOString();
+      v.runs.push({ finished, requirements, ...({ started, ended, exit: code, endpoint: client?.origin ?? null, requests: counted.requests, bytes: counted.bytes, modelIdentity: client ? d.client.modelIdentityOf(client.host, client.identity()) : null, sent, stderr: stderr.slice(0, 2000) } as object) } as RunRecord);
       writeJson(LOG, book);
       console.log(`${id} ${versionId} run ${v.runs.length}: exit ${code}, ${counted.requests} requests, finished=${finished}, ${spent}/${limit} spent`);
     }

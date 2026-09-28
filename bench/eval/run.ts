@@ -28,6 +28,8 @@ import { StopRun } from "./adjudicate.ts";
 import { BASELINE_VERSION, EFFORT, MODEL } from "./baseline.ts";
 import { batchFilesOf, caseRepo as sealedCaseRepo, checkCases, comparison, fetchSandbox, gitSandbox, leaks, materialize, measureCases, openSet, preflight, prepareClone, workOf, type CheckedCase, type Measured, type Preflight, type Work } from "./sealed.ts";
 import { endpointFromEnv, jevModel } from "../../src/judgments/client.ts";
+import { DECIDING, expectedRows, frozenProblem, layOut, measureRetro, namesAt, recordsOf, recordsProblem, reportOf, RETRO_VERSION, screenedOf, type RetroCase } from "./retro/run89.ts";
+import type { TargetRecord } from "./retro/target.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = join(HERE, "..", "..");
@@ -130,7 +132,7 @@ const lines = (text: string) =>
     .map((l) => JSON.parse(l) as OpenLine | ResultLine);
 
 /** Every line of main's log and of this tree's, each once (a line is its JSON text). */
-function allLines(onMain: string | null, here: string): (OpenLine | ResultLine)[] {
+export function allLines(onMain: string | null, here: string): (OpenLine | ResultLine)[] {
   const seen = new Set<string>();
   const out: (OpenLine | ResultLine)[] = [];
   for (const text of [onMain ?? "", here]) {
@@ -165,6 +167,7 @@ export async function runSealed(deps: SealedDeps, runId: string): Promise<Result
   const onMain = deps.accessLogOnMain();
   const open = onMain === null ? undefined : lines(onMain).find((l): l is OpenLine => l.kind === "open" && l.runId === runId);
   if (open === undefined) throw new Refused(`run ${runId} is not opened on origin/main: commit the line \`open\` appended, merge it, then run`);
+  if ((open as { measurement?: string }).measurement !== undefined) throw new Refused(`run ${runId} was opened for ${(open as { measurement?: string }).measurement}; it runs through that measurement's own path`);
   // Looked for on main as well as here: a fresh clone of main has no local result line to find.
   if (allLines(onMain, deps.readAccessLog()).some((l) => l.kind === "result" && l.runId === runId)) throw new Refused(`run ${runId} has run already; open another`);
   const dirty = deps.dirty();
@@ -176,6 +179,84 @@ export async function runSealed(deps: SealedDeps, runId: string): Promise<Result
   // The same checks again, at the commits the opening recorded; what they found must be what it found.
   const p = await deps.prepare(runId, open.sandbox);
   for (const k of ["repos", "limit", "baseline", "files", "versions"] as const) {
+    if (JSON.stringify(p[k]) !== JSON.stringify(open[k])) throw new Refused(`the ${k} checked now is not what the run was opened with; open another`);
+  }
+  const head = deps.head();
+  const dist = deps.build();
+  const { file, sha256, answeredBy, results } = await deps.measure(runId, open);
+  const line: ResultLine = { kind: "result", runId, at: deps.now(), head, manifest, dist, answeredBy, result: file, resultSha256: sha256, results };
+  deps.appendAccessLog(`${JSON.stringify(line)}\n`);
+  return line;
+}
+
+// ---------------------------------------------------------------------------------------------
+// #89, the retrospective (RETRO.md v7-v10): its own line, the same access log and counting.
+
+export interface RetroOpenLine {
+  kind: "open";
+  measurement: "#89";
+  runId: string;
+  at: string;
+  head: string;
+  retroVersion: number;
+  manifest: string;
+  model: RequestedModel;
+  reason: string;
+  repos: string[];
+  opened: Record<string, number>;
+  sandbox: Record<string, string>;
+  limit: number;
+  files: Record<string, string>;
+}
+
+export interface RetroPrepared {
+  repos: string[];
+  sandbox: Record<string, string>;
+  limit: number;
+  files: Record<string, string>;
+}
+
+export interface RetroDeps extends Omit<SealedDeps, "prepare" | "measure"> {
+  /** The files changed between `head` and this tree's HEAD. */
+  changedSince(head: string): string[];
+  prepare(runId: string, pinned?: Record<string, string>): Promise<RetroPrepared>;
+  measure(runId: string, open: RetroOpenLine): Promise<{ file: string; sha256: string; answeredBy: unknown[]; results: Record<string, string> }>;
+}
+
+export async function openRetro(deps: RetroDeps, reason: string, retroVersion: number): Promise<RetroOpenLine> {
+  if (!/#89\b/.test(reason)) throw new Refused("a retrospective opening names #89 in its reason (RETRO.md, \"Where records live\")");
+  const model = deps.modelIdentity();
+  if (model === null) throw new Refused("this environment sends judgments nowhere, so the model a sealed run asks for cannot be named");
+  const dirty = deps.dirty();
+  if (dirty.trim() !== "") throw new Refused(`the working tree is not clean, so the manifest would not be the commit the line names:\n${dirty}`);
+  const runId = deps.newRunId();
+  const p = await deps.prepare(runId);
+  if (p.repos.length === 0) throw new Refused("the retrospective has no sealed case to open");
+  // Counted over every measurement's lines: a repository's openings are its own, whoever opened it.
+  const before = allLines(deps.accessLogOnMain(), deps.readAccessLog()).filter((l) => l.kind === "open") as { repos: string[] }[];
+  const opened = Object.fromEntries(p.repos.map((r) => [r, before.filter((l) => l.repos.includes(r)).length + 1]));
+  const line: RetroOpenLine = { kind: "open", measurement: "#89", runId, at: deps.now(), head: deps.head(), retroVersion, manifest: deps.manifest(), model, reason: reason.trim(), repos: p.repos, opened, sandbox: p.sandbox, limit: p.limit, files: p.files };
+  deps.appendAccessLog(`${JSON.stringify(line)}\n`);
+  return line;
+}
+
+export async function runRetro(deps: RetroDeps, runId: string): Promise<ResultLine> {
+  const onMain = deps.accessLogOnMain();
+  const open = onMain === null ? undefined : (lines(onMain) as unknown as RetroOpenLine[]).find((l) => l.kind === "open" && l.runId === runId);
+  if (open === undefined) throw new Refused(`run ${runId} is not opened on origin/main: commit the line \`open\` appended, merge it, then run`);
+  if (open.measurement !== "#89") throw new Refused(`run ${runId} was not opened for #89`);
+  if (allLines(onMain, deps.readAccessLog()).some((l) => l.kind === "result" && l.runId === runId)) throw new Refused(`run ${runId} has run already; open another`);
+  const dirty = deps.dirty();
+  if (dirty.trim() !== "") throw new Refused(`the working tree is not clean, so the build would not be the commit the log names:\n${dirty}`);
+  const model = deps.modelIdentity();
+  if (model === null || JSON.stringify(model) !== JSON.stringify(open.model)) throw new Refused("this environment does not ask the host and model the run was opened with");
+  const manifest = deps.manifest();
+  if (manifest !== open.manifest) throw new Refused("split.json or pool.json is not what the run was opened with; open another");
+  // The tool is built at the opening line's head (RETRO.md "Scoring"): only the line's own merge may lie between.
+  const moved = deps.changedSince(open.head).filter((f) => f !== relative(ROOT, ACCESS_LOG));
+  if (moved.length > 0) throw new Refused(`${moved.length} file(s) changed since the run was opened, so the tool would not be the one it names; open another`);
+  const p = await deps.prepare(runId, open.sandbox);
+  for (const k of ["repos", "limit", "files"] as const) {
     if (JSON.stringify(p[k]) !== JSON.stringify(open[k])) throw new Refused(`the ${k} checked now is not what the run was opened with; open another`);
   }
   const head = deps.head();
@@ -267,6 +348,99 @@ export const realDeps: SealedDeps = {
     return { file: relative(ROOT, file), sha256: sha256(text), answeredBy: answeredByOf(m.jev), results };
   },
 };
+
+/** What #89's `prepare` built in this process, for `measure` to run on. */
+const prepared89 = new Map<string, { work: Work; cases: RetroCase[]; screened: ReturnType<typeof screenedOf> }>();
+
+/** #89's checks and cases (RETRO.md v7-v10), from the sandbox's `batches` at `pinned` or its tip. */
+async function prepareRetro(work: Work, pinned: Record<string, string> | undefined, side: "sealed" | "dev", only: readonly number[] | null) {
+  const commits = fetchSandbox(work, ["batches"], pinned);
+  const view = gitSandbox(work.sandbox);
+  const batchLines = (JSON.parse(readFileSync(join(HERE, "sealed-batches.json"), "utf8")) as { batches: SealedBatch[] }).batches;
+  const problem = recordsProblem(view, commits.batches!, batchLines);
+  if (problem !== null) throw new Refused(problem);
+  const records = recordsOf(view, commits.batches!, batchLines);
+  const verdicts = Object.fromEntries(batchLines.filter((l) => l.measurement === "#89").map((l) => [l.id, l.sha256]));
+  let targets: TargetRecord[];
+  if (side === "sealed") {
+    const frozen = (JSON.parse(readFileSync(join(HERE, "retro", "frozen.json"), "utf8")) as { lines: { side: string; file: string; sha256: string }[] }).lines.find((l) => l.side === "sealed");
+    if (frozen === undefined) throw new Refused("main holds no line of the sealed targets (retro/frozen.json)");
+    const got = frozenProblem(view.file(commits.batches!, frozen.file), frozen, verdicts, expectedRows(records, readSplit(), "sealed"));
+    if (typeof got === "string") throw new Refused(got);
+    targets = got;
+  } else {
+    // Dev: the latest attempt of the target step, read as it is; only the rows asked.
+    const names = view.files(commits.batches!, "batches").filter((f) => /^89-targets-dev-\d+\.json$/.test(f)).sort();
+    if (names.length === 0) throw new Refused("the sandbox holds no dev targets");
+    const f = JSON.parse(view.file(commits.batches!, `batches/${names.at(-1)!}`)!.toString("utf8")) as { cases: TargetRecord[] };
+    targets = f.cases.filter((c) => only!.includes(c.row));
+    if (targets.length !== only!.length) throw new Refused(`rows ${only!.join(", ")} are not all dev cases of the targets`);
+  }
+  const cases = layOut(targets, records, side, work);
+  return { commits, cases, screened: screenedOf(records, readSplit(), side) };
+}
+
+const retroLimit = async (cases: readonly RetroCase[]) => {
+  // Every attempt a case may take (an unfinished run is tried again), so the limit never stops the run midway.
+  const { perRunOf, ATTEMPTS } = await import("../acceptance/run.ts");
+  return cases.filter((c) => c.requirements.length > 0 && c.clone !== "").reduce((n, c) => n + ATTEMPTS * perRunOf(c.requirements.length), 0);
+};
+
+const retroFiles = () => Object.fromEntries(DECIDING.map((f) => [f, sha256(readFileSync(join(ROOT, f)))]));
+
+const onlyOf = (cases: readonly RetroCase[]) => {
+  const m = new Map(cases.filter((c) => c.clone !== "" && c.landed !== null).map((c) => [c.order, namesAt(c.clone, c.landed!.head)]));
+  return (row: number) => m.get(row) ?? (() => false);
+};
+
+export const realRetroDeps: RetroDeps = {
+  ...(({ prepare: _p, measure: _m, ...rest }) => rest)(realDeps),
+  changedSince: (head) => execFileSync("git", ["-C", ROOT, "diff", "--name-only", head, "HEAD"], { encoding: "utf8" }).split("\n").filter(Boolean),
+  prepare: async (runId, pinned) => {
+    const work = workOf(sealedWork(runId));
+    if (pinned !== undefined && existsSync(join(work.root, "started"))) throw new Refused(`run ${runId} was already started in ${work.root}; open again`);
+    const { commits, cases, screened } = await prepareRetro(work, pinned, "sealed", null);
+    const n1 = preflight(work);
+    if (n1.problem !== null) throw new Refused(`before any request: ${n1.problem}`);
+    prepared89.set(runId, { work, cases, screened });
+    return { repos: cases.map((c) => c.repo), sandbox: commits, limit: await retroLimit(cases), files: retroFiles() };
+  },
+  measure: async (runId, open) => {
+    const p = prepared89.get(runId);
+    if (p === undefined) throw new Refused(`run ${runId} was not prepared in this process`);
+    const started = join(p.work.root, "started");
+    if (existsSync(started)) throw new StopRun(`this opening was already started in ${p.work.root}; open again`);
+    writeFileSync(started, new Date().toISOString());
+    const { measure, enumerationAll } = await import("../acceptance/run.ts");
+    const m = await measureRetro(p.work, p.cases, open.limit, measure, enumerationAll);
+    const out = reportOf(m, p.cases, "sealed", onlyOf(p.cases), p.screened);
+    mkdirSync(join(HERE, "logs"), { recursive: true });
+    const file = join(HERE, "logs", `sealed-89-${runId}-report.json`);
+    const text = `${JSON.stringify(out, null, 2)}\n`;
+    writeFileSync(file, text);
+    const results = Object.fromEntries(["jev.json", "adjudication.json", "scored.json"].map((f) => [f, sha256(readFileSync(join(p.work.root, f)))]));
+    console.log(`the logs of the cases are in ${p.work.root}; push them to the sandbox's results branch as results/${runId}/`);
+    return { file: relative(ROOT, file), sha256: sha256(text), answeredBy: answeredByOf(m.jev), results };
+  },
+};
+
+/** #89's rehearsal: the same path on dev rows of the latest dev targets; no opening, no line. */
+async function rehearseRetro(rows: number[], max: number | null) {
+  // The tool the run measures is this tree's, built first: the run reads it from dist/.
+  realDeps.build();
+  const runId = `dev-89-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+  const work = workOf(join(homedir(), ".cctmp", runId));
+  const { cases, screened } = await prepareRetro(work, undefined, "dev", rows);
+  const n1 = preflight(work);
+  if (n1.problem !== null) throw new Refused(`before any request: ${n1.problem}`);
+  const { measure, enumerationAll } = await import("../acceptance/run.ts");
+  // `--max`: a rehearsal may be held under the count it was allowed, below the worst case.
+  const limit = Math.min(await retroLimit(cases), max ?? Number.POSITIVE_INFINITY);
+  const m = await measureRetro(work, cases, limit, measure, enumerationAll);
+  const out = reportOf(m, cases, "dev", onlyOf(cases), screened);
+  writeFileSync(join(work.root, "report.json"), `${JSON.stringify(out, null, 2)}\n`);
+  console.log(JSON.stringify({ work: work.root, rows, score: out.score }, null, 2));
+}
 
 /** The run's own directory, outside the repository: the sandbox clone, the cases, the clones, the logs. */
 const sealedWork = (runId: string) => join(homedir(), ".cctmp", `sealed-${runId}`);
@@ -415,17 +589,32 @@ async function cli(argv: string[]) {
   const at = argv.indexOf("--set");
   const set = at === -1 ? undefined : argv[at + 1];
   const rest = argv.filter((_, i) => i !== at && i !== at + 1);
-  const usage = "usage: run.ts --set dev measure <clones> <limit> | --set dev report [<log>] | --set dev sandbox <row>... | --set sealed open --reason \"<why>\" | --set sealed run <run id>";
+  const usage = "usage: run.ts --set dev measure <clones> <limit> | --set dev report [<log>] | --set dev sandbox <row>... | --set dev retro <row>... [--max <requests>] | --set sealed open [--measurement \"#89\"] --reason \"<why>\" | --set sealed run <run id>";
   try {
     if (set === "dev" && rest[0] === "measure" && rest[1] && rest[2]) return await measureDev(rest[1], Number(rest[2]));
     if (set === "dev" && rest[0] === "report") return console.log(JSON.stringify(report(JSON.parse(readFileSync(rest[1] ?? DEV_LOG, "utf8")), readSplit(), "dev"), null, 2));
     if (set === "dev" && rest[0] === "sandbox" && rest.length > 1) return await rehearse(rest.slice(1).map(Number));
+    if (set === "dev" && rest[0] === "retro" && rest.length > 1) {
+      const at = rest.indexOf("--max");
+      const rows = rest.slice(1).filter((_, i) => at === -1 || (i + 1 !== at && i + 1 !== at + 1)).map(Number);
+      return await rehearseRetro(rows, at === -1 ? null : Number(rest[at + 1]));
+    }
     if (set === "sealed" && rest[0] === "open") {
       const r = rest.indexOf("--reason");
-      const line = await openSealed(realDeps, r === -1 ? "" : (rest[r + 1] ?? ""));
+      const reason = r === -1 ? "" : (rest[r + 1] ?? "");
+      const mm = rest.indexOf("--measurement");
+      const measurement = mm === -1 ? "#80" : rest[mm + 1];
+      if (measurement !== "#80" && measurement !== "#89") throw new Refused(`--measurement is #80 or #89, not ${measurement}`);
+      const line = measurement === "#89" ? await openRetro(realRetroDeps, reason, RETRO_VERSION) : await openSealed(realDeps, reason);
       return console.log(`opened ${line.runId}. Commit ${relative(ROOT, ACCESS_LOG)}, merge it to main, then: run.ts --set sealed run ${line.runId}`);
     }
-    if (set === "sealed" && rest[0] === "run" && rest[1]) return console.log(JSON.stringify(await runSealed(realDeps, rest[1])));
+    if (set === "sealed" && rest[0] === "run" && rest[1]) {
+      // The measurement is the opening line's: a #89 line runs through #89's path.
+      const onMain = realDeps.accessLogOnMain();
+      const line = onMain === null ? undefined : lines(onMain).find((l) => l.kind === "open" && l.runId === rest[1]);
+      if ((line as { measurement?: string } | undefined)?.measurement === "#89") return console.log(JSON.stringify(await runRetro(realRetroDeps, rest[1])));
+      return console.log(JSON.stringify(await runSealed(realDeps, rest[1])));
+    }
     if (set === "sealed") throw new Refused(`the sealed set is run only through \`open\` then \`run\`.\n${usage}`);
     console.error(usage);
     process.exitCode = 2;
@@ -438,7 +627,7 @@ async function cli(argv: string[]) {
     if (!(error instanceof Refused)) {
       // A sealed or rehearsal step's other errors can carry a case's paths or a tool's stderr: they go
       // to a file, and the terminal gets only where.
-      if (set === "sealed" || rest[0] === "sandbox") {
+      if (set === "sealed" || rest[0] === "sandbox" || rest[0] === "retro") {
         const file = join(homedir(), ".cctmp", `run-ts-error-${Date.now()}.txt`);
         writeFileSync(file, error instanceof Error ? (error.stack ?? error.message) : String(error));
         console.error(`failed: ${error instanceof Error ? error.name : "error"}; the details are in ${file}`);

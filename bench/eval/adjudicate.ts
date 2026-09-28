@@ -60,7 +60,7 @@ export interface Item {
 }
 
 const collapse = (s: string) => s.replace(/\s+/g, "");
-const keyOf = (f: { file: string; function: string; call: string }) => `${f.file.replace(/^(?:\.\/|[ab]\/)/, "")}\0${f.function.split("::").at(-1)!.trim()}\0${collapse(f.call)}`;
+export const keyOf = (f: { file: string; function: string; call: string }) => `${f.file.replace(/^(?:\.\/|[ab]\/)/, "")}\0${f.function.split("::").at(-1)!.trim()}\0${collapse(f.call)}`;
 
 /**
  * The findings of a correct version that need a label: of jev's top five and the baseline's five, in the
