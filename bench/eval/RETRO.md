@@ -78,6 +78,14 @@ commit holding the batch's sha256): **13 sealed, 6 dev**. The case caught before
 sealed side, so 12 of the 13 count toward the 17. Sealed is short of 17, so the next batch reads on from
 row 101.
 
+**Batch `b2`** (rows 101 to 200, 2026-09-28): 77 repositories read, 23 with a case — 3 caught before
+the merge. Of the 23, 16 had a requirement written and kept by the check, 6 had none the writer could
+write, 1 had a gap in O's bundle. Left out: 33 screened as not failure handling, 6 as propagating, 2 as
+other and 2 as `cannot_label`, 13 without O, 3 whose fix's material was not complete, 2 not pull
+requests, 1 whose screen request was over the size, and 15 rows of a repository that had its case
+(b1's among them). 339 annotator runs of the 500 allowed (owner); the run was stopped once by the owner
+at row 172 and resumed there. Its repositories are placed once this line is on main.
+
 ## The question
 
 Would jev-intent-review, run on a pull request as it was when it merged, have listed a real
