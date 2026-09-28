@@ -863,6 +863,19 @@ wander by seconds. A first version that read the receiver of every method call b
 took whatsapp-rust#759 from 8.6 s to 25.1 s; the receiver is read only where the name alone does not
 settle the call now.
 
+With Jev, on moltis#1064's six versions, three runs each (`bench/logs/acceptance-v5.json`,
+`node bench/acceptance/run.ts measure moltis-1064 <clone> 2400 callee`, 858 requests, every run
+finished): defect-C's target — `complete(&messages, &[])` in `generate_title`, a function neither
+changed nor calling one that is — was listed in **3 runs of 3**, from `called_by_changed` via
+`generate_title_for_session`, Jev reading the function as returning success when that call fails. In
+the other five versions the same call was asked every run and read as returning the error, and
+listed in none. The rule for a call listed from this origin was written before the run (the pull
+request's body): right only if that version's code turns the failure into a success and the call is
+on the path of generating the session title. The three listed are defect-C's own; nothing else was
+listed from it. The targets A and B read as before: defect-A and defect-B listed 3 of 3, the shipped
+code and rewrite-A 0 of 3, hidden-A's A not asked. One case and one kind of defect: this shows the
+path reaches such a defect, not how often it does.
+
 ### What another push would not have to ask again
 
 Whether keeping a pull request's answers would save anything, measured before anything keeps them
