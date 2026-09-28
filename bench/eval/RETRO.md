@@ -337,7 +337,12 @@ the ones of `BASELINE.md`, and are not these.)
   were defects outside Rust (a workflow, a shell script, a benchmark's configuration) that the tool
   cannot list, one was no failure-handling defect, one had its call in a file F created, one was over
   the size. The first change gives the annotators Rust files only and asks for a Rust call with its
-  parentheses (`TARGET_PROMPTS_VERSION` 2).
+  parentheses (`TARGET_PROMPTS_VERSION` 2). The second dev attempt named 6 of 13: the five not named for
+  having no Rust file of F are the three defects outside Rust, the call in the file F created, and one
+  the first attempt had named in TypeScript, which the tool could never have listed; the others are the
+  one that was no failure-handling defect and the one over the size. So both attempts named the same six
+  targets the tool can list. What stands in the way is not the prompt's wording, so the second change is
+  not used, and the sealed targets are named with version 2 (owner, 2026-09-28).
 
 ## Scoring
 
