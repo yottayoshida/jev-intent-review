@@ -1,0 +1,82 @@
+{
+  "measurement": "#89",
+  "retroVersion": 10,
+  "side": "sealed",
+  "repositories": 17,
+  "score": {
+    "cases": 17,
+    "detected": 0,
+    "primary": {
+      "rate": 0,
+      "lower": 0,
+      "upper": 0.19506432296910248
+    },
+    "gate": {
+      "lowerAbove": 0.2,
+      "guards": false,
+      "passed": false
+    },
+    "withRequirement": {
+      "cases": 14,
+      "detected": 0,
+      "rate": 0
+    },
+    "stages": {
+      "requirement": 14,
+      "covered": 0,
+      "listed": 0,
+      "listedNotCovered": 0,
+      "shares": {
+        "requirement": {
+          "rate": 0.8235294117647058,
+          "lower": 0.5656821271557249,
+          "upper": 0.9620149319293603
+        },
+        "covered": {
+          "rate": 0,
+          "lower": 0,
+          "upper": 0.23163576165009658
+        },
+        "listed": null
+      }
+    },
+    "guards": {
+      "falsePerPullRequest": 0,
+      "precision": null,
+      "runCases": 14
+    },
+    "notNamed": {
+      "a request over the size": 4,
+      "no call is named": 2,
+      "O cannot be read": 1,
+      "no file of the fix at O's head": 1
+    },
+    "noRequirement": 3,
+    "notFoundAtHead": 1,
+    "unfinished": 0,
+    "byOrigin": {
+      "blame": {
+        "cases": 17,
+        "detected": 0
+      }
+    },
+    "reach": {
+      "inDiff": 0,
+      "outsideDiff": 0
+    },
+    "cost": {
+      "requests": 3763,
+      "bytes": 14180259,
+      "seconds": 2364.996,
+      "runs": 42,
+      "longestRunSeconds": 162.438,
+      "runsOver600Seconds": 0
+    }
+  },
+  "screened": {
+    "cases": 28,
+    "caughtBeforeMerge": 4,
+    "checksUnknown": 3
+  },
+  "adjudicationFailures": 0
+}
