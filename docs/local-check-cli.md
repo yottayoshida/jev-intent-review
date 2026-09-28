@@ -67,9 +67,9 @@ the GitHub Action should act on it is #41's).
 ## What it asks
 
 For each requirement it takes the Rust functions the change touched and the functions that call
-them, one hop out, and every call inside those functions — and, last and under a budget of their
-own, the other callers of the repository functions the changed code calls (*The siblings of a
-change* below). Which of those calls can be asked about, and what is asked, is the requirement's
+them, one hop out, and every call inside those functions — and, last and under budgets of their
+own, the bodies of the repository functions the changed code calls (*What the changed code calls*
+below) and those functions' other callers (*The siblings of a change* below). Which of those calls can be asked about, and what is asked, is the requirement's
 form. Each askable call, up to the budgets below — 20 per requirement in the functions the change
 touched, and 10 and what those left in their callers — gets two questions to Jev, in separate requests: whether the requirement requires
 something of this call (`applies` / `does_not_apply` / `unknown`), and what the function does under
@@ -158,12 +158,36 @@ the Action's check run count the siblings with everything else: a sibling's call
 read. A sibling's set-aside and left-over calls are under *Not checked*, so the check run can be neutral
 where it was green, and a finding in a sibling is a finding for `policy.fail_on`.
 
+### What the changed code calls
+
+**The body of each seed above — a function of this repository the changed code calls, whose call
+settles at one definition here that returns a `Result`, is not a changed function and is used in at
+most 20 files, at most 8 of them — is read for its own calls, under a budget of its own, 10 per
+requirement** (#37, ADR 0028). They are asked after the functions the change touched, their callers
+and the changes' questions, and before the siblings: one function at a time in seed order, each
+body's calls in the order they are written. A body already listed one hop out (a caller of a changed
+function) is not listed again, and a body is not also a sibling, so no call is listed by both budgets. A seed only a removed line calls
+has no body read here: the changed code calls it no more. One step down only: what a body calls is not
+read.
+
+- In `--json` these calls carry `origin: called_by_changed` and `via`, the changed function that calls
+  the seed (the first read, where several do), and so does a finding in one; `counts.calledByChanged`
+  counts them apart, in the terms `counts.siblings` uses. The report counts them in lines of their own
+  and says "**Reached as**: called by the change" on a finding.
+- The report's first line and the Action's check run count them with everything else. A body's
+  set-aside and left-over calls are under *Not checked*, so a check run can be neutral where it was
+  green.
+- **Not reached:** a defect two calls down; in a helper the changed code calls from more than 20 files,
+  or past the eighth seed; in a trait's method or a function per platform the change calls (those are no
+  seeds).
+
 ### The budget
 
 **The functions the change touched and the functions that call them have a budget each — 20 calls
 per requirement, and at least 10 plus what the first leaves — and in the callers' budget the calls
 into a function the change touched are asked first, whichever caller they are in** (ADR 0015).
-Together the two ask at most 30 calls a requirement; the siblings' 10 are apart from both.
+Together the two ask at most 30 calls a requirement; the 10 of what the changed code calls and the
+siblings' 10 are apart from both.
 
 **Every function the run reads — changed, a caller one hop out, or a sibling — has its calls listed
 up to 1,000 before any budget orders them, and what that cap leaves out is counted in the notes**
@@ -372,6 +396,16 @@ call, an enum's variant, a call's written return type (three steps deep). A fiel
 closure's parameter or a pattern is not read, and neither is what a `Box`, `Rc` or `Arc` holds — the
 call is set aside. A standard-library type is never this repository's: a `v.len()` on a `Vec` is `Vec`'s,
 whatever trait here implements `len` for it. Nothing is settled here that the reading above had not.
+
+**A method called on `dyn T` or `impl T` is looked for in `T`** (#37, ADR 0028). When `x` in
+`x.name(…)` is written — past `&`, `Box`, `Rc` and `Arc` — as `dyn T` or `impl T` (read as far as the
+paragraph above reads: a parameter, a `let` with a written type or set from a call, a call's written
+return type) and `T` is a trait of this repository, the definitions are `T`'s declaration of `name` and
+the `name` of every `impl T for …` outside tests, found from the trait's side where the name alone
+does not settle the call (more than one definition, or a search cut short). A name several traits declare, or one defined more than 20 times, is then read as `T`'s
+versions, and all of them must return a `Result` as above. A name `T` does not declare (a
+supertrait's), one also written in `impl dyn T`, or a search cut short leaves the call to the readings
+above; a method named like one of the standard library's stays under the paragraph above.
 
 How often each of these settles the definition rust-analyzer settles, and where it does not, is recorded
 in `docs/resolution.md`; which relations are trusted is ADR 0025's.

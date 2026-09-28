@@ -47,13 +47,23 @@ export function bindingAt(bindings: readonly Binding[], name: string, line: numb
 
 /** The written type's head path (`&mut CostContext<T>` → `["CostContext"]`), or null for what has none (`impl Trait`, `dyn T`, a tuple, a slice). */
 export function headPath(type: string): string[] | null {
+  const t = stripRefs(type);
+  if (/^(dyn|impl)\b/.test(t) || !/^[A-Za-z_]/.test(t)) return null;
+  return pathOf(t);
+}
+
+/** A written type past its references, lifetimes and `mut` (`&'a mut X` → `X`). */
+function stripRefs(type: string): string {
   let t = type.trim();
   for (;;) {
     const next = t.replace(/^&\s*('\w+\s+)?(mut\s+)?/, "").replace(/^'\w+\s+/, "").trim();
-    if (next === t) break;
+    if (next === t) return t;
     t = next;
   }
-  if (/^(dyn|impl)\b/.test(t) || !/^[A-Za-z_]/.test(t)) return null;
+}
+
+/** The path a type begins with (`a::B<C>` → `["a", "B"]`), or null. */
+function pathOf(t: string): string[] | null {
   const path = /^((?:[A-Za-z_]\w*\s*::\s*)*[A-Za-z_]\w*)/.exec(t)?.[1];
   return path ? path.split("::").map((s) => s.trim()) : null;
 }
@@ -90,6 +100,50 @@ export async function receiverType(receiver: Receiver, ctx: ReceiverContext, dep
     case "unread":
       return null;
   }
+}
+
+/**
+ * The trait a receiver is written as — `dyn T` or `impl T`, past `&`, `Box`, `Rc` and `Arc` — when `T`
+ * is a trait of this repository, or null (#37, ADR 0028). Read as far as `receiverType` reads: a
+ * parameter or `let` with a written type, a `let` set from a call or a name, a call's written return type.
+ */
+export async function receiverTrait(receiver: Receiver, ctx: ReceiverContext, depth = 0): Promise<string | null> {
+  if (depth >= DEPTH) return null;
+  switch (receiver.kind) {
+    case "name": {
+      const b = bindingAt(ctx.parsed.bindings, receiver.name, ctx.line);
+      if (!b || b.unread) return null;
+      if (b.type) return traitFromText(b.type, ctx.fn.path, ctx.line, ctx);
+      return b.value ? receiverTrait(b.value, ctx, depth + 1) : null;
+    }
+    case "call": {
+      const def = await ctx.settle(receiver.line, receiver.startColumn, depth + 1);
+      if (!def) return null;
+      const signature = await returnTypesFor(ctx.discoverer).signature(def.path, def.line, def.name);
+      return signature.ok ? traitFromText(signature.returns, def.path, def.line, ctx) : null;
+    }
+    default:
+      return null;
+  }
+}
+
+/** The trait path a written type names as `dyn T` or `impl T` (`&Arc<dyn T + Send>` → `["T"]`), or null for any other type. */
+export function writtenTrait(type: string): string[] | null {
+  let t = type.trim();
+  for (;;) {
+    const bare = stripRefs(t);
+    const held = /^(?:(?:std|alloc)::(?:boxed|rc|sync)::)?(?:Box|Rc|Arc)\s*<([\s\S]*)>$/.exec(bare)?.[1]?.trim() ?? bare;
+    if (held === t) break;
+    t = held;
+  }
+  const path = /^(?:dyn|impl)\s+(.*)$/s.exec(t)?.[1];
+  return path ? pathOf(path) : null;
+}
+
+/** The name when it is one of this repository's; whether a `trait` of it declares the method is the caller's to find. */
+async function traitFromText(type: string, file: string, line: number, ctx: ReceiverContext): Promise<string | null> {
+  const path = writtenTrait(type);
+  return path ? repositoryType(path, file, line, ctx) : null;
 }
 
 /** `Self` at `file`:`line`: the type of the `impl` around it, when that is one of this repository's. */

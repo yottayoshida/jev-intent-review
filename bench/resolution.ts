@@ -26,9 +26,10 @@ import { pathFilter } from "../src/config/glob.ts";
 import { analyzeChange } from "../src/change/seeds.ts";
 import { Discoverer, isTestPath, refuseWord } from "../src/discovery/discover.ts";
 import { isSensitivePath } from "../src/evidence/redact.ts";
-import { calleeOf, declaredForTestsOnly, targetOf, type CalleeLocation } from "../src/plan/applicability.ts";
+import { calleeOf, declaredForTestsOnly, targetOf, throughTraitOf, type CalleeLocation } from "../src/plan/applicability.ts";
 import type { CallCandidate, FunctionCandidate } from "../src/plan/candidates.ts";
 import { CandidateFiles, COMMON_FILES, isRust, MAX_CALLER_FUNCTIONS, MAX_HOP_NAMES, readListing, readsAsCall, sitesFromChange } from "../src/plan/from-diff.ts";
+import { itemHead, returnTypesFor } from "../src/plan/result-type.ts";
 import { Git } from "../src/repository/git.ts";
 import { isMethodCandidate } from "./call-oracle/classify.ts";
 import { clopperPearson, estimateOver } from "./eval/metrics.ts";
@@ -450,6 +451,47 @@ interface Row {
   column: number;
 }
 
+/**
+ * Every listed call `calleeOf` reads through a trait (#37, ADR 0028), not a sample: a call it does not
+ * read so takes the path it took before, so these are the only calls whose answer can have moved.
+ * Each is classified against rust-analyzer like `measure`'s rows. Writes
+ * bench/logs/resolution-trait-<material name>.json.
+ */
+async function throughTrait(materialPath: string): Promise<void> {
+  const material = JSON.parse(readFileSync(materialPath, "utf8")) as Material;
+  const seen = new Set<string>();
+  const rows: Row[] = [];
+  let listedMethods = 0;
+  for (const k of material.cases) {
+    const s = await setting(k);
+    const { oracle } = oracleFor(k, s.dir);
+    const listed = await listedCalls(s, k.commit, oracle, seen);
+    const indexed = (path: string) => oracle.files.has(path);
+    for (const c of listed.calls) {
+      if (c.form !== "method") continue;
+      listedMethods += 1;
+      if (!(await throughTraitOf(s.discoverer, c.fn, c.call))) continue;
+      const product = await calleeOf(s.discoverer, c.fn, c.call);
+      const answer = oracleAnswer(oracle, oracle.at(c.path, c.call.line, c.nameColumn));
+      const cls = classifyCall(product, answer, indexed);
+      // The trait on both sides, by name: `dispatch` alone does not say it is the same trait.
+      const first = product.at && product.at.kind !== "outside" ? await returnTypesFor(s.discoverer).enclosing(product.at.path, product.at.line) : null;
+      const head = first?.kind === "item" ? itemHead(first.text) : null;
+      const productTrait = head?.kind === "trait" ? head.name : null;
+      const oracleTrait = "symbol" in answer ? (/([A-Za-z_]\w*)#[A-Za-z_]\w*\(\)\.?$/.exec(answer.symbol)?.[1] ?? null) : null;
+      rows.push({ case: k.case, repo: k.repo, path: c.path, line: c.call.line, callee: c.call.callee, form: c.form, asked: (await targetOf(s.discoverer, c.fn)) === null, class: cls, product: product.at, oracle: "symbol" in answer ? answer.symbol : answer.kind, column: c.nameColumn, productTrait, oracleTrait } as Row & { productTrait: string | null; oracleTrait: string | null });
+    }
+    console.log(`${k.case}: ${rows.filter((r) => r.case === k.case).length} read through a trait`);
+  }
+  const byClass: Record<string, number> = {};
+  for (const r of rows) byClass[r.class.class] = (byClass[r.class.class] ?? 0) + 1;
+  const named = rows as (Row & { productTrait: string | null; oracleTrait: string | null })[];
+  const traits = { same: named.filter((r) => r.productTrait !== null && r.productTrait === r.oracleTrait).length, differ: named.filter((r) => r.productTrait !== null && r.oracleTrait !== null && r.productTrait !== r.oracleTrait).length, unnamed: named.filter((r) => r.productTrait === null || r.oracleTrait === null).length };
+  const out = { what: "#37 (ADR 0028): every listed method call read through a trait — its versions from the trait's side — against rust-analyzer, and the trait named on each side. Not a sample.", material: material.name, listedMethods, readThroughTrait: rows.length, byClass, traits, rows };
+  writeFileSync(join(HERE, `bench/logs/resolution-trait-${material.name}.json`), `${JSON.stringify(out, null, 1)}\n`);
+  console.log(JSON.stringify({ listedMethods, readThroughTrait: rows.length, byClass, traits }));
+}
+
 async function measure(materialPath: string, broken: boolean): Promise<void> {
   const material = JSON.parse(readFileSync(materialPath, "utf8")) as Material;
   const seen = new Set<string>();
@@ -778,6 +820,7 @@ if (import.meta.main) {
   else if (command === "denominators" && arg) await denominators(arg);
   else if (command === "measure" && arg) await measure(arg, flag === "--broken");
   else if (command === "rustc" && arg) await rustc(arg);
+  else if (command === "trait" && arg) await throughTrait(arg);
   else if (command === "fixtures") fixtures();
   else {
     console.error("usage: node bench/resolution.ts index|denominators|measure|rustc <material.json> [--broken] | fixtures");

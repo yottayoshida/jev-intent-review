@@ -9,6 +9,7 @@ import { openRetro, Refused, runRetro, type RetroDeps, type RetroPrepared } from
 import { caseFiles, foundAt, frozenProblem, measureRetro, recordsProblem, reportOf, screenedOf, type RetroCase } from "../bench/eval/retro/run89.ts";
 import type { RowRecord } from "../bench/eval/retro/screen.ts";
 import type { TargetRecord } from "../bench/eval/retro/target.ts";
+import { perRunOf } from "../bench/acceptance/run.ts";
 import { workOf } from "../bench/eval/sealed.ts";
 import { validateIntentSpec } from "../src/intent/schema.ts";
 
@@ -112,7 +113,7 @@ test("the run measures every case with a requirement, always, and adjudicates th
       return { decided: Object.fromEntries(items.map((i) => [i.n, i.call.startsWith("open") ? "real_defect" : "false"])) };
     }) as never;
     const m = await measureRetro(f.work, [c, noReq, unread], 999, measure as never, async () => [{ requirementId: "R1", wouldAsk: [finding("read(p)")] }], adj);
-    assert.deepEqual(measured, [{ id: "c89-7", always: true, perRun: 176 }]);
+    assert.deepEqual(measured, [{ id: "c89-7", always: true, perRun: perRunOf(2) }]);
     // The unfinished run's call is not adjudicated; `open(q)` goes under R1, `close(r)` under R2.
     assert.deepEqual(asked, [
       { reqText: "one", calls: ["open(q)"], claims: ["claim open(q)"] },

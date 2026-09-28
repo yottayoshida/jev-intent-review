@@ -49,6 +49,19 @@ export interface Seed {
   files: number;
   /** Where its one definition is: `path:line`. */
   definedAt: string;
+  /**
+   * The changed function whose call made it a seed, the first read (#37, ADR 0028). Absent for a name only
+   * a removed line calls: the changed code calls it no more, so its body is not read as called by the change.
+   */
+  from?: string;
+}
+
+/** A seed's own body, read for its calls (origin `called_by_changed`, #37, ADR 0028). */
+export interface CalleeBody {
+  fn: FunctionCandidate;
+  candidates: Candidates;
+  /** The changed function that calls it. */
+  via: string;
 }
 
 export interface Sibling {
@@ -62,6 +75,8 @@ export interface Sibling {
 
 export interface SiblingSet {
   seeds: Seed[];
+  /** The seeds' own bodies that no earlier budget reads (#37, ADR 0028). */
+  bodies: CalleeBody[];
   siblings: Sibling[];
   notes: string[];
   /**
@@ -147,7 +162,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   // one, by the name alone where only a removed line held it. A method name the standard library uses
   // too is settled by what each call is made on (#83, ADR 0027), so every call of it is read: calls of
   // it that settle apart, or one that does not settle, leave the name unsettled — never a seed.
-  const settled = new Map<string, { at: CalleeLocation; returns: boolean; regions: number }>();
+  const settled = new Map<string, { at: CalleeLocation; returns: boolean; regions: number; from?: string }>();
   for (const { fn, candidates } of changedSites) {
     const seen = new Set<string>();
     for (const call of candidates.calls.filter((c) => c.functionId === fn.id)) {
@@ -167,7 +182,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
         if (JSON.stringify(prior.at) !== JSON.stringify(at)) settled.set(name, { ...prior, at: null, returns: false });
         continue;
       }
-      settled.set(name, { at, returns: result.ok, regions: 1 });
+      settled.set(name, { at, returns: result.ok, regions: 1, from: fn.name });
     }
   }
   const reader = returnTypesFor(discoverer);
@@ -234,7 +249,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
       common.push(name);
       continue;
     }
-    candidates.push({ name, onChangedLine: onChanged.has(name), regions: entry.regions, files: spread, definedAt: `${at.path}:${at.line}` });
+    candidates.push({ name, onChangedLine: onChanged.has(name), regions: entry.regions, files: spread, definedAt: `${at.path}:${at.line}`, ...(entry.from === undefined ? {} : { from: entry.from }) });
   }
   const onlyInTests = [...inTests].filter((n) => !settled.has(n)).sort();
 
@@ -252,6 +267,31 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   if (beyondSearch.length > 0) left(`siblings: ${named("names have more references than the search returns and were not followed", beyondSearch)}`);
   if (refused.length > 0) left(`siblings: ${named("names could not be searched", refused)}`);
   if (leftOut.length > 0) left(`siblings: ${named(`seeds over the cap of ${MAX_SEEDS} were not followed`, leftOut)}`);
+
+  // The seeds' own bodies (#37, ADR 0028): a function an earlier budget reads is not added.
+  const bodies: CalleeBody[] = [];
+  const bodyNotFound: string[] = [];
+  for (const seed of seeds) {
+    if (seed.from === undefined) continue;
+    const path = seed.definedAt.slice(0, seed.definedAt.lastIndexOf(":"));
+    const listing = await files.of(path);
+    if (!listing) {
+      left(`callees of the change: ${path} could not be read here, so the calls of ${redact(seed.name).text} are not read`);
+      continue;
+    }
+    const fn = listing.functions.find((f) => `${f.path}:${f.startLine}` === seed.definedAt);
+    if (!fn) {
+      bodyNotFound.push(seed.name);
+      continue;
+    }
+    if (known.has(fn.id)) continue;
+    if (listing.omitted.calls > 0) left(`callees of the change: ${path}: ${listing.omitted.calls} calls were left out of the listing by its cap`);
+    if (listing.omitted.unreadLines > 0) left(`callees of the change: ${path}: ${listing.omitted.unreadLines} lines the parser could not read were left out of the listing`);
+    bodies.push({ fn, candidates: listing, via: seed.from });
+  }
+  // A body is read as called by the change and is no sibling as well: no call is listed by both budgets.
+  const bodyIds = new Set(bodies.map((b) => b.fn.id));
+  if (bodyNotFound.length > 0) left(`callees of the change: ${named("seeds' bodies are not in the listing of their file, so their calls are not read", bodyNotFound)}`);
 
   const siblings: Sibling[] = [];
   const taken = new Set<string>();
@@ -286,7 +326,7 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
       // And the lines its parser could not read (#83), which may hold a call to the seed.
       if (listing.omitted.unreadLines > 0) unreadLines.set(path, listing.omitted.unreadLines);
       for (const fn of listing.functions) {
-        if (`${fn.path}:${fn.startLine}` === seed.definedAt || known.has(fn.id) || taken.has(fn.id) || turnedAway.has(fn.id)) continue;
+        if (`${fn.path}:${fn.startLine}` === seed.definedAt || known.has(fn.id) || bodyIds.has(fn.id) || taken.has(fn.id) || turnedAway.has(fn.id)) continue;
         if (index.testRegions.some((r) => fn.startLine >= r.start && fn.startLine <= r.end)) continue;
         // A changed function the one-hop listing's caps left out is not in `known`, and is still
         // changed: it is no sibling, whatever it calls.
@@ -346,5 +386,5 @@ export async function siblingsOf(files: CandidateFiles, discoverer: Discoverer, 
   for (const [path, n] of capped) left(`siblings: ${path}: ${n} calls were left out of the listing by its cap`);
   for (const [path, n] of unreadLines) left(`siblings: ${path}: ${n} lines the parser could not read were left out of the listing`);
 
-  return { seeds, siblings, notes, unreached };
+  return { seeds, bodies, siblings, notes, unreached };
 }
