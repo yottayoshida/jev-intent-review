@@ -1,4 +1,4 @@
-# The retrospective measurement, version 6 (issue #89)
+# The retrospective measurement, version 9 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -53,6 +53,24 @@ toward going on. The steps and bytes of a request not sent are kept in the row's
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
 
+**Version 9** (while the sealed targets were being named, eight named and none of them read) adds a
+reason a target is not named: an O that GitHub no longer has. The naming stopped on it at its ninth case
+— the pull request answers 404, so its range cannot be taken — and the screen had counted the same
+thing as a gap in O's bundle. It is counted against the tool, as every other reason is, and the naming
+goes on from the ninth case; the eight before it are not asked again (owner, 2026-09-28).
+
+**Version 8** (before any target was named) takes out, for the sealed targets, the runs the command
+printed: the number of answers that reached the checker could be worked out from them, and with it how
+many targets were named. Nothing about scoring changes.
+
+**Version 7** (after `b2` and its placing, before any target was named or any sealed case opened, and
+before any tool was run on one) writes down how a case is scored, all of it before anything that could
+show a result: which 17 are opened, the tool's one version, how the defect's call — the target — is
+named from F and frozen, how it is matched against what the tool lists, how the guards and the cost are
+counted, and what is reported (below, "Opening and targets" and "Scoring"). The target is named by an
+annotator and checked by another (owner, 2026-09-28); only their answer is frozen, and the tool first
+meets a sealed case inside its run.
+
 **Version 6** (after `b1`, before any repository was placed) changes when this measurement's opening is
 written and where its cases stay; nothing about how a row is examined. `run.ts` no longer opens every
 sealed repository of `split.json`: #80's opening takes #80's repositories only (`sealed.ts`, `openSet`,
@@ -77,6 +95,24 @@ Its 19 case repositories are placed by the salt `52d60c0` (the merge of #127, th
 commit holding the batch's sha256): **13 sealed, 6 dev**. The case caught before the merge is on the
 sealed side, so 12 of the 13 count toward the 17. Sealed is short of 17, so the next batch reads on from
 row 101.
+
+**Batch `b2`** (rows 101 to 200, 2026-09-28): 77 repositories read, 23 with a case — 3 caught before
+the merge. Of the 23, 16 had a requirement written and kept by the check, 6 had none the writer could
+write, 1 had a gap in O's bundle. Left out: 33 screened as not failure handling, 6 as propagating, 2 as
+other and 2 as `cannot_label`, 13 without O, 3 whose fix's material was not complete, 2 not pull
+requests, 1 whose screen request was over the size, and 15 rows of a repository that had its case
+(b1's among them). 339 annotator runs of the 500 allowed (owner); the run was stopped once by the owner
+at row 172 and resumed there. Its repositories are placed by the salt `6924dc7` (the merge of #135):
+**22 of its 23, 15 sealed and 7 dev**. The 23rd, `randomcash/ethpayserver`, had a row read in `b1` that
+was no case and a row in `b2` that was; `PROTOCOL.md` rule 5 salts a repository by the first batch that
+read one of its rows, so that its side is drawn once, and `b1` kept 19 without it. It is not placed and
+its case is not used (owner, 2026-09-28): neither rule was changed to fit one repository, and its side
+was not looked at before deciding. `b2` therefore has 22 of its `kept` 23 on the split, and
+`screen.ts` refuses a next batch — which the cap does not call for.
+
+**The sealed side now holds 24 repositories with a case not caught before the merge (b1's 12, b2's
+15 less the 3 caught), over the 17 the cap stops at**, so no further batch is read. Which 17 are opened is
+written in version 7 (below, "Opening and targets").
 
 ## The question
 
@@ -271,18 +307,87 @@ the ones of `BASELINE.md`, and are not these.)
    leave out fewer cases, and so move the primary metric in the tool's favour.
 4. The requirement that passes is frozen before the tool runs on O.
 
+## Opening and targets
+
+- **The cases opened** are this measurement's sealed repositories on `split.json` whose case was not
+  caught before the merge, in the order of their case's row, the first 17 (owner, 2026-09-28). For
+  this measurement this takes the place of `PROTOCOL.md` rule 7, which does not set cases caught before
+  the merge aside first. The rest are not opened and not counted as opened. The run works the 17 out
+  again from the verdicts and the split and refuses when they differ from the list frozen with the
+  targets (`batches/89-targets.json`).
+- **The target** of a case — the defect's call in O — is named by an annotator (`TARGET_SYSTEM`, the
+  annotators of "Writing and checking the requirement": `claude -p`, no tools, a fixed prompt). It is
+  given F's bundle (title and description), F's diff, and each Rust file F changed as it stands at the head
+  O is measured at (below, "A case is measured") — under F's base name when F renamed it — and answers with one call as `{file, function, call, quote}`.
+  Another annotator (`TARGET_CHECK_SYSTEM`) is given the same and the answer, and says whether that is
+  the call F fixed. A request over the size of version 5 is not sent. An answer that cannot be counted is
+  asked again three times; an answer never counted here makes the target not named (where the
+  screen, above, stops instead: a target is one case's, and nothing downstream waits on it). **A case
+  whose target is not named** — the checker does not agree, no call is named, a call without `(`, a
+  request over the size, an answer never counted, or an O that GitHub no longer has (version 9) — is
+  not detected in the primary metric, and
+  counted apart. So is one whose target the run does not find in O's head before measuring: no file
+  whose path ends, segment by segment, with the target's, no function of that name in it, or no call
+  in that function that matches the target (below).
+- **Only the answer is frozen.** No tool is run on a sealed case before its opening (`PROTOCOL.md` rule
+  3). The answers go to the sandbox's `batches` branch as `batches/89-targets.json`, which also holds
+  the sha256 of `b1`'s and `b2`'s verdicts; its sha256 goes on main in `bench/eval/retro/frozen.json`,
+  lines only added. **The sealed targets are named once.** For the sealed ones the command prints the sha256 and
+  whether the runs stayed within those allowed — not how many were named, nor its runs, from which the
+  number of answers that reached the checker, and so how many could be named, can be worked out (version
+  8); both are written in the sandbox. A case is named once: a run that stops keeps each case named so
+  far and a later one goes on from the next, and a line of `frozen.json` for them refuses a new naming. Naming
+  them again is a new version of this file. Before the sealed ones, the step is tried on this
+  measurement's dev cases and its yield counted; below two in three named there, `TARGET_SYSTEM` is
+  changed on dev before the sealed ones are named — at most twice; after that the sealed ones are
+  named with it as it is. The first dev attempt (2026-09-28) named 7 of 13; of the six not named, three
+  were defects outside Rust (a workflow, a shell script, a benchmark's configuration) that the tool
+  cannot list, one was no failure-handling defect, one had its call in a file F created, one was over
+  the size. The first change gives the annotators Rust files only and asks for a Rust call with its
+  parentheses (`TARGET_PROMPTS_VERSION` 2). The second dev attempt named 6 of 13: the five not named for
+  having no Rust file of F are the three defects outside Rust, the call in the file F created, and one
+  the first attempt had named in TypeScript, which the tool could never have listed; the others are the
+  one that was no failure-handling defect and the one over the size. So both attempts named the same six
+  targets the tool can list. What stands in the way is not the prompt's wording, so the second change is
+  not used, and the sealed targets are named with version 2 (owner, 2026-09-28).
+
 ## Scoring
 
-- **The tool's version** is main at the commit the batch's requirements were frozen at, with Jev's
-  alias and the versions the host named (`#84`'s `modelIdentity`), recorded with each run.
-- **A detection**: the defect's call in O is listed in 3 runs of 3, as `PROTOCOL.md` counts.
+- **The tool's version** is the head of the opening line (`run.ts`'s): the tool is built there, and
+  enumerates and lists every case at that one version (version 7; up to version 6 it was main where each
+  batch's requirements were frozen, which is two commits for two batches). Jev's alias and the versions
+  the host named (`#84`'s `modelIdentity`) are recorded with each run.
+- **A case is measured** on what O put on the default branch: from the parent of the first commit O
+  brought onto it, following first parents, to the last — its merge commit when merged with one, its one
+  commit when squashed, the last of its commits when rebased (a pull request merged with a merge commit
+  has its head already on the branch, so a merge base with it would be O's head itself). A case without
+  a requirement is not run.
+- **Matching the target** against a run's list, at the run's version: the file when one path ends,
+  segment by segment, with the other — the shorter of the two with at least two segments, unless it names
+  the only file of that name at that version; the function by the last segment of its path; and the call
+  once both calls are brought to the same form — spaces taken out, a final `?` or `.await` dropped, a
+  receiver before the called name at the top level (such as `self.`) taken off, and a path before it cut
+  to its last segment (`crate::a::Foo::new(x)` to `Foo::new(x)`), since the tool lists a call without its
+  receiver and an annotator quotes it as written. When only one side has a path, the path is taken off
+  that side. The two forms must then be equal on their first 200 characters (the tool keeps no more of a
+  call), so `or(x)` does not match `unwrap_or(x)`, `a::f(x)` does not match `b::f(x)`, and the inner half
+  of a nested call does not match the outer. A call with no `(` never matches. Every requirement's
+  list counts, and all of it (not the first five, which `compare.ts` keeps for `#88`); a run in which two
+  listed rows match is one hit.
+- **A detection**: the defect's call in O is listed in 3 runs of 3 — under any requirement in each, not
+  necessarily the same one. A case whose three runs did not all finish in five attempts is not
+  detected, counted apart, and the run goes on to the next case: for this measurement this takes the
+  place of `PROTOCOL.md`'s stopping the run, since a case's attempts are its own and the openings are
+  counted for good.
 - **The primary metric**: detections over **every case that was not caught before the merge —
   including those whose requirement could not be written or was left out by the check, counted as
   not detected** (owner, 2026-09-25) — a requirement not sent for its size (version 5) among them. The tool does nothing without a requirement, so a case where one
   could not be written is a defect it would not have listed. The rate over only the cases with a
   requirement is reported beside it.
 - **Stages**, with the same interval: the share of cases with a requirement, the share of those whose
-  requirement covers the defect's call, and the share of those listed. A detection whose requirement
+  requirement covers the defect's call — in the tool's own enumeration at the run's version, taken once
+  a case for each of its requirements, a row that matches the target by the rule above is within the
+  budget of what it asks — and the share of those listed. A detection whose requirement
   does not cover the defect's call is counted apart; without such detections the primary metric is the
   product of the three, so a result below the gate says which stage it failed at.
 - The interval is `metrics.ts`'s: each repository one observation, Clopper–Pearson at 95 %, two-sided.
@@ -305,8 +410,19 @@ a rate a team would not notice. A lower bound above 0 is never the criterion.
 **Guards**, both needed: on the cases scored, the mean number of findings per pull request adjudicated
 false (by `BASELINE.md`'s adjudication) is at most 1, and the listed precision — listed calls that are
 the defect or adjudicated a real defect, over all listed calls — is at least 0.5, point estimates.
+Counted per case over the union of its finished runs' lists (three, or fewer when five attempts did not
+finish three), a call once (`(file, function, call)`): the calls that match the target are the defect;
+every other call is adjudicated by `BASELINE.md`'s adjudication with no baseline's findings, against the
+first requirement, in the spec's order, it was listed under. False findings per pull request are over
+the cases that were run — every case with a requirement, its target named or not; the precision is
+over every case's calls together. A call the adjudicators could not decide counts against the tool in
+both: as a false finding, and as not a real defect. A call the adjudication folds into another as the same sentence counts once, as the
+adjudication does.
 
-**Cost**: a detection bought beyond the provisional cost envelope is not counted as one.
+**Cost**: a detection bought beyond the provisional cost envelope is not counted as one. The tool's own
+limits for one pull request are the envelope's 400 requests and 4 MB, and a run cut short there does
+not finish, so it is not one of the three runs a detection needs. The run records each run's time, and
+the 600 seconds are reported, not checked.
 
 **Stop rule**: unless the lower bound is above 0.20 and both guards hold, the roadmap does not go on to
 #90, #91 or #92. A failed gate is a product result. It is not answered by rewriting a requirement with
@@ -314,9 +430,10 @@ what F showed, or by lowering the threshold after a sealed result.
 
 Reported with every result: the primary rate and its interval, the rate over cases with a requirement,
 the three stages, how O was found and the rates for each way, the reach origin of each detection, the
-cases caught before the merge and those with checks unknown, the cases whose requirement could not be
-written, false findings per pull request, listed precision, requests, bytes and time, and the
-repositories, cases and runs behind every number.
+cases caught before the merge and those with checks unknown (those not opened, by count), the cases
+whose requirement could not be written, the cases whose target was not named, false findings per pull
+request, listed precision, requests, bytes and time, and the repositories, cases and runs behind every
+number.
 
 ## Where records live
 
