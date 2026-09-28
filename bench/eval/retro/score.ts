@@ -21,7 +21,8 @@ export const CALL_CHARS = 200;
  * `path` says whether the call had a path, so that one side's path is dropped when the other has none.
  */
 export function normalCall(call: string): { name: string; path: string | null } {
-  let s = call.replace(/\s+/g, "");
+  // A comma before a `)` is not part of the call (RETRO.md v10): rustfmt leaves one after a last argument.
+  let s = call.replace(/\s+/g, "").replace(/,\)/g, ")");
   for (let changed = true; changed; ) {
     changed = false;
     if (s.endsWith("?")) (s = s.slice(0, -1)), (changed = true);

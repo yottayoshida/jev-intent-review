@@ -75,7 +75,7 @@ function fixture() {
   writeFileSync(join(clone, "README"), "x\n");
   git("add", "."), git("commit", "-q", "-m", "base");
   const base = git("rev-parse", "HEAD");
-  writeFileSync(join(clone, "src", "a.rs"), "fn load() { read(p); }\n");
+  writeFileSync(join(clone, "src", "a.rs"), "fn load() { read(p); }\nfn save() {\n    write_all(\n        buf,\n        len,\n    );\n}\n");
   git("add", "."), git("commit", "-q", "-m", "o");
   const head = git("rev-parse", "HEAD");
   const work = workOf(join(root, "work"));
@@ -177,8 +177,10 @@ test("a target is found at O's head only with its file, its function and its cal
     const all = () => true;
     assert.equal(foundAt(f.clone, f.head, target, all), true);
     assert.equal(foundAt(f.clone, f.head, { ...target, file: "src/b.rs" }, all), false);
-    assert.equal(foundAt(f.clone, f.head, { ...target, function: "save" }, all), false);
+    assert.equal(foundAt(f.clone, f.head, { ...target, function: "missing" }, all), false);
     assert.equal(foundAt(f.clone, f.head, { ...target, call: "write(p)" }, all), false);
+    // rustfmt's comma after the last argument is not part of the call (RETRO.md v10).
+    assert.equal(foundAt(f.clone, f.head, { file: "src/a.rs", function: "save", call: "write_all(buf, len)" }, all), true);
     // Not at the base: the file came with O.
     assert.equal(foundAt(f.clone, f.base, target, all), false);
   } finally {

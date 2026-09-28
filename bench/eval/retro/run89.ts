@@ -1,4 +1,4 @@
-// The retrospective's opening and run (#89, RETRO.md v7-v9), through `run.ts --set sealed … --measurement
+// The retrospective's opening and run (#89, RETRO.md v7-v10), through `run.ts --set sealed … --measurement
 // "#89"`: the checks before an opening, the cases laid out as #80's are, the tool run three times on each
 // case with a requirement, every requirement enumerated, the calls that are not the target adjudicated,
 // and the score. Nothing of a case is printed or written into the repository: the report holds numbers.
@@ -20,7 +20,7 @@ import { matches, normalCall, sameFile, score, type Call, type ScoredCase, type 
 const sha256 = (b: string | Buffer) => createHash("sha256").update(b).digest("hex");
 
 /** RETRO.md's version these runs follow. */
-export const RETRO_VERSION = 9;
+export const RETRO_VERSION = 10;
 export const OPENED = 17;
 
 /** A case of this measurement laid out for a run: #80's shape, and what only the score reads. */
@@ -204,7 +204,7 @@ export function foundAt(clone: string, head: string, target: Call, only: (name: 
     .filter((p) => p !== "" && sameFile(p, target.file, only))
     .some((p) => {
       const text = git("show", `${head}:${p}`);
-      return new RegExp(`\\bfn\\s+${fn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(text) && text.replace(/\s+/g, "").includes(call);
+      return new RegExp(`\\bfn\\s+${fn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(text) && text.replace(/\s+/g, "").replace(/,\)/g, ")").includes(call);
     });
 }
 
@@ -249,5 +249,5 @@ export function expectedRows(records: readonly RowRecord[], split: Pick<Split, "
 }
 
 /** The files a #89 opening and its run are held to. */
-export const DECIDING = ["bench/eval/run.ts", "bench/eval/sealed.ts", "bench/eval/adjudicate.ts", "bench/eval/metrics.ts", "bench/eval/split.ts", "bench/eval/baseline.ts", "bench/eval/compare.ts", "bench/eval/json-in.ts", "bench/eval/n1.ts", "bench/eval/sealed-batches.json", "bench/eval/retro/frozen.json", "bench/eval/retro/run89.ts", "bench/eval/retro/score.ts", "bench/eval/retro/target.ts", "bench/eval/retro/screen.ts", "bench/acceptance/run.ts", "bench/acceptance/score.ts", "bench/acceptance/replay.ts"] as const;
+export const DECIDING = ["bench/eval/RETRO.md", "bench/eval/run.ts", "bench/eval/sealed.ts", "bench/eval/adjudicate.ts", "bench/eval/metrics.ts", "bench/eval/split.ts", "bench/eval/baseline.ts", "bench/eval/compare.ts", "bench/eval/json-in.ts", "bench/eval/n1.ts", "bench/eval/sealed-batches.json", "bench/eval/retro/frozen.json", "bench/eval/retro/run89.ts", "bench/eval/retro/score.ts", "bench/eval/retro/target.ts", "bench/eval/retro/screen.ts", "bench/acceptance/run.ts", "bench/acceptance/score.ts", "bench/acceptance/replay.ts"] as const;
 

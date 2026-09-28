@@ -190,7 +190,7 @@ export async function runSealed(deps: SealedDeps, runId: string): Promise<Result
 }
 
 // ---------------------------------------------------------------------------------------------
-// #89, the retrospective (RETRO.md v7-v9): its own line, the same access log and counting.
+// #89, the retrospective (RETRO.md v7-v10): its own line, the same access log and counting.
 
 export interface RetroOpenLine {
   kind: "open";
@@ -352,7 +352,7 @@ export const realDeps: SealedDeps = {
 /** What #89's `prepare` built in this process, for `measure` to run on. */
 const prepared89 = new Map<string, { work: Work; cases: RetroCase[]; screened: ReturnType<typeof screenedOf> }>();
 
-/** #89's checks and cases (RETRO.md v7-v9), from the sandbox's `batches` at `pinned` or its tip. */
+/** #89's checks and cases (RETRO.md v7-v10), from the sandbox's `batches` at `pinned` or its tip. */
 async function prepareRetro(work: Work, pinned: Record<string, string> | undefined, side: "sealed" | "dev", only: readonly number[] | null) {
   const commits = fetchSandbox(work, ["batches"], pinned);
   const view = gitSandbox(work.sandbox);

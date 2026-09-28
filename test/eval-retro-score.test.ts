@@ -120,6 +120,10 @@ test("a call at the end of a chain is matched by its own name and arguments, wha
   // A comparison in the receiver's arguments does not hide the called name.
   assert.equal(normalCall("a.b(x < y).c()").name, "c()");
   assert.equal(normalCall("a.b(x > y, z).c(w)").name, "c(w)");
+  // A comma rustfmt leaves after the last argument is not part of the call (RETRO.md v10).
+  assert.equal(normalCall("apply( a, b, )").name, "apply(a,b)");
+  assert.equal(matches(at("run(store, rate, token, )"), at("run(store, rate, token)"), only), true);
+  assert.equal(matches(at("f(g(x,), y,)"), at("f(g(x), y)"), only), true);
 });
 
 test("a target not found in O's head is not detected, and is counted apart", () => {
