@@ -33,6 +33,19 @@
       ]
     },
     {
+      "repo": "ai-dynamo/dynamo",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "alacritty/alacritty",
       "side": "dev",
       "fixed": true,
@@ -65,6 +78,19 @@
       ]
     },
     {
+      "repo": "anvai-labs/proximadb",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "apache/datafusion",
       "side": "sealed",
       "fixed": false,
@@ -77,6 +103,19 @@
         "id": "b2"
       },
       "readAs": "spiceai/datafusion"
+    },
+    {
+      "repo": "api7/aisix",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "aptos-labs/aptos-core",
@@ -192,6 +231,19 @@
       }
     },
     {
+      "repo": "bitty-terminal/bitty",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "blackcat-informatics/purrdf",
       "side": "sealed",
       "fixed": false,
@@ -232,6 +284,19 @@
       "why": [
         "sentence-choice: used to build or tune"
       ]
+    },
+    {
+      "repo": "button-inc/batten",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "caliban-ai/caliban",
@@ -323,6 +388,19 @@
       ]
     },
     {
+      "repo": "daniel-t-s-adams/tig-mining-pool-public",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "dashpay/grovedb",
       "side": "dev",
       "fixed": true,
@@ -373,6 +451,19 @@
       ]
     },
     {
+      "repo": "drasi-project/drasi-core",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "dsx-ai-factory/infra-controller",
       "side": "dev",
       "fixed": true,
@@ -402,6 +493,19 @@
       }
     },
     {
+      "repo": "effortlessmetrics/copybook-rs",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "esoltys/luminous",
       "side": "sealed",
       "fixed": false,
@@ -421,6 +525,45 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "fagemx/edda",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
+      "repo": "feldera/feldera",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
+      "repo": "ferriskey/ferriskey",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "folo-rs/folo",
@@ -552,6 +695,19 @@
       ]
     },
     {
+      "repo": "jdx/communique",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "jonathangadeaharder/pytest-linter",
       "side": "dev",
       "fixed": true,
@@ -581,6 +737,19 @@
       }
     },
     {
+      "repo": "juspay/hyperswitch-prism",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "keinsleif/sbsp",
       "side": "sealed",
       "fixed": false,
@@ -600,6 +769,19 @@
       "why": [
         "acceptance-v2: in the pool before protocol v1"
       ]
+    },
+    {
+      "repo": "kent8192/reinhardt-web",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "kexa-io/kxn",
@@ -635,6 +817,19 @@
         "acceptance-v1: the tool was run on it for (b)",
         "bench/acceptance/cases/kontor-385: built or pre-checked"
       ]
+    },
+    {
+      "repo": "krabka-io/krabka-broker",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "kyomi-ai/kyomi",
@@ -697,6 +892,19 @@
       "batch": {
         "measurement": "#80",
         "id": "b1"
+      }
+    },
+    {
+      "repo": "majiayu000/harness",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
       }
     },
     {
@@ -916,6 +1124,19 @@
       }
     },
     {
+      "repo": "platformed-com/platformed-llm",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "pnpm/pnpm",
       "side": "dev",
       "fixed": true,
@@ -937,6 +1158,19 @@
       }
     },
     {
+      "repo": "prokosna/tradr",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "qdrant/qdrant",
       "side": "dev",
       "fixed": true,
@@ -952,6 +1186,19 @@
         "acceptance-v1: the tool was run on it for (b)",
         "bench/acceptance/cases/quebec-136: built or pre-checked"
       ]
+    },
+    {
+      "repo": "redisjson/redisjson",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
     },
     {
       "repo": "risingtides-dev/ocean-os",
@@ -1114,6 +1361,19 @@
       ]
     },
     {
+      "repo": "solvela-ai/solvela",
+      "side": "sealed",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "stacks-network/stacks-core",
       "side": "dev",
       "fixed": false,
@@ -1127,6 +1387,19 @@
       }
     },
     {
+      "repo": "statecrafting/spec-spine",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
+        "id": "b2"
+      }
+    },
+    {
       "repo": "takazudo/zudo-front-builder",
       "side": "sealed",
       "fixed": false,
@@ -1136,6 +1409,19 @@
       "salt": "4dffed63052809ff69b1eee066c4eae88b6c6ed1",
       "batch": {
         "measurement": "#80",
+        "id": "b2"
+      }
+    },
+    {
+      "repo": "tamnd/rudb-compat",
+      "side": "dev",
+      "fixed": false,
+      "why": [
+        "#89 b2: a case (RETRO.md, \"Candidates\"); placed by the hash"
+      ],
+      "salt": "6924dc78910315faba80959cb6e50347f1691b93",
+      "batch": {
+        "measurement": "#89",
         "id": "b2"
       }
     },
