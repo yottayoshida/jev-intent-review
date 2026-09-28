@@ -72,6 +72,23 @@ export const LEAK_SYSTEM = [
   'Answer with JSON only: {"requirements":[{"text":"...","quote":"..."}]}.',
 ].join("\n");
 
+/** The target step's prompts (RETRO.md v7, "Opening and targets"): their own version, apart from `PROMPTS_VERSION`. */
+export const TARGET_PROMPTS_VERSION = 1;
+
+/** Names the defect's call in the earlier code, from the later fix. */
+export const TARGET_SYSTEM = [
+  "You are given a later pull request that fixed a defect: its title and description, its diff, and the files it changed as they stood when the earlier pull request that put the defect in had merged (lines may have moved since; the diff is against a later version).",
+  "The defect is in how the code handled a failure: an operation that can fail, whose failure the earlier code did not bring to its caller as an error. Name the one call whose failure the later fix changed the handling of, in the files as given.",
+  'Answer with JSON only: {"file":"path/as/given","function":"the enclosing fn name","call":"the call as written, with its arguments","quote":"the line holding it, word for word"}, or {"none":"why"} when no single call can be named.',
+].join("\n");
+
+/** Checks a named call against the later fix. */
+export const TARGET_CHECK_SYSTEM = [
+  "You are given a later pull request that fixed a defect in how the code handled a failure — its title, description and diff — the files it changed as they stood when the earlier pull request had merged, and a call someone named as the one whose failure the fix changed the handling of.",
+  "Say whether that call is the one: the fix changes what happens when that call fails. A call next to it, or one the fix only moved, is not.",
+  'Answer with JSON only: {"agree":true|false,"why":"..."}.',
+].join("\n");
+
 export const CAUGHT_SYSTEM = [
   "You are given the review comments, bot reviews and check results a pull request had before it merged, and a description of a defect found later.",
   "Say whether any of them pointed at that defect before the merge: the failing call, or what happens when it fails, in the code the defect is in. A general remark about error handling elsewhere does not count.",
