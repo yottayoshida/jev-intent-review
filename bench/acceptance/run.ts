@@ -3,7 +3,7 @@
 //
 //   node bench/acceptance/run.ts precheck <case> <clone>          no request; writes case.json
 //   node bench/acceptance/run.ts estimate                          no request; the planned total
-//   node bench/acceptance/run.ts measure  <case> <clone> <limit> <sibling|again>
+//   node bench/acceptance/run.ts measure  <case> <clone> <limit> <sibling|again|callee>
 //                                                                  requests; appends to the log named
 //
 // It drives the built command (`dist/cli/main.js`, run `npm run build` first) through `main`, the
@@ -42,11 +42,13 @@ const DIST = new URL("../../dist/", import.meta.url);
  * Where a measurement is written, named on the command line so that none is written by default,
  * with what it is about for `replay.ts` to state and to gate: `sibling` is the measurement of one
  * sibling's defect (`claim: "sibling"`, candidates-v2.json, #37), `again` the
- * acceptance set measured again with a later tool, of the same kind as v2 (#38).
+ * acceptance set measured again with a later tool, of the same kind as v2 (#38), `callee` moltis#1064
+ * with the bodies of what the changed code calls read (#37, ADR 0028; defect-C is in one of them).
  */
 const LOGS = {
   sibling: { file: join(HERE, "..", "logs", "acceptance-v3.json"), claim: "sibling" },
   again: { file: join(HERE, "..", "logs", "acceptance-v4.json"), claim: undefined },
+  callee: { file: join(HERE, "..", "logs", "acceptance-v5.json"), claim: "callee" },
 } as const;
 type LogName = keyof typeof LOGS;
 const RUNS = 3;
@@ -309,8 +311,8 @@ if (process.argv[1] === undefined || realpathSync(process.argv[1]) !== fileURLTo
   // Imported (bench/eval/run.ts): no command line to read.
 } else if (mode === "precheck" && id && clone) await precheck(id, clone);
 else if (mode === "estimate") console.log(`planned at most ${estimate(id)} requests across the live branches${id ? ` of ${id}` : ""}`);
-else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again")) await measure(id, clone, Number(limit), LOGS[which]);
+else if (mode === "measure" && id && clone && limit && (which === "sibling" || which === "again" || which === "callee")) await measure(id, clone, Number(limit), LOGS[which]);
 else {
-  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again>");
+  console.error("usage: run.ts precheck <case> <clone> | estimate [<case>] | measure <case> <clone> <limit> <sibling|again|callee>");
   process.exitCode = 2;
 }
