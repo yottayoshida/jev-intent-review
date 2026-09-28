@@ -311,7 +311,7 @@ the ones of `BASELINE.md`, and are not these.)
   targets (`batches/89-targets.json`).
 - **The target** of a case — the defect's call in O — is named by an annotator (`TARGET_SYSTEM`, the
   annotators of "Writing and checking the requirement": `claude -p`, no tools, a fixed prompt). It is
-  given F's bundle (title and description), F's diff, and each file F changed as it stands at the head
+  given F's bundle (title and description), F's diff, and each Rust file F changed as it stands at the head
   O is measured at (below, "A case is measured") — under F's base name when F renamed it — and answers with one call as `{file, function, call, quote}`.
   Another annotator (`TARGET_CHECK_SYSTEM`) is given the same and the answer, and says whether that is
   the call F fixed. A request over the size of version 5 is not sent. An answer that cannot be counted is
@@ -333,7 +333,11 @@ the ones of `BASELINE.md`, and are not these.)
   them again is a new version of this file. Before the sealed ones, the step is tried on this
   measurement's dev cases and its yield counted; below two in three named there, `TARGET_SYSTEM` is
   changed on dev before the sealed ones are named — at most twice; after that the sealed ones are
-  named with it as it is.
+  named with it as it is. The first dev attempt (2026-09-28) named 7 of 13; of the six not named, three
+  were defects outside Rust (a workflow, a shell script, a benchmark's configuration) that the tool
+  cannot list, one was no failure-handling defect, one had its call in a file F created, one was over
+  the size. The first change gives the annotators Rust files only and asks for a Rust call with its
+  parentheses (`TARGET_PROMPTS_VERSION` 2).
 
 ## Scoring
 
