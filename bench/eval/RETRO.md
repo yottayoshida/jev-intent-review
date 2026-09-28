@@ -84,7 +84,17 @@ write, 1 had a gap in O's bundle. Left out: 33 screened as not failure handling,
 other and 2 as `cannot_label`, 13 without O, 3 whose fix's material was not complete, 2 not pull
 requests, 1 whose screen request was over the size, and 15 rows of a repository that had its case
 (b1's among them). 339 annotator runs of the 500 allowed (owner); the run was stopped once by the owner
-at row 172 and resumed there. Its repositories are placed once this line is on main.
+at row 172 and resumed there. Its repositories are placed by the salt `6924dc7` (the merge of #135):
+**22 of its 23, 15 sealed and 7 dev**. The 23rd, `randomcash/ethpayserver`, had a row read in `b1` that
+was no case and a row in `b2` that was; `PROTOCOL.md` rule 5 salts a repository by the first batch that
+read one of its rows, so that its side is drawn once, and `b1` kept 19 without it. It is not placed and
+its case is not used (owner, 2026-09-28): neither rule was changed to fit one repository, and its side
+was not looked at before deciding. `b2` therefore has 22 of its `kept` 23 on the split, and
+`screen.ts` refuses a next batch — which the cap does not call for.
+
+**The sealed side now holds 24 repositories with a case not caught before the merge (b1's 12, b2's
+15 less the 3 caught), over the 17 the cap stops at**, so no further batch is read. Which 17 are opened,
+and how, is decided with this measurement's opening and run (version 6).
 
 ## The question
 
