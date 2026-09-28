@@ -22,7 +22,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Split } from "../split.ts";
 import { arrivedBetween, cloneInto, n1Problem, readAppended, workspaceState } from "./calibrate.ts";
-import { ghApi, PIPED } from "./gh.ts";
+import { ghApi, isGone, PIPED } from "./gh.ts";
 import { fetchBundle, type Bundle } from "./material.ts";
 import { annotate, TARGET_CHECK_SYSTEM, TARGET_PROMPTS_VERSION, TARGET_SYSTEM, WRITE_SYSTEM, writeRequest, type Answer } from "./prompts.ts";
 import { batchProblem, overSize, type RowRecord } from "./screen.ts";
@@ -73,14 +73,16 @@ export type NotNamed =
   | "a call without ("
   | "a request over the size"
   | "an answer never counted"
-  | "no file of the fix at O's head";
+  | "no file of the fix at O's head"
+  | "O cannot be read";
 
 export interface TargetRecord {
   row: number;
   ref: string;
   repo: string;
   origin: number;
-  landed: Landed;
+  /** `null` when GitHub no longer has O. */
+  landed: Landed | null;
   target: Named | null;
   why?: NotNamed;
   answers: Answer[];
@@ -120,12 +122,20 @@ const namedOf = (j: unknown): Named | "none" | null => {
 /** One case's target: the namer, then the checker. Never throws for want of an answer. */
 export function nameTarget(c: { row: number; ref: string; repo: string; origin: number }, deps: TargetDeps): TargetRecord {
   const answers: Answer[] = [];
-  const landed = deps.landed(c.repo, c.origin);
+  let landed: Landed | null;
+  try {
+    landed = deps.landed(c.repo, c.origin);
+  } catch (error) {
+    // GitHub no longer having O is a fact about the case (RETRO.md v9); a rate limit or the network stops.
+    if (!isGone(error)) throw error;
+    landed = null;
+  }
   const rec = (target: Named | null, why?: NotNamed): TargetRecord => ({ row: c.row, ref: c.ref, repo: c.repo, origin: c.origin, landed, target, ...(why ? { why } : {}), answers });
+  if (landed === null) return rec(null, "O cannot be read");
   const fix = deps.fix(c.repo, Number(c.ref.split("#")[1]));
   // Rust files only: the tool reads Rust, and a defect elsewhere is one it cannot list (dev, 2026-09-28).
   const files = changedFiles(fix.diff).filter((p) => p.endsWith(".rs")).flatMap((p): [string, string][] => {
-    const text = deps.fileAt(c.repo, landed.head, p);
+    const text = deps.fileAt(c.repo, landed!.head, p);
     return text === null ? [] : [[p, text]];
   });
   if (files.length === 0) return rec(null, "no file of the fix at O's head");

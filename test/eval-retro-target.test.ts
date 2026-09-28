@@ -148,3 +148,10 @@ test("only Rust files are given: a fix that changed none has no file to name fro
   assert.deepEqual([r.target, r.why, calls.length], [null, "no file of the fix at O's head", 0]);
   assert.deepEqual(changedFiles(DIFF + "diff --git a/run.sh b/run.sh\n").filter((p) => p.endsWith(".rs")), ["src/a.rs"]);
 });
+
+test("an O that GitHub no longer has is a target not named; another failure still stops", () => {
+  const { d, calls } = deps();
+  const gone = nameTarget(c, { ...d, landed: () => { throw Object.assign(new Error("Command failed"), { stderr: "gh: Not Found (HTTP 404)" }); } });
+  assert.deepEqual([gone.target, gone.why, gone.landed, calls.length], [null, "O cannot be read", null, 0]);
+  assert.throws(() => nameTarget(c, { ...d, landed: () => { throw Object.assign(new Error("Command failed"), { stderr: "gh: API rate limit exceeded (HTTP 403)" }); } }), /Command failed/);
+});
