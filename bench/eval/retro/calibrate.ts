@@ -303,23 +303,27 @@ export function devCandidates(pool: Pick<Pool, "rows">): (Candidate & { label80:
 
 const EARLIEST_FIX = "2026-07-01";
 
+/**
+ * A full clone of `repo` under `clones`, fetched when it is there already. Not a partial clone (as
+ * `bench/packet-reuse.ts`): `blame -C` reads the files of every commit it walks, and a `blob:none` clone
+ * fetches each one over the network — measured 2026-09-27 on a dev repository, 22 s for one line's blame
+ * against 0 s in a full clone, and hours on a large one. A partial clone left from before stays partial
+ * on fetch: refused, so a run never goes back to it.
+ */
+export function cloneInto(clones: string, repo: string): string {
+  const dir = join(clones, repo.replace("/", "__"));
+  if (!existsSync(dir)) execFileSync("git", ["clone", "-q", "--no-checkout", `https://github.com/${repo}.git`, dir], { stdio: "ignore" });
+  else {
+    if (spawnSync("git", ["-C", dir, "config", "--get", "remote.origin.partialclonefilter"], { stdio: PIPED }).status === 0) throw new Error("a partial clone is in the clones directory; use a new one");
+    execFileSync("git", ["-C", dir, "fetch", "-q", "origin"], { stdio: "ignore" });
+  }
+  return dir;
+}
+
 export function realCalDeps(clones: string, labels80: Map<string, Label>, empty: string): CalDeps {
   const api = ghApi;
   const defaults = new Map<string, string>();
-  const cloneOf = (repo: string) => {
-    const dir = join(clones, repo.replace("/", "__"));
-    // Not a partial clone (as `bench/packet-reuse.ts`): `blame -C` reads the files of every commit it
-    // walks, and a `blob:none` clone fetches each one over the network — measured 2026-09-27 on a dev
-    // repository, 22 s for one line's blame against 0 s in a full clone, and hours on a large one.
-    if (!existsSync(dir)) execFileSync("git", ["clone", "-q", "--no-checkout", `https://github.com/${repo}.git`, dir], { stdio: "ignore" });
-    // A clone taken before the fix merged may not hold its base: fetched every time it is used. A partial
-    // clone left from before stays partial on fetch: refused, so the run never goes back to it.
-    else {
-      if (spawnSync("git", ["-C", dir, "config", "--get", "remote.origin.partialclonefilter"], { stdio: PIPED }).status === 0) throw new Error("a partial clone is in the clones directory; use a new one");
-      execFileSync("git", ["-C", dir, "fetch", "-q", "origin"], { stdio: "ignore" });
-    }
-    return dir;
-  };
+  const cloneOf = (repo: string) => cloneInto(clones, repo);
   return {
     fix(repo, number) {
       let p: { merged_at: string | null; base: { sha: string }; title: string; body: string | null };

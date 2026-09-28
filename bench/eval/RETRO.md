@@ -1,4 +1,4 @@
-# The retrospective measurement, version 7 (issue #89)
+# The retrospective measurement, version 8 (issue #89)
 
 **In the retrospective measurement, a requirement is written from material that existed before the
 original pull request merged and from nothing else, by an annotator with no tools and a fixed prompt;
@@ -52,6 +52,10 @@ A case counted as not caught this way counts as not caught in the yield check as
 toward going on. The steps and bytes of a request not sent are kept in the row's record (`notSent`).
 The cap is for the machine the annotators run on (macOS, whose limit is on all arguments together;
 Linux limits one argument to 128 KB, and a run there needs its own cap).
+
+**Version 8** (before any target was named) takes out, for the sealed targets, the runs the command
+printed: the number of answers that reached the checker could be worked out from them, and with it how
+many targets were named. Nothing about scoring changes.
 
 **Version 7** (after `b2` and its placing, before any target was named or any sealed case opened, and
 before any tool was run on one) writes down how a case is scored, all of it before anything that could
@@ -321,8 +325,11 @@ the ones of `BASELINE.md`, and are not these.)
 - **Only the answer is frozen.** No tool is run on a sealed case before its opening (`PROTOCOL.md` rule
   3). The answers go to the sandbox's `batches` branch as `batches/89-targets.json`, which also holds
   the sha256 of `b1`'s and `b2`'s verdicts; its sha256 goes on main in `bench/eval/retro/frozen.json`,
-  lines only added. **The sealed targets are named once.** The command prints its runs and the sha256,
-  never how many were named — that number would bound the detections before any case is opened. Naming
+  lines only added. **The sealed targets are named once.** For the sealed ones the command prints the sha256 and
+  whether the runs stayed within those allowed — not how many were named, nor its runs, from which the
+  number of answers that reached the checker, and so how many could be named, can be worked out (version
+  8); both are written in the sandbox. A case is named once: a run that stops keeps each case named so
+  far and a later one goes on from the next, and a line of `frozen.json` for them refuses a new naming. Naming
   them again is a new version of this file. Before the sealed ones, the step is tried on this
   measurement's dev cases and its yield counted; below two in three named there, `TARGET_SYSTEM` is
   changed on dev before the sealed ones are named — at most twice; after that the sealed ones are
