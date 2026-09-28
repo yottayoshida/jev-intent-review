@@ -452,14 +452,15 @@ export function main(argv: readonly string[]) {
   if (!Number.isInteger(maxRuns) || maxRuns < 1 || !records) throw new Error("usage: screen.ts run <clones> <records> <max runs>");
   // A batch whose verdicts are written is hashed and may be on main: it is never run again.
   if (existsSync(verdictsFile(records, batch.id))) throw new Error("this batch's verdicts are written; it is not run again");
-  const unplaced = unplacedBatch(lines, { repos: splitEntries() });
-  if (unplaced !== null) throw new Error(unplaced);
   const decided = readRows(records, batch.id, rows);
   const spentFile = join(records, `89-${batch.id}.runs.json`);
   const spent = existsSync(spentFile) ? (JSON.parse(readFileSync(spentFile, "utf8")) as { runs: number }).runs : 0;
   // Nothing runs, the N=1 run included, past the number allowed — nor the N=1 run when no row would fit after it.
   const needed = decided.length < rows.length ? 1 + SCREEN.worstPerRow : 1;
   if (spent + needed > maxRuns) return print({ batch: batch.id, stopped: `${spent} of the ${maxRuns} runs allowed are spent`, runs: spent });
+  // After the budget and before anything runs: an earlier batch not placed yet would let a repository take a second case.
+  const unplaced = unplacedBatch(lines, { repos: splitEntries() });
+  if (unplaced !== null) throw new Error(unplaced);
   const empty = mkdtempSync(join(tmpdir(), "jir-annotator-"));
   const deps = realDeps(clones!, empty);
   // N=1 first, as the calibration: one writer's run and the workspace's state around it. Counted.
