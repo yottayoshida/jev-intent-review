@@ -2,6 +2,11 @@
 
 **Intent-aware review beyond the diff.**
 
+> **Status: maintenance stopped (2026-09-29).** The tool did not pass its own sealed evaluations, whose stop rules were committed before the sealed sets were opened.
+> Against a frontier model given the same requirement, diff and material in one request, it found fewer known defects, not more (−0.47, 2 wins and 15 losses over 17 repositories; [#130](https://github.com/yottayoshida/jev-intent-review/pull/130)).
+> On 17 past defects found after the fact, it detected none ([#146](https://github.com/yottayoshida/jev-intent-review/pull/146)).
+> The code still runs, but no new features or fixes are planned. The npm release stays at v0.1.1; the changes on `main` since then will not be released.
+
 `jev-intent-review` reads a requirement written in a spec, an issue or the pull request, and lists the calls that may break it — including calls in code the diff did not touch — with the evidence for each, so a person can check or reject it.
 It starts from the requirement, not from the changed lines: **the diff is a search hint, not the review boundary.**
 
